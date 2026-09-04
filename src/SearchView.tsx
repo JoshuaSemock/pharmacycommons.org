@@ -37,7 +37,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
           Query drug information by active ingredients,<br className="hidden sm:block" /> formulations, or classes
         </h1>
         <p className="mx-auto max-w-xl font-sans text-[15px] text-sage-600 leading-relaxed mb-8">
-          Information on this website is for educational purposes, not medical advice, we have restructed open source information from, for example the FDA, WHO, and NIH.
+          Information on this website is for educational purposes, not medical advice, we have curated here open source information from, for example the FDA, WHO, and NIH.
         </p>
 
         {/* Search bar */}
@@ -135,8 +135,8 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
         <footer className="mt-16 border-t border-sage-200 pt-8">
           <div className="grid gap-6 sm:grid-cols-3">
             <DataSource icon="🏛️" label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
-            <DataSource icon="🌿" label="EMA EMEA PSUR" desc="Environmental risk assessments and ecopharmacovigilance data" />
             <DataSource icon="🧪" label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
+            <DataSource icon="🌿" label="Founded by Dr. Joshua Semock, PharmD" desc="(Aug. 2026) contact@pharmacycommons.org" />
           </div>
         </footer>
       )}
