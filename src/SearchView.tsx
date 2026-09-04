@@ -14,8 +14,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
 
   const filtered = DRUGS.filter(drug => {
     // Substance entries (alcohol, iodinated contrast media, etc.) exist only
-    // to support linked drug-interaction records — they aren't prescribable
-    // drugs, so they're excluded from general browse/search results.
+    // to support linked drug-interaction records.
     if (drug.entryType === 'substance') return false
     const q = query.toLowerCase()
     const matchesQuery = !query ||
@@ -33,7 +32,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
 
       {/* Hero search */}
       <section className="pt-16 pb-12 text-center">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">Open pharmacology reference</p>
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">Open source pharmacy compendium</p>
         <h1 className="font-display text-4xl sm:text-5xl font-semibold text-sage-900 leading-[1.1] mb-4" style={{ fontFamily: 'var(--font-display)' }}>
           Query drug information by active ingredient,<br className="hidden sm:block" /> formulations, and classes
         </h1>
