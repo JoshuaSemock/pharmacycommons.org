@@ -87,7 +87,7 @@ export const DRUGS: Drug[] = [
     entryType: 'drug',
     schedule: 'Rx',
     therapeuticArea: 'Endocrinology',
-    description: 'First-line oral antidiabetic for type 2 diabetes mellitus. Reduces hepatic glucose production and improves insulin sensitivity without causing hypoglycemia.',
+    description: 'Second-line antidiabetic for type 2 diabetes mellitus. Traditionally used as a first-line oral medication, guidelines now recommend more effective therapies at initiation, except for in pre-diabetes or when only reduction in blood glucose is indicated. Glucose dependent reduction of hepatic glucose production and improvement of insulin sensitivity.',
     classification: {
       mechanism: ['AMPK Activator', 'Hepatic Gluconeogenesis Inhibitor', 'Mitochondrial Complex I Inhibitor'],
       physiologicEffect: ['Decreased Blood Glucose', 'Improved Insulin Sensitivity', 'Reduced Hepatic Glucose Output'],
@@ -107,8 +107,8 @@ export const DRUGS: Drug[] = [
       ],
     },
     clinical: {
-      indications: ['Type 2 diabetes mellitus (first-line)', 'Prediabetes (off-label)', 'Polycystic ovary syndrome (off-label)', 'Weight management adjunct (off-label)'],
-      dosing: 'Initial: 500 mg twice daily or 850 mg once daily with meals. Titrate by 500 mg weekly. Max: 2550 mg/day in divided doses.',
+      indications: ['Type 2 diabetes mellitus (second-line)', 'Prediabetes (off-label)', 'Polycystic ovary syndrome (off-label)', 'Weight management adjunct (off-label)'],
+      dosing: 'Initial: 500 mg twice daily or 850 mg once daily with meals. Titrate by 500 mg weekly. Max: 2550 mg/day in divided doses. Standard dose 1000 mg twice daily with extended release formulation.',
       halfLife: '4–9 hours (plasma); 17.6 hours (blood)',
       proteinBinding: 'Negligible',
       metabolism: 'Not metabolized. Excreted unchanged.',
@@ -139,7 +139,7 @@ export const DRUGS: Drug[] = [
     entryType: 'drug',
     schedule: 'Rx',
     therapeuticArea: 'Psychiatry',
-    description: 'Selective serotonin reuptake inhibitor (SSRI) with broad-spectrum efficacy across mood and anxiety disorders. Most prescribed antidepressant globally by volume.',
+    description: 'Selective serotonin reuptake inhibitor (SSRI) with broad-spectrum efficacy across mood and anxiety disorders. Considered a first-line therapy option for major depressive disorder, however the failure rate typically requires further augmentation of therapy when used at normal doses.',
     classification: {
       mechanism: ['Selective Serotonin Reuptake Inhibitor (SSRI)', 'Sigma-1 Receptor Agonist'],
       physiologicEffect: ['Increased Synaptic Serotonin', 'Anxiolytic Effect', 'Antidepressant Effect'],
@@ -156,8 +156,8 @@ export const DRUGS: Drug[] = [
       ],
     },
     clinical: {
-      indications: ['Major depressive disorder', 'Obsessive-compulsive disorder', 'Panic disorder', 'Post-traumatic stress disorder', 'Social anxiety disorder', 'Premenstrual dysphoric disorder'],
-      dosing: 'MDD/OCD: Initial 50 mg/day. Range 50–200 mg/day. Panic/PTSD/SAD: Initial 25 mg/day, increase to 50 mg after 1 week.',
+      indications: ['Major depressive disorder (MDD)', 'Obsessive-compulsive disorder (OCD)', 'Panic disorder', 'Post-traumatic stress disorder (PTSD)', 'Social anxiety disorder', 'Premenstrual dysphoric disorder'],
+      dosing: 'MDD/OCD: Initial 50 mg/day. Range 50–200 mg/day. Panic/PTSD/social anxiety: Initial 25 mg/day, increase to 50 mg after 1 week.',
       halfLife: '26 hours (sertraline); 62–104 hours (N-desmethylsertraline)',
       proteinBinding: '98%',
       metabolism: 'Extensive hepatic metabolism via CYP2C19, CYP2C9, CYP2D6, CYP3A4',
