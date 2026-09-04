@@ -66,7 +66,7 @@ export default function Nav({ view, onNavigate }: NavProps) {
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
-                placeholder="query the Commons..."
+                placeholder="...query the Commons"
                 className="flex-1 bg-transparent font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none"
               />
               {query && (
