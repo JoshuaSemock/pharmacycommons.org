@@ -38,7 +38,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
           Find a drug, ingredient,<br className="hidden sm:block" /> or formulation
         </h1>
         <p className="mx-auto max-w-xl font-sans text-[15px] text-sage-600 leading-relaxed mb-8">
-          FDA and CDC public records — structured, versioned, and enriched with ecopharmacovigilance metrics for greener prescribing.
+          Information on this website are for educational purposes, where we have restructed open source information from for example the FDA, WHO, and NIH.
         </p>
 
         {/* Search bar */}
