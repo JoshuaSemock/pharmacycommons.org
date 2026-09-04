@@ -14,9 +14,11 @@ export default function Nav({ view, onNavigate }: NavProps) {
 
   const suggestions = query.length > 1
     ? DRUGS.filter(d =>
-        d.name.toLowerCase().includes(query.toLowerCase()) ||
-        d.therapeuticArea.toLowerCase().includes(query.toLowerCase()) ||
-        d.classification.chemicalClass.toLowerCase().includes(query.toLowerCase())
+        d.entryType !== 'substance' && (
+          d.name.toLowerCase().includes(query.toLowerCase()) ||
+          d.therapeuticArea.toLowerCase().includes(query.toLowerCase()) ||
+          d.classification.chemicalClass.some(c => c.toLowerCase().includes(query.toLowerCase()))
+        )
       ).slice(0, 5)
     : []
 
@@ -92,7 +94,7 @@ export default function Nav({ view, onNavigate }: NavProps) {
                     {drug.name.slice(0, 2).toUpperCase()}
                   </span>
                   <span className="flex-1">
-                    <span className="block font-sans text-[13px] font-medium text-sage-900">{drug.name}</span>
+                    <span className="block font-sans text-[11px] text-sage-500">{drug.classification.chemicalClass.join(' / ')} · {drug.therapeuticArea}</span>
                     <span className="block font-sans text-[11px] text-sage-500">{drug.classification.chemicalClass} · {drug.therapeuticArea}</span>
                   </span>
                   <EcoRiskDot risk={drug.eco.risk} />
