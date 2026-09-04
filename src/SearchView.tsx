@@ -32,7 +32,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
 
       {/* Hero search */}
       <section className="pt-16 pb-12 text-center">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">The Pharmacy of the Commons, our open source pharmacy compendium</p>
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">This Pharmacy is our Commons, an open source compendium</p>
         <h1 className="font-display text-4xl sm:text-5xl font-semibold text-sage-900 leading-[1.1] mb-4" style={{ fontFamily: 'var(--font-display)' }}>
           //Query drug information 
           //by active ingredient,<br className="hidden sm:block" /> formulations, 
