@@ -51,7 +51,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="e.g. metformin, SSRI, ACE inhibitor…"
+              placeholder="...ibuprofen, Advil, NSAID, analgesic, etc."
               className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
               autoFocus
             />
