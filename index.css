@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  --color-sage-50:  oklch(97.5% 0.010 145);
+  --color-sage-100: oklch(95.0% 0.018 145);
+  --color-sage-200: oklch(90.5% 0.026 145);
+  --color-sage-300: oklch(84.0% 0.035 145);
+  --color-sage-400: oklch(72.0% 0.050 145);
+  --color-sage-600: oklch(48.0% 0.060 145);
+  --color-sage-700: oklch(38.0% 0.050 145);
+  --color-sage-800: oklch(28.0% 0.038 145);
+  --color-sage-900: oklch(19.0% 0.025 145);
+
+  --color-aqua-100: oklch(93.5% 0.042 162);
+  --color-aqua-200: oklch(88.0% 0.080 162);
+  --color-aqua-300: oklch(83.0% 0.110 162);
+  --color-aqua-400: oklch(77.0% 0.135 162);
+  --color-aqua-500: oklch(70.5% 0.148 162);
+  --color-aqua-600: oklch(62.0% 0.148 162);
+  --color-aqua-700: oklch(52.0% 0.140 162);
+
+  --color-violet-100: oklch(94.0% 0.038 292);
+  --color-violet-200: oklch(88.5% 0.075 292);
+  --color-violet-300: oklch(82.5% 0.110 292);
+  --color-violet-400: oklch(76.0% 0.140 292);
+  --color-violet-600: oklch(60.0% 0.145 292);
+
+  --color-coral-100: oklch(93.0% 0.038 25);
+  --color-coral-200: oklch(87.5% 0.072 25);
+  --color-coral-300: oklch(81.0% 0.105 25);
+  --color-coral-400: oklch(74.5% 0.130 25);
+  --color-coral-600: oklch(58.0% 0.135 25);
+
+  --color-amber-100: oklch(94.0% 0.050 75);
+  --color-amber-400: oklch(78.0% 0.145 75);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: oklch(97.5% 0.010 145);
+  color: oklch(19% 0.025 145);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(84% 0.035 145) transparent;
+}
+
+*::-webkit-scrollbar { width: 5px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: oklch(84% 0.035 145); border-radius: 3px; }
