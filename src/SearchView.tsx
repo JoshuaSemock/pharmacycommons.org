@@ -35,7 +35,7 @@ export default function SearchView({ initialQuery, onNavigate }: SearchViewProps
       <section className="pt-16 pb-12 text-center">
         <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">Open pharmacology reference</p>
         <h1 className="font-display text-4xl sm:text-5xl font-semibold text-sage-900 leading-[1.1] mb-4" style={{ fontFamily: 'var(--font-display)' }}>
-          Find a drug, ingredient,<br className="hidden sm:block" /> or formulation
+          Query drug information by active ingredient,<br className="hidden sm:block" /> formulations, and classes
         </h1>
         <p className="mx-auto max-w-xl font-sans text-[15px] text-sage-600 leading-relaxed mb-8">
           Information on this website are for educational purposes, where we have restructed open source information from for example the FDA, WHO, and NIH.
