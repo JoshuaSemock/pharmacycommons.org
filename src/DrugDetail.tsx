@@ -29,8 +29,8 @@ export default function DrugDetail({ id, onNavigate }: DrugDetailProps) {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-24">
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 py-4 font-sans text-[12px] text-sage-500">
-        <button onClick={() => onNavigate({ type: 'search' })} className="hover:text-aqua-600 transition-colors">
+      <nav className="flex items-center gap-1.5 py-4 font-sans text-[12px] text-sage-400">
+        <button onClick={() => onNavigate({ type: 'search' })} className="hover:text-sage-500 transition-colors">
           Browse
         </button>
         <span>/</span>
