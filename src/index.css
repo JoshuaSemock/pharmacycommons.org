@@ -7,12 +7,6 @@
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
-  --spacing-xs: 0.36rem;   /* 8px */
-  --spacing-sm: 0.62rem;     /* 16px */
-  --spacing-md: 1rem; /* ~26px */
-  --spacing-lg: 1.618rem; /* ~42px */
-  --spacing-xl: 2.618rem; /* ~68px, rare/hero use only */
-
   --color-sage-50:  oklch(97.5% 0.010 145);
   --color-sage-100: oklch(95.0% 0.018 145);
   --color-sage-200: oklch(90.5% 0.026 145);
