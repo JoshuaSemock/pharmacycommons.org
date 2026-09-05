@@ -42,12 +42,7 @@ export default function Nav({ view, onNavigate }: NavProps) {
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
 
         {/* Wordmark */}
-        <button
-          onClick={() => onNavigate({ type: 'search' })}
-          className="flex shrink-0 items-center gap-2.5 group"
-          aria-label="Pharmacy Commons home"
-        
-        </button>
+       
         <button
           onClick={() => onNavigate({ type: 'search' })}
           className="flex shrink-0 items-center gap-2.5 group"
