@@ -46,15 +46,20 @@ export default function Nav({ view, onNavigate }: NavProps) {
           onClick={() => onNavigate({ type: 'search' })}
           className="flex shrink-0 items-center gap-2.5 group"
           aria-label="Pharmacy Commons home"
+        
+        </button>
+        <button
+          onClick={() => onNavigate({ type: 'search' })}
+          className="flex shrink-0 items-center gap-2.5 group"
+          aria-label="Pharmacy Commons home"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-aqua-400 text-sage-900 transition-colors group-hover:bg-aqua-500">
-            <RxGlyph />
-          </span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sage-100">
+  <img src="/logo.png" alt="" className="h-5 w-5 object-contain" />
+</span>
           <span className="hidden font-sans text-[15px] font-medium tracking-[-0.01em] text-sage-900 sm:block">
             Pharmacy Commons
           </span>
         </button>
-
         {/* Search */}
         <div className="relative flex-1 max-w-lg">
           <form onSubmit={handleSubmit}>
