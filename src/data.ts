@@ -735,10 +735,10 @@ export const DRUGS: Drug[] = [
 ]
 
 export const CATEGORIES = [
-  { id: 'mechanism', label: 'Mechanism of Action', count: 0, color: 'violet' as const },
-  { id: 'drug', label: 'Drugs', count: 3094, color: 'aqua' as const },
-  { id: 'chemical', label: 'Chemical Class', count: 0, color: 'sage' as const },
   { id: 'eco', label: 'Environmental Impact', count: 11, color: 'coral' as const },
+  { id: 'drug', label: 'Drug', count: 3094, color: 'aqua' as const },
+  { id: 'chemical', label: 'Chemical Class', count: 0, color: 'sage' as const },
+  
 ]
 
 export const ECO_RISK_COLORS: Record<EcoRisk, { bg: string; text: string; border: string; label: string }> = {
