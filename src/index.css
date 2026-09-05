@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:...');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:...');
 @import 'tailwindcss';
+
 @theme {
   --font-display: 'Fraunces', Georgia, serif;
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
@@ -58,7 +59,37 @@ body {
   scrollbar-width: thin;
   scrollbar-color: oklch(84% 0.035 145) transparent;
 }
-
 *::-webkit-scrollbar { width: 5px; height: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: oklch(84% 0.035 145); border-radius: 3px; }
+
+/* Background texture overlay */
+.page-background {
+  position: relative;
+  min-height: 100vh;
+}
+
+.page-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("/assets/textures/lichen_seamless.jpg");
+  background-repeat: repeat;
+  background-size: 512px auto;
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-background::before {
+    mix-blend-mode: overlay;
+    opacity: 0.06;
+  }
+}
