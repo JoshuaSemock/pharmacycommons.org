@@ -77,8 +77,8 @@ body {
   z-index: 0;
   background-image: url("/assets/textures/lichen_seamless.jpg");
   background-repeat: repeat;
-  background-size: 2160px auto;
-  opacity: 0.06;
+  background-size: 1080px auto;
+  opacity: 0.04;
   mix-blend-mode: multiply;
 }
 
