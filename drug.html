@@ -142,36 +142,53 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         async function loadProfile() {
-            const params = new URLSearchParams(window.location.search);
-            const drugId = params.get('id');
-
-            if (!drugId) {
-                document.getElementById('drug-title').innerText = "Entity Not Found";
-                document.getElementById('drug-content').innerHTML = "<p>No PCID or generic name provided in the URL.</p>";
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from('drugs')
-                .select('*')
-                .eq('id', drugId)
-                .single();
-
-            if (data) {
-                document.getElementById('drug-title').innerText = data.generic_name;
-                
-                // Parse wiki-links
-                const parsedContent = data.wiki_markup.replace(/\[\[(.*?)\]\]/g, '<a href="/drug.html?id=$1">$1</a>');
-                document.getElementById('drug-content').innerHTML = parsedContent;
-
-                // Hydrate Infobox
-                document.getElementById('drug-infobox').style.display = 'block';
-                document.getElementById('meta-id').innerText = data.id;
-                document.getElementById('meta-moa').innerText = data.moa || 'N/A';
-                document.getElementById('meta-pe').innerText = data.pe || 'N/A';
-                document.getElementById('meta-cs').innerText = data.cs || 'N/A';
+        const params = new URLSearchParams(window.location.search);
+        const drugId = params.get('id');
+    
+        if (!drugId) {
+            document.getElementById('drug-title').innerText = "Entity Not Found";
+            document.getElementById('drug-content').innerHTML = "<p>No PCID or generic name provided in the URL.</p>";
+            return;
+        }
+    
+        // Execute the relational join
+        const { data, error } = await supabase
+            .from('drugs')
+            .select(`
+                *,
+                class_definitions (
+                    class_name,
+                    moa,
+                    pe,
+                    cs
+                )
+            `)
+            .eq('id', drugId)
+            .single(); //[cite: 1]
+    
+        if (data) {
+            document.getElementById('drug-title').innerText = data.generic_name;
+            
+            // Parse wiki-links
+            const parsedContent = data.wiki_markup.replace(/\[\[(.*?)\]\]/g, '<a href="/drug.html?id=$1">$1</a>'); //
+            document.getElementById('drug-content').innerHTML = parsedContent;
+    
+            // Hydrate Infobox with nested relational data
+            document.getElementById('drug-infobox').style.display = 'block';
+            document.getElementById('meta-id').innerText = data.id;
+            
+            // Safely unpack the joined class_definitions object
+            if (data.class_definitions) {
+                document.getElementById('meta-moa').innerText = data.class_definitions.moa || 'N/A';
+                document.getElementById('meta-pe').innerText = data.class_definitions.pe || 'N/A';
+                document.getElementById('meta-cs').innerText = data.class_definitions.cs || 'N/A';
+            } else {
+                document.getElementById('meta-moa').innerText = 'Unclassified';
+                document.getElementById('meta-pe').innerText = 'Unclassified';
+                document.getElementById('meta-cs').innerText = 'Unclassified';
             }
         }
+    }
         
         loadProfile();
     </script>
