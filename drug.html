@@ -62,6 +62,23 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Button Styling Added for Editor */
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary { background: var(--moss-700); color: var(--bg); }
+        .btn-primary:hover { background: var(--moss-900); }
+        .btn-secondary { background: var(--bg-raised); color: var(--ink); border: 1px solid var(--line); }
+        .btn-secondary:hover { background: var(--line); }
+
         .infobox {
             background: var(--bg-raised);
             border: 1px solid var(--line);
@@ -111,6 +128,14 @@
 
     <main class="article-body">
         <h1 id="drug-title">Loading...</h1>
+        
+        <!-- Editor Toggle & Workspace -->
+        <div style="margin-bottom: 1rem;">
+            <button id="edit-btn" onclick="toggleEdit()" class="btn btn-secondary" style="display: none;">Edit Monograph</button>
+            <button id="save-btn" onclick="saveArticle()" class="btn btn-primary" style="display: none;">Save Changes</button>
+        </div>
+        <textarea id="drug-editor" style="display: none; width: 100%; height: 400px; font-family: 'IBM Plex Mono', monospace; padding: 1rem; border: 1px solid var(--line); background: var(--bg-raised); color: var(--ink); border-radius: var(--radius); margin-bottom: 1rem; box-sizing: border-box;"></textarea>
+
         <div id="drug-content">
             <p style="color: var(--ink-soft);">Querying the compendium...</p>
         </div>
@@ -140,55 +165,104 @@
         const supabaseUrl = 'https://nenwovhyrdcdkhxzjiiv.supabase.co';
         const supabaseKey = 'sb_publishable_n2bmQaOdwbOvqO1QhSuAgw_RxO-mLYQ';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let rawWikiMarkup = ''; // Variable to hold the raw markdown for the editor
 
         async function loadProfile() {
-        const params = new URLSearchParams(window.location.search);
-        const drugId = params.get('id');
-    
-        if (!drugId) {
-            document.getElementById('drug-title').innerText = "Entity Not Found";
-            document.getElementById('drug-content').innerHTML = "<p>No PCID or generic name provided in the URL.</p>";
-            return;
-        }
-    
-        // Execute the relational join
-        const { data, error } = await supabase
-            .from('drugs')
-            .select(`
-                *,
-                class_definitions (
-                    class_name,
-                    moa,
-                    pe,
-                    cs
-                )
-            `)
-            .eq('id', drugId)
-            .single(); //[cite: 1]
-    
-        if (data) {
-            document.getElementById('drug-title').innerText = data.generic_name;
-            
-            // Parse wiki-links
-            const parsedContent = data.wiki_markup.replace(/\[\[(.*?)\]\]/g, '<a href="/drug.html?id=$1">$1</a>'); //
-            document.getElementById('drug-content').innerHTML = parsedContent;
-    
-            // Hydrate Infobox with nested relational data
-            document.getElementById('drug-infobox').style.display = 'block';
-            document.getElementById('meta-id').innerText = data.id;
-            
-            // Safely unpack the joined class_definitions object
-            if (data.class_definitions) {
-                document.getElementById('meta-moa').innerText = data.class_definitions.moa || 'N/A';
-                document.getElementById('meta-pe').innerText = data.class_definitions.pe || 'N/A';
-                document.getElementById('meta-cs').innerText = data.class_definitions.cs || 'N/A';
-            } else {
-                document.getElementById('meta-moa').innerText = 'Unclassified';
-                document.getElementById('meta-pe').innerText = 'Unclassified';
-                document.getElementById('meta-cs').innerText = 'Unclassified';
+            const params = new URLSearchParams(window.location.search);
+            const drugId = params.get('id');
+        
+            if (!drugId) {
+                document.getElementById('drug-title').innerText = "Entity Not Found";
+                document.getElementById('drug-content').innerHTML = "<p>No PCID or generic name provided in the URL.</p>";
+                return;
+            }
+        
+            // Execute the relational join
+            const { data, error } = await supabase
+                .from('drugs')
+                .select(`
+                    *,
+                    class_definitions (
+                        class_name,
+                        moa,
+                        pe,
+                        cs
+                    )
+                `)
+                .eq('id', drugId)
+                .single(); 
+        
+            if (data) {
+                document.getElementById('drug-title').innerText = data.generic_name;
+                
+                // Save raw markup for the editor
+                rawWikiMarkup = data.wiki_markup || '';
+                
+                // Reveal the edit button now that data is loaded
+                document.getElementById('edit-btn').style.display = 'inline-block';
+                
+                // Parse wiki-links
+                const parsedContent = rawWikiMarkup.replace(/\[\[(.*?)\]\]/g, '<a href="/drug.html?id=$1">$1</a>'); 
+                document.getElementById('drug-content').innerHTML = parsedContent || 'No monograph written yet.';
+        
+                // Hydrate Infobox with nested relational data
+                document.getElementById('drug-infobox').style.display = 'block';
+                document.getElementById('meta-id').innerText = data.id;
+                
+                // Safely unpack the joined class_definitions object
+                if (data.class_definitions) {
+                    document.getElementById('meta-moa').innerText = data.class_definitions.moa || 'N/A';
+                    document.getElementById('meta-pe').innerText = data.class_definitions.pe || 'N/A';
+                    document.getElementById('meta-cs').innerText = data.class_definitions.cs || 'N/A';
+                } else {
+                    document.getElementById('meta-moa').innerText = 'Unclassified';
+                    document.getElementById('meta-pe').innerText = 'Unclassified';
+                    document.getElementById('meta-cs').innerText = 'Unclassified';
+                }
             }
         }
-    }
+
+        // Toggle the editor view
+        function toggleEdit() {
+            const contentDiv = document.getElementById('drug-content');
+            const editor = document.getElementById('drug-editor');
+            const saveBtn = document.getElementById('save-btn');
+            const editBtn = document.getElementById('edit-btn');
+            
+            if (editor.style.display === 'none') {
+                editor.value = rawWikiMarkup; 
+                editor.style.display = 'block';
+                contentDiv.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                editBtn.innerText = 'Cancel Edit';
+            } else {
+                editor.style.display = 'none';
+                contentDiv.style.display = 'block';
+                saveBtn.style.display = 'none';
+                editBtn.innerText = 'Edit Monograph';
+            }
+        }
+
+        // Save back to Supabase
+        async function saveArticle() {
+            const editor = document.getElementById('drug-editor');
+            const newContent = editor.value;
+            const params = new URLSearchParams(window.location.search);
+            const drugId = params.get('id');
+            
+            const { error } = await supabase
+                .from('drugs')
+                .update({ wiki_markup: newContent, updated_at: new Date() })
+                .eq('id', drugId); 
+                
+            if (!error) {
+                alert('Monograph updated successfully.');
+                location.reload(); 
+            } else {
+                alert('Error saving: ' + error.message);
+            }
+        }
         
         loadProfile();
     </script>
