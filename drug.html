@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Profile - Pharmacy Commons</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: oklch(98% 0.008 145); 
+            --bg-raised: oklch(95.5% 0.014 145); 
+            --line: oklch(85% 0.02 145);
+            --ink: oklch(24% 0.02 155); 
+            --ink-soft: oklch(42% 0.02 155);
+            --moss-100: oklch(95% 0.02 148); 
+            --moss-300: oklch(85% 0.05 148); 
+            --moss-500: oklch(68% 0.07 148); 
+            --moss-700: oklch(48% 0.07 150); 
+            --moss-900: oklch(30% 0.05 152);
+            --orange: oklch(80% 0.11 55); 
+            --purple: oklch(80% 0.07 305); 
+            --radius: 3px;
+        }
+
+        html[data-theme="dark"] {
+            --bg: oklch(15% 0.006 150); 
+            --bg-raised: oklch(19.5% 0.012 150); 
+            --line: oklch(32% 0.018 150);
+            --ink: oklch(92% 0.01 150); 
+            --ink-soft: oklch(74% 0.015 150);
+            --moss-100: oklch(26% 0.02 148);
+            --moss-300: oklch(38% 0.045 148);
+            --moss-500: oklch(58% 0.07 148);
+            --moss-700: oklch(78% 0.08 148);
+            --moss-900: oklch(90% 0.04 150);
+            --orange: oklch(72% 0.12 55); 
+            --purple: oklch(70% 0.09 305);
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            margin: 0;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .article-body {
+            line-height: 1.6;
+        }
+
+        .article-body h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--moss-300);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .infobox {
+            background: var(--bg-raised);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .infobox h3 {
+            margin-top: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--moss-700);
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 0.5rem;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.9rem;
+        }
+
+        .data-label {
+            font-weight: bold;
+            color: var(--ink-soft);
+        }
+
+        a {
+            color: var(--moss-700);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        a:hover {
+            border-bottom-color: var(--orange);
+        }
+
+        @media (max-width: 780px) {
+            body { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="article-body">
+        <h1 id="drug-title">Loading...</h1>
+        <div id="drug-content">
+            <p style="color: var(--ink-soft);">Querying the compendium...</p>
+        </div>
+    </main>
+
+    <aside class="infobox" id="drug-infobox" style="display: none;">
+        <h3>Clinical Metadata</h3>
+        <div class="data-row">
+            <span class="data-label">Identity (PCID)</span>
+            <span id="meta-id"></span>
+        </div>
+        <div class="data-row">
+            <span class="data-label">Mechanism of Action</span>
+            <span id="meta-moa"></span>
+        </div>
+        <div class="data-row">
+            <span class="data-label">Physiologic Effect</span>
+            <span id="meta-pe"></span>
+        </div>
+        <div class="data-row">
+            <span class="data-label">Chemical Structure</span>
+            <span id="meta-cs"></span>
+        </div>
+    </aside>
+
+    <script>
+        const supabaseUrl = 'https://nenwovhyrdcdkhxzjiiv.supabase.co';
+        const supabaseKey = 'sb_publishable_n2bmQaOdwbOvqO1QhSuAgw_RxO-mLYQ';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadProfile() {
+            const params = new URLSearchParams(window.location.search);
+            const drugId = params.get('id');
+
+            if (!drugId) {
+                document.getElementById('drug-title').innerText = "Entity Not Found";
+                document.getElementById('drug-content').innerHTML = "<p>No PCID or generic name provided in the URL.</p>";
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('drugs')
+                .select('*')
+                .eq('id', drugId)
+                .single();
+
+            if (data) {
+                document.getElementById('drug-title').innerText = data.generic_name;
+                
+                // Parse wiki-links
+                const parsedContent = data.wiki_markup.replace(/\[\[(.*?)\]\]/g, '<a href="/drug.html?id=$1">$1</a>');
+                document.getElementById('drug-content').innerHTML = parsedContent;
+
+                // Hydrate Infobox
+                document.getElementById('drug-infobox').style.display = 'block';
+                document.getElementById('meta-id').innerText = data.id;
+                document.getElementById('meta-moa').innerText = data.moa || 'N/A';
+                document.getElementById('meta-pe').innerText = data.pe || 'N/A';
+                document.getElementById('meta-cs').innerText = data.cs || 'N/A';
+            }
+        }
+        
+        loadProfile();
+    </script>
+</body>
+</html>
