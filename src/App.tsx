@@ -1,23 +1,20 @@
-import { useState } from 'react'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Nav from './Nav'
 import SearchView from './SearchView'
 import DrugDetail from './DrugDetail'
-export type View = { type: 'search'; query?: string } | { type: 'drug'; id: string }
+
 export default function App() {
-  const [view, setView] = useState<View>({ type: 'search' })
+  const navigate = useNavigate()
+
   return (
-    <div
-      className="min-h-full page-background"
-      style={{ backgroundColor: 'oklch(95.5% 0.016 145)', color: 'oklch(20% 0.022 145)' }}
-    >
+    <div className="min-h-full page-background">
       <div className="page-content">
-        <Nav view={view} onNavigate={setView} />
-        {view.type === 'search' && (
-          <SearchView initialQuery={view.query} onNavigate={setView} />
-        )}
-        {view.type === 'drug' && (
-          <DrugDetail id={view.id} onNavigate={setView} />
-        )}
+        <Nav />
+        <Routes>
+          <Route path="/" element={<SearchView />} />
+          <Route path="/drugs/:slug" element={<DrugDetail />} />
+          <Route path="*" element={<SearchView />} />
+        </Routes>
       </div>
     </div>
   )
