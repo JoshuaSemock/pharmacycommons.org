@@ -3,11 +3,17 @@ name: Build and deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# Let an in-flight deploy finish rather than cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -16,8 +22,9 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      # pnpm version comes from the "packageManager" field in package.json,
-      # so it stays in step with mise.toml and with local development.
+      # No `version:` key — pnpm/action-setup reads packageManager from
+      # package.json (pnpm@10.34.3). Declaring both is an error, not a
+      # preference. To change pnpm, edit packageManager and nothing else.
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
 
@@ -28,7 +35,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build the site
         run: pnpm build
