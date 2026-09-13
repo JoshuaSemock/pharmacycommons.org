@@ -6,6 +6,13 @@
   "license": "GPL-3.0-or-later",
   "author": "Joshua Semock, PharmD",
   "homepage": "https://pharmacycommons.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshuaSemock/pharmacycommons.org.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JoshuaSemock/pharmacycommons.org/issues"
+  },
   "type": "module",
   "packageManager": "pnpm@10.34.3",
   "engines": {
