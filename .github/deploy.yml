@@ -1,0 +1,10 @@
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:                            # ← delete these
+          version: 9                     # ← two lines
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20               # ← change to 22
+          cache: pnpm
