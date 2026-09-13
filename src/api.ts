@@ -1,1 +1,161 @@
-/**\n * Pharmacy Commons API Client & Slug Resolution Layer\n * Connects frontend to Supabase backend (PCID-based)\n * Implements slug↔PCID bidirectional lookup with caching\n */\n\nimport { createClient } from '@supabase/supabase-js'\nimport type {\n  DrugDetail,\n  DrugListResponse,\n  SearchResponse,\n  ApiError,\n  DrugsListQuery,\n  DrugsSearchQuery,\n} from './api.generated'\n\n/**\n * Supabase client initialization\n * Uses public anon key for public read access; RLS policies enforce access control\n */\nconst supabaseUrl = 'https://nenwovhyrdcdkhxzjiiv.supabase.co'\nconst supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lbndvdmh5cmRjZGtoeHpqaWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDc1NzcsImV4cCI6MjEwMzc4MzU3N30.gDxL9yx88AWPgwuPlDNv879VhpNHLQMFfmaqDwed30I'\n\nconst supabase = createClient(supabaseUrl, supabaseAnonKey)\n\n/**\n * In-memory slug → PCID cache\n * Reduces database queries for repeated slug lookups\n * TODO: Consider persistent cache (localStorage) for production\n */\nconst slugCache = new Map<string, string>()\n\n/**\n * Resolve a slug to its PCID\n * Checks in-memory cache first, then queries Supabase if miss\n * @param slug URL-friendly slug (e.g., 'metformin')\n * @returns PCID code (e.g., 'PCID-1234567') or null if not found\n */\nexport async function resolveSlugToPcid(slug: string): Promise<string | null> {\n  // Check cache first\n  if (slugCache.has(slug)) {\n    return slugCache.get(slug) ?? null\n  }\n\n  try {\n    const { data, error } = await supabase\n      .from('pcid')\n      .select('pcid_code')\n      .eq('slug', slug)\n      .eq('status', 'active')\n      .single()\n\n    if (error) {\n      console.warn(`[API] Slug lookup failed for '${slug}':`, error.message)\n      return null\n    }\n\n    if (data) {\n      slugCache.set(slug, data.pcid_code)\n      return data.pcid_code\n    }\n\n    return null\n  } catch (err) {\n    console.error(`[API] Unexpected error resolving slug '${slug}':`, err)\n    return null\n  }\n}\n\n/**\n * Resolve a PCID to its slug (reverse lookup)\n * Useful for programmatic slug generation or validation\n * @param pcidCode PCID code (e.g., 'PCID-1234567')\n * @returns Slug (e.g., 'metformin') or null if not found\n */\nexport async function resolvePcidToSlug(pcidCode: string): Promise<string | null> {\n  try {\n    const { data, error } = await supabase\n      .from('pcid')\n      .select('slug')\n      .eq('pcid_code', pcidCode)\n      .single()\n\n    if (error) {\n      console.warn(`[API] PCID lookup failed for '${pcidCode}':`, error.message)\n      return null\n    }\n\n    return data?.slug ?? null\n  } catch (err) {\n    console.error(`[API] Unexpected error resolving PCID '${pcidCode}':`, err)\n    return null\n  }\n}\n\n/**\n * Fetch complete drug detail by slug\n * This is the main entry point for drug detail pages\n * @param slug Drug slug (e.g., 'metformin')\n * @returns Complete DrugDetail or null if not found\n */\nexport async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {\n  try {\n    // Call the Supabase stored function\n    const { data, error } = await supabase.rpc('get_drug_by_slug', {\n      p_slug: slug,\n    })\n\n    if (error) {\n      console.error(`[API] Error fetching drug '${slug}':`, error.message)\n      return null\n    }\n\n    // Check for API error in response (stored function returns JSON)\n    if (data && 'error' in data && data.error === true) {\n      console.warn(`[API] Drug '${slug}' not found`)\n      return null\n    }\n\n    return data as DrugDetail\n  } catch (err) {\n    console.error(`[API] Unexpected error fetching drug '${slug}':`, err)\n    return null\n  }\n}\n\n/**\n * Fetch complete drug detail by PCID\n * Direct PCID lookup without slug resolution\n * @param pcidCode PCID (e.g., 'PCID-1234567')\n * @returns Complete DrugDetail or null if not found\n */\nexport async function getDrugByPcid(pcidCode: string): Promise<DrugDetail | null> {\n  try {\n    const { data, error } = await supabase.rpc('get_drug_by_pcid', {\n      p_pcid_code: pcidCode,\n    })\n\n    if (error) {\n      console.error(`[API] Error fetching drug '${pcidCode}':`, error.message)\n      return null\n    }\n\n    if (data && 'error' in data && data.error === true) {\n      console.warn(`[API] Drug '${pcidCode}' not found`)\n      return null\n    }\n\n    return data as DrugDetail\n  } catch (err) {\n    console.error(`[API] Unexpected error fetching drug '${pcidCode}':`, err)\n    return null\n  }\n}\n\n/**\n * List drugs with pagination\n * @param params Pagination and filter parameters\n * @returns Paginated list of drugs\n */\nexport async function listDrugs(params: DrugsListQuery = {}): Promise<DrugListResponse | null> {\n  const limit = Math.min(params.limit ?? 25, 100) // Cap at 100\n  const offset = params.offset ?? 0\n  const entityType = params.entity_type ?? null\n\n  try {\n    const { data, error } = await supabase.rpc('list_drugs_paginated', {\n      p_limit: limit,\n      p_offset: offset,\n      p_entity_type: entityType,\n    })\n\n    if (error) {\n      console.error('[API] Error listing drugs:', error.message)\n      return null\n    }\n\n    if (data && 'error' in data && data.error === true) {\n      console.warn('[API] Error in list_drugs_paginated')\n      return null\n    }\n\n    return data as DrugListResponse\n  } catch (err) {\n    console.error('[API] Unexpected error listing drugs:', err)\n    return null\n  }\n}\n\n/**\n * Search drugs by name, slug, or attributes\n * Full-text search with prefix matching\n * @param params Search query and pagination\n * @returns Search results\n */\nexport async function searchDrugs(params: DrugsSearchQuery): Promise<SearchResponse | null> {\n  if (!params.q || params.q.trim().length === 0) {\n    console.warn('[API] Empty search query')\n    return null\n  }\n\n  const limit = Math.min(params.limit ?? 25, 100)\n  const offset = params.offset ?? 0\n\n  try {\n    const { data, error } = await supabase.rpc('search_drugs', {\n      p_query: params.q.trim(),\n      p_limit: limit,\n      p_offset: offset,\n    })\n\n    if (error) {\n      console.error('[API] Error searching drugs:', error.message)\n      return null\n    }\n\n    if (data && 'error' in data && data.error === true) {\n      console.warn('[API] Error in search_drugs')\n      return null\n    }\n\n    return data as SearchResponse\n  } catch (err) {\n    console.error('[API] Unexpected error searching drugs:', err)\n    return null\n  }\n}\n\n/**\n * Fetch interactions for a specific drug\n * Extracts from full drug detail (convenience method)\n * @param slug Drug slug (e.g., 'metformin')\n * @returns Array of interactions or null if drug not found\n */\nexport async function getDrugInteractions(slug: string) {\n  const drug = await getDrugBySlug(slug)\n  return drug?.interactions ?? null\n}\n\n/**\n * Clear the slug cache (for debugging or testing)\n */\nexport function clearSlugCache() {\n  slugCache.clear()\n  console.debug('[API] Slug cache cleared')\n}\n\n/**\n * Get cache statistics (for monitoring)\n */\nexport function getCacheStats() {\n  return {\n    size: slugCache.size,\n    entries: Array.from(slugCache.entries()).map(([slug, pcid]) => ({ slug, pcid })),\n  }\n}\n\n/**\n * Type guard to check if response is an API error\n */\nexport function isApiError(data: unknown): data is ApiError {\n  return (\n    typeof data === 'object' &&\n    data !== null &&\n    'error' in data &&\n    (data as ApiError).error === true\n  )\n}\n"
+/**
+ * Pharmacy Commons — API layer
+ *
+ * Backed by the static catalog (public/drug-catalog.json), which ships with the
+ * build and covers the full PCID spine. Supabase is an enhancement layer: when
+ * the schema is deployed and a record exists, detail pages hydrate with clinical
+ * and environmental data. When it isn't — or when a request fails — the catalog
+ * answer is served instead.
+ *
+ * The consequence worth knowing: search and browse never touch the network, and
+ * a backend outage costs detail, not availability.
+ */
+
+import { createClient } from '@supabase/supabase-js'
+import {
+  loadCatalog,
+  searchCatalog,
+  browse,
+  getBySlug,
+  getByPcid,
+  pcidOf,
+  type CatalogEntry,
+} from './catalog'
+import type {
+  ApiError,
+  DrugDetail,
+  DrugListItem,
+  DrugListResponse,
+  DrugsListQuery,
+  DrugsSearchQuery,
+  SearchResponse,
+} from './api.generated'
+
+const SUPABASE_URL = 'https://nenwovhyrdcdkhxzjiiv.supabase.co'
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lbndvdmh5cmRjZGtoeHpqaWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDc1NzcsImV4cCI6MjEwMzc4MzU3N30.gDxL9yx88AWPgwuPlDNv879VhpNHLQMFfmaqDwed30I'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+/**
+ * Set false to skip Supabase entirely — useful while the schema is undeployed,
+ * since every detail view would otherwise wait on a call that cannot succeed.
+ * Flip to true once 01_core_schema_v2.sql has been applied.
+ */
+const BACKEND_ENABLED = false
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalog → API shape
+// ─────────────────────────────────────────────────────────────────────────────
+
+function toListItem(e: CatalogEntry): DrugListItem {
+  return {
+    pcid_code: pcidOf(e),
+    slug: e.slug,
+    name: e.name,
+    entity_type: e.type === 1 ? 'combination' : 'drug',
+    description: e.brand ? `Also marketed as ${e.brand}.` : null,
+    eco_risk: null,
+    status: 'partial',
+  }
+}
+
+function toDetail(e: CatalogEntry): DrugDetail {
+  return {
+    ...toListItem(e),
+    attributes: {},
+    components: [],
+    interactions: [],
+    eco: null,
+    fda_ndc_codes: [],
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reads
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch one drug by slug.
+ * Returns null only when the slug is absent from the spine — a genuine 404.
+ */
+export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
+  await loadCatalog()
+
+  const entry = getBySlug(slug)
+  if (!entry) return null
+
+  const base = toDetail(entry)
+  if (!BACKEND_ENABLED) return base
+
+  try {
+    const { data, error } = await supabase.rpc('get_drug_by_slug', { p_slug: slug })
+    if (error || !data || isApiError(data)) return base
+    return { ...base, ...(data as Partial<DrugDetail>), status: 'full' }
+  } catch (err) {
+    console.warn(`[api] hydration failed for '${slug}', serving catalog entry`, err)
+    return base
+  }
+}
+
+export async function getDrugByPcid(pcidCode: string): Promise<DrugDetail | null> {
+  await loadCatalog()
+  const entry = getByPcid(pcidCode)
+  return entry ? getDrugBySlug(entry.slug) : null
+}
+
+/** Paginated browse. Served from the catalog; no network call. */
+export async function listDrugs(params: DrugsListQuery = {}): Promise<DrugListResponse | null> {
+  await loadCatalog()
+
+  const limit = Math.min(params.limit ?? 25, 100)
+  const offset = Math.max(params.offset ?? 0, 0)
+  const type = params.entity_type === 'combination' ? 1 : params.entity_type ? 0 : undefined
+
+  const { entries, total } = browse({ type: type as 0 | 1 | undefined, offset, limit })
+
+  return {
+    drugs: entries.map(toListItem),
+    total,
+    offset,
+    limit,
+    has_more: offset + entries.length < total,
+  }
+}
+
+/** Ranked search over name, brand, and slug. Local and synchronous. */
+export async function searchDrugs(params: DrugsSearchQuery): Promise<SearchResponse | null> {
+  const q = params.q?.trim()
+  if (!q) return null
+
+  await loadCatalog()
+
+  const limit = Math.min(params.limit ?? 25, 100)
+  const offset = Math.max(params.offset ?? 0, 0)
+
+  const hits = searchCatalog(q, offset + limit + 1)
+  const page = hits.slice(offset, offset + limit)
+
+  return {
+    query: q,
+    drugs: page.map(toListItem),
+    total: hits.length,
+    offset,
+    limit,
+    has_more: hits.length > offset + limit,
+  }
+}
+
+export async function getDrugInteractions(slug: string) {
+  const drug = await getDrugBySlug(slug)
+  return drug?.interactions ?? null
+}
+
+export function isApiError(data: unknown): data is ApiError {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'error' in data &&
+    (data as ApiError).error === true
+  )
+}

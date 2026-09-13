@@ -3,14 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="The drug information compendium at Pharmacy Commons is a free, open-access pharmacology reference providing restructed data from the FDA, WHO, NIH, and others, plus environmental impact metrics for greener prescribing." />
+    <meta
+      name="description"
+      content="The drug information compendium at Pharmacy Commons is a free, open-access pharmacology reference providing restructured data from the FDA, WHO, NIH, and others, plus environmental impact metrics for greener prescribing."
+    />
+
+    <title>Pharmacy Commons</title>
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Ph. Commons" />
-    <title>Pharmacy Commons</title>
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      GitHub Pages SPA redirect handler.
+
+      Pages serves 404.html for any path it has no file for. That file stores the
+      requested route in sessionStorage and bounces to /. This script reads it back
+      and hands it to the History API before React mounts, so a direct visit to
+      /drugs/metformin lands on the right route instead of the home page.
+    -->
+    <script>
+      (function () {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, '', redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
