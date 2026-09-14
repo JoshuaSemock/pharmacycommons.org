@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Pharmacy Commons</title>
+    <!--
+      GitHub Pages SPA routing, half one.
+
+      Pages serves this file for any path it cannot resolve to a real file,
+      which for a client-routed app means every route except "/". Stash the
+      requested path, bounce to the root, and let index.html restore it before
+      React Router boots.
+
+      Keep this file at public/404.html so Vite copies it to the root of dist/.
+      It is intentionally dependency-free and inline — it has to work before any
+      bundle loads.
+    -->
+    <script>
+      (function () {
+        var path = window.location.pathname + window.location.search + window.location.hash
+        // Guard against a redirect loop if Pages ever serves this for "/".
+        if (path && path !== '/') {
+          try {
+            sessionStorage.setItem('pc:redirect', path)
+          } catch (e) {
+            /* No storage: fall through to the homepage. */
+          }
+        }
+        window.location.replace('/')
+      })()
+    </script>
+    <noscript><meta http-equiv="refresh" content="0;URL=/" /></noscript>
+  </head>
+  <body>
+    <p>
+      Redirecting to <a href="/">Pharmacy Commons</a>.
+    </p>
+  </body>
+</html>
