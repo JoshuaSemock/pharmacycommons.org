@@ -93,7 +93,7 @@ export default function Nav() {
               {suggestions.map(drug => (
                 <button
                   key={drug.id}
-                  onMouseDown={() => handleSuggestion(drug.slug || drug.name.toLowerCase())}
+                 onMouseDown={() => handleSuggestion(drug.id)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-sage-50 transition-colors"
                 >
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-aqua-100 font-mono text-[10px] font-medium text-aqua-700">
