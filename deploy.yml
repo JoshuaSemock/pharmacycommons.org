@@ -1,0 +1,58 @@
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # pnpm version comes from the "packageManager" field in package.json,
+      # so it stays in step with mise.toml and with local development.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # CI implies --frozen-lockfile. If this fails with
+      # ERR_PNPM_OUTDATED_LOCKFILE, pnpm-lock.yaml is behind package.json —
+      # run `pnpm install` in a Codespace and commit the lockfile.
+      - name: Install dependencies
+        run: pnpm install
+
+      # vite build does not type check. Without this, a type error ships a
+      # stale or broken artifact instead of failing the run.
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Build the site
+        run: pnpm build
+
+      - name: Upload build output
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
