@@ -26,10 +26,13 @@ const PAGE_SIZES = [50, 100, 500, 0] as const
 const DEFAULT_PAGE = 50
 
 /**
- * Nineteen of the twenty-four Greek letters have nothing behind them in this
- * catalog. Flip this to render the full row anyway, greyed out.
+ * Nineteen of the twenty-four Greek letters have nothing behind them in the
+ * current data, and the symbol bucket fills only once a source with `(+)-` and
+ * `(±)-` names lands. Both are hidden while empty; flip either to render the
+ * full row greyed out instead.
  */
 const SHOW_EMPTY_GREEK = false
+const SHOW_EMPTY_SYMBOL = false
 
 const pageLabel = (n: number) => (n === 0 ? 'Everything' : String(n))
 
@@ -87,7 +90,7 @@ export default function SearchView() {
   const catalogSize = useMemo(() => (ready ? orderedCatalog().length : 0), [ready])
 
   const searching = !!query.trim()
-  /** Where this view starts inside the full A→ω run. */
+  /** Where this view starts inside the full run. */
   const start = !searching && !confined && bucket && offsets ? offsets[bucket] : 0
 
   const { entries, total } = useMemo(() => {
@@ -103,7 +106,7 @@ export default function SearchView() {
   const remaining = total - start - entries.length
   const hasMore = remaining > 0
 
-  /** Bucket runs, so a continuous list reads as A … 9 … ω as you scroll. */
+  /** Bucket runs, so a continuous list reads A … 9 … ω … ± as you scroll. */
   const groups = useMemo(() => {
     if (searching || confined) return [{ key: 'flat', def: null, items: entries }]
     const out: { key: string; def: BucketDef | null; items: CatalogEntry[] }[] = []
@@ -174,7 +177,7 @@ export default function SearchView() {
                 ? <>Drugs filed under <span className="font-medium text-sage-900">{bucketLabel(bucket)}</span></>
                 : bucket
                   ? <>The catalog from <span className="font-medium text-sage-900">{bucketLabel(bucket)}</span> onward</>
-                  : 'The full catalog, A to omega'}
+                  : 'The full catalog, A onward'}
             {ready && total > 0 && (
               <span className="ml-2 font-mono text-[12px] text-sage-400">
                 {(start + 1).toLocaleString()}–{(start + entries.length).toLocaleString()} of {total.toLocaleString()}
@@ -250,7 +253,7 @@ export default function SearchView() {
                     >
                       {g.def.label}
                     </span>
-                    {g.def.kind === 'greek' && (
+                    {(g.def.kind === 'greek' || g.def.kind === 'symbol') && (
                       <span className="font-sans text-[12px] text-sage-400">{g.def.name}</span>
                     )}
                     <span className="h-px flex-1 self-center bg-sage-200" />
@@ -299,9 +302,10 @@ export default function SearchView() {
 }
 
 /**
- * A–Z, then the numbers, then the Greek descriptors — set as type rather than
- * as chips, with hairline dividers between the three runs. Empty buckets stay
- * inert; empty Greek letters are omitted entirely unless SHOW_EMPTY_GREEK.
+ * A–Z, the numbers, the Greek descriptors, then the symbol bucket — set as type
+ * rather than as chips, with hairline dividers between runs. Empty buckets in
+ * the Latin and numeric runs stay inert; empty Greek and symbol buckets are
+ * omitted entirely unless their SHOW_EMPTY flag is set.
  */
 function CharacterIndex({
   counts, active, onSelect,
@@ -310,9 +314,12 @@ function CharacterIndex({
   active: Bucket | null
   onSelect: (b: Bucket | null) => void
 }) {
-  const visible = BUCKETS.filter(
-    b => b.kind !== 'greek' || SHOW_EMPTY_GREEK || (counts?.[b.key] ?? 0) > 0,
-  )
+  const visible = BUCKETS.filter(b => {
+    const n = counts?.[b.key] ?? 0
+    if (b.kind === 'greek') return SHOW_EMPTY_GREEK || n > 0
+    if (b.kind === 'symbol') return SHOW_EMPTY_SYMBOL || n > 0
+    return true
+  })
 
   return (
     <nav
@@ -344,7 +351,7 @@ function CharacterIndex({
                 onClick={() => onSelect(isActive ? null : b.key)}
                 disabled={!n}
                 aria-pressed={isActive}
-                aria-label={b.kind === 'greek' ? b.name : undefined}
+                aria-label={b.kind === 'latin' || b.kind === 'numeric' ? undefined : b.name}
                 title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
                 className={`rounded px-[7px] py-1 font-mono text-[13px] leading-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600 ${
                   !n
