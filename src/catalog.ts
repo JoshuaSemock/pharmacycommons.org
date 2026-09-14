@@ -217,7 +217,7 @@ export const STRIP_CONFIG_PREFIXES = false
 
 const CONFIG_RE = /^\(\s*(r|s|rs|sr|r\*|s\*|e|z|d|l|dl|d,l)\s*\)[\s\-–—]*/
 
-const GREEK_BY_SYMBOL = new Map(GREEK_LETTERS.map(g => [g.symbol, g.name]))
+const GREEK_BY_SYMBOL = const GREEK_BY_SYMBOL = new Map<string, string>(GREEK_LETTERS.map(g => [g.symbol, g.name]))
 
 /** Greek glyphs survive this so `β-carotene` can reach the β bucket. */
 const stripLead = (s: string) => s.replace(/^[^a-z0-9\u0370-\u03ff]+/, '')
