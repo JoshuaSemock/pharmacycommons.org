@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharmacy Commons</title>
+    <meta
+      name="description"
+      content="Pharmacy Commons is a free, open-access pharmacology reference. Restructured drug data from the FDA, WHO, and NIH, with environmental impact metrics for greener prescribing."
+    />
+    <link rel="canonical" href="https://pharmacycommons.org/" />
+
+    <!-- Icons. Verify each of these exists in public/ — a missing file here is
+         a silent 404 that only shows up in the network tab. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="Ph. Commons" />
+    <meta name="theme-color" content="#f2f5f0" />
+
+    <!-- Link previews. These are static for every route: a shared blog post
+         shows the site-level card, not the post's own title. Per-page cards
+         need prerendering at build time. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pharmacy Commons" />
+    <meta property="og:title" content="Pharmacy Commons" />
+    <meta
+      property="og:description"
+      content="A free, open-access pharmacology reference with environmental impact metrics for greener prescribing."
+    />
+    <meta property="og:url" content="https://pharmacycommons.org/" />
+    <meta property="og:image" content="https://pharmacycommons.org/logo.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <!--
+      GitHub Pages SPA routing, half two.
+
+      Pages has no server-side rewrite, so a direct request to /blog/some-post
+      returns 404.html. That file stashes the requested path and bounces here.
+      This script puts the path back into the address bar before main.tsx runs,
+      so React Router boots on the correct route.
+
+      Must stay in <head> and stay non-module. The module script at the bottom
+      of <body> is deferred, so this always runs first.
+    -->
+    <script>
+      (function () {
+        try {
+          var redirect = sessionStorage.getItem('pc:redirect')
+          if (!redirect) return
+          sessionStorage.removeItem('pc:redirect')
+          // Same-origin absolute paths only. Rejecting a leading "//" keeps a
+          // crafted value from turning into a protocol-relative URL.
+          if (redirect.charAt(0) === '/' && redirect.charAt(1) !== '/') {
+            window.history.replaceState(null, '', redirect)
+          }
+        } catch (e) {
+          /* sessionStorage unavailable (private mode, blocked cookies) —
+             the user lands on the homepage, which is an acceptable fallback. */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      Pharmacy Commons needs JavaScript to run. Source and data exports are at
+      <a href="https://github.com/JoshuaSemock/pharmacycommons.org">github.com/JoshuaSemock/pharmacycommons.org</a>.
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
