@@ -72,6 +72,9 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
     _catalog = entries
     _bySlug = new Map(entries.map(e => [e.slug, e]))
     _byNum = new Map(entries.map(e => [e.n, e]))
+    _ordered = null              // invalidate derived caches
+    _counts = null
+    _offsets = null
     return entries
   })()
 
@@ -96,6 +99,96 @@ export function toDrug(e: CatalogEntry): Drug {
     schedule: e.sched ? _schedules[e.sched] ?? null : null,
     completeness: 'partial',
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Alphabetical ordering — A … Z, then 0 … 9
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** The 26 letters followed by a single numeric bucket, in display order. */
+export const BUCKETS = [
+  'A','B','C','D','E','F','G','H','I','J','K','L','M',
+  'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#',
+] as const
+
+export type Bucket = (typeof BUCKETS)[number]
+
+/** Label shown in the nav for a bucket key. */
+export const bucketLabel = (b: Bucket): string => (b === '#' ? '0–9' : b)
+
+/**
+ * Leading brackets and parens are chemical-name syntax, not sort information:
+ * `[1,1'-biphenyl]…` files under 1 and `(2-aminopropyl)…` files under 2.
+ */
+const sortKey = (name: string): string =>
+  name.toLowerCase().replace(/^[^a-z0-9]+/, '')
+
+export function bucketOf(name: string): Bucket {
+  const c = sortKey(name).charAt(0)
+  if (!c) return '#'
+  return c >= 'a' && c <= 'z' ? (c.toUpperCase() as Bucket) : '#'
+}
+
+const bucketRank = (b: Bucket): number => (b === '#' ? 26 : b.charCodeAt(0) - 65)
+
+let _ordered: CatalogEntry[] | null = null
+let _counts: Record<Bucket, number> | null = null
+let _offsets: Record<Bucket, number> | null = null
+
+function buildOrder() {
+  const pool = _catalog ?? []
+
+  const ordered = [...pool].sort((a, b) => {
+    const d = bucketRank(bucketOf(a.name)) - bucketRank(bucketOf(b.name))
+    if (d !== 0) return d
+    return sortKey(a.name).localeCompare(sortKey(b.name), 'en', { sensitivity: 'base' })
+  })
+
+  const counts = Object.fromEntries(BUCKETS.map(b => [b, 0])) as Record<Bucket, number>
+  const offsets = Object.fromEntries(BUCKETS.map(b => [b, -1])) as Record<Bucket, number>
+
+  ordered.forEach((e, i) => {
+    const b = bucketOf(e.name)
+    counts[b]++
+    if (offsets[b] === -1) offsets[b] = i
+  })
+
+  // An empty bucket resolves to where it *would* start, so jumping to a letter
+  // with nothing behind it lands on the next letter rather than back at A.
+  let next = ordered.length
+  for (let i = BUCKETS.length - 1; i >= 0; i--) {
+    const b = BUCKETS[i]
+    if (offsets[b] === -1) offsets[b] = next
+    else next = offsets[b]
+  }
+
+  _ordered = ordered
+  _counts = counts
+  _offsets = offsets
+}
+
+/**
+ * The whole catalog in display order: A first, numeric names last. Sorted once
+ * and cached — 3,433 entries is a single sub-millisecond pass.
+ */
+export function orderedCatalog(): CatalogEntry[] {
+  if (!_ordered) buildOrder()
+  return _ordered!
+}
+
+/** Entry count per bucket, for disabling letters with nothing behind them. */
+export function bucketCounts(): Record<Bucket, number> {
+  if (!_counts) buildOrder()
+  return _counts!
+}
+
+/**
+ * Index of each bucket's first entry within `orderedCatalog()`. Lets the letter
+ * nav jump into the middle of one continuous A→9 list instead of filtering it.
+ */
+export function bucketOffsets(): Record<Bucket, number> {
+  if (!_offsets) buildOrder()
+  return _offsets!
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -149,11 +242,27 @@ export function getByPcid(pcid: string): CatalogEntry | null {
   return m ? _byNum?.get(Number(m[1])) ?? null : null
 }
 
-export function browse(opts: { type?: 0 | 1; offset?: number; limit?: number } = {}) {
+/**
+ * Paged browse over the ordered catalog.
+ *
+ * `bucket` narrows the pool to one letter; `offset` instead starts partway
+ * through the full run and keeps going, which is how the letter nav scrolls
+ * across letter boundaries. `total` always reflects the pool, not the page.
+ */
+export function browse(
+  opts: { type?: 0 | 1; bucket?: Bucket; offset?: number; limit?: number } = {},
+) {
   if (!_catalog) return { entries: [] as CatalogEntry[], total: 0 }
-  const { type, offset = 0, limit = 50 } = opts
-  const pool = type === undefined ? _catalog : _catalog.filter(e => e.type === type)
-  return { entries: pool.slice(offset, offset + limit), total: pool.length }
+  const { type, bucket, offset = 0, limit = 50 } = opts
+
+  let pool = orderedCatalog()
+  if (type !== undefined) pool = pool.filter(e => e.type === type)
+  if (bucket) pool = pool.filter(e => bucketOf(e.name) === bucket)
+
+  return {
+    entries: pool.slice(offset, limit === Infinity ? undefined : offset + limit),
+    total: pool.length,
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
