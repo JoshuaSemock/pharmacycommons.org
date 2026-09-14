@@ -23,8 +23,8 @@
   "rows": [
     [
       1000251,
-      "1-1-2-thienylcyclohexypyrrolidine",
-      "1-(1-(2-thienyl)cyclohexy)pyrrolidine",
+      "(+)-1-1-2-thienylcyclohexypyrrolidine",
+      "(+)-1-(1-(2-thienyl)cyclohexy)pyrrolidine",
       null,
       0,
       1,
@@ -32,8 +32,8 @@
     ],
     [
       1000252,
-      "1-1-benzofuran-5-yl-n-ethylpropan-2-amine-5-eapb",
-      "1-(1-benzofuran-5-yl)-n-ethylpropan-2-amine (5-eapb)",
+      "(±)-1-1-benzofuran-5-yl-n-ethylpropan-2-amine-5-eapb",
+      "(±)-1-(1-benzofuran-5-yl)-n-ethylpropan-2-amine (5-eapb)",
       null,
       0,
       1,
