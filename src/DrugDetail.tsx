@@ -214,9 +214,6 @@ export default function DrugDetail() {
               {drug.fda_ndc_codes && drug.fda_ndc_codes.length > 0 && (
                 <IdRow label="NDC codes" value={drug.fda_ndc_codes.join(', ')} />
               )}
-              {drug.fda_application_number && (
-                <IdRow label="FDA application" value={drug.fda_application_number} />
-              )}
             </div>
           </div>
         </aside>

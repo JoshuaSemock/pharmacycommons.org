@@ -106,7 +106,7 @@ export function toDrug(e: CatalogEntry): Drug {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** One 0–9 bucket, or ten separate digit buckets. */
-export const NUMERIC_MODE: 'single' | 'split' = 'single'
+export const NUMERIC_MODE = 'single' as 'single' | 'split'
 
 /**
  * Greek stereodescriptors are spelled out in the current data (`17beta-`), but
