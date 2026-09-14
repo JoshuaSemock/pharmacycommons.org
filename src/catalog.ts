@@ -102,34 +102,127 @@ export function toDrug(e: CatalogEntry): Drug {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Alphabetical ordering — A … Z, then 0 … 9
+// Browse buckets — A…Z, then 0…9, then α…ω
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** The 26 letters followed by a single numeric bucket, in display order. */
-export const BUCKETS = [
-  'A','B','C','D','E','F','G','H','I','J','K','L','M',
-  'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#',
-] as const
-
-export type Bucket = (typeof BUCKETS)[number]
-
-/** Label shown in the nav for a bucket key. */
-export const bucketLabel = (b: Bucket): string => (b === '#' ? '0–9' : b)
+/** One 0–9 bucket, or ten separate digit buckets. */
+export const NUMERIC_MODE: 'single' | 'split' = 'single'
 
 /**
- * Leading brackets and parens are chemical-name syntax, not sort information:
- * `[1,1'-biphenyl]…` files under 1 and `(2-aminopropyl)…` files under 2.
+ * Greek stereodescriptors are written out in this data (`17beta-`, not `17β-`),
+ * so matching happens on the word and the symbol is display only.
  */
-const sortKey = (name: string): string =>
-  name.toLowerCase().replace(/^[^a-z0-9]+/, '')
+export const GREEK_LETTERS = [
+  { name: 'alpha',   symbol: 'α' }, { name: 'beta',    symbol: 'β' },
+  { name: 'gamma',   symbol: 'γ' }, { name: 'delta',   symbol: 'δ' },
+  { name: 'epsilon', symbol: 'ε' }, { name: 'zeta',    symbol: 'ζ' },
+  { name: 'eta',     symbol: 'η' }, { name: 'theta',   symbol: 'θ' },
+  { name: 'iota',    symbol: 'ι' }, { name: 'kappa',   symbol: 'κ' },
+  { name: 'lambda',  symbol: 'λ' }, { name: 'mu',      symbol: 'μ' },
+  { name: 'nu',      symbol: 'ν' }, { name: 'xi',      symbol: 'ξ' },
+  { name: 'omicron', symbol: 'ο' }, { name: 'pi',      symbol: 'π' },
+  { name: 'rho',     symbol: 'ρ' }, { name: 'sigma',   symbol: 'σ' },
+  { name: 'tau',     symbol: 'τ' }, { name: 'upsilon', symbol: 'υ' },
+  { name: 'phi',     symbol: 'φ' }, { name: 'chi',     symbol: 'χ' },
+  { name: 'psi',     symbol: 'ψ' }, { name: 'omega',   symbol: 'ω' },
+] as const
 
-export function bucketOf(name: string): Bucket {
-  const c = sortKey(name).charAt(0)
-  if (!c) return '#'
-  return c >= 'a' && c <= 'z' ? (c.toUpperCase() as Bucket) : '#'
+/**
+ * Bucket keys are strings rather than a literal union because the set is built
+ * at runtime from NUMERIC_MODE. Validate anything arriving from a URL with
+ * `paramToBucket`, which is the only untrusted entry point.
+ */
+export type Bucket = string
+
+export type BucketDef = {
+  key: Bucket
+  /** What the nav button shows — a letter, `0–9`, or a Greek glyph. */
+  label: string
+  /** Spoken form for aria-label and section headings. */
+  name: string
+  kind: 'latin' | 'numeric' | 'greek'
 }
 
-const bucketRank = (b: Bucket): number => (b === '#' ? 26 : b.charCodeAt(0) - 65)
+const LATIN_DEFS: BucketDef[] = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(c => ({
+  key: c, label: c, name: c, kind: 'latin' as const,
+}))
+
+const NUMERIC_DEFS: BucketDef[] =
+  NUMERIC_MODE === 'split'
+    ? [...'0123456789'].map(d => ({ key: d, label: d, name: d, kind: 'numeric' as const }))
+    : [{ key: '#', label: '0–9', name: 'numbers', kind: 'numeric' as const }]
+
+const GREEK_DEFS: BucketDef[] = GREEK_LETTERS.map(g => ({
+  key: `g:${g.name}`, label: g.symbol, name: g.name, kind: 'greek' as const,
+}))
+
+/** Every bucket, in display order: A…Z, 0–9, α…ω. */
+export const BUCKETS: BucketDef[] = [...LATIN_DEFS, ...NUMERIC_DEFS, ...GREEK_DEFS]
+
+const BUCKET_BY_KEY = new Map(BUCKETS.map(b => [b.key, b]))
+const BUCKET_RANK = new Map(BUCKETS.map((b, i) => [b.key, i]))
+
+export const bucketDef = (key: Bucket): BucketDef | null => BUCKET_BY_KEY.get(key) ?? null
+export const bucketLabel = (key: Bucket): string => BUCKET_BY_KEY.get(key)?.label ?? key
+export const bucketName = (key: Bucket): string => BUCKET_BY_KEY.get(key)?.name ?? key
+
+/** `#` and `g:` prefixes don't belong in a query string. */
+export function bucketToParam(key: Bucket): string {
+  if (key === '#') return '0-9'
+  return key.startsWith('g:') ? key.slice(2) : key
+}
+
+export function paramToBucket(v: string | null): Bucket | null {
+  if (!v) return null
+  const raw = v.toLowerCase()
+  const candidates = [raw === '0-9' ? '#' : raw.toUpperCase(), `g:${raw}`, raw]
+  return candidates.find(k => BUCKET_BY_KEY.has(k)) ?? null
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bucket assignment
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Whether a leading locant run is stepped over before looking for a Greek
+ * descriptor — `17beta-hydroxy-androstano[2,3-d]isoxazole` files under β rather
+ * than under 1. Set false to leave those nine steroid names in the digits.
+ *
+ * Note this departs from USP/CAS index style, which ignores stereodescriptors
+ * outright and would file `beta-carotene` under C. Browsing wants the visible
+ * first token; a printed index wants the parent name. Different jobs.
+ */
+export const SKIP_LOCANTS = true
+
+/** Leading brackets and parens are syntax, not sort information. */
+const stripLead = (s: string) => s.replace(/^[^a-z0-9]+/, '')
+
+/** Locants, stereo numbering, and the commas between them: `4,17beta-…` */
+const stripLocants = (s: string) => s.replace(/^[\d,'\u2019\-\s]+/, '')
+
+const GREEK_RE = new RegExp(
+  `^(${GREEK_LETTERS.map(g => g.name).join('|')})(?![a-z])`,
+)
+
+/**
+ * The trailing `(?![a-z])` is what keeps alphaprodine, betamethasone, betaxolol
+ * and etanercept in the Latin buckets — a descriptor ends at a boundary, a word
+ * that merely starts with one does not.
+ */
+export function bucketOf(name: string): Bucket {
+  const s = stripLead(name.toLowerCase())
+  if (!s) return NUMERIC_DEFS[0].key
+
+  const core = SKIP_LOCANTS ? stripLocants(s) : s
+  const greek = GREEK_RE.exec(core)
+  if (greek) return `g:${greek[1]}`
+
+  const c = s.charAt(0)
+  if (c >= 'a' && c <= 'z') return c.toUpperCase()
+  return NUMERIC_MODE === 'split' ? c : '#'
+}
+
+const sortKey = (name: string): string => stripLead(name.toLowerCase())
 
 let _ordered: CatalogEntry[] | null = null
 let _counts: Record<Bucket, number> | null = null
@@ -137,29 +230,30 @@ let _offsets: Record<Bucket, number> | null = null
 
 function buildOrder() {
   const pool = _catalog ?? []
+  const rank = (b: Bucket) => BUCKET_RANK.get(b) ?? BUCKETS.length
 
   const ordered = [...pool].sort((a, b) => {
-    const d = bucketRank(bucketOf(a.name)) - bucketRank(bucketOf(b.name))
+    const d = rank(bucketOf(a.name)) - rank(bucketOf(b.name))
     if (d !== 0) return d
     return sortKey(a.name).localeCompare(sortKey(b.name), 'en', { sensitivity: 'base' })
   })
 
-  const counts = Object.fromEntries(BUCKETS.map(b => [b, 0])) as Record<Bucket, number>
-  const offsets = Object.fromEntries(BUCKETS.map(b => [b, -1])) as Record<Bucket, number>
+  const counts = Object.fromEntries(BUCKETS.map(b => [b.key, 0])) as Record<Bucket, number>
+  const offsets = Object.fromEntries(BUCKETS.map(b => [b.key, -1])) as Record<Bucket, number>
 
   ordered.forEach((e, i) => {
     const b = bucketOf(e.name)
-    counts[b]++
+    counts[b] = (counts[b] ?? 0) + 1
     if (offsets[b] === -1) offsets[b] = i
   })
 
   // An empty bucket resolves to where it *would* start, so jumping to a letter
-  // with nothing behind it lands on the next letter rather than back at A.
+  // with nothing behind it lands on the next one rather than back at A.
   let next = ordered.length
   for (let i = BUCKETS.length - 1; i >= 0; i--) {
-    const b = BUCKETS[i]
-    if (offsets[b] === -1) offsets[b] = next
-    else next = offsets[b]
+    const k = BUCKETS[i].key
+    if (offsets[k] === -1) offsets[k] = next
+    else next = offsets[k]
   }
 
   _ordered = ordered
@@ -168,23 +262,23 @@ function buildOrder() {
 }
 
 /**
- * The whole catalog in display order: A first, numeric names last. Sorted once
- * and cached — 3,433 entries is a single sub-millisecond pass.
+ * The whole catalog in display order: A first, then digits, then the Greek
+ * descriptors. Sorted once and cached — 3,433 entries is a single pass.
  */
 export function orderedCatalog(): CatalogEntry[] {
   if (!_ordered) buildOrder()
   return _ordered!
 }
 
-/** Entry count per bucket, for disabling letters with nothing behind them. */
+/** Entry count per bucket, for disabling buckets with nothing behind them. */
 export function bucketCounts(): Record<Bucket, number> {
   if (!_counts) buildOrder()
   return _counts!
 }
 
 /**
- * Index of each bucket's first entry within `orderedCatalog()`. Lets the letter
- * nav jump into the middle of one continuous A→9 list instead of filtering it.
+ * Index of each bucket's first entry within `orderedCatalog()`. Lets the nav
+ * jump into the middle of one continuous run instead of filtering it.
  */
 export function bucketOffsets(): Record<Bucket, number> {
   if (!_offsets) buildOrder()
@@ -245,9 +339,9 @@ export function getByPcid(pcid: string): CatalogEntry | null {
 /**
  * Paged browse over the ordered catalog.
  *
- * `bucket` narrows the pool to one letter; `offset` instead starts partway
- * through the full run and keeps going, which is how the letter nav scrolls
- * across letter boundaries. `total` always reflects the pool, not the page.
+ * `bucket` narrows the pool to one bucket; `offset` instead starts partway
+ * through the full run and keeps going, which is how the nav scrolls across
+ * bucket boundaries. `total` always reflects the pool, not the page.
  */
 export function browse(
   opts: { type?: 0 | 1; bucket?: Bucket; offset?: number; limit?: number } = {},
