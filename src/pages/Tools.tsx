@@ -51,7 +51,7 @@ export default function Tools() {
       title="Calculators and query aids"
       lede="Small, auditable tools. Every result shows its inputs, its formula, and the source of its constants — a number you cannot check is a number you should not use."
     >
-      {/* Pharmacopoe AI — lead item, not a grid cell */}
+      {/* Pharmacopoe Ai — lead item, not a grid cell */}
       <section className="border-t border-sage-200 py-8">
         <div className="rounded-xl border border-aqua-200 bg-aqua-100/40 p-6">
           <div className="mb-2 flex items-center gap-3">
@@ -59,7 +59,7 @@ export default function Tools() {
               className="font-display text-[22px] font-semibold text-sage-900"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              Pharmacopoe AI
+              Pharmacopoe Ai
             </h2>
             <StatusTag status="building" />
           </div>
