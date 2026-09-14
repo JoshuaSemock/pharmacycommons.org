@@ -1,243 +1,224 @@
+import { createContext, useContext } from 'react'
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeSlug from 'rehype-slug'
 
 /**
- * A deliberately small markdown renderer — no dependency, no lockfile change.
+ * Markdown rendering for blog posts.
  *
- * Supported: ## / ### headings, paragraphs, - and 1. lists, > blockquotes,
- * ``` fenced code, --- rules, and inline **bold**, *italic*, `code`,
- * [links](url).
+ * remark-gfm adds tables, strikethrough, task lists, footnotes, and autolinks
+ * on top of CommonMark. rehype-slug puts ids on headings so posts can be deep
+ * linked (/blog/some-post#the-section).
  *
- * Not supported: tables, images, nested lists, HTML passthrough, footnotes.
- * If a post needs those, that is the signal to add a real markdown library
- * rather than to grow this file.
+ * Raw HTML in markdown is NOT enabled — no rehype-raw. Posts are authored in
+ * the repo, but leaving HTML off keeps the door shut in case post bodies ever
+ * come from the revisions queue rather than from git.
+ *
+ * Every element below is mapped explicitly to project tokens. There is no
+ * prose/typography plugin in the stack, so unmapped elements fall back to
+ * browser defaults and will look wrong — add a mapping rather than a global
+ * stylesheet.
  */
 
-type Block =
-  | { kind: 'heading'; level: 2 | 3 | 4; text: string }
-  | { kind: 'paragraph'; text: string }
-  | { kind: 'list'; ordered: boolean; items: string[] }
-  | { kind: 'quote'; text: string }
-  | { kind: 'code'; text: string }
-  | { kind: 'rule' }
+/** Lets the `code` mapping tell fenced blocks apart from inline spans. */
+const InsidePre = createContext(false)
 
-function toBlocks(source: string): Block[] {
-  const lines = source.replace(/\r\n/g, '\n').split('\n')
-  const blocks: Block[] = []
-  let i = 0
-
-  while (i < lines.length) {
-    const line = lines[i]
-
-    if (!line.trim()) {
-      i++
-      continue
-    }
-
-    // Fenced code
-    if (line.trimStart().startsWith('```')) {
-      const buffer: string[] = []
-      i++
-      while (i < lines.length && !lines[i].trimStart().startsWith('```')) {
-        buffer.push(lines[i])
-        i++
-      }
-      i++ // consume closing fence
-      blocks.push({ kind: 'code', text: buffer.join('\n') })
-      continue
-    }
-
-    // Horizontal rule
-    if (/^\s*(---|\*\*\*|___)\s*$/.test(line)) {
-      blocks.push({ kind: 'rule' })
-      i++
-      continue
-    }
-
-    // Headings
-    const heading = /^(#{2,4})\s+(.*)$/.exec(line)
-    if (heading) {
-      blocks.push({
-        kind: 'heading',
-        level: heading[1].length as 2 | 3 | 4,
-        text: heading[2].trim(),
-      })
-      i++
-      continue
-    }
-
-    // Blockquote
-    if (/^\s*>\s?/.test(line)) {
-      const buffer: string[] = []
-      while (i < lines.length && /^\s*>\s?/.test(lines[i])) {
-        buffer.push(lines[i].replace(/^\s*>\s?/, ''))
-        i++
-      }
-      blocks.push({ kind: 'quote', text: buffer.join(' ').trim() })
-      continue
-    }
-
-    // Lists
-    const bullet = /^\s*[-*]\s+(.*)$/
-    const numbered = /^\s*\d+[.)]\s+(.*)$/
-    if (bullet.test(line) || numbered.test(line)) {
-      const ordered = numbered.test(line)
-      const pattern = ordered ? numbered : bullet
-      const items: string[] = []
-      while (i < lines.length && pattern.test(lines[i])) {
-        items.push(pattern.exec(lines[i])![1].trim())
-        i++
-      }
-      blocks.push({ kind: 'list', ordered, items })
-      continue
-    }
-
-    // Paragraph — accumulate until a blank line or a block-starting token
-    const buffer: string[] = []
-    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i])) {
-      buffer.push(lines[i].trim())
-      i++
-    }
-    if (buffer.length) blocks.push({ kind: 'paragraph', text: buffer.join(' ') })
-    else i++ // safety: never stall
-  }
-
-  return blocks
-}
-
-function isBlockStart(line: string): boolean {
+function CodeBlockWrapper({ children }: { children?: ReactNode }) {
   return (
-    line.trimStart().startsWith('```') ||
-    /^(#{2,4})\s+/.test(line) ||
-    /^\s*>\s?/.test(line) ||
-    /^\s*[-*]\s+/.test(line) ||
-    /^\s*\d+[.)]\s+/.test(line) ||
-    /^\s*(---|\*\*\*|___)\s*$/.test(line)
+    <InsidePre.Provider value={true}>
+      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-[12.5px] leading-relaxed text-sage-800">
+        {children}
+      </pre>
+    </InsidePre.Provider>
   )
 }
 
-const INLINE = /(`[^`]+`)|(\[[^\]]+\]\([^)\s]+\))|(\*\*[^*]+\*\*)|(\*[^*]+\*)/g
+function CodeSpan({ children }: { children?: ReactNode }) {
+  const insidePre = useContext(InsidePre)
+  if (insidePre) return <code>{children}</code>
+  return (
+    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.9em] text-sage-800">
+      {children}
+    </code>
+  )
+}
 
-function renderInline(text: string, keyPrefix: string): ReactNode[] {
-  const out: ReactNode[] = []
-  let last = 0
-  let n = 0
-  let match: RegExpExecArray | null
+function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
+  const className =
+    'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
 
-  INLINE.lastIndex = 0
-  while ((match = INLINE.exec(text)) !== null) {
-    if (match.index > last) out.push(text.slice(last, match.index))
-    const token = match[0]
-    const key = `${keyPrefix}-${n++}`
-
-    if (token.startsWith('`')) {
-      out.push(
-        <code
-          key={key}
-          className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.9em] text-sage-800"
-        >
-          {token.slice(1, -1)}
-        </code>
-      )
-    } else if (token.startsWith('[')) {
-      const link = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(token)!
-      const href = link[2]
-      const external = /^https?:\/\//.test(href)
-      out.push(
-        <a
-          key={key}
-          href={href}
-          {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
-          className="text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
-        >
-          {link[1]}
-        </a>
-      )
-    } else if (token.startsWith('**')) {
-      out.push(
-        <strong key={key} className="font-medium text-sage-900">
-          {token.slice(2, -2)}
-        </strong>
-      )
-    } else {
-      out.push(
-        <em key={key} className="italic">
-          {token.slice(1, -1)}
-        </em>
-      )
-    }
-
-    last = match.index + token.length
+  // Internal route — keep it a client-side navigation.
+  if (href && href.startsWith('/')) {
+    return (
+      <Link to={href} className={className}>
+        {children}
+      </Link>
+    )
   }
 
-  if (last < text.length) out.push(text.slice(last))
-  return out
+  // Same-page fragment.
+  if (href && href.startsWith('#')) {
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <a href={href} target="_blank" rel="noreferrer" className={className}>
+      {children}
+    </a>
+  )
+}
+
+const components: Components = {
+  h1: ({ children, ...props }) => (
+    <h2
+      {...props}
+      className="pt-4 font-display text-[24px] font-semibold text-sage-900"
+      style={{ fontFamily: 'var(--font-display)' }}
+    >
+      {children}
+    </h2>
+  ),
+  h2: ({ children, ...props }) => (
+    <h2
+      {...props}
+      className="scroll-mt-28 pt-4 font-display text-[21px] font-semibold text-sage-900"
+      style={{ fontFamily: 'var(--font-display)' }}
+    >
+      {children}
+    </h2>
+  ),
+  h3: ({ children, ...props }) => (
+    <h3
+      {...props}
+      className="scroll-mt-28 pt-3 font-display text-[17px] font-semibold text-sage-900"
+      style={{ fontFamily: 'var(--font-display)' }}
+    >
+      {children}
+    </h3>
+  ),
+  h4: ({ children, ...props }) => (
+    <h4
+      {...props}
+      className="scroll-mt-28 pt-2 font-sans text-[15px] font-medium text-sage-900"
+    >
+      {children}
+    </h4>
+  ),
+
+  p: ({ children }) => (
+    <p className="font-sans text-[15px] leading-relaxed text-sage-700">{children}</p>
+  ),
+
+  a: ({ href, children }) => <Anchor href={href}>{children}</Anchor>,
+
+  strong: ({ children }) => <strong className="font-medium text-sage-900">{children}</strong>,
+  em: ({ children }) => <em className="italic">{children}</em>,
+  del: ({ children }) => (
+    <del className="text-sage-600 line-through decoration-sage-400">{children}</del>
+  ),
+
+  ul: ({ children }) => (
+    <ul className="list-disc space-y-2 pl-5 font-sans text-[15px] leading-relaxed text-sage-700 marker:text-sage-400">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal space-y-2 pl-5 font-sans text-[15px] leading-relaxed text-sage-700 marker:text-sage-400">
+      {children}
+    </ol>
+  ),
+  // Nested lists need their own margin; the outer space-y does not reach them.
+  li: ({ children }) => <li className="[&>ul]:mt-2 [&>ol]:mt-2 [&>ul]:mb-1 [&>ol]:mb-1">{children}</li>,
+
+  blockquote: ({ children }) => (
+    <blockquote className="border-l-2 border-aqua-300 pl-4 font-sans text-[15px] italic leading-relaxed text-sage-600 [&>p]:text-sage-600">
+      {children}
+    </blockquote>
+  ),
+
+  pre: ({ children }) => <CodeBlockWrapper>{children}</CodeBlockWrapper>,
+  code: ({ children }) => <CodeSpan>{children}</CodeSpan>,
+
+  hr: () => <hr className="border-sage-200" />,
+
+  table: ({ children }) => (
+    <div className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70">
+      <table className="w-full border-collapse font-sans text-[13.5px]">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="bg-sage-100">{children}</thead>,
+  tr: ({ children }) => <tr className="border-b border-sage-200 last:border-0">{children}</tr>,
+  th: ({ children, ...props }) => (
+    <th
+      {...props}
+      className="px-3 py-2 text-left font-medium text-sage-900"
+      style={{ textAlign: (props.style?.textAlign as 'left' | 'center' | 'right') ?? 'left' }}
+    >
+      {children}
+    </th>
+  ),
+  td: ({ children, ...props }) => (
+    <td {...props} className="px-3 py-2 align-top text-sage-700">
+      {children}
+    </td>
+  ),
+
+  img: ({ src, alt }) => (
+    <figure className="space-y-2">
+      <img
+        src={typeof src === 'string' ? src : undefined}
+        alt={alt ?? ''}
+        loading="lazy"
+        className="w-full rounded-lg border border-sage-200"
+      />
+      {alt && (
+        <figcaption className="font-sans text-[12.5px] text-sage-600">{alt}</figcaption>
+      )}
+    </figure>
+  ),
+
+  // GFM task list checkboxes.
+  input: ({ type, checked, disabled }) =>
+    type === 'checkbox' ? (
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        readOnly
+        className="mr-1.5 align-middle accent-aqua-600"
+      />
+    ) : null,
+
+  // Footnote section produced by remark-gfm.
+  section: ({ children, ...props }) => {
+    const isFootnotes = (props as { 'data-footnotes'?: boolean })['data-footnotes']
+    return isFootnotes ? (
+      <section className="border-t border-sage-200 pt-6 font-sans text-[13px] text-sage-600 [&_h2]:text-[15px] [&_ol]:text-[13px]">
+        {children}
+      </section>
+    ) : (
+      <section>{children}</section>
+    )
+  },
 }
 
 export default function Markdown({ source }: { source: string }) {
-  const blocks = toBlocks(source)
-
   return (
     <div className="space-y-5">
-      {blocks.map((block, idx) => {
-        const key = `b${idx}`
-        switch (block.kind) {
-          case 'heading': {
-            const size =
-              block.level === 2 ? 'text-[21px]' : block.level === 3 ? 'text-[17px]' : 'text-[15px]'
-            const Tag = block.level === 2 ? 'h2' : block.level === 3 ? 'h3' : 'h4'
-            return (
-              <Tag
-                key={key}
-                className={`pt-3 font-display font-semibold text-sage-900 ${size}`}
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {renderInline(block.text, key)}
-              </Tag>
-            )
-          }
-          case 'paragraph':
-            return (
-              <p key={key} className="font-sans text-[15px] leading-relaxed text-sage-700">
-                {renderInline(block.text, key)}
-              </p>
-            )
-          case 'list': {
-            const ListTag = block.ordered ? 'ol' : 'ul'
-            return (
-              <ListTag
-                key={key}
-                className={`space-y-2 pl-5 font-sans text-[15px] leading-relaxed text-sage-700 ${
-                  block.ordered ? 'list-decimal' : 'list-disc'
-                } marker:text-sage-400`}
-              >
-                {block.items.map((item, j) => (
-                  <li key={`${key}-${j}`}>{renderInline(item, `${key}-${j}`)}</li>
-                ))}
-              </ListTag>
-            )
-          }
-          case 'quote':
-            return (
-              <blockquote
-                key={key}
-                className="border-l-2 border-aqua-300 pl-4 font-sans text-[15px] italic leading-relaxed text-sage-600"
-              >
-                {renderInline(block.text, key)}
-              </blockquote>
-            )
-          case 'code':
-            return (
-              <pre
-                key={key}
-                className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-[12.5px] leading-relaxed text-sage-800"
-              >
-                <code>{block.text}</code>
-              </pre>
-            )
-          case 'rule':
-            return <hr key={key} className="border-sage-200" />
-        }
-      })}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSlug]}
+        components={components}
+      >
+        {source}
+      </ReactMarkdown>
     </div>
   )
 }
