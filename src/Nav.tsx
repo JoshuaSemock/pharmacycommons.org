@@ -1,6 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, NavLink as RouterNavLink } from 'react-router-dom'
 import { DRUGS } from './data'
+
+const SECTIONS = [
+  { to: '/', label: 'Browse', end: true },
+  { to: '/about', label: 'About' },
+  { to: '/tools', label: 'Tools' },
+  { to: '/resources', label: 'Resources' },
+  { to: '/citations', label: 'Citations' },
+  { to: '/blog', label: 'Blog' },
+]
 
 export default function Nav() {
   const navigate = useNavigate()
@@ -34,6 +43,8 @@ export default function Nav() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-sage-200 bg-sage-50/90 backdrop-blur-md">
+
+      {/* Row 1 — wordmark, search, contribute */}
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
 
         {/* Wordmark */}
@@ -90,7 +101,7 @@ export default function Nav() {
                   </span>
                   <span className="flex-1">
                     <span className="block font-sans text-[11px] text-sage-900 font-medium">{drug.name}</span>
-                    <span className="block font-sans text-[10px] text-sage-500">{drug.classification.chemicalClass.join(' / ')} · {drug.therapeuticArea}</span>
+                    <span className="block font-sans text-[10px] text-sage-600">{drug.classification.chemicalClass.join(' / ')} · {drug.therapeuticArea}</span>
                   </span>
                   <EcoRiskDot risk={drug.eco.risk} />
                 </button>
@@ -100,25 +111,40 @@ export default function Nav() {
         </div>
 
         {/* Right actions */}
-        <div className="ml-auto flex items-center gap-1 shrink-0">
-          <NavLink label="Browse" onClick={() => navigate('/')} />
-          <button className="ml-1 rounded-lg border border-aqua-400 bg-aqua-400/10 px-3 py-1.5 font-sans text-[12.5px] font-medium text-aqua-700 transition-all hover:bg-aqua-400/20 hover:border-aqua-500">
+        <div className="ml-auto shrink-0">
+          <button className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-3 py-1.5 font-sans text-[12.5px] font-medium text-aqua-700 transition-all hover:bg-aqua-400/20 hover:border-aqua-500">
             Contribute
           </button>
         </div>
       </div>
-    </nav>
-  )
-}
 
-function NavLink({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="rounded-md px-3 py-1.5 font-sans text-[13px] text-sage-600 hover:bg-sage-100 hover:text-sage-900 transition-colors"
-    >
-      {label}
-    </button>
+      {/* Row 2 — section bar, left-justified */}
+      <div className="border-t border-sage-200/70">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <ul className="flex items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SECTIONS.map(section => (
+              <li key={section.to} className="shrink-0">
+                <RouterNavLink
+                  to={section.to}
+                  end={section.end}
+                  className={({ isActive }) =>
+                    [
+                      'relative block px-3 py-2 font-sans text-[13px] transition-colors',
+                      'after:absolute after:inset-x-3 after:bottom-0 after:h-px after:transition-colors',
+                      isActive
+                        ? 'text-sage-900 after:bg-aqua-500'
+                        : 'text-sage-600 hover:text-sage-900 after:bg-transparent',
+                    ].join(' ')
+                  }
+                >
+                  {section.label}
+                </RouterNavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </nav>
   )
 }
 
