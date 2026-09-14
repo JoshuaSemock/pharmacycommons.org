@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # vite build uses esbuild, which strips types without checking them.
+      # Without this step a type error ships silently instead of failing.
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
       - name: Build the site
         run: pnpm build
 
