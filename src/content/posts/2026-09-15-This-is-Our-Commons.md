@@ -1,6 +1,6 @@
 ---
 
-title: " This is Our Commons: The Case for Open Pharmaceutical Knowledge
+title: "This is Our Commons: The Case for Open Pharmaceutical Knowledge"
 author: Joshua Semock, PharmD
 date: 2026-09-15
 version: 0.1
