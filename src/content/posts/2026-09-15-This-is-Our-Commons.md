@@ -5,7 +5,7 @@ author: Joshua Semock, PharmD
 date: 2026-09-15
 version: 0.1
 status: Theory of medical information freedom.
-tags: [Pharmacy Commons, Theory]
+tags: [Pharmacy Commons,Theory]
 
 ---
 
