@@ -16,7 +16,7 @@ tags: [Pharmacy Commons]
 **White paper · Draft 0.4 · September 2026
 Joshua Semock, PharmD · pharmacycommons.org**
 
-\---
+
 
 ## Abstract
 
@@ -57,7 +57,7 @@ commits the project to. **Part II (Sections 8–18)** describes the architecture
 detail. **Part III (Sections 19–23)** reports where the project stands today, the
 decisions still open, the roadmap, and how to take part.
 
-\---
+
 
 # Part I — Why Pharmacy Commons
 
@@ -101,7 +101,7 @@ structured enough for machines to understand, transparent enough for people to a
 and durable enough to stay useful as individual databases, applications, and
 technologies come and go.
 
-\---
+
 
 ## 2\. Why we started
 
@@ -158,7 +158,7 @@ at the point of choosing between two equivalent agents. Where environmental indi
 are published, they tend to appear as a single number with no visible chain of
 assumptions behind it.
 
-\---
+
 
 ## 3\. What we believe
 
@@ -233,7 +233,7 @@ read the same record through different views, and contributors maintain it throu
 one more. A view changes what is shown and how it is explained; it never changes the
 facts.
 
-\---
+
 
 ## 4\. The Commons
 
@@ -263,7 +263,7 @@ it, and maintained in the open through the Commons view (Section 17.7). That vie
 where the project's name becomes something a reader can use: the place to see how the
 record is built, and to help build it.
 
-\---
+
 
 ## 5\. What we're building
 
@@ -304,7 +304,7 @@ where contributors and curators review, correct, and extend the record. One iden
 one evidence record, several ways to understand it, and a shared place to maintain it
 (Section 17).
 
-\---
+
 
 ## 6\. Our commitment to trust
 
@@ -338,7 +338,7 @@ published.
 * **Not medical advice.** Pharmacy Commons describes how drug information is structured
 and where it comes from. It does not tell anyone what to do for a particular patient.
 
-\---
+
 
 ## 7\. Founder and organization
 
@@ -363,7 +363,7 @@ Dr. Joshua Semock completed his training at the University of Colorado's Anschut
 Campus with the Skaggs School of Pharmacy and Pharmaceutical Sciences. He attended a post-graduate
 year one (PGY1) program at the Buffalo Psychiatric Centers' Strozzi Hospital, part of the New York
 State Office of Mental Health. He now practices in Atlanta, Georgia.
-\---
+ 
 
 # Part II — Architecture
 
@@ -481,7 +481,7 @@ A combination product found in the solo block is treated as a split in miniature
 PCID is allocated in block 2, the misfiled PCID is retired with a successor pointer, and
 its slug redirects. The same rule covers any entity found in the wrong block.
 
-\---
+ 
 
 ## 9\. Substances and the formulation ladder
 
@@ -549,7 +549,7 @@ unit. Units follow UCUM so that automated comparison and conversion are possible
 Strength belongs to the clinical drug component and product levels. It does not belong
 on a moiety, and it does not belong on a combination product's PCID (Section 14).
 
-\---
+ 
 
 ## 10\. Cross-references and resolution
 
@@ -607,7 +607,7 @@ source. Language tags are required and meaningful. A Spanish or Italian name tag
 English defeats the multilingual goal, and a misspelling tagged as a synonym misleads
 anyone who reuses the name list.
 
-\---
+ 
 
 ## 11\. Relationships and classes
 
@@ -659,7 +659,7 @@ An initial predicate vocabulary includes `member\_of`, `subclass\_of`, `has\_com
 `contraindicated\_in`, `successor\_of`, and `has\_product`. A value that is not in the
 registry cannot be written.
 
-\---
+ 
 
 ## 12\. Assertions, curation, and canonical facts
 
@@ -739,7 +739,7 @@ provenance, then record the decision and its rationale. It also means that every
 published value, whether it came from a regulator or a volunteer, can answer the same
 question: who said this, when, and who approved it.
 
-\---
+ 
 
 ## 13\. Time and jurisdiction
 
@@ -762,7 +762,7 @@ approved indications, and environmental exposure all vary by jurisdiction. Asser
 and canonical rows carry a jurisdiction wherever the value is not universal, so the
 platform can later serve more than one regulatory context without restructuring.
 
-\---
+ 
 
 ## 14\. Combination products
 
@@ -794,7 +794,7 @@ Every inherited or computed value keeps its derivation path: which components, w
 component assertions, and which policy produced it. When a component's data changes,
 dependent combination values can be identified and recomputed.
 
-\---
+ 
 
 ## 15\. Ecopharmacovigilance as a first-class domain
 
@@ -865,7 +865,7 @@ hundred compounds, cross-referenced to the ECOTOX bulk export. Coverage expands 
 there as physicochemical backfill and excretion data make PEC estimation possible for
 more of the catalog.
 
-\---
+ 
 
 ## 16\. Machine-readable surfaces and AI
 
@@ -942,7 +942,7 @@ fills in detail from the database when it is available. Pages declare how comple
 their data is and render accordingly. A backend outage therefore reduces the detail a
 page can show without making any drug unreachable, and search keeps working.
 
-\---
+ 
 
 ## 17\. Views: one record, many readers, one shared workspace
 
@@ -1151,7 +1151,7 @@ with the site's existing URL-driven navigation. A view is therefore linkable, sh
 and compatible with static hosting. Views degrade the same way pages do: a stub entry
 shows what its completeness allows in every view (Section 16.6).
 
-\---
+ 
 
 ## 18\. Licensing and upstream terms
 
@@ -1179,7 +1179,7 @@ domain sources where they exist.
 Because every canonical value links to its supporting assertions and every assertion
 names its source, whichever option is chosen can be applied mechanically and audited.
 
-\---
+ 
 
 # Part III — Status and path forward
 
@@ -1258,7 +1258,7 @@ The fixtures are chosen by the concept they stress, not by popularity:
 Fixtures use their real spine PCIDs. Placeholder identifiers are never allocated,
 because any PCID that is used once is permanent.
 
-\---
+ 
 
 ## 20\. Open decisions
 
@@ -1282,7 +1282,7 @@ be documented publicly when resolved.
 |Which parts of the Commons view are readable without an account|Commons view, trust commitments|
 |Contributor terms: license grant for contributions, attribution and pseudonymity, and conflict-of-interest disclosure|Commons view, dataset license|
 
-\---
+ 
 
 ## 21\. Roadmap
 
@@ -1304,7 +1304,7 @@ Large-scale ingestion will not begin until phases 1 and 2 have shown that the id
 provenance, level-discipline, and lifecycle rules hold on deliberately difficult real
 records.
 
-\---
+ 
 
 ## 22\. Get involved
 
@@ -1334,7 +1334,7 @@ make every contribution automatically authoritative, but to make every contribut
 Pharmacy Commons is being built as infrastructure that others can use, question,
 improve, and extend. To get in touch, write to **contact@pharmacycommons.org**.
 
-\---
+ 
 
 ## 23\. Conclusion
 
@@ -1351,7 +1351,7 @@ The identity spine is already public. The next step is to show, on a small and
 deliberately difficult set of records, that the rest of the architecture holds before
 it is asked to carry the whole catalog.
 
-\---
+ 
 
 ## Appendix A. Glossary
 
@@ -1409,7 +1409,7 @@ not final table names. Mapping to schema v2 is Phase 1 work.
 |View-specific writing|Plain-language and teaching text linked to, and hashed against, the canonical rows it explains|
 |Retired PCIDs|Permanently withdrawn identifiers kept for permalink routing|
 
-\---
+ 
 
 *Pharmacy Commons code is licensed under GPL-3.0. Aggregated datasets are published
 under Creative Commons terms. This document describes data structures and methodology
