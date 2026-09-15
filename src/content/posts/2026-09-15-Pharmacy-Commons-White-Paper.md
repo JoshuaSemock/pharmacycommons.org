@@ -5,7 +5,7 @@ author: Joshua Semock, PharmD
 date: 2026-09-15
 version: 0.4 (draft for review)
 status: Architecture proposal; describes both the current build and the intended design
-tags: [Pharmacy-Commons]
+tags: [Pharmacy Commons]
 
 ---
 
