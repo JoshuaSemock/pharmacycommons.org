@@ -11,7 +11,8 @@ import rehypeSlug from 'rehype-slug'
  *
  * remark-gfm adds tables, strikethrough, task lists, footnotes, and autolinks
  * on top of CommonMark. rehype-slug puts ids on headings so posts can be deep
- * linked (/blog/some-post#the-section).
+ * linked (/blog/some-post#the-section) and so the "On this page" rail can find
+ * them.
  *
  * Raw HTML in markdown is NOT enabled — no rehype-raw. Posts are authored in
  * the repo, but leaving HTML off keeps the door shut in case post bodies ever
@@ -21,15 +22,31 @@ import rehypeSlug from 'rehype-slug'
  * prose/typography plugin in the stack, so unmapped elements fall back to
  * browser defaults and will look wrong — add a mapping rather than a global
  * stylesheet.
+ *
+ * react-markdown passes the hast `node` to every component. It is destructured
+ * out below before spreading props, otherwise React writes node="[object Object]"
+ * onto the DOM element.
+ *
+ * Type scale: 16.5px body on a phi step — h3 ≈ 20px, h2 ≈ 26px (16.5 × 1.618).
  */
+
+const BODY = 'font-sans text-[16.5px] leading-[1.7] text-sage-700'
 
 /** Lets the `code` mapping tell fenced blocks apart from inline spans. */
 const InsidePre = createContext(false)
 
+/** Lets paragraphs inside a blockquote take the quote's type instead of body type. */
+const InsideQuote = createContext(false)
+
+function Paragraph({ children }: { children?: ReactNode }) {
+  const insideQuote = useContext(InsideQuote)
+  return <p className={insideQuote ? undefined : BODY}>{children}</p>
+}
+
 function CodeBlockWrapper({ children }: { children?: ReactNode }) {
   return (
     <InsidePre.Provider value={true}>
-      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-[12.5px] leading-relaxed text-sage-800">
+      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-[13px] leading-relaxed text-sage-800">
         {children}
       </pre>
     </InsidePre.Provider>
@@ -40,7 +57,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
   const insidePre = useContext(InsidePre)
   if (insidePre) return <code>{children}</code>
   return (
-    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.9em] text-sage-800">
+    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.88em] text-sage-800">
       {children}
     </code>
   )
@@ -48,7 +65,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
 
 function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
   const className =
-    'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
+    'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
 
   // Internal route — keep it a client-side navigation.
   if (href && href.startsWith('/')) {
@@ -59,7 +76,8 @@ function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
     )
   }
 
-  // Same-page fragment.
+  // Same-page fragment. PageFrame picks up the hash change and corrects the
+  // scroll position for the sticky nav.
   if (href && href.startsWith('#')) {
     return (
       <a href={href} className={className}>
@@ -76,45 +94,44 @@ function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
 }
 
 const components: Components = {
-  h1: ({ children, ...props }) => (
+  // A post's title is already the page h1; demote any h1 in the body.
+  h1: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="pt-4 font-display text-[24px] font-semibold text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-[30px] font-semibold leading-tight text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
     </h2>
   ),
-  h2: ({ children, ...props }) => (
+  h2: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="scroll-mt-28 pt-4 font-display text-[21px] font-semibold text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-[26px] font-semibold leading-snug text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
     </h2>
   ),
-  h3: ({ children, ...props }) => (
+  h3: ({ node: _node, children, ...props }) => (
     <h3
       {...props}
-      className="scroll-mt-28 pt-3 font-display text-[17px] font-semibold text-sage-900"
+      className="scroll-mt-32 pt-3 font-display text-[20px] font-semibold leading-snug text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
     </h3>
   ),
-  h4: ({ children, ...props }) => (
+  h4: ({ node: _node, children, ...props }) => (
     <h4
       {...props}
-      className="scroll-mt-28 pt-2 font-sans text-[15px] font-medium text-sage-900"
+      className="scroll-mt-32 pt-2 font-sans text-[16.5px] font-medium text-sage-900"
     >
       {children}
     </h4>
   ),
 
-  p: ({ children }) => (
-    <p className="font-sans text-[15px] leading-relaxed text-sage-700">{children}</p>
-  ),
+  p: ({ children }) => <Paragraph>{children}</Paragraph>,
 
   a: ({ href, children }) => <Anchor href={href}>{children}</Anchor>,
 
@@ -125,37 +142,41 @@ const components: Components = {
   ),
 
   ul: ({ children }) => (
-    <ul className="list-disc space-y-2 pl-5 font-sans text-[15px] leading-relaxed text-sage-700 marker:text-sage-400">
-      {children}
-    </ul>
+    <ul className={`list-disc space-y-3 pl-5 marker:text-sage-400 ${BODY}`}>{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal space-y-2 pl-5 font-sans text-[15px] leading-relaxed text-sage-700 marker:text-sage-400">
-      {children}
-    </ol>
+    <ol className={`list-decimal space-y-3 pl-5 marker:text-sage-400 ${BODY}`}>{children}</ol>
   ),
   // Nested lists need their own margin; the outer space-y does not reach them.
-  li: ({ children }) => <li className="[&>ul]:mt-2 [&>ol]:mt-2 [&>ul]:mb-1 [&>ol]:mb-1">{children}</li>,
+  li: ({ children }) => (
+    <li className="pl-1 [&>ol]:mt-2 [&>ol]:mb-1 [&>ul]:mt-2 [&>ul]:mb-1">{children}</li>
+  ),
 
+  // Set in Fraunces so a pulled line reads as a different voice from the body.
   blockquote: ({ children }) => (
-    <blockquote className="border-l-2 border-aqua-300 pl-4 font-sans text-[15px] italic leading-relaxed text-sage-600 [&>p]:text-sage-600">
-      {children}
-    </blockquote>
+    <InsideQuote.Provider value={true}>
+      <blockquote
+        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-[20px] leading-[1.5] text-sage-800 italic"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        {children}
+      </blockquote>
+    </InsideQuote.Provider>
   ),
 
   pre: ({ children }) => <CodeBlockWrapper>{children}</CodeBlockWrapper>,
   code: ({ children }) => <CodeSpan>{children}</CodeSpan>,
 
-  hr: () => <hr className="border-sage-200" />,
+  hr: () => <hr className="my-4 border-sage-200" />,
 
   table: ({ children }) => (
     <div className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70">
-      <table className="w-full border-collapse font-sans text-[13.5px]">{children}</table>
+      <table className="w-full border-collapse font-sans text-[14px]">{children}</table>
     </div>
   ),
   thead: ({ children }) => <thead className="bg-sage-100">{children}</thead>,
   tr: ({ children }) => <tr className="border-b border-sage-200 last:border-0">{children}</tr>,
-  th: ({ children, ...props }) => (
+  th: ({ node: _node, children, ...props }) => (
     <th
       {...props}
       className="px-3 py-2 text-left font-medium text-sage-900"
@@ -164,23 +185,21 @@ const components: Components = {
       {children}
     </th>
   ),
-  td: ({ children, ...props }) => (
+  td: ({ node: _node, children, ...props }) => (
     <td {...props} className="px-3 py-2 align-top text-sage-700">
       {children}
     </td>
   ),
 
   img: ({ src, alt }) => (
-    <figure className="space-y-2">
+    <figure className="my-8 space-y-2">
       <img
         src={typeof src === 'string' ? src : undefined}
         alt={alt ?? ''}
         loading="lazy"
         className="w-full rounded-lg border border-sage-200"
       />
-      {alt && (
-        <figcaption className="font-sans text-[12.5px] text-sage-600">{alt}</figcaption>
-      )}
+      {alt && <figcaption className="font-sans text-[13px] text-sage-600">{alt}</figcaption>}
     </figure>
   ),
 
@@ -196,11 +215,15 @@ const components: Components = {
       />
     ) : null,
 
-  // Footnote section produced by remark-gfm.
+  // Footnote section produced by remark-gfm. data-toc-skip keeps its
+  // "Footnotes" heading out of the On this page rail.
   section: ({ children, ...props }) => {
     const isFootnotes = (props as { 'data-footnotes'?: boolean })['data-footnotes']
     return isFootnotes ? (
-      <section className="border-t border-sage-200 pt-6 font-sans text-[13px] text-sage-600 [&_h2]:text-[15px] [&_ol]:text-[13px]">
+      <section
+        data-toc-skip=""
+        className="mt-12 border-t border-sage-200 pt-6 font-sans text-[14px] text-sage-600 [&_h2]:pt-0 [&_h2]:text-[16px] [&_ol]:text-[14px] [&_p]:text-[14px]"
+      >
         {children}
       </section>
     ) : (
@@ -211,7 +234,7 @@ const components: Components = {
 
 export default function Markdown({ source }: { source: string }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug]}
