@@ -43,12 +43,18 @@ export default function SearchView() {
   const [failed, setFailed] = useState(false)
   const listTop = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    document.title = 'Browse the catalog · Pharmacy Commons'
+  }, [])
+
   const query = params.get('q') ?? ''
   const bucket = paramToBucket(params.get('letter'))
   /** Confined to one bucket; otherwise the bucket is just a starting point. */
   const confined = params.get('mode') === 'letter'
 
-  const perParam = Number(params.get('per'))
+  // Number(null) is 0, which is also the 'Everything' size — only read a real value.
+  const perRaw = params.get('per')
+  const perParam = perRaw === null ? NaN : Number(perRaw)
   const per = (PAGE_SIZES as readonly number[]).includes(perParam) ? perParam : DEFAULT_PAGE
   const pageSize = per === 0 ? Infinity : per
 
@@ -122,20 +128,21 @@ export default function SearchView() {
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 pb-24">
 
-      {/* Hero search */}
-      <section className="pt-16 pb-10 text-center">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.15em] text-aqua-600">This Pharmacy is our Commons, an open source compendium</p>
-        <h1 className="font-display text-4xl sm:text-5xl font-semibold text-sage-900 leading-[1.1] mb-4" style={{ fontFamily: 'var(--font-display)' }}>
-          Query drug information by active ingredients,<br className="hidden sm:block" /> formulations, or classes
+      {/* Page header and filter */}
+      <section className="pt-10 pb-8 sm:pt-14">
+        <h1
+          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-sage-900 sm:text-[2.618rem]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Browse the catalog
         </h1>
-        <p className="mx-auto max-w-xl font-sans text-[15px] text-sage-600 leading-relaxed mb-8">
-          Information on this website is for educational purposes, not medical advice, we have curated here open source information from, for example the FDA, WHO, and NIH.
+        <p className="mt-4 max-w-[42rem] font-sans text-[16px] leading-relaxed text-pretty text-sage-600">
+          Every drug in the Commons, from A onward. Filter by name or brand, or jump to a letter.
         </p>
 
-        {/* Search bar */}
-        <div className="mx-auto max-w-lg">
-          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-3 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200 transition-all">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" className="shrink-0 text-sage-400">
+        <div className="mt-6 max-w-lg">
+          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-2.5 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200 transition-all">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
@@ -143,13 +150,14 @@ export default function SearchView() {
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="...ibuprofen, Advil, NSAID, analgesic, etc."
+              placeholder="Filter by name or brand"
+              aria-label="Filter the catalog"
               className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
-              autoFocus
+              autoFocus={!!query}
             />
             {query && (
               <button onClick={() => setQuery('')} className="text-sage-400 hover:text-sage-600" aria-label="Clear search">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </button>
@@ -165,7 +173,7 @@ export default function SearchView() {
         onSelect={selectBucket}
       />
 
-      <div ref={listTop} className="scroll-mt-28" />
+      <div ref={listTop} className="scroll-mt-[calc(var(--nav-h,5.75rem)_+_3rem)]" />
 
       {/* Results */}
       <section className="pt-6">
@@ -246,7 +254,7 @@ export default function SearchView() {
             {groups.map(g => (
               <div key={g.key} className="mb-10 last:mb-0">
                 {g.def && (
-                  <div id={`bucket-${bucketToParam(g.key)}`} className="mb-3 flex items-baseline gap-3 scroll-mt-28">
+                  <div id={`bucket-${bucketToParam(g.key)}`} className="mb-3 flex items-baseline gap-3 scroll-mt-[calc(var(--nav-h,5.75rem)_+_3rem)]">
                     <span
                       className="font-display text-[26px] font-semibold leading-none text-sage-300"
                       style={{ fontFamily: 'var(--font-display)' }}
@@ -324,7 +332,7 @@ function CharacterIndex({
   return (
     <nav
       aria-label="Browse by first character"
-      className="sticky top-14 z-30 -mx-4 border-y border-sage-200 bg-sage-50/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
+      className="sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 border-y border-sage-200 bg-sage-50/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
     >
       <div className="flex items-center gap-1 overflow-x-auto sm:flex-wrap sm:overflow-visible">
         <button
