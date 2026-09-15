@@ -222,7 +222,6 @@ function SourcesFooter() {
         <DataSource label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
         <DataSource label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
         <DataSource
-          icon="🌿"
           label="Founded by Dr. Joshua Semock, PharmD"
           desc="(Aug. 2026) contact@pharmacycommons.org"
         />
@@ -231,7 +230,7 @@ function SourcesFooter() {
   )
 }
 
-function DataSource({ icon, label, desc }: { icon: string; label: string; desc: string }) {
+function DataSource({ label, desc }: { label: string; desc: string }) {
   return (
     <div className="flex gap-3">
       <span className="mt-0.5 text-xl leading-none" aria-hidden="true">
