@@ -4,7 +4,7 @@ slug: A-Public-Build-Log
 date: 2026-09-14
 author: Joshua Semock, PharmD
 summary: Why the work on Pharmacy Commons gets written down in the open, including the parts that go wrong.
-tags: [meta, process, architecture]
+tags: [Pharmacy Commons]
 draft: false
 ---
 
