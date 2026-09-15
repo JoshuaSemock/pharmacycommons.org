@@ -1,6 +1,6 @@
 \---
 
-title: "Pharmacy Commons: A Stable-Identity Architecture for Open, Auditable, and Environmentally Aware Drug Knowledge"
+title: "Pharmacy Commons: A Vision for Building Open Pharmaceutical Knowledge Infrastructure for Humans and Machines"
 author: Joshua Semock, PharmD
 date: 2026-09-15
 version: 0.4 (draft for review)
@@ -9,7 +9,7 @@ status: Architecture proposal; describes both the current build and the intended
 
 # Pharmacy Commons
 
-## A Stable-Identity Architecture for Open, Auditable, and Environmentally Aware Drug Knowledge
+## A Vision for Building Open Pharmaceutical Knowledge Infrastructure for Humans and Machines
 
 **White paper · Draft 0.4 · September 2026
 Joshua Semock, PharmD · pharmacycommons.org**
@@ -104,7 +104,7 @@ technologies come and go.
 ## 2\. Why we started
 
 Pharmacy Commons began with a simple observation: pharmaceutical information is
-everywhere, but the connections between sources are hard to see and hard to trust. The
+everywhere, but the connections between sources are hard to see and hard to trust, and when they are connected it's behind a paywall. The
 same medicine appears under different identifiers and at different levels of chemical,
 clinical, product, and regulatory granularity. A reference may give a useful answer
 without making clear whether that answer came from a regulator, a curated database,
@@ -117,7 +117,7 @@ and leave readers unable to tell where a value came from. The project was starte
 address that infrastructure problem rather than to reproduce another collection of
 drug facts, which is why Pharmacy Commons treats identity, provenance, level
 discipline, lifecycle, and evidence as infrastructure rather than as metadata added
-after the fact.
+after the fact. This is of utmost importance as large language models become our go to source for medical information.
 
 Four specific failures motivate the design.
 
@@ -340,7 +340,7 @@ and where it comes from. It does not tell anyone what to do for a particular pat
 
 ## 7\. Founder and organization
 
-Pharmacy Commons was founded by **Joshua Semock, PharmD**, to address a problem at the
+Pharmacy Commons was founded by **Joshua Semock, PharmD** in September of 2026, to address a problem at the
 intersection of pharmacy practice, pharmaceutical information, data architecture, and
 open knowledge. The project grew from the recognition that the hard part of
 pharmaceutical information is often not finding another fact, but understanding how
@@ -357,6 +357,10 @@ convert to a nonprofit structure. A trademark filing for the Pharmacy Commons na
 planned. The project is built publicly, with its architecture and unresolved decisions
 documented as the system develops.
 
+Dr. Joshua Semock completed his training at the University of Colorado's Anschutz Medical
+Campus with the Skaggs School of Pharmacy and Pharmaceutical Sciences. He attended a post-graduate
+year one (PGY1) program at the Buffalo Psychiatric Centers' Strozzi Hospital, part of the New York
+State Office of Mental Health. He now practices in Atlanta, Georgia.
 \---
 
 # Part II — Architecture
