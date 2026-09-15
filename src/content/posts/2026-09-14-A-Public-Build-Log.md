@@ -1,6 +1,6 @@
 ---
-title: A public build log
-slug: a-public-build-log
+title: A Public Build Log
+slug: A-Public-Build-Log
 date: 2026-09-14
 author: Joshua Semock, PharmD
 summary: Why the work on Pharmacy Commons gets written down in the open, including the parts that go wrong.
