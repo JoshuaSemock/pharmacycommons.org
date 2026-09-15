@@ -3,7 +3,7 @@ title: A Public Build Log
 slug: A-Public-Build-Log
 date: 2026-09-14
 author: Joshua Semock, PharmD
-summary: Why the work on Pharmacy Commons gets written down in the open, including the parts that go wrong.
+summary: An open record of progress and setbacks.
 tags: [Pharmacy Commons]
 draft: false
 ---
@@ -31,8 +31,8 @@ has to be legible, including the decisions that turned out to be wrong.
   regardless of view, how community contributions are licensed. When one gets
   decided, the decision and the reasoning land here.
 - **Environmental methodology.** Every risk quotient on this site is a calculation
-  with assumptions baked into it. Those assumptions get stated. The first of these
-  posts covers [what a risk quotient actually tells you](/blog/what-a-risk-quotient-tells-you).
+  with assumptions baked into it. Those assumptions get stated. More prinicples can
+  be found in [Pharmacy Commons: A Vision](/blog/Pharmacy-Commons-White-Paper).
 - **Corrections.** When a field is wrong and gets fixed, the fix is described rather
   than quietly applied. The database is being designed to keep both the wrong value
   and the fix, so a correction becomes part of the record instead of an erasure.
@@ -73,8 +73,8 @@ do with a patient. The Patient view will not change that either: it will explain
 medicine in plain language and leave decisions to the patient's pharmacist and
 prescriber.
 
-> The fastest way to lose trust in a reference is to discover it was confident about
-> something it had no basis for.
+> "Whoever is careless with the truth in small matters cannot be trusted with
+> important matters." — Einstein
 
 ## Coming up
 
