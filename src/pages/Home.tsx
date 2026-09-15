@@ -54,18 +54,17 @@ function Hero() {
   return (
     <section className="pt-16 pb-14 text-center">
       <p className="mb-3 font-sans text-[13.5px] font-medium text-aqua-700">
-        This Pharmacy is our Commons, an open source compendium
+        This is our Commons, an open source compendium of medical and pharmacy knowledge
       </p>
       <h1
         className="mb-4 font-display text-4xl font-semibold leading-[1.1] text-balance text-sage-900 sm:text-5xl"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Query drug information by active ingredients,
-        <br className="hidden sm:block" /> formulations, or classes
+        <br className="hidden sm:block" /> formulations, classes, and more
       </h1>
       <p className="mx-auto mb-8 max-w-xl font-sans text-[15px] leading-relaxed text-pretty text-sage-600">
-        Information on this website is for educational purposes, not medical advice. It is curated from
-        open sources such as the FDA, WHO, and NIH.
+        Information on this website is for educational purposes, not for medical use without a providers discretion.
       </p>
 
       <div className="relative mx-auto max-w-lg text-left">
@@ -81,7 +80,7 @@ function Hero() {
               onChange={e => setQuery(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setTimeout(() => setFocused(false), 150)}
-              placeholder="...ibuprofen, Advil, NSAID, analgesic, etc."
+              placeholder="...ibuprofen, Advil, NSAID, analgesic, pain, etc."
               aria-label="Search the catalog"
               className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
               autoFocus
@@ -167,10 +166,10 @@ function RecentPosts() {
           className="font-display text-[26px] font-semibold leading-snug text-sage-900"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          From the build log
+          From the Community Commons Blog
         </h2>
         <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-sage-600">
-          Decisions, methodology, and corrections, written down as the work happens.
+          Decisions, commentary, and methodology, written down as the work happens.
         </p>
         <Link
           to="/blog"
@@ -220,8 +219,8 @@ function SourcesFooter() {
   return (
     <footer className="mt-16 border-t border-sage-200 pt-8">
       <div className="grid gap-6 sm:grid-cols-3">
-        <DataSource icon="🏛️" label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
-        <DataSource icon="🧪" label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
+        <DataSource label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
+        <DataSource label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
         <DataSource
           icon="🌿"
           label="Founded by Dr. Joshua Semock, PharmD"
