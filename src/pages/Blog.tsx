@@ -44,8 +44,8 @@ export default function Blog() {
 
   return (
     <PageShell
-      title="Notes from the build"
-      lede="Data-model decisions, environmental-risk methodology, and the occasional argument about why a drug reference should be free. Written as the work happens, not after it."
+      title="Community Commons Blog"
+      lede="An open creative space to share insight to the profession."
       aside={aside}
       toc={false}
     >
