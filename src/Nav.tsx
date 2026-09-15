@@ -101,8 +101,15 @@ export default function Nav() {
 
 /**
  * A radio group on md+ (arrow keys move and select, as native radios do), a
- * grouped <select> below md. Hairlines separate Explore / Access / Contribute.
+ * grouped <select> below md. The options sit in an inset track; the selected
+ * one is raised out of it and reads "Patient View", the rest just "Patient".
+ * Hairlines separate Explore / Access / Contribute.
  */
+const TRACK =
+  'rounded-lg bg-sage-100 ring-1 ring-inset ring-sage-200 shadow-[inset_0_1px_2px_rgb(0_0_0/0.07)]'
+const RAISED =
+  'shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
+
 function ViewSwitcher() {
   const { view, setView } = useView()
   const buttons = useRef<Partial<Record<ViewKey, HTMLButtonElement | null>>>({})
@@ -119,66 +126,61 @@ function ViewSwitcher() {
 
   return (
     <>
-      <div className="hidden shrink-0 items-center gap-2 py-1.5 md:flex">
-        <span id="view-switcher-label" className="font-sans text-[12.5px] text-sage-600">
-          View:
-        </span>
-        <div role="radiogroup" aria-labelledby="view-switcher-label" className="flex items-center gap-0.5">
-          {VIEWS.map((v, i) => {
-            const active = v.key === view
-            const startsGroup = i > 0 && VIEWS[i - 1].group !== v.group
-            const contribute = v.group === 'contribute'
-            return (
-              <span key={v.key} className="flex items-center">
-                {startsGroup && <span className="mx-1.5 h-4 w-px bg-sage-200" aria-hidden="true" />}
-                <button
-                  ref={el => {
-                    buttons.current[v.key] = el
-                  }}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  tabIndex={active ? 0 : -1}
-                  title={v.tagline}
-                  onClick={() => setView(v.key)}
-                  onKeyDown={e => onKeyDown(e, i)}
-                  className={[
-                    'rounded-md px-2 py-1 font-sans text-[12.5px] transition-colors',
-                    'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
-                    active
-                      ? contribute
-                        ? 'bg-aqua-100 font-medium text-aqua-700'
-                        : 'bg-white font-medium text-sage-900 ring-1 ring-sage-200'
-                      : 'text-sage-600 hover:text-sage-900',
-                  ].join(' ')}
-                >
-                  {v.label}
-                </button>
-              </span>
-            )
-          })}
-        </div>
+      <div
+        role="radiogroup"
+        aria-label="View"
+        className={`my-1.5 hidden shrink-0 items-center gap-0.5 p-0.5 md:flex ${TRACK}`}
+      >
+        {VIEWS.map((v, i) => {
+          const active = v.key === view
+          const startsGroup = i > 0 && VIEWS[i - 1].group !== v.group
+          const contribute = v.group === 'contribute'
+          return (
+            <span key={v.key} className="flex items-center">
+              {startsGroup && <span className="mx-1 h-4 w-px bg-sage-300/70" aria-hidden="true" />}
+              <button
+                ref={el => {
+                  buttons.current[v.key] = el
+                }}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                tabIndex={active ? 0 : -1}
+                title={v.tagline}
+                onClick={() => setView(v.key)}
+                onKeyDown={e => onKeyDown(e, i)}
+                className={[
+                  'rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap transition-colors',
+                  'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
+                  active
+                    ? `${RAISED} font-medium ${contribute ? 'bg-aqua-100 text-aqua-700' : 'bg-white text-sage-900'}`
+                    : 'text-sage-600 hover:text-sage-900',
+                ].join(' ')}
+              >
+                {active ? `${v.label} View` : v.label}
+              </button>
+            </span>
+          )
+        })}
       </div>
 
-      <label className="flex shrink-0 items-center gap-1.5 py-1.5 font-sans text-[12.5px] text-sage-600 md:hidden">
-        View:
-        <select
-          value={view}
-          onChange={e => setView(e.target.value as ViewKey)}
-          title={viewDef(view).tagline}
-          className="rounded-md border border-sage-200 bg-white px-1.5 py-1 font-sans text-[12.5px] text-sage-900 outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
-        >
-          {VIEW_GROUPS.map(g => (
-            <optgroup key={g.key} label={g.label}>
-              {VIEWS.filter(v => v.group === g.key).map(v => (
-                <option key={v.key} value={v.key}>
-                  {v.label}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
+      <select
+        value={view}
+        onChange={e => setView(e.target.value as ViewKey)}
+        aria-label="View"
+        title={viewDef(view).tagline}
+        className={`my-1.5 shrink-0 px-2 py-1 font-sans text-[12.5px] font-medium text-sage-900 outline-none focus:ring-2 focus:ring-aqua-200 md:hidden ${TRACK}`}
+      >
+        {VIEW_GROUPS.map(g => (
+          <optgroup key={g.key} label={g.label}>
+            {VIEWS.filter(v => v.group === g.key).map(v => (
+              <option key={v.key} value={v.key}>
+                {v.key === view ? `${v.label} View` : v.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
     </>
   )
 }
