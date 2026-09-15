@@ -16,48 +16,6 @@ tags: [Pharmacy Commons]
 **White paper · Draft 0.4 · September 2026
 Joshua Semock, PharmD · pharmacycommons.org**
 
-
-
-## Introduction
-
-Drug information is paradoxically both abundant and scarce. Anyone can pull up a federal
-website and search a drugs name, and get links to other government entities; by the time
-you have visited a few sites the picture is lost. This is why pharmacies, universities
-hospitals, and sometimes individuals out of pocket, pay for curated information systems to
-keep their facilities running. There surely a gap in the marketplace which was filled by three
-major companies: Micromedex, UpToDate/Lexicomp, and Clinical Key/Pharmacology. However, what they
-took from the commons into the marketplace was the commodification of our collective knowledge.
-Constructing paywalls, an enclosure, separating the ecosystem of knowledge from the laborer,
-requiring an employer to pay for access. This would see logical by the English philosopher John Locke,
-who was a physician, because in Liberalism we say that once labor has acted upon nature it becomes
-the property of that laborer. But more importantly, it has now become the property of the employer
-by legal means, it's a service now that is provided. Physicians, nurses, pharmacists, physicians assistants,
-and many other medical providers have already had to pay private institutions for this information once,
-and might I say for hundreds of thousands of dollars to earn the requirments for their right to practice.
-
-The issue at hand is not that an individual or corporation has collected information and packaged it up nicely for
-sale, the issue is that they did not produce this information yet claim property right over it's distribution. The
-advances of medicine may come from many sources, individuals, governmental institutions, private and public research
-institutions, and so on, but the funding comes from the people. The labor of all individuals pays towards the benefit
-of humanities process of healing. Everything is built on the shoulders of those who came before us, let's not forget.
-In the Modern Monetary Theory perspective, taxpayer dollars are supporting the production of medical information,
-we must sell our labor power in order to pay taxes to give the currency purchasing power. In other words, we the people
-in order to form a more reasonable existence have contributed to the discovery, invention, and production of medical
-information, and thus should have a right to access in a reasonable way that information.
-
-Now, I am arguing that we all already use this information but at the cost of reduction of wages to health care providers,
-increase in cost of medical care, and even paying for internet providers and Ai subscriptions. Any number of idioms have
-foreshadowed, the cat is out of the bag and it opened Pandora's box too, large language models are hungry for information
-and the harder it is to find it, the more our environment has to pay. The omnibus of medical information must be available
-freely and readably for either a machine or a human to read, or lives will be at risk. Hallucination of medical information is
-made possible by paywalls and by the generally accessible unstructured data of the internet. There have been major advances against
-this issue, for example Open Evidence, but there is more work to be do, tilling the soils of the commons. The tragedy of the commons
-is preventable by communities working together. 
-
-Elinor Ostrom, who won the 2009 Nobel Prize in Economic Sciences showed that local communities can successfully manage shared resources
-together without state control or privatization. She has said "The capacity of individuals to sustain cooperating sets of rules is far
-greater than standard economic theories of rational, self-interested individuals indicate."
-
 ## Abstract
 
 The FDA, NLM, WHO, EPA, and a
