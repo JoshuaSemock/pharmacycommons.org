@@ -1,4 +1,4 @@
-\---
+---
 
 title: "Pharmacy Commons: A Vision for Building Open Pharmaceutical Knowledge Infrastructure for Humans and Machines"
 author: Joshua Semock, PharmD
