@@ -234,7 +234,6 @@ function DataSource({ label, desc }: { label: string; desc: string }) {
   return (
     <div className="flex gap-3">
       <span className="mt-0.5 text-xl leading-none" aria-hidden="true">
-        {icon}
       </span>
       <div>
         <p className="font-sans text-[13px] font-medium text-sage-800">{label}</p>
