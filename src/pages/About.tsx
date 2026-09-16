@@ -45,7 +45,7 @@ export default function About() {
         </p>
       </Section>
 
-      <Section heading="Our status">
+      <Section heading="Our Status">
         <p>
           Search and browsing currently run on a fixed list of drug identifiers.
           Detailed drug content is being added gradually, so many pages are incomplete
