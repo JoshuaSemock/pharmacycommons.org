@@ -13,9 +13,8 @@ import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import Account from './pages/Account'
 
-// Calculators are lazy: their scripts, styles, and reference text load only
-// when someone opens the tool, not on every page.
-const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
+// Carries the vanilla calculator bundle; load it only on its own route.
+const CreatinineClearance = lazy(() => import('./pages/CreatinineClearance'))
 
 export default function App() {
   return (
@@ -23,22 +22,27 @@ export default function App() {
       <div className="min-h-full page-background">
         <div className="page-content">
           <Nav />
-          <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/browse" element={<SearchView />} />
-              <Route path="/drugs/:slug" element={<DrugDetail />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/tools" element={<Tools />} />
-              <Route path="/tools/creatinine-clearance" element={<CreatinineClearance />} />
-              <Route path="/resources" element={<Resources />} />
-              <Route path="/citations" element={<Citations />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="*" element={<Home />} />
-            </Routes>
-          </Suspense>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/browse" element={<SearchView />} />
+            <Route path="/drugs/:slug" element={<DrugDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/tools" element={<Tools />} />
+            <Route
+              path="/tools/creatinine-clearance"
+              element={
+                <Suspense fallback={<main className="min-h-[60vh]" aria-busy="true" />}>
+                  <CreatinineClearance />
+                </Suspense>
+              }
+            />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/citations" element={<Citations />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="*" element={<Home />} />
+          </Routes>
         </div>
       </div>
     </ViewProvider>
