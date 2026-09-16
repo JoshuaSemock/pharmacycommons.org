@@ -22,10 +22,18 @@ export default function Resources() {
         </h2>
         <div className="font-sans text-[14.5px] text-sage-700 leading-relaxed space-y-3">
           <p>
-            The application code is GPL-3.0. Aggregated datasets are published under
-            Creative Commons terms, but downstream license conditions travel with the
-            data — sources marked CC BY-NC 4.0 above restrict commercial reuse of any
-            derivative containing them.
+            The application code is GPL-3.0. Data original to Pharmacy Commons is
+            dedicated to the public domain under{' '}
+            <a
+              href="https://creativecommons.org/publicdomain/zero/1.0/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
+            >
+              CC0 1.0
+            </a>
+            . Third-party data keeps its source license: anything drawn from a source
+            marked CC BY-NC 4.0 above still restricts commercial reuse.
           </p>
           <p>
             If you need a dataset export for research, write to{' '}
