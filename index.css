@@ -75,21 +75,14 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("/assets/textures/lichen_seamless.jpg");
+  background-image: url("/assets/textures/moss_seamless.jpg");
   background-repeat: repeat;
   background-size: 1080px auto;
-  opacity: 0.04;
+  opacity: 0.1;
   mix-blend-mode: multiply;
 }
 
 .page-content {
   position: relative;
   z-index: 1;
-}
-
-@media (prefers-color-scheme: dark) {
-  .page-background::before {
-    mix-blend-mode: overlay;
-    opacity: 0.06;
-  }
 }
