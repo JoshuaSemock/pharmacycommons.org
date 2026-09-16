@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Nav from './Nav'
+import Footer from './Footer'
 import SearchView from './SearchView'
 import DrugDetail from './DrugDetail'
 import { ViewProvider } from './views'
@@ -20,7 +21,7 @@ export default function App() {
   return (
     <ViewProvider>
       <div className="min-h-full page-background">
-        <div className="page-content">
+        <div className="page-content flex min-h-screen flex-col">
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/account" element={<Account />} />
             <Route path="*" element={<Home />} />
           </Routes>
+          <Footer />
         </div>
       </div>
     </ViewProvider>
