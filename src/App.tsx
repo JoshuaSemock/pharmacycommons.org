@@ -15,7 +15,7 @@ import Account from './pages/Account'
 
 // Calculators are lazy: their scripts, styles, and reference text load only
 // when someone opens the tool, not on every page.
-const CreatinineClearance = lazy(() => import('./pages/tools/CreatinineClearance'))
+const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 
 export default function App() {
   return (
