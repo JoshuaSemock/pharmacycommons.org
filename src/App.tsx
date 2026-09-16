@@ -14,7 +14,7 @@ import BlogPost from './pages/BlogPost'
 import Account from './pages/Account'
 
 // Carries the vanilla calculator bundle; load it only on its own route.
-const CreatinineClearance = lazy(() => import('./pages/CreatinineClearance'))
+const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 
 export default function App() {
   return (
