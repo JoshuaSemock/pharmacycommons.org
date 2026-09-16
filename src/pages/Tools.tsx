@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import PageShell from './PageShell'
 
 type Tool = {
@@ -11,8 +12,9 @@ type Tool = {
 const CLINICAL: Tool[] = [
   {
     name: 'Creatinine clearance',
-    blurb: 'Cockcroft-Gault with actual, ideal, and adjusted body weight side by side, so the weight choice is explicit rather than buried.',
-    status: 'planned',
+    blurb: 'Cockcroft-Gault with actual, ideal, adjusted, and lean body weight side by side, so the weight choice is explicit rather than buried. Adds CKD-EPI 2021 eGFR, CKD and AKI staging, amputation correction, and a renal dose check.',
+    status: 'live',
+    to: '/tools/creatinine-clearance',
   },
   {
     name: 'Body surface area',
@@ -107,7 +109,18 @@ function ToolList({ heading, tools }: { heading: string; tools: Tool[] }) {
         {tools.map(tool => (
           <li key={tool.name} className="border-l-2 border-sage-200 pl-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h3 className="font-sans text-[14.5px] font-medium text-sage-900">{tool.name}</h3>
+              <h3 className="font-sans text-[14.5px] font-medium text-sage-900">
+                {tool.to ? (
+                  <Link
+                    to={tool.to}
+                    className="underline decoration-aqua-300 underline-offset-2 transition-colors hover:text-aqua-700 hover:decoration-aqua-600"
+                  >
+                    {tool.name}
+                  </Link>
+                ) : (
+                  tool.name
+                )}
+              </h3>
               <StatusTag status={tool.status} />
             </div>
             <p className="mt-1 font-sans text-[14px] text-sage-600 leading-relaxed">{tool.blurb}</p>
