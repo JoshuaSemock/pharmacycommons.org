@@ -54,7 +54,7 @@ function Hero() {
   return (
     <section className="pt-16 pb-14 text-center">
       <p className="mb-3 font-sans text-[13.5px] font-medium text-aqua-700">
-        This is our Commons, an open source compendium of medical and pharmacy knowledge
+        This is our commons, a shared compendium of pharmacy and medical knowledge
       </p>
       <h1
         className="mb-4 font-display text-4xl font-semibold leading-[1.1] text-balance text-sage-900 sm:text-5xl"
