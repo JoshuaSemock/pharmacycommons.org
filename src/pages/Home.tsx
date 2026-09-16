@@ -219,11 +219,9 @@ function SourcesFooter() {
   return (
     <footer className="mt-16 border-t border-sage-200 pt-8">
       <div className="grid gap-6 sm:grid-cols-3">
-        <DataSource label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
-        <DataSource label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
         <DataSource
           label="Founded by Dr. Joshua Semock, PharmD"
-          desc="(Aug. 2026) contact@pharmacycommons.org"
+          desc="(Sep. 2026) contact@pharmacycommons.org"
         />
       </div>
     </footer>
