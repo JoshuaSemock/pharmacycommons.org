@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Nav from './Nav'
 import SearchView from './SearchView'
@@ -12,25 +13,32 @@ import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import Account from './pages/Account'
 
+// Calculators are lazy: their scripts, styles, and reference text load only
+// when someone opens the tool, not on every page.
+const CreatinineClearance = lazy(() => import('./pages/tools/CreatinineClearance'))
+
 export default function App() {
   return (
     <ViewProvider>
       <div className="min-h-full page-background">
         <div className="page-content">
           <Nav />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/browse" element={<SearchView />} />
-            <Route path="/drugs/:slug" element={<DrugDetail />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/citations" element={<Citations />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/browse" element={<SearchView />} />
+              <Route path="/drugs/:slug" element={<DrugDetail />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/tools" element={<Tools />} />
+              <Route path="/tools/creatinine-clearance" element={<CreatinineClearance />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/citations" element={<Citations />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
         </div>
       </div>
     </ViewProvider>
