@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { FormEvent, KeyboardEvent } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import type { FocusEvent, FormEvent, KeyboardEvent, PointerEvent } from 'react'
 import { Link, NavLink as RouterNavLink, useLocation, useNavigate } from 'react-router-dom'
 import { loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
+import { ROUTED_TOOLS } from './tools'
 import { useView, VIEWS, VIEW_GROUPS, viewDef } from './views'
 import type { ViewKey } from './views'
 
@@ -64,38 +65,271 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* Row 2 — sections on the left, view switcher on the right */}
+      {/* Row 2 — view switcher on the left, sections on the right */}
       <div className="border-t border-sage-200/70">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 sm:px-6">
-          {/* -ml-3 cancels the first link's padding so its text lines up with the wordmark. */}
-          <ul className="-ml-3 flex min-w-0 items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {SECTIONS.map(section => (
-              <li key={section.to} className="shrink-0">
-                <RouterNavLink
-                  to={section.to}
-                  className={({ isActive }) =>
-                    [
-                      'relative block px-3 py-2 font-sans text-[13px] transition-colors',
-                      'after:absolute after:inset-x-3 after:bottom-0 after:h-px after:transition-colors',
-                      isActive
-                        ? 'text-sage-900 after:bg-aqua-500'
-                        : 'text-sage-600 hover:text-sage-900 after:bg-transparent',
-                    ].join(' ')
-                  }
-                >
-                  {section.label}
-                </RouterNavLink>
-              </li>
-            ))}
-          </ul>
+          <ViewSwitcher />
 
-          {/* ViewSwitcher renders two siblings (radio group on md+, select below), so the wrapper carries ml-auto. */}
-          <div className="ml-auto flex shrink-0 items-center">
-            <ViewSwitcher />
-          </div>
+          <ul className="-mr-3 ml-auto flex min-w-0 items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SECTIONS.map(section =>
+              section.to === '/tools' && ROUTED_TOOLS.length > 0 ? (
+                <ToolsSection key={section.to} to={section.to} label={section.label} />
+              ) : (
+                <li key={section.to} className="shrink-0">
+                  <SectionLink to={section.to} label={section.label} />
+                </li>
+              ),
+            )}
+          </ul>
         </div>
       </div>
     </nav>
+  )
+}
+
+function sectionLinkClass({ isActive }: { isActive: boolean }): string {
+  return [
+    'relative block px-3 py-2 font-sans text-[13px] transition-colors',
+    'after:absolute after:inset-x-3 after:bottom-0 after:h-px after:transition-colors',
+    'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-aqua-500',
+    isActive ? 'text-sage-900 after:bg-aqua-500' : 'text-sage-600 hover:text-sage-900 after:bg-transparent',
+  ].join(' ')
+}
+
+function SectionLink({ to, label }: { to: string; label: string }) {
+  return (
+    <RouterNavLink to={to} className={sectionLinkClass}>
+      {label}
+    </RouterNavLink>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tools menu
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * "Tools" stays a plain link to /tools. Hovering it with a mouse opens a menu
+ * of the tools that have their own page; the chevron beside it does the same
+ * for keyboard and touch. This is disclosure navigation, not an ARIA menu, so
+ * Tab moves through the items in DOM order.
+ *
+ * The section list scrolls horizontally on small screens, and overflow-x clips
+ * absolutely positioned children of the list itself. The menu therefore avoids
+ * every positioned ancestor up to the sticky <nav>, which becomes its
+ * containing block and sits outside the clip. Its offset is measured against
+ * the nav. Do not add `relative` to this <li> or to the list.
+ */
+const MENU_WIDTH = 288 // 18rem
+const CLOSE_DELAY = 140
+
+function ToolsSection({ to, label }: { to: string; label: string }) {
+  const { pathname } = useLocation()
+  const menuId = useId()
+  const itemRef = useRef<HTMLLIElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const closeTimer = useRef<number | undefined>(undefined)
+  const focusFirstOnOpen = useRef(false)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
+
+  const place = useCallback(() => {
+    const item = itemRef.current
+    const nav = item?.closest('nav')
+    if (!item || !nav) return
+    const r = item.getBoundingClientRect()
+    const n = nav.getBoundingClientRect()
+    const maxLeft = n.width - MENU_WIDTH - 8
+    setPos({
+      top: r.bottom - n.top,
+      left: Math.max(8, Math.min(r.left - n.left, maxLeft)),
+    })
+  }, [])
+
+  const cancelClose = () => window.clearTimeout(closeTimer.current)
+
+  const openMenu = useCallback(() => {
+    window.clearTimeout(closeTimer.current)
+    place()
+    setOpen(true)
+  }, [place])
+
+  const closeMenu = useCallback(() => {
+    window.clearTimeout(closeTimer.current)
+    setOpen(false)
+  }, [])
+
+  // Navigating anywhere closes the menu.
+  useEffect(() => closeMenu(), [pathname, closeMenu])
+
+  useEffect(() => () => window.clearTimeout(closeTimer.current), [])
+
+  // Keyboard opening moves focus into the menu once it has rendered.
+  useEffect(() => {
+    if (!open || !focusFirstOnOpen.current) return
+    focusFirstOnOpen.current = false
+    menuRef.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+
+    const inside = (node: EventTarget | null) =>
+      node instanceof Node && Boolean(itemRef.current?.contains(node))
+
+    const onPointerDown = (e: globalThis.PointerEvent) => {
+      if (!inside(e.target)) closeMenu()
+    }
+    const onKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      const hadFocus = inside(document.activeElement)
+      closeMenu()
+      if (hadFocus) toggleRef.current?.focus()
+    }
+
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('resize', place)
+    // Capture catches the section list's own horizontal scroll.
+    window.addEventListener('scroll', place, { capture: true, passive: true })
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, { capture: true })
+    }
+  }, [open, place, closeMenu])
+
+  function onPointerEnter(e: PointerEvent) {
+    if (e.pointerType === 'mouse') openMenu()
+  }
+
+  function onPointerLeave(e: PointerEvent) {
+    if (e.pointerType !== 'mouse') return
+    // Don't pull the menu away from someone typing in it.
+    if (menuRef.current?.contains(document.activeElement)) return
+    window.clearTimeout(closeTimer.current)
+    closeTimer.current = window.setTimeout(() => setOpen(false), CLOSE_DELAY)
+  }
+
+  function onBlur(e: FocusEvent) {
+    const next = e.relatedTarget
+    if (next instanceof Node && itemRef.current?.contains(next)) return
+    // Focus left for somewhere else on the page; a hovering mouse keeps it open.
+    if (!itemRef.current?.matches(':hover')) closeMenu()
+  }
+
+  function onToggleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    if (e.key !== 'ArrowDown') return
+    e.preventDefault()
+    if (open) menuRef.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+    else {
+      focusFirstOnOpen.current = true
+      openMenu()
+    }
+  }
+
+  function onMenuKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+    const links = Array.from(menuRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? [])
+    const i = links.indexOf(document.activeElement as HTMLAnchorElement)
+    if (i < 0) return
+    e.preventDefault()
+    if (e.key === 'ArrowUp' && i === 0) {
+      toggleRef.current?.focus()
+      return
+    }
+    links[Math.max(0, Math.min(links.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))]?.focus()
+  }
+
+  return (
+    <li
+      ref={itemRef}
+      className="flex shrink-0 items-stretch"
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onPointerMove={cancelClose}
+      onBlur={onBlur}
+    >
+      <SectionLink to={to} label={label} />
+      <button
+        ref={toggleRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={menuId}
+        aria-label={`${label} menu`}
+        onClick={() => (open ? closeMenu() : openMenu())}
+        onKeyDown={onToggleKeyDown}
+        className={[
+          '-ml-2 flex w-6 items-center justify-center transition-colors',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-aqua-500',
+          open ? 'text-sage-900' : 'text-sage-400 hover:text-sage-700',
+        ].join(' ')}
+      >
+        <ChevronIcon open={open} />
+      </button>
+
+      <div
+        ref={menuRef}
+        id={menuId}
+        hidden={!open}
+        onKeyDown={onMenuKeyDown}
+        style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
+        className="absolute z-10 pt-1.5"
+      >
+        <div className="overflow-hidden rounded-lg border border-sage-200 bg-white shadow-lg shadow-sage-900/5">
+          <ul className="py-1.5">
+            {ROUTED_TOOLS.map(tool => {
+              const current = pathname === tool.to
+              return (
+                <li key={tool.id}>
+                  <Link
+                    to={tool.to}
+                    aria-current={current ? 'page' : undefined}
+                    onClick={closeMenu}
+                    className={[
+                      'block border-l-2 px-3.5 py-2 transition-colors',
+                      'focus-visible:bg-sage-50 focus-visible:outline-none',
+                      current ? 'border-aqua-500 bg-sage-50' : 'border-transparent hover:bg-sage-50',
+                    ].join(' ')}
+                  >
+                    <span className="block font-sans text-[13px] font-medium text-sage-900">{tool.name}</span>
+                    {tool.summary && (
+                      <span className="mt-0.5 block font-sans text-[11.5px] leading-snug text-sage-600">
+                        {tool.summary}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+          <Link
+            to={to}
+            onClick={closeMenu}
+            className="block border-t border-sage-200 px-3.5 py-2 font-sans text-[12.5px] text-sage-600 transition-colors hover:bg-sage-50 hover:text-sage-900 focus-visible:bg-sage-50 focus-visible:text-sage-900 focus-visible:outline-none"
+          >
+            All tools, including planned ones
+          </Link>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden="true"
+      className={`transition-transform duration-150 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`}
+    >
+      <path d="M2 3.75L5 6.75L8 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
