@@ -1,0 +1,200 @@
+/* ==========================================================================
+   crcl-theme.css
+   Maps the calculator's --crcl-* tokens onto the Pharmacy Commons design
+   system, and removes the widget's generic chrome (tracked all-caps labels,
+   blue brand, brightness-filter hovers).
+
+   Loaded after crcl-calculator.css. Selectors are `.crcl.pc-crcl` (0,2,0) so
+   they beat the widget's own `.crcl` (0,1,0) regardless of stylesheet order —
+   this file ships in a lazy chunk, so order is not guaranteed.
+
+   The page pins data-crcl-theme="light" because the site itself has no dark
+   theme yet. When it gets one, add a dark block here and drop the pin.
+
+   `@reference` pulls in the @theme tokens without emitting any CSS. It also
+   matters for a second reason: Tailwind v4 prunes theme variables nothing uses
+   (violet-300/400 are already absent from the build). Referencing them from a
+   Tailwind-processed file is what keeps them in the output.
+
+   SPDX-License-Identifier: GPL-3.0-or-later
+   ========================================================================== */
+
+@reference "../../index.css";
+
+.crcl.pc-crcl {
+  --crcl-ink:        var(--color-sage-900);
+  --crcl-ink-soft:   var(--color-sage-700);
+  --crcl-ink-faint:  var(--color-sage-600);
+  --crcl-bg:         oklch(100% 0 0);
+  --crcl-bg-sunken:  var(--color-sage-50);
+  --crcl-line:       var(--color-sage-200);
+  --crcl-line-soft:  var(--color-sage-100);
+
+  --crcl-brand:      var(--color-sage-800);
+  --crcl-brand-ink:  var(--color-sage-50);
+  --crcl-accent:     var(--color-aqua-700);
+
+  --crcl-ok:         var(--color-aqua-700);
+  --crcl-ok-bg:      var(--color-aqua-100);
+
+  /* Clinical caution. Deliberately NOT the amber tokens, which are reserved
+     for eco-risk. Ochre, same family, darker and less saturated so it reads
+     as "adjust dose" and never as "environmental flag". */
+  --crcl-caution:    oklch(52% 0.105 70);
+  --crcl-caution-bg: oklch(96% 0.030 85);
+
+  --crcl-warn:       var(--color-coral-600);
+  --crcl-warn-bg:    var(--color-coral-100);
+  --crcl-avoid:      oklch(46% 0.160 25);
+  --crcl-avoid-bg:   var(--color-coral-100);
+  --crcl-info-bg:    color-mix(in oklch, var(--color-aqua-100) 45%, white);
+
+  --crcl-radius:     0.5rem;
+  --crcl-gap:        1rem;
+
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------------- labels */
+
+/* Sentence case everywhere. The widget's uppercase + tracking reads as
+   template chrome and fights Fraunces. */
+.crcl.pc-crcl .crcl-panel > legend,
+.crcl.pc-crcl .crcl-card-title,
+.crcl.pc-crcl .crcl-headline-label,
+.crcl.pc-crcl .crcl-stat-label,
+.crcl.pc-crcl .crcl-table thead th,
+.crcl.pc-crcl .crcl-optional,
+.crcl.pc-crcl .crcl-badge {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.crcl.pc-crcl .crcl-panel > legend {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--crcl-ink);
+  padding: 0 0.35rem;
+}
+
+.crcl.pc-crcl .crcl-card-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--crcl-ink);
+}
+
+.crcl.pc-crcl .crcl-headline-label,
+.crcl.pc-crcl .crcl-stat-label,
+.crcl.pc-crcl .crcl-table thead th {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--crcl-ink-soft);
+}
+
+.crcl.pc-crcl .crcl-optional {
+  font-size: 0.8rem;
+  color: var(--crcl-ink-faint);
+}
+
+.crcl.pc-crcl .crcl-field > label,
+.crcl.pc-crcl .crcl-amp-item label {
+  font-weight: 500;
+}
+
+/* Matches the StatusTag on /tools. */
+.crcl.pc-crcl .crcl-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  border: 1px solid var(--color-aqua-300);
+  background: var(--color-aqua-100);
+  color: var(--color-aqua-700);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+
+/* -------------------------------------------------------------- headline */
+
+/* The one place the page spends its boldness: the number itself, in
+   Fraunces, on the same aqua wash as the Pharmacopoe Ai block. */
+.crcl.pc-crcl .crcl-headline {
+  border-color: var(--color-aqua-200);
+  border-radius: 0.75rem;
+}
+
+.crcl.pc-crcl .crcl-headline-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3.2rem;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.crcl.pc-crcl .crcl-headline-unit {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.crcl.pc-crcl .crcl-headline-reason {
+  border-top-color: var(--color-aqua-200);
+}
+
+.crcl.pc-crcl .crcl-stat-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------- controls */
+
+.crcl.pc-crcl input:focus-visible,
+.crcl.pc-crcl select:focus-visible,
+.crcl.pc-crcl button:focus-visible {
+  outline: 2px solid var(--color-aqua-500);
+  outline-offset: 1px;
+}
+
+.crcl.pc-crcl input[type="number"]:focus,
+.crcl.pc-crcl input[type="date"]:focus,
+.crcl.pc-crcl select:focus {
+  border-color: var(--color-aqua-400);
+}
+
+.crcl.pc-crcl .crcl-seg button {
+  font-weight: 500;
+}
+
+.crcl.pc-crcl .crcl-btn {
+  font-weight: 500;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+/* The widget brightens on hover, which washes out a dark sage. Deepen it. */
+.crcl.pc-crcl .crcl-btn-primary:hover {
+  filter: none;
+  background: var(--color-sage-900);
+}
+
+.crcl.pc-crcl .crcl-btn-ghost:hover {
+  border-color: var(--color-sage-300);
+}
+
+/* -------------------------------------------------------------- results */
+
+/* Results scroll into view on submit; keep them clear of the sticky nav. */
+.crcl.pc-crcl .crcl-results {
+  scroll-margin-top: calc(var(--nav-h, 6rem) + 1rem);
+}
+
+@media (max-width: 30rem) {
+  .crcl.pc-crcl .crcl-headline-value { font-size: 2.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crcl.pc-crcl .crcl-btn { transition: none; }
+}
