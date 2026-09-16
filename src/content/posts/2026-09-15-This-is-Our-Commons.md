@@ -1,19 +1,14 @@
 ---
 
-title: "This is Our Commons: The Case for Open Pharmaceutical Knowledge"
+title: "This is Our Commons: The Case for Shared Pharmaceutical Knowledge"
 author: Joshua Semock, PharmD
 date: 2026-09-15
-version: 0.1
+version: 0.2
 status: Theory of medical information freedom.
 tags: [Pharmacy Commons,Theory]
 
 ---
-
-# This is Our Commons: 
-
-## The Case for Open Pharmaceutical Knowledge
-
-**September 2026
+**September 16th, 2026
 Joshua Semock, PharmD · pharmacycommons.org**
 
 Drug information is paradoxically both abundant and scarce. Anyone can open a browser, search for drug information across public and federal databases, and end up lost in a labyrinth of information or go down a rabbit hole on Reddit. Either way the clinical picture quickly disintegrates. This is why pharmacies, universities, hospitals, and sometimes individuals out of pocket pay for curated information systems to keep their facilities running, what used to be available to own in a book. Three major conglomerates, Micromedex, UpToDate/Lexicomp, and ClinicalKey, captured this market vacancy. However, what they took from the commons into the marketplace was the commodification of our collective knowledge. Constructing paywalls, an enclosure, separating the ecosystem of knowledge from the laborer, requiring an employer to pay for access. 
