@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:...');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:...');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:...');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
   --color-sage-50:  oklch(97.5% 0.010 145);
@@ -45,14 +45,18 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   background-color: oklch(97.5% 0.010 145);
   color: oklch(19% 0.025 145);
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .article-body h1 {
+  font-family: 'Newsreader', Georgia, serif;
 }
 
 * {
@@ -67,6 +71,8 @@ body {
 .page-background {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
 }
 
 .page-background::before {
@@ -77,9 +83,19 @@ body {
   z-index: 0;
   background-image: url("/assets/textures/moss_seamless.jpg");
   background-repeat: repeat;
+  background-attachment: scroll;
   background-size: 1080px auto;
-  opacity: 0.1;
+  opacity: 0.12;
   mix-blend-mode: multiply;
+  transform: translateZ(0);
+}
+
+@media (max-width: 780px) {
+  .page-background::before {
+    background-size: 380px auto;
+    opacity: 0.18;
+    mix-blend-mode: normal;
+  }
 }
 
 .page-content {
