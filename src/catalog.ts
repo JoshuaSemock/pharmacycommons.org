@@ -8,15 +8,25 @@
  * `'partial'`/`'full'` completeness split are retired; every record here is a
  * live Supabase row.
  *
+ * 2026-09-20: search/browse is filtered down to moiety rows only
+ * (entity_type='moiety'). Precise forms, formulations and combination
+ * products no longer surface as their own catalog entries — metformin
+ * hydrochloride and every metformin combination product used to show up
+ * alongside plain "metformin" as separate search hits. They're still fully
+ * in the database; they now live under their parent moiety's detail page
+ * (see the `moiety_hierarchy` materialized view and DrugDetail's Hierarchy
+ * section) instead of cluttering the catalog. A combination's own page is
+ * still reachable by slug/PCID directly, and from the moiety pages that
+ * link to it — it's just not a top-level search result any more.
+ *
  * The public surface (loadCatalog, searchCatalog, browse, the A–Z bucket
  * machinery, toDrug, pcidOf, …) is unchanged on purpose, so SearchView.tsx,
  * Home.tsx and Nav.tsx did not need to change: only where the data comes
- * from changed, not its shape or how it's consumed.
- *
- * `type` now spans all four browsable blocks rather than just
- * ingredient/combination: 0 = moiety, 1 = combination, 2 = precise_form,
- * 3 = formulation. Existing call sites that only ever checked `type === 1`
- * for "combination product" keep working unchanged.
+ * from changed, not its shape or how it's consumed. `type` is always 0
+ * (moiety) now, but the field and the 0/1/2/3 union are kept as-is rather
+ * than collapsed, since getBySlug/getByPcid/toDrug and any caller matching
+ * on `type` or `entryType` still work unchanged, and it costs nothing to
+ * leave the door open for a future "show combinations too" toggle.
  */
 
 import { supabase } from './supabaseClient'
@@ -89,9 +99,10 @@ function rowToEntry(r: CatalogRow): CatalogEntry {
 }
 
 /**
- * Fetches every row of `catalog_entries`, 1,000 at a time (PostgREST's page
- * cap), and caches the result for the session. Same one-time-then-cached
- * shape as the old JSON fetch, just paginated instead of a single file.
+ * Fetches every moiety row of `catalog_entries` (entity_type='moiety' only —
+ * see the file header), 1,000 at a time (PostgREST's page cap), and caches
+ * the result for the session. Same one-time-then-cached shape as the old
+ * JSON fetch, just paginated instead of a single file.
  */
 export async function loadCatalog(): Promise<CatalogEntry[]> {
   if (_catalog) return _catalog
@@ -105,6 +116,7 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
       const { data, error } = await supabase
         .from('catalog_entries')
         .select('pcid,slug,name,entity_type,primary_brand,controlled_schedule')
+        .eq('entity_type', 'moiety')
         .order('pcid', { ascending: true })
         .range(from, from + PAGE_SIZE - 1)
 
