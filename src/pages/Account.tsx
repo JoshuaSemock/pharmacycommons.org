@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import PageShell, { Section } from '../PageShell'
+import PageShell, { Section } from './PageShell'
 import {
   authErrorMessage,
   getMyProviderVerification,
