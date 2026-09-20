@@ -36,6 +36,27 @@ export type DrugComponent = {
   role_note?: string | null
 }
 
+/** One related entity nested under a moiety's hierarchy section. */
+export type HierarchyMember = {
+  pcid_code: string
+  slug: string
+  name: string
+  term_type: string | null
+  primary_brand?: string | null
+}
+
+/**
+ * A moiety's precise forms, combination products, and known brand names —
+ * derived from the `moiety_hierarchy` materialized view (base_name matching;
+ * there's no FK for this yet). Only present on a moiety's DrugDetail; null
+ * for every other entity type.
+ */
+export type MoietyHierarchy = {
+  precise_forms: HierarchyMember[]
+  combinations: HierarchyMember[]
+  brand_names: string[]
+}
+
 /** Shape used by search results and browse lists. */
 export type DrugListItem = {
   pcid_code: string
@@ -55,6 +76,8 @@ export type DrugDetail = DrugListItem & {
   interactions: DrugInteraction[]
   eco: EcoMetrics | null
   fda_ndc_codes: string[]
+  /** Only populated when entity_type is 'moiety' (see api.ts:getDrugBySlug). */
+  hierarchy: MoietyHierarchy | null
   created_at?: string
   updated_at?: string
 }
