@@ -9,10 +9,14 @@
 // uses the service role key to bypass RLS, but only after it has actually
 // confirmed the NPI against CMS and cross-checked the submitted last name.
 //
-// Already deployed directly to Supabase as the active `verify-npi` edge
-// function on 2026-09-19 — this file mirrors it for the record. Future
-// edits should be deployed again via the Supabase MCP/CLI, not assumed to
-// auto-deploy from a git push (deploy.yml's scope is GitHub Pages only).
+// CORS: every response (including the OPTIONS preflight) carries
+// Access-Control-Allow-Origin: * — this function is called from the
+// browser via supabase.functions.invoke(), and without these headers the
+// browser blocks the request before it reaches this code at all (surfaces
+// client-side as "Failed to send a request to the Edge Function", not as
+// any error this function ever gets a chance to return). '*' is fine here:
+// the function takes no cookies/session from the origin, only a bearer
+// token in the Authorization header, which '*' does not expose.
 //
 // Request:  POST { npi: string, last_name: string }
 //   Authorization: Bearer <user's access token>  (verified via getUser())
@@ -26,7 +30,18 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const NPI_API = 'https://npiregistry.cms.hhs.gov/api/?version=2.1'
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
 Deno.serve(async req => {
+  // Browser preflight — must return before any auth/body parsing.
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS_HEADERS })
+  }
+
   if (req.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405)
   }
@@ -164,7 +179,7 @@ Deno.serve(async req => {
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
   })
 }
 
