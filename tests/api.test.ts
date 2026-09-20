@@ -10,6 +10,15 @@
  * thenable) to answer the queries api.ts actually issues, against a small
  * fixture dataset built below.
  *
+ * 2026-09-20: listDrugs/searchDrugs/catalog.ts were restricted to
+ * entity_type='moiety' only — precise forms, formulations and combination
+ * products no longer surface as their own catalog entries (they nest under
+ * their parent moiety's `hierarchy` instead; see getMoietyHierarchy in
+ * api.ts). TOTAL below is every entity in the fixture (moieties + the one
+ * combination); MOIETIES is what listDrugs/searchDrugs actually return now.
+ * The fixture db also carries an (empty, for these tests) `moiety_hierarchy`
+ * table, since getDrugBySlug queries it for any moiety.
+ *
  * No network access, no credentials, runs anywhere — same guarantee the old
  * suite made, kept for the new architecture.
  *
@@ -23,7 +32,7 @@ import type { DrugEntityType } from '@/api.generated'
 // Fixture data + fake supabase-js query builder
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { db, TOTAL, COMBINATIONS } = vi.hoisted(() => {
+const { db, TOTAL, MOIETIES, COMBINATIONS } = vi.hoisted(() => {
   type Row = Record<string, unknown>
 
   const entities: Row[] = []
@@ -31,6 +40,7 @@ const { db, TOTAL, COMBINATIONS } = vi.hoisted(() => {
   const combinations: Row[] = []
   const catalog_entries: Row[] = []
   const clinical_statements: Row[] = [] // empty: components/interactions are [] in every test
+  const moiety_hierarchy: Row[] = [] // empty: no test exercises a populated hierarchy
 
   function addMoiety(pcid: number, slug: string, name: string, primary_brand: string | null = null) {
     entities.push({ pcid, slug, name, entity_type: 'moiety' })
@@ -47,6 +57,8 @@ const { db, TOTAL, COMBINATIONS } = vi.hoisted(() => {
   addMoiety(1000700, 'sertraline', 'sertraline')
 
   // Combination — exercises the entity_type mapping and PCID-2 block.
+  // Not returned by listDrugs/searchDrugs any more (moiety-only), but still
+  // reachable directly via getDrugBySlug/getDrugByPcid.
   entities.push({ pcid: 2000100, slug: 'acetaminophen-pentazocine', name: 'acetaminophen-pentazocine', entity_type: 'combination' })
   combinations.push({ pcid: 2000100, primary_brand: null, class_name: null })
   catalog_entries.push({
@@ -64,10 +76,15 @@ const { db, TOTAL, COMBINATIONS } = vi.hoisted(() => {
 
   const TOTAL = entities.length
   const COMBINATIONS = entities.filter(e => e.entity_type === 'combination').length
+  const MOIETIES = entities.filter(e => e.entity_type === 'moiety').length
 
   return {
-    db: { entities, moieties, combinations, precise_forms: [], formulations: [], clinical_statements, catalog_entries },
+    db: {
+      entities, moieties, combinations, precise_forms: [], formulations: [],
+      clinical_statements, catalog_entries, moiety_hierarchy,
+    },
     TOTAL,
+    MOIETIES,
     COMBINATIONS,
   }
 })
@@ -187,6 +204,18 @@ describe('getDrugBySlug', () => {
     })
   })
 
+  it('carries an empty hierarchy for a moiety with no related entities', async () => {
+    // Every moiety gets a `hierarchy` object (see api.ts:getMoietyHierarchy);
+    // the fixture's moiety_hierarchy table is empty, so it's all-empty, not null.
+    const drug = await getDrugBySlug('ibuprofen')
+    expect(drug?.hierarchy).toEqual({ precise_forms: [], combinations: [], brand_names: [] })
+  })
+
+  it('leaves hierarchy null for a non-moiety entity', async () => {
+    const drug = await getDrugBySlug('acetaminophen-pentazocine')
+    expect(drug?.hierarchy).toBeNull()
+  })
+
   it('returns null, not an error, for an unknown slug', async () => {
     await expect(getDrugBySlug('not-a-real-drug-xyz')).resolves.toBeNull()
   })
@@ -238,7 +267,7 @@ describe('listDrugs', () => {
     const res = await listDrugs({ limit: 5 })
     expect(res).toMatchObject({
       drugs: expect.any(Array),
-      total: TOTAL,
+      total: MOIETIES,
       offset: 0,
       limit: 5,
       has_more: true,
@@ -265,15 +294,21 @@ describe('listDrugs', () => {
   })
 
   it('reports has_more false on the last page', async () => {
-    const res = await listDrugs({ limit: 10, offset: TOTAL - 3 })
+    const res = await listDrugs({ limit: 10, offset: MOIETIES - 3 })
     expect(res?.drugs).toHaveLength(3)
     expect(res?.has_more).toBe(false)
   })
 
-  it('filters to combinations', async () => {
+  it('only ever returns moieties, regardless of entity_type', async () => {
+    // Precise forms, formulations and combination products aren't
+    // catalog-level entries any more (see the 2026-09-20 file-header note) —
+    // they live under their parent moiety's hierarchy instead. entity_type is
+    // accepted for API compatibility but no longer widens or narrows the
+    // result past moiety rows.
     const res = await listDrugs({ entity_type: 'combination', limit: 100 })
-    expect(res?.total).toBe(COMBINATIONS)
-    expect(res?.drugs.every(d => d.entity_type === 'combination')).toBe(true)
+    expect(res?.total).toBe(MOIETIES)
+    expect(res?.drugs.every(d => d.entity_type === 'drug')).toBe(true)
+    expect(COMBINATIONS).toBeGreaterThan(0) // sanity: the fixture does have one, just unreachable here
   })
 
   it('describes a brand name when the catalog has one', async () => {
@@ -296,7 +331,7 @@ describe('listDrugs', () => {
       offset += page.drugs.length
       page = page.has_more ? await listDrugs({ limit: 100, offset }) : null
     }
-    expect(seen).toBe(TOTAL)
+    expect(seen).toBe(MOIETIES)
   })
 })
 
@@ -334,6 +369,11 @@ describe('searchDrugs', () => {
     const res = await searchDrugs({ q: 'xyzabc123nonexistent' })
     expect(res?.drugs).toEqual([])
     expect(res?.has_more).toBe(false)
+  })
+
+  it('does not surface the fixture combination', async () => {
+    const res = await searchDrugs({ q: 'acetaminophen-pentazocine' })
+    expect(res?.drugs).toEqual([])
   })
 
   it('pages without overlap', async () => {
