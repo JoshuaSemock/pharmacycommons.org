@@ -12,6 +12,11 @@
  * block indicates, plus `clinical_statements` for components and
  * interactions. There is no eco-metrics table yet — `eco` stays null until
  * Phase 4 enrichment lands (CAS Common Chemistry / openFDA / EPA ECOTOX).
+ *
+ * 2026-09-20: a moiety's DrugDetail also carries `hierarchy` — its precise
+ * forms, combination products and known brand names, nested here instead of
+ * surfacing as their own catalog/search entries (see catalog.ts and
+ * moiety_hierarchy in Supabase). Every other entity type gets `hierarchy: null`.
  */
 
 import { supabase } from './supabaseClient'
@@ -25,6 +30,8 @@ import type {
   DrugListResponse,
   DrugsListQuery,
   DrugsSearchQuery,
+  HierarchyMember,
+  MoietyHierarchy,
   SearchResponse,
 } from './api.generated'
 
@@ -111,9 +118,10 @@ export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
     if (data) satellite = data as Record<string, unknown>
   }
 
-  const [components, interactions] = await Promise.all([
+  const [components, interactions, hierarchy] = await Promise.all([
     getComponents(pcid),
     getInteractions(pcid),
+    entityType === 'moiety' ? getMoietyHierarchy(pcid, satellite.primary_brand as string | null) : null,
   ])
 
   const listItem: DrugListItem = {
@@ -131,6 +139,7 @@ export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
     attributes: toAttributes(satellite),
     components,
     interactions,
+    hierarchy,
     eco: null,
     fda_ndc_codes: splitCodes(satellite.ndc_codes as string | null | undefined),
     created_at: typeof satellite.created_at === 'string' ? satellite.created_at : undefined,
@@ -234,22 +243,77 @@ async function getInteractions(pcid: number): Promise<DrugInteraction[]> {
   })
 }
 
-/** Paginated browse against the `catalog_entries` view (blocks 1–4 only). */
+/**
+ * A moiety's precise forms, combination products, and known brand names —
+ * from the `moiety_hierarchy` materialized view (base_name matching against
+ * precise_forms/formulations/combinations; there's no FK for this yet, see
+ * the view's own comment in Supabase). `ownBrand` is the moiety row's own
+ * `primary_brand`, folded into `brand_names` alongside any carried by its
+ * precise forms or combinations.
+ *
+ * Formulations (brand-name products) don't come back from the view at all
+ * today — their base_name is the brand name itself (e.g. "ABILIFY"), not the
+ * chemical name, so nothing links them to a moiety until the FDA NDC-matching
+ * pass (fda_applications/fda_products.pcid) runs. Once that lands, this is
+ * the function to extend with a `relation = 'formulation'` bucket.
+ */
+async function getMoietyHierarchy(
+  pcid: number,
+  ownBrand: string | null,
+): Promise<MoietyHierarchy> {
+  const { data, error } = await supabase
+    .from('moiety_hierarchy')
+    .select('member_pcid, member_slug, member_name, member_term_type, primary_brand, relation')
+    .eq('moiety_pcid', pcid)
+
+  if (error) throw new Error(`Failed to load hierarchy for PCID-${pcid}: ${error.message}`)
+
+  const rows = (data ?? []) as {
+    member_pcid: number
+    member_slug: string
+    member_name: string
+    member_term_type: string | null
+    primary_brand: string | null
+    relation: 'precise_form' | 'formulation' | 'combination'
+  }[]
+
+  const toMember = (row: (typeof rows)[number]): HierarchyMember => ({
+    pcid_code: `PCID-${row.member_pcid}`,
+    slug: row.member_slug,
+    name: row.member_name,
+    term_type: row.member_term_type,
+    primary_brand: row.primary_brand,
+  })
+
+  const preciseForms = rows.filter(r => r.relation === 'precise_form').map(toMember)
+  const combinations = rows.filter(r => r.relation === 'combination').map(toMember)
+
+  const brandNames = Array.from(
+    new Set(
+      [ownBrand, ...rows.map(r => r.primary_brand)].filter(
+        (b): b is string => typeof b === 'string' && b.length > 0,
+      ),
+    ),
+  ).sort((a, b) => a.localeCompare(b))
+
+  return { precise_forms: preciseForms, combinations, brand_names: brandNames }
+}
+
+/** Paginated browse against the `catalog_entries` view, restricted to moieties. */
 export async function listDrugs(params: DrugsListQuery = {}): Promise<DrugListResponse | null> {
   const limit = Math.min(params.limit ?? 25, 100)
   const offset = Math.max(params.offset ?? 0, 0)
 
-  let query = supabase
+  // Only moieties are catalog-level entries now (see catalog.ts's 2026-09-20
+  // note) — precise forms, formulations and combination products live under
+  // their parent moiety's hierarchy instead. `entity_type` is accepted for
+  // API-compatibility but no longer widens the result past moiety rows.
+  const query = supabase
     .from('catalog_entries')
     .select('pcid, slug, name, entity_type, primary_brand', { count: 'exact' })
+    .eq('entity_type', 'moiety')
     .order('pcid', { ascending: true })
     .range(offset, offset + limit - 1)
-
-  if (params.entity_type === 'combination') {
-    query = query.eq('entity_type', 'combination')
-  } else if (params.entity_type) {
-    query = query.in('entity_type', ['moiety', 'precise_form', 'formulation'])
-  }
 
   const { data, error, count } = await query
   if (error) throw new Error(`Failed to list drugs: ${error.message}`)
@@ -268,7 +332,7 @@ export async function listDrugs(params: DrugsListQuery = {}): Promise<DrugListRe
   return { drugs, total, offset, limit, has_more: offset + drugs.length < total }
 }
 
-/** Ranked search over name, brand, and slug via the `catalog_entries` view. */
+/** Ranked search over name, brand, and slug, restricted to moieties. */
 export async function searchDrugs(params: DrugsSearchQuery): Promise<SearchResponse | null> {
   const q = params.q?.trim()
   if (!q) return null
@@ -280,6 +344,7 @@ export async function searchDrugs(params: DrugsSearchQuery): Promise<SearchRespo
   const { data, error, count } = await supabase
     .from('catalog_entries')
     .select('pcid, slug, name, entity_type, primary_brand', { count: 'exact' })
+    .eq('entity_type', 'moiety')
     .or(`name.ilike.${like},primary_brand.ilike.${like},slug.ilike.${like}`)
     .order('name', { ascending: true })
     .range(offset, offset + limit - 1)
