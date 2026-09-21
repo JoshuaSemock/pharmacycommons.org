@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import PageShell, { Section } from './PageShell'
+import PageShell, { Section } from '../PageShell'
 import {
   authErrorMessage,
   getMyProviderVerification,
@@ -151,7 +151,7 @@ function SignedIn({ email }: { email: string }) {
             aria-selected={tab === t.key}
             onClick={() => setTab(t.key)}
             className={[
-              'rounded-md px-3.5 py-1.5 font-sans text-[13px] font-medium transition-colors',
+              'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
               'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
               tab === t.key
                 ? 'bg-white text-sage-900 shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
@@ -160,7 +160,7 @@ function SignedIn({ email }: { email: string }) {
           >
             {t.label}
             {t.key === 'saved' && savedCount !== null && savedCount > 0 && (
-              <span className="ml-1.5 rounded-full bg-sage-200 px-1.5 py-0.5 font-mono text-[10px] text-sage-700">
+              <span className="ml-1.5 rounded-full bg-sage-200 px-1.5 py-0.5 font-mono text-xs text-sage-700">
                 {savedCount}
               </span>
             )}
@@ -195,8 +195,8 @@ function OverviewPanel({
   return (
     <div className="space-y-5">
       <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
-        <p className="font-sans text-[13px] text-sage-600">Signed in as</p>
-        <p className="font-sans text-[15px] font-medium text-sage-900">{email}</p>
+        <p className="font-sans text-sm text-sage-600">Signed in as</p>
+        <p className="font-sans text-md font-medium text-sage-900">{email}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -221,9 +221,9 @@ function OverviewPanel({
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint: string }) {
   return (
     <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
-      <p className="font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">{label}</p>
-      <p className="mt-0.5 font-mono text-[20px] font-semibold text-sage-900">{value}</p>
-      <p className="mt-0.5 font-sans text-[11.5px] text-sage-600">{hint}</p>
+      <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</p>
+      <p className="mt-0.5 font-mono text-lg font-semibold text-sage-900">{value}</p>
+      <p className="mt-0.5 font-sans text-2xs text-sage-600">{hint}</p>
     </div>
   )
 }
@@ -255,17 +255,17 @@ function NpiStatCard() {
 
   return (
     <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
-      <p className="font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+      <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
         Contribution status
       </p>
       <p
-        className={`mt-0.5 font-sans text-[15px] font-semibold ${
+        className={`mt-0.5 font-sans text-md font-semibold ${
           checking ? 'text-sage-400' : verified ? 'text-aqua-700' : 'text-sage-700'
         }`}
       >
         {checking ? 'Checking…' : verified ? 'NPI verified' : 'Not verified'}
       </p>
-      <p className="mt-0.5 font-sans text-[11.5px] text-sage-600">
+      <p className="mt-0.5 font-sans text-2xs text-sage-600">
         {verified ? verification?.verified_name : 'Verify below to unlock edits'}
       </p>
     </div>
@@ -319,7 +319,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   }
 
   if (loading) {
-    return <p className="font-sans text-[13px] text-sage-600">Loading saved pages…</p>
+    return <p className="font-sans text-sm text-sage-600">Loading saved pages…</p>
   }
 
   if (error) {
@@ -329,7 +329,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   if (rows.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-sage-300 bg-white/50 px-4 py-6 text-center">
-        <p className="font-sans text-[13px] text-sage-600">
+        <p className="font-sans text-sm text-sage-600">
           Nothing saved yet. Look for the <span className="font-medium text-sage-800">Save</span>{' '}
           button on any drug page to bookmark it here.
         </p>
@@ -347,11 +347,11 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
           <div className="min-w-0">
             <Link
               to={`/drugs/${row.slug}`}
-              className="block truncate font-sans text-[13.5px] font-medium text-sage-900 hover:text-aqua-700 hover:underline"
+              className="block truncate font-sans text-md font-medium text-sage-900 hover:text-aqua-700 hover:underline"
             >
               {row.name}
             </Link>
-            <p className="mt-0.5 font-mono text-[11px] text-sage-500">
+            <p className="mt-0.5 font-mono text-2xs text-sage-500">
               {row.pcid_code}
               {row.entity_type && <span className="ml-2 font-sans text-sage-400">· {row.entity_type}</span>}
             </p>
@@ -411,13 +411,13 @@ function ChangeEmailForm({ currentEmail }: { currentEmail: string }) {
 
   return (
     <div>
-      <h3 className="mb-1 font-sans text-[13px] font-semibold text-sage-900">Change email</h3>
-      <p className="mb-3 font-sans text-[12px] leading-relaxed text-sage-600">
+      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Change email</h3>
+      <p className="mb-3 font-sans text-sm leading-relaxed text-sage-600">
         Currently <span className="font-medium text-sage-800">{currentEmail}</span>. Changing it
         sends a confirmation link to the new address before it takes effect.
       </p>
       {status === 'sent' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-[13px] leading-relaxed text-aqua-700">
+        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm leading-relaxed text-aqua-700">
           Check {newEmail.trim()} for a confirmation link to finish the change.
         </p>
       ) : (
@@ -475,12 +475,12 @@ function ChangePasswordForm() {
 
   return (
     <div>
-      <h3 className="mb-1 font-sans text-[13px] font-semibold text-sage-900">Change password</h3>
-      <p className="mb-3 font-sans text-[12px] leading-relaxed text-sage-600">
+      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Change password</h3>
+      <p className="mb-3 font-sans text-sm leading-relaxed text-sage-600">
         Takes effect immediately — you'll stay signed in on this device.
       </p>
       {status === 'done' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-[13px] text-aqua-700">
+        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm text-aqua-700">
           Password updated.
         </p>
       ) : (
@@ -533,8 +533,8 @@ function SignOutRow() {
 
   return (
     <div className="border-t border-sage-200 pt-5">
-      <h3 className="mb-1 font-sans text-[13px] font-semibold text-sage-900">Sign out</h3>
-      <p className="mb-3 font-sans text-[12px] text-sage-600">Ends your session on this device.</p>
+      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Sign out</h3>
+      <p className="mb-3 font-sans text-sm text-sage-600">Ends your session on this device.</p>
       {error && <p className={`mb-2 ${errorClass}`}>{error}</p>}
       <button type="button" onClick={handleSignOut} disabled={signingOut} className={buttonClass}>
         {signingOut ? 'Signing out…' : 'Sign out'}
@@ -613,7 +613,7 @@ function NpiVerification() {
   if (checking) {
     return (
       <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
-        <p className="font-sans text-[13px] text-sage-600">Checking NPI verification status…</p>
+        <p className="font-sans text-sm text-sage-600">Checking NPI verification status…</p>
       </div>
     )
   }
@@ -625,13 +625,13 @@ function NpiVerification() {
   if (verification && verification.status === 'active') {
     return (
       <div className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-4 py-3.5">
-        <p className="font-sans text-[13px] font-medium text-aqua-700">
+        <p className="font-sans text-sm font-medium text-aqua-700">
           NPI verified — {verification.verified_name ?? verification.npi}
         </p>
         {verification.primary_taxonomy && (
-          <p className="mt-0.5 font-sans text-[12px] text-aqua-700/80">{verification.primary_taxonomy}</p>
+          <p className="mt-0.5 font-sans text-sm text-aqua-700/80">{verification.primary_taxonomy}</p>
         )}
-        <p className="mt-1.5 font-sans text-[12px] text-aqua-700/80">
+        <p className="mt-1.5 font-sans text-sm text-aqua-700/80">
           NPI {verification.npi} · you can submit edits once the contribution form ships.
         </p>
       </div>
@@ -640,8 +640,8 @@ function NpiVerification() {
 
   return (
     <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
-      <p className="mb-3 font-sans text-[13px] font-medium text-sage-900">Verify your NPI</p>
-      <p className="mb-4 font-sans text-[12.5px] leading-relaxed text-sage-600">
+      <p className="mb-3 font-sans text-sm font-medium text-sage-900">Verify your NPI</p>
+      <p className="mb-4 font-sans text-sm leading-relaxed text-sage-600">
         Required before you can submit an edit. Checked against the CMS NPI Registry — your last
         name must match the name on file for that NPI.
       </p>
@@ -720,7 +720,7 @@ function TabButton({
       aria-selected={active}
       onClick={onClick}
       className={[
-        'rounded-md px-3.5 py-1.5 font-sans text-[13px] font-medium transition-colors',
+        'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
         active
           ? 'bg-white text-sage-900 shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
@@ -770,7 +770,7 @@ function SignInForm() {
 
   if (status === 'reset-sent') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-[13.5px] leading-relaxed text-aqua-700">
+      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-aqua-700">
         If an account exists for {email}, a password reset link is on its way.
       </p>
     )
@@ -809,7 +809,7 @@ function SignInForm() {
           type="button"
           onClick={handleForgotPassword}
           disabled={status === 'loading'}
-          className="font-sans text-[12.5px] text-sage-600 underline-offset-2 hover:text-sage-900 hover:underline disabled:opacity-50"
+          className="font-sans text-sm text-sage-600 underline-offset-2 hover:text-sage-900 hover:underline disabled:opacity-50"
         >
           Forgot password?
         </button>
@@ -853,7 +853,7 @@ function RegisterForm() {
 
   if (status === 'check-email') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-[13.5px] leading-relaxed text-aqua-700">
+      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-aqua-700">
         Check {email} for a confirmation link to finish setting up your account.
       </p>
     )
@@ -895,7 +895,7 @@ function RegisterForm() {
 
       {error && <p className={errorClass}>{error}</p>}
 
-      <p className="font-sans text-[11.5px] leading-snug text-sage-600">
+      <p className="font-sans text-2xs leading-snug text-sage-600">
         Anything you submit for review is licensed under the project's terms, same as the rest of
         the dataset.
       </p>
@@ -922,21 +922,21 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block font-sans text-[12.5px] font-medium text-sage-700">{label}</span>
+      <span className="mb-1.5 block font-sans text-sm font-medium text-sage-700">{label}</span>
       {children}
-      {hint && <span className="mt-1 block font-sans text-[11.5px] text-sage-600">{hint}</span>}
+      {hint && <span className="mt-1 block font-sans text-2xs text-sage-600">{hint}</span>}
     </label>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-[12px] text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
 
 const primaryButtonClass =
-  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
+  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
 
 const errorClass =
-  'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-[12.5px] text-coral-600'
+  'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-coral-600'
