@@ -1,12 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:...');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:...');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:...');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* ---------------------------------------------------------------
+     Golden ratio type scale (phi = 1.618, base = 16px = 1rem)
+     text-{xs,sm,base} are fixed; text-{lg..5xl} fluid-scale between
+     a mobile floor and the full phi-derived desktop size via clamp().
+     Override --text-* tokens here rather than hardcoding font-size
+     anywhere else, so the whole site stays on one ratio.
+     --------------------------------------------------------------- */
+  --text-2xs: 0.697rem;     /* 11.15px — phi^-0.75 */
+  --text-xs: 0.618rem;      /* 9.89px  — phi^-1 */
+  --text-sm: 0.786rem;      /* 12.58px — phi^-0.5 */
+  --text-md: 0.887rem;      /* 14.19px — phi^-0.25 (fills the sm/base gap) */
+  --text-base: 1rem;        /* 16px    — phi^0 (body) */
+  --text-lg: clamp(1.161rem, 1.05rem + 0.55vw, 1.272rem);   /* 18.57–20.35px — phi^0.5 */
+  --text-xl: clamp(1.348rem, 1.14rem + 1.04vw, 1.618rem);   /* 21.56–25.89px — phi^1 */
+  --text-2xl: clamp(1.565rem, 1.20rem + 1.83vw, 2.058rem);  /* 25.03–32.93px — phi^1.5 */
+  --text-3xl: clamp(1.816rem, 1.24rem + 2.88vw, 2.618rem);  /* 29.06–41.89px — phi^2 */
+  --text-4xl: clamp(2.108rem, 1.20rem + 4.54vw, 3.330rem);  /* 33.73–53.28px — phi^2.5 */
+  --text-5xl: clamp(2.448rem, 1.05rem + 6.99vw, 4.236rem);  /* 39.16–67.77px — phi^3 */
 
   --color-sage-50:  oklch(97.5% 0.010 145);
   --color-sage-100: oklch(95.0% 0.018 145);
@@ -45,15 +64,30 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   background-color: oklch(97.5% 0.010 145);
   color: oklch(19% 0.025 145);
   -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3, .article-body h1 {
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+/* Golden ratio heading defaults. Tailwind's text-* utilities
+   (text-3xl, text-lg, etc.) already read from the --text-* tokens
+   above, so this just gives bare h1–h6 the same scale when no
+   utility class is applied. */
+h1 { font-size: var(--text-4xl); line-height: 1.1; }
+h2 { font-size: var(--text-3xl); line-height: 1.15; }
+h3 { font-size: var(--text-2xl); line-height: 1.2; }
+h4 { font-size: var(--text-xl); line-height: 1.25; }
+h5 { font-size: var(--text-lg); line-height: 1.3; }
+h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 
 * {
   scrollbar-width: thin;
@@ -67,6 +101,8 @@ body {
 .page-background {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
 }
 
 .page-background::before {
@@ -75,21 +111,24 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("/assets/textures/lichen_seamless.jpg");
+  background-image: url("/assets/textures/moss_seamless.jpg");
   background-repeat: repeat;
+  background-attachment: scroll;
   background-size: 1080px auto;
-  opacity: 0.04;
+  opacity: 0.12;
   mix-blend-mode: multiply;
+  transform: translateZ(0);
+}
+
+@media (max-width: 780px) {
+  .page-background::before {
+    background-size: 380px auto;
+    opacity: 0.18;
+    mix-blend-mode: normal;
+  }
 }
 
 .page-content {
   position: relative;
   z-index: 1;
-}
-
-@media (prefers-color-scheme: dark) {
-  .page-background::before {
-    mix-blend-mode: overlay;
-    opacity: 0.06;
-  }
 }
