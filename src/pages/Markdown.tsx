@@ -27,10 +27,13 @@ import rehypeSlug from 'rehype-slug'
  * out below before spreading props, otherwise React writes node="[object Object]"
  * onto the DOM element.
  *
- * Type scale: 16.5px body on a phi step — h3 ≈ 20px, h2 ≈ 26px (16.5 × 1.618).
+ * Type scale: body on text-base (16px), h4 on text-base, h3 on text-xl (phi^1,
+ * 25.89px), h2 on text-2xl (phi^1.5, 32.93px). Sizes come from the site-wide
+ * --text-* tokens in index.css rather than being hardcoded here, so tuning the
+ * ratio there updates this page too.
  */
 
-const BODY = 'font-sans text-[16.5px] leading-[1.7] text-sage-700'
+const BODY = 'font-sans text-base leading-[1.7] text-sage-700'
 
 /** Lets the `code` mapping tell fenced blocks apart from inline spans. */
 const InsidePre = createContext(false)
@@ -46,7 +49,7 @@ function Paragraph({ children }: { children?: ReactNode }) {
 function CodeBlockWrapper({ children }: { children?: ReactNode }) {
   return (
     <InsidePre.Provider value={true}>
-      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-[13px] leading-relaxed text-sage-800">
+      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-sm leading-relaxed text-sage-800">
         {children}
       </pre>
     </InsidePre.Provider>
@@ -98,7 +101,7 @@ const components: Components = {
   h1: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="scroll-mt-32 pt-6 font-display text-[30px] font-semibold leading-tight text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-2xl font-semibold leading-tight text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -107,7 +110,7 @@ const components: Components = {
   h2: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="scroll-mt-32 pt-6 font-display text-[26px] font-semibold leading-snug text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-xl font-semibold leading-snug text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -116,7 +119,7 @@ const components: Components = {
   h3: ({ node: _node, children, ...props }) => (
     <h3
       {...props}
-      className="scroll-mt-32 pt-3 font-display text-[20px] font-semibold leading-snug text-sage-900"
+      className="scroll-mt-32 pt-3 font-display text-lg font-semibold leading-snug text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -125,7 +128,7 @@ const components: Components = {
   h4: ({ node: _node, children, ...props }) => (
     <h4
       {...props}
-      className="scroll-mt-32 pt-2 font-sans text-[16.5px] font-medium text-sage-900"
+      className="scroll-mt-32 pt-2 font-sans text-base font-medium text-sage-900"
     >
       {children}
     </h4>
@@ -156,7 +159,7 @@ const components: Components = {
   blockquote: ({ children }) => (
     <InsideQuote.Provider value={true}>
       <blockquote
-        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-[20px] leading-[1.5] text-sage-800 italic"
+        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-lg leading-[1.5] text-sage-800 italic"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {children}
@@ -171,7 +174,7 @@ const components: Components = {
 
   table: ({ children }) => (
     <div className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70">
-      <table className="w-full border-collapse font-sans text-[14px]">{children}</table>
+      <table className="w-full border-collapse font-sans text-md">{children}</table>
     </div>
   ),
   thead: ({ children }) => <thead className="bg-sage-100">{children}</thead>,
@@ -199,7 +202,7 @@ const components: Components = {
         loading="lazy"
         className="w-full rounded-lg border border-sage-200"
       />
-      {alt && <figcaption className="font-sans text-[13px] text-sage-600">{alt}</figcaption>}
+      {alt && <figcaption className="font-sans text-sm text-sage-600">{alt}</figcaption>}
     </figure>
   ),
 
@@ -222,7 +225,7 @@ const components: Components = {
     return isFootnotes ? (
       <section
         data-toc-skip=""
-        className="mt-12 border-t border-sage-200 pt-6 font-sans text-[14px] text-sage-600 [&_h2]:pt-0 [&_h2]:text-[16px] [&_ol]:text-[14px] [&_p]:text-[14px]"
+        className="mt-12 border-t border-sage-200 pt-6 font-sans text-md text-sage-600 [&_h2]:pt-0 [&_h2]:text-base [&_ol]:text-md [&_p]:text-md"
       >
         {children}
       </section>
