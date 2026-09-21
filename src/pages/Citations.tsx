@@ -61,7 +61,7 @@ export default function Citations() {
 
       <section className="border-t border-sage-200 py-9">
         <SectionHeading id="references">References</SectionHeading>
-        <div className="space-y-3 font-sans text-[14.5px] leading-relaxed text-sage-700">
+        <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
           <p>
             For anything load-bearing — a dose, a contraindication, an approval date — cite
             the primary record, not this site. These are the datasets the Commons is built
@@ -92,7 +92,7 @@ export default function Citations() {
           <div key={group.id} className="mt-10">
             <h3
               id={group.id}
-              className="mb-5 font-display text-[18px] font-semibold leading-snug text-sage-900"
+              className="mb-5 font-display text-lg font-semibold leading-snug text-sage-900"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {group.heading}
@@ -171,7 +171,7 @@ function PageCitation({
 
       <div className="mt-7">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="font-sans text-[13px] font-medium text-sage-900">Formatted citation</span>
+          <span className="font-sans text-sm font-medium text-sage-900">Formatted citation</span>
           <CopyButton copied={copied} disabled={!citation} onClick={() => onCopy('page', citation)} />
         </div>
         <CitationText muted={!citation}>
@@ -200,17 +200,17 @@ function ReferenceItem({
           href={source.href}
           target="_blank"
           rel="noreferrer"
-          className="font-sans text-[14.5px] font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="font-sans text-md font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
         >
           {source.name}
         </a>
         {source.license && (
-          <span className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-[10px] text-sage-600">
+          <span className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-sage-600">
             {source.license}
           </span>
         )}
       </div>
-      <p className="mt-1 font-sans text-[14px] leading-relaxed text-sage-600">{source.role}</p>
+      <p className="mt-1 font-sans text-md leading-relaxed text-sage-600">{source.role}</p>
 
       <div className="mt-3 flex items-start gap-3">
         <div className="min-w-0 flex-1">
@@ -254,7 +254,7 @@ function CitationSettings({
                 aria-checked={selected}
                 onClick={() => onStyle(s.id)}
                 className={[
-                  'rounded-md border px-2.5 py-1 font-sans text-[13px] transition-colors',
+                  'rounded-md border px-2.5 py-1 font-sans text-sm transition-colors',
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500',
                   selected
                     ? 'border-aqua-400 bg-aqua-100 text-aqua-700'
@@ -269,7 +269,7 @@ function CitationSettings({
       </div>
 
       <div className="max-w-xs">
-        <label htmlFor="citation-accessed" className="mb-3 block font-sans text-[12.5px] font-medium text-sage-900">
+        <label htmlFor="citation-accessed" className="mb-3 block font-sans text-sm font-medium text-sage-900">
           Accessed
         </label>
         <input
@@ -279,7 +279,7 @@ function CitationSettings({
           onChange={e => onAccessed(e.target.value)}
           className={inputClass}
         />
-        <span className="mt-1.5 block font-sans text-[11.5px] leading-snug text-sage-600">
+        <span className="mt-1.5 block font-sans text-2xs leading-snug text-sage-600">
           Applies to web citations. Journal articles are cited by DOI and don't take one.
         </span>
       </div>
@@ -293,7 +293,7 @@ function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="mb-5 font-display text-[22px] font-semibold leading-snug text-sage-900"
+      className="mb-5 font-display text-lg font-semibold leading-snug text-sage-900"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -305,7 +305,7 @@ function CitationText({ children, muted = false }: { children: ReactNode; muted?
   return (
     <div className="rounded-lg border border-sage-200 bg-white/70 px-3.5 py-3">
       <p
-        className={`whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed ${
+        className={`whitespace-pre-wrap break-words font-mono text-sm leading-relaxed ${
           muted ? 'text-sage-600' : 'text-sage-800'
         }`}
       >
@@ -342,9 +342,9 @@ function CopyButton({
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block font-sans text-[12.5px] font-medium text-sage-700">{label}</span>
+      <span className="mb-1.5 block font-sans text-sm font-medium text-sage-700">{label}</span>
       {children}
-      {hint && <span className="mt-1 block font-sans text-[11.5px] text-sage-600">{hint}</span>}
+      {hint && <span className="mt-1 block font-sans text-2xs text-sage-600">{hint}</span>}
     </label>
   )
 }
@@ -372,10 +372,10 @@ function useCopy() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-[12px] text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
 
 const linkClass =
   'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
