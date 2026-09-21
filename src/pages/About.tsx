@@ -9,7 +9,7 @@ export default function About() {
     <PageShell
       kicker="About"
       title="About Pharmacy Commons"
-      lede="A shared drug reference built from public sources such as the FDA, WHO, and NIH. The project is in early development."
+      lede="A shared drug reference built from public sources. The project is in early development."
     >
       <Section heading="Our Mission">
         <p>
@@ -89,7 +89,7 @@ export default function About() {
        </p>
       <p>
         Drug's effects also continue after it is taken. Drugs and their byproducts reach rivers, lakes, and 
-        groundwater through metabolism, through disposal, and through manufacturing. Where reliable data exist, we
+        groundwater through human waste, disposal, and manufacturing. Where reliable data exist, we
         show estimated environmental risk alongside clinical information and place comparable medicines side by side.
         The aim is to let pharmacists and prescribers weigh environmental impact, alongside a multitude of other 
         considerations like cost and accessibility, when choosing among options that are clinically appropriate.
