@@ -3,6 +3,10 @@
    All selectors are namespaced under .crcl so this can drop into an existing
    site without colliding. Colors are tokens on .crcl - override them to
    match your brand.
+
+   Type scale: golden ratio (phi = 1.618) quarter-steps, rooted at a 16px
+   base (root font-size), same ratio as the rest of the site but kept as its
+   own --crcl-text-* tokens so this file stays self-contained and portable.
    ========================================================================== */
 
 .crcl {
@@ -31,11 +35,21 @@
   --crcl-radius:     8px;
   --crcl-gap:        1rem;
 
+  /* phi^n * 16px, quarter-steps */
+  --crcl-text-2xs:  0.697rem;  /* 11.15px — phi^-0.75 */
+  --crcl-text-sm:   0.786rem;  /* 12.58px — phi^-0.5 */
+  --crcl-text-md:   0.887rem;  /* 14.19px — phi^-0.25 */
+  --crcl-text-base: 1rem;      /* 16px    — phi^0 */
+  --crcl-text-lg:   1.128rem;  /* 18.05px — phi^0.25 */
+  --crcl-text-xl:   1.618rem;  /* 25.89px — phi^1 */
+  --crcl-text-2xl:  2.321rem;  /* 37.14px — phi^1.75 */
+  --crcl-text-3xl:  2.953rem;  /* 47.24px — phi^2.25 */
+
   box-sizing: border-box;
   color: var(--crcl-ink);
   background: var(--crcl-bg);
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--crcl-text-base);
   line-height: 1.5;
   max-width: 62rem;
 }
@@ -61,7 +75,7 @@
 }
 .crcl-panel > legend {
   font-weight: 650;
-  font-size: 0.8rem;
+  font-size: var(--crcl-text-sm);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--crcl-brand);
@@ -74,13 +88,13 @@
 .crcl-field > label {
   display: block;
   font-weight: 600;
-  font-size: 0.86rem;
+  font-size: var(--crcl-text-md);
   margin-bottom: 0.3rem;
   color: var(--crcl-ink);
 }
 .crcl-optional {
   font-weight: 400;
-  font-size: 0.76rem;
+  font-size: var(--crcl-text-2xs);
   color: var(--crcl-ink-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -115,14 +129,14 @@
 }
 
 .crcl-unit {
-  font-size: 0.85rem;
+  font-size: var(--crcl-text-sm);
   color: var(--crcl-ink-soft);
   white-space: nowrap;
 }
 
 .crcl-hint {
   margin: 0.3rem 0 0;
-  font-size: 0.79rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.4;
   color: var(--crcl-ink-faint);
 }
@@ -137,7 +151,7 @@
 }
 .crcl-seg button {
   font: inherit;
-  font-size: 0.85rem;
+  font-size: var(--crcl-text-sm);
   font-weight: 550;
   border: 0;
   background: var(--crcl-bg);
@@ -162,7 +176,7 @@
 }
 .crcl-details > summary {
   cursor: pointer;
-  font-size: 0.84rem;
+  font-size: var(--crcl-text-md);
   font-weight: 600;
   color: var(--crcl-accent);
   list-style-position: inside;
@@ -173,7 +187,7 @@
   display: flex;
   gap: 0.55rem;
   align-items: flex-start;
-  font-size: 0.85rem;
+  font-size: var(--crcl-text-sm);
   margin-bottom: 0.8rem;
   cursor: pointer;
 }
@@ -181,7 +195,7 @@
 .crcl-check em {
   display: block;
   font-style: normal;
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.4;
   color: var(--crcl-ink-faint);
   margin-top: 0.15rem;
@@ -197,14 +211,14 @@
 }
 .crcl-amp-item label {
   display: block;
-  font-size: 0.79rem;
+  font-size: var(--crcl-text-sm);
   font-weight: 600;
   color: var(--crcl-ink-soft);
   margin-bottom: 0.2rem;
 }
 .crcl-amp-item select {
   width: 100%;
-  font-size: 0.84rem;
+  font-size: var(--crcl-text-md);
   padding: 0.38rem 0.45rem;
 }
 
@@ -215,10 +229,10 @@
   background: var(--crcl-caution-bg);
   border-radius: 0 6px 6px 0;
 }
-.crcl-amp-total-value { font-size: 0.9rem; }
-.crcl-amp-total-value strong { font-size: 1.1rem; }
+.crcl-amp-total-value { font-size: var(--crcl-text-md); }
+.crcl-amp-total-value strong { font-size: var(--crcl-text-lg); }
 .crcl-amp-total-items {
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.4;
   color: var(--crcl-ink-soft);
   margin-top: 0.15rem;
@@ -267,33 +281,33 @@
   margin-bottom: var(--crcl-gap);
 }
 .crcl-headline-label {
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-sm);
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--crcl-brand);
 }
 .crcl-headline-value {
-  font-size: 2.9rem;
+  font-size: var(--crcl-text-3xl);
   font-weight: 700;
   line-height: 1.05;
   margin: 0.15rem 0;
   color: var(--crcl-ink);
 }
 .crcl-headline-unit {
-  font-size: 1rem;
+  font-size: var(--crcl-text-base);
   font-weight: 600;
   color: var(--crcl-ink-soft);
   margin-left: 0.4rem;
 }
 .crcl-headline-method {
-  font-size: 0.88rem;
+  font-size: var(--crcl-text-md);
   font-weight: 600;
   color: var(--crcl-ink-soft);
 }
 .crcl-headline-reason {
   margin: 0.7rem 0 0;
-  font-size: 0.85rem;
+  font-size: var(--crcl-text-md);
   line-height: 1.45;
   color: var(--crcl-ink-soft);
   border-top: 1px solid rgba(20, 82, 125, 0.18);
@@ -308,7 +322,7 @@
 }
 .crcl-card-title {
   margin: 0 0 0.85rem;
-  font-size: 0.8rem;
+  font-size: var(--crcl-text-sm);
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -330,25 +344,25 @@
   padding: 0.65rem 0.8rem;
 }
 .crcl-stat-label {
-  font-size: 0.75rem;
+  font-size: var(--crcl-text-2xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--crcl-ink-faint);
 }
 .crcl-stat-value {
-  font-size: 1.6rem;
+  font-size: var(--crcl-text-xl);
   font-weight: 700;
   line-height: 1.2;
 }
 .crcl-stat-unit {
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-sm);
   font-weight: 600;
   color: var(--crcl-ink-soft);
   margin-left: 0.3rem;
 }
 .crcl-stat-sub {
-  font-size: 0.79rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.35;
   color: var(--crcl-ink-soft);
   margin-top: 0.15rem;
@@ -362,7 +376,7 @@
 .crcl-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: var(--crcl-text-md);
 }
 .crcl-table th, .crcl-table td {
   text-align: left;
@@ -371,7 +385,7 @@
   vertical-align: top;
 }
 .crcl-table thead th {
-  font-size: 0.75rem;
+  font-size: var(--crcl-text-2xs);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--crcl-ink-faint);
@@ -385,7 +399,7 @@
 .crcl-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .crcl-strong { font-weight: 700; }
 .crcl-table-note {
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-2xs);
   line-height: 1.35;
   color: var(--crcl-ink-faint);
   margin-top: 0.1rem;
@@ -402,7 +416,7 @@
 .crcl-badge {
   display: inline-block;
   margin-left: 0.45rem;
-  font-size: 0.68rem;
+  font-size: var(--crcl-text-2xs);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -417,7 +431,7 @@
   background: var(--crcl-bg-sunken);
   color: var(--crcl-ink-soft);
   border: 1px solid var(--crcl-line);
-  font-size: 0.74rem;
+  font-size: var(--crcl-text-2xs);
   letter-spacing: 0.02em;
   text-transform: none;
   padding: 0.2rem 0.5rem;
@@ -436,7 +450,7 @@
   border-top: 3px solid var(--crcl-line);
   padding: 0.35rem 0.3rem;
   text-align: center;
-  font-size: 0.7rem;
+  font-size: var(--crcl-text-2xs);
   line-height: 1.3;
   color: var(--crcl-ink-faint);
 }
@@ -458,7 +472,7 @@
   flex-wrap: wrap;
   margin-bottom: 0.7rem;
 }
-.crcl-med-ind { font-size: 0.82rem; color: var(--crcl-ink-soft); }
+.crcl-med-ind { font-size: var(--crcl-text-sm); color: var(--crcl-ink-soft); }
 
 .crcl-rec {
   border-radius: 6px;
@@ -466,9 +480,9 @@
   padding: 0.75rem 0.9rem;
   margin-bottom: 0.8rem;
 }
-.crcl-rec-dose { font-size: 1.05rem; font-weight: 650; }
+.crcl-rec-dose { font-size: var(--crcl-text-lg); font-weight: 650; }
 .crcl-rec-band {
-  font-size: 0.79rem;
+  font-size: var(--crcl-text-sm);
   color: var(--crcl-ink-soft);
   margin-top: 0.15rem;
   font-variant-numeric: tabular-nums;
@@ -483,7 +497,7 @@
   border-left: 4px solid;
   padding: 0.7rem 0.9rem;
   margin-bottom: 0.8rem;
-  font-size: 0.87rem;
+  font-size: var(--crcl-text-md);
   line-height: 1.45;
 }
 .crcl-alert.is-warn  { border-color: var(--crcl-warn);  background: var(--crcl-warn-bg); }
@@ -493,26 +507,26 @@
 
 .crcl-note {
   margin: 0.7rem 0 0;
-  font-size: 0.82rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.5;
   color: var(--crcl-ink-soft);
 }
 .crcl-source {
   margin: 0.7rem 0 0;
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-2xs);
   color: var(--crcl-ink-faint);
 }
 .crcl-list {
   margin: 0.4rem 0 0;
   padding-left: 1.2rem;
-  font-size: 0.85rem;
+  font-size: var(--crcl-text-sm);
   line-height: 1.5;
   color: var(--crcl-ink-soft);
 }
 .crcl-list li + li { margin-top: 0.3rem; }
 
 .crcl-disclaimer {
-  font-size: 0.78rem;
+  font-size: var(--crcl-text-2xs);
   line-height: 1.5;
   color: var(--crcl-ink-faint);
   border-top: 1px solid var(--crcl-line-soft);
@@ -537,7 +551,7 @@
     display: inline-block;
     text-align: left;
     margin: 0.4rem 1.4rem 0 0;
-    font-size: 0.95rem;
+    font-size: var(--crcl-text-base);
   }
 
   /* Two-column tables stack label over value rather than squeezing. */
@@ -566,7 +580,7 @@
 }
 
 @media (max-width: 30rem) {
-  .crcl-headline-value { font-size: 2.3rem; }
+  .crcl-headline-value { font-size: var(--crcl-text-2xl); }
   .crcl-bmi-scale { grid-template-columns: repeat(3, 1fr); }
   .crcl-actions .crcl-btn { flex: 1 1 auto; }
   .crcl-panel { padding: 0.9rem 0.9rem 1rem; }
