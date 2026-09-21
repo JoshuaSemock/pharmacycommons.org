@@ -153,7 +153,7 @@ export default function DrugDetail() {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="font-sans text-[13px] text-aqua-700 hover:underline"
+          className="font-sans text-sm text-aqua-700 hover:underline"
         >
           Return to search
         </button>
@@ -164,7 +164,7 @@ export default function DrugDetail() {
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 py-4 font-sans text-[12px] text-sage-600">
+      <nav className="flex items-center gap-1.5 py-4 font-sans text-sm text-sage-600">
         <button onClick={() => navigate('/')} className="transition-colors hover:text-sage-900">
           Browse
         </button>
@@ -175,7 +175,7 @@ export default function DrugDetail() {
       {/* Drug header */}
       <header className="mb-8 border-b border-sage-200 pb-6">
         <div className="mb-2 flex flex-wrap items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-aqua-200 font-mono text-[13px] font-medium text-aqua-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-aqua-200 font-mono text-sm font-medium text-aqua-700">
             {drug.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex-1">
@@ -186,11 +186,11 @@ export default function DrugDetail() {
               >
                 {drug.name}
               </h1>
-              <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-[11px] text-sage-600">
+              <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-2xs text-sage-600">
                 INN
               </span>
             </div>
-            <p className="font-sans text-[14px] text-sage-600">{drug.entity_type}</p>
+            <p className="font-sans text-md text-sage-600">{drug.entity_type}</p>
           </div>
           <SaveButton
             pcidCode={drug.pcid_code}
@@ -200,7 +200,7 @@ export default function DrugDetail() {
           />
         </div>
 
-        <p className="mt-3 max-w-2xl font-sans text-[14px] leading-relaxed text-sage-700">
+        <p className="mt-3 max-w-2xl font-sans text-md leading-relaxed text-sage-700">
           {drug.description || 'Active pharmaceutical ingredient'}
         </p>
       </header>
@@ -211,7 +211,7 @@ export default function DrugDetail() {
         <aside className="space-y-4">
           <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
             <div className="border-b border-sage-100 px-4 py-3">
-              <h2 className="font-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-sage-600">
+              <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
                 Identifiers
               </h2>
             </div>
@@ -234,7 +234,7 @@ export default function DrugDetail() {
                 role="tab"
                 aria-selected={tab === t}
                 onClick={() => setTab(t)}
-                className={`flex-1 rounded-lg px-3 py-1.5 font-sans text-[12.5px] font-medium capitalize transition-all ${
+                className={`flex-1 rounded-lg px-3 py-1.5 font-sans text-sm font-medium capitalize transition-all ${
                   tab === t
                     ? 'bg-white text-sage-900 shadow-sm'
                     : 'text-sage-600 hover:text-sage-900'
@@ -336,7 +336,7 @@ function SaveButton({
         disabled={pending}
         aria-pressed={saved}
         title={saved ? 'Remove from saved pages' : 'Save this page to your account'}
-        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-[12.5px] font-medium transition-colors disabled:opacity-50 ${
+        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-sm font-medium transition-colors disabled:opacity-50 ${
           saved
             ? 'border-amber-300 bg-amber-100 text-amber-700 hover:border-amber-400'
             : 'border-sage-200 bg-white/70 text-sage-600 hover:border-sage-300 hover:text-sage-900'
@@ -345,7 +345,7 @@ function SaveButton({
         <BookmarkIcon filled={saved} />
         {saved ? 'Saved' : 'Save'}
       </button>
-      {error && <p className="max-w-[14rem] text-right font-sans text-[11px] text-coral-600">{error}</p>}
+      {error && <p className="max-w-[14rem] text-right font-sans text-2xs text-coral-600">{error}</p>}
     </div>
   )
 }
@@ -372,7 +372,7 @@ function OverviewTab({ drug }: { drug: DrugDetailType }) {
   return (
     <div className="space-y-6">
       <ContentCard title="Description">
-        <p className="font-sans text-[13.5px] leading-relaxed text-sage-700">
+        <p className="font-sans text-md leading-relaxed text-sage-700">
           {drug.description || 'No description available'}
         </p>
       </ContentCard>
@@ -384,8 +384,8 @@ function OverviewTab({ drug }: { drug: DrugDetailType }) {
           <div className="space-y-2">
             {attributes.map((attr, i) => (
               <div key={`${attr.label}-${i}`} className="rounded-lg bg-sage-50 px-3 py-2">
-                <p className="font-sans text-[12.5px] font-medium text-sage-800">{attr.label}</p>
-                <p className="font-mono text-[10px] text-sage-600">{attr.value}</p>
+                <p className="font-sans text-sm font-medium text-sage-800">{attr.label}</p>
+                <p className="font-mono text-xs text-sage-600">{attr.value}</p>
               </div>
             ))}
           </div>
@@ -399,7 +399,7 @@ function ClinicalTab({ drug }: { drug: DrugDetailType }) {
   return (
     <div className="space-y-6">
       <ContentCard title="Clinical information">
-        <p className="font-sans text-[13.5px] leading-relaxed text-sage-700">
+        <p className="font-sans text-md leading-relaxed text-sage-700">
           {drug.description || 'No clinical information available'}
         </p>
       </ContentCard>
@@ -413,18 +413,18 @@ function ClassificationTab({ drug }: { drug: DrugDetailType }) {
       <ContentCard title="Classification">
         <div className="space-y-3">
           <div>
-            <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
               Entity type
             </p>
-            <span className="rounded-lg border border-violet-200 bg-violet-100 px-3 py-1.5 font-sans text-[12.5px] font-medium text-violet-600">
+            <span className="rounded-lg border border-violet-200 bg-violet-100 px-3 py-1.5 font-sans text-sm font-medium text-violet-600">
               {drug.entity_type}
             </span>
           </div>
           <div>
-            <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
               Status
             </p>
-            <p className="font-sans text-[13px] text-sage-700">{drug.status}</p>
+            <p className="font-sans text-sm text-sage-700">{drug.status}</p>
           </div>
         </div>
       </ContentCard>
@@ -436,7 +436,7 @@ function InteractionsTab({ drug }: { drug: DrugDetailType }) {
   if (!drug.interactions || drug.interactions.length === 0) {
     return (
       <ContentCard title="Interactions">
-        <p className="font-sans text-[13px] text-sage-600">No interactions recorded</p>
+        <p className="font-sans text-sm text-sage-600">No interactions recorded</p>
       </ContentCard>
     )
   }
@@ -447,14 +447,14 @@ function InteractionsTab({ drug }: { drug: DrugDetailType }) {
         <div className="space-y-2">
           {drug.interactions.map((interaction, i) => (
             <div key={i} className="rounded-lg border border-sage-200 bg-sage-50 px-4 py-3">
-              <p className="mb-1 font-sans text-[13.5px] font-semibold text-sage-900">
+              <p className="mb-1 font-sans text-md font-semibold text-sage-900">
                 {interaction.interacting_drug_name}
               </p>
-              <p className="font-sans text-[12.5px] leading-relaxed text-sage-600">
+              <p className="font-sans text-sm leading-relaxed text-sage-600">
                 {interaction.mechanism || 'Interaction details not available'}
               </p>
               {interaction.severity && (
-                <span className="mt-2 inline-block rounded bg-sage-100 px-2 py-1 font-mono text-[10px] font-medium text-sage-600">
+                <span className="mt-2 inline-block rounded bg-sage-100 px-2 py-1 font-mono text-xs font-medium text-sage-600">
                   {interaction.severity}
                 </span>
               )}
@@ -493,7 +493,7 @@ function HierarchyCard({
               {brandNames.map(b => (
                 <span
                   key={b}
-                  className="rounded-md border border-sage-200 bg-sage-50 px-2 py-1 font-sans text-[12px] text-sage-700"
+                  className="rounded-md border border-sage-200 bg-sage-50 px-2 py-1 font-sans text-sm text-sage-700"
                 >
                   {b}
                 </span>
@@ -521,7 +521,7 @@ function HierarchyCard({
 function HierarchySection({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="mb-2 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+      <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
         {label}
       </p>
       {children}
@@ -539,11 +539,11 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
           onClick={() => navigate(`/drugs/${m.slug}`)}
           className="flex items-center justify-between gap-2 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-aqua-50"
         >
-          <span className="truncate font-sans text-[12.5px] font-medium text-sage-800">
+          <span className="truncate font-sans text-sm font-medium text-sage-800">
             {m.name}
           </span>
           {m.term_type && (
-            <span className="shrink-0 font-mono text-[10px] text-sage-500">{m.term_type}</span>
+            <span className="shrink-0 font-mono text-xs text-sage-500">{m.term_type}</span>
           )}
         </button>
       ))}
@@ -601,11 +601,11 @@ function EcoPanel({ eco }: { eco: unknown }) {
     <div className="overflow-hidden rounded-xl border" style={{ borderColor }}>
       <div className={`px-4 py-3 ${headerBg}`}>
         <div className="mb-0.5 flex items-center justify-between gap-2">
-          <h2 className="font-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-sage-600">
+          <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
             Environmental risk
           </h2>
           <span
-            className={`shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase ${riskMeta.bg} ${riskMeta.text} ${riskMeta.border}`}
+            className={`shrink-0 rounded-md border px-2 py-0.5 font-mono text-xs font-semibold uppercase ${riskMeta.bg} ${riskMeta.text} ${riskMeta.border}`}
           >
             {riskMeta.label} risk
           </span>
@@ -615,10 +615,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
       <div className="space-y-4 bg-white p-4">
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
-            <span className="font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+            <span className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
               Risk quotient (RQ)
             </span>
-            <span className={`font-mono text-[18px] font-semibold ${rqTextColor}`}>
+            <span className={`font-mono text-lg font-semibold ${rqTextColor}`}>
               {rqFormatted}
             </span>
           </div>
@@ -629,7 +629,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
             />
           </div>
           {rqValue === null && (
-            <p className="mt-1.5 font-sans text-[11px] text-sage-600">
+            <p className="mt-1.5 font-sans text-2xs text-sage-600">
               No risk quotient calculated for this entry.
             </p>
           )}
@@ -638,10 +638,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
         {typeof metrics.dpd_category === 'string' && metrics.dpd_category && (
           <div className="flex items-center justify-between rounded-lg bg-sage-50 px-3 py-2.5">
             <div>
-              <p className="font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+              <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
                 Drug persistence
               </p>
-              <p className="mt-0.5 font-sans text-[12px] font-medium text-sage-700">
+              <p className="mt-0.5 font-sans text-sm font-medium text-sage-700">
                 {titleCase(metrics.dpd_category)}
                 {typeof metrics.dpd_days === 'number' && ` · ${metrics.dpd_days} days`}
               </p>
@@ -651,10 +651,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
         {typeof metrics.excretion_route === 'string' && metrics.excretion_route && (
           <div>
-            <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
               Excretion route
             </p>
-            <p className="font-sans text-[12.5px] text-sage-700">
+            <p className="font-sans text-sm text-sage-700">
               {titleCase(metrics.excretion_route)}
             </p>
           </div>
@@ -662,10 +662,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
         {typeof metrics.primary_concern === 'string' && metrics.primary_concern && (
           <div>
-            <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
               Primary concern
             </p>
-            <p className="font-sans text-[12.5px] leading-relaxed text-sage-700">
+            <p className="font-sans text-sm leading-relaxed text-sage-700">
               {metrics.primary_concern}
             </p>
           </div>
@@ -681,7 +681,7 @@ function ContentCard({ title, children }: { title: string; children: ReactNode }
   return (
     <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
       <div className="border-b border-sage-100 px-5 py-3">
-        <h3 className="font-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-sage-600">
+        <h3 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
           {title}
         </h3>
       </div>
@@ -694,10 +694,10 @@ function IdRow({ label, value }: { label: string; value: string | string[] }) {
   const displayValue = Array.isArray(value) ? value.join(', ') : value
   return (
     <div>
-      <p className="mb-0.5 font-sans text-[10px] uppercase tracking-[0.08em] text-sage-600">
+      <p className="mb-0.5 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
         {label}
       </p>
-      <p className="break-all font-mono text-[11px] text-sage-800">{displayValue}</p>
+      <p className="break-all font-mono text-2xs text-sage-800">{displayValue}</p>
     </div>
   )
 }
