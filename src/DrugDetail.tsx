@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getDrugBySlug, getDrugLabels, getLabelContent } from './api'
-import type { LabelDocument, LabelSection } from './api'
+import { getDrugBySlug } from './api'
 import type { DrugDetail as DrugDetailType, HierarchyMember } from './api.generated'
 import { ECO_RISK_COLORS } from './data'
 import type { EcoRisk } from './data'
 import { authErrorMessage, isEntitySaved, saveEntity, unsaveEntity, useSession } from './auth'
+import LabelSections from './LabelSections'
 
 type Tab = 'overview' | 'clinical' | 'classification' | 'interactions'
 
@@ -396,152 +396,14 @@ function OverviewTab({ drug }: { drug: DrugDetailType }) {
   )
 }
 
-/** Extracts the numeric pcid from the display string built by getDrugBySlug()
- *  (`PCID-${pcid}`) — the API layer doesn't expose the raw number separately. */
-function parsePcid(pcidCode: string): number | null {
-  const match = /^PCID-(\d+)$/.exec(pcidCode)
-  return match ? Number(match[1]) : null
-}
-
+/**
+ * The drug's FDA prescribing information as readable sections
+ * (boxed warning, uses, dosing, contraindications, warnings, side effects,
+ * interactions, special populations, reference). See LabelSections.tsx and
+ * src/labels.ts; `key` resets the chosen label when the drug changes.
+ */
 function ClinicalTab({ drug }: { drug: DrugDetailType }) {
-  const pcid = parsePcid(drug.pcid_code)
-
-  const [labels, setLabels] = useState<LabelDocument[]>([])
-  const [labelsLoading, setLabelsLoading] = useState(true)
-  const [labelsError, setLabelsError] = useState<string | null>(null)
-  const [selectedSetid, setSelectedSetid] = useState<string | null>(null)
-
-  const [sections, setSections] = useState<LabelSection[]>([])
-  const [sectionsLoading, setSectionsLoading] = useState(false)
-  const [sectionsError, setSectionsError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (pcid === null) {
-      setLabelsLoading(false)
-      return
-    }
-    let cancelled = false
-    setLabelsLoading(true)
-    setLabelsError(null)
-    getDrugLabels(pcid)
-      .then(data => {
-        if (cancelled) return
-        setLabels(data)
-        setSelectedSetid(data[0]?.setid ?? null)
-      })
-      .catch(err => {
-        if (cancelled) return
-        setLabelsError('Failed to load prescribing information')
-        console.error(err)
-      })
-      .finally(() => {
-        if (!cancelled) setLabelsLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [pcid])
-
-  useEffect(() => {
-    if (!selectedSetid) {
-      setSections([])
-      return
-    }
-    let cancelled = false
-    setSectionsLoading(true)
-    setSectionsError(null)
-    getLabelContent(selectedSetid)
-      .then(data => {
-        if (!cancelled) setSections(data)
-      })
-      .catch(err => {
-        if (cancelled) return
-        setSectionsError('Failed to load label content')
-        console.error(err)
-      })
-      .finally(() => {
-        if (!cancelled) setSectionsLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [selectedSetid])
-
-  if (labelsLoading) {
-    return (
-      <div className="space-y-6">
-        <ContentCard title="Clinical information">
-          <p className="font-sans text-sm text-sage-500">Loading prescribing information…</p>
-        </ContentCard>
-      </div>
-    )
-  }
-
-  if (labelsError || labels.length === 0) {
-    return (
-      <div className="space-y-6">
-        <ContentCard title="Clinical information">
-          <p className="font-sans text-md leading-relaxed text-sage-700">
-            {labelsError || drug.description || 'No FDA label on file for this entity yet.'}
-          </p>
-        </ContentCard>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      {labels.length > 1 && (
-        <ContentCard title="Label source">
-          <div className="flex flex-wrap gap-2">
-            {labels.map(label => (
-              <button
-                key={label.setid}
-                onClick={() => setSelectedSetid(label.setid)}
-                className={`rounded-lg border px-3 py-1.5 text-left font-sans text-sm transition-colors ${
-                  selectedSetid === label.setid
-                    ? 'border-aqua-300 bg-aqua-100 text-aqua-700'
-                    : 'border-sage-200 bg-white text-sage-600 hover:border-sage-300'
-                }`}
-              >
-                <span className="block font-medium">{label.labeler || 'Unknown labeler'}</span>
-                {label.effective_time && (
-                  <span className="block font-mono text-2xs text-sage-500">
-                    {label.effective_time}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </ContentCard>
-      )}
-
-      {sectionsLoading && (
-        <ContentCard title="Clinical information">
-          <p className="font-sans text-sm text-sage-500">Loading label sections…</p>
-        </ContentCard>
-      )}
-
-      {sectionsError && (
-        <ContentCard title="Clinical information">
-          <p className="font-sans text-sm text-coral-600">{sectionsError}</p>
-        </ContentCard>
-      )}
-
-      {!sectionsLoading &&
-        !sectionsError &&
-        sections.map(section => (
-          <ContentCard
-            key={section.section_order}
-            title={section.title || section.loinc_display || 'Section'}
-          >
-            <p className="whitespace-pre-wrap font-sans text-md leading-relaxed text-sage-700">
-              {section.text || 'No content for this section.'}
-            </p>
-          </ContentCard>
-        ))}
-    </div>
-  )
+  return <LabelSections key={drug.slug} slug={drug.slug} />
 }
 
 function ClassificationTab({ drug }: { drug: DrugDetailType }) {
