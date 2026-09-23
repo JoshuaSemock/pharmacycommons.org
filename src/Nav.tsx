@@ -491,7 +491,7 @@ function HeaderSearch() {
   }
 
   return (
-    <div className="relative max-w-lg flex-1">
+    <div className="relative min-w-0 max-w-lg flex-1">
       <form onSubmit={handleSubmit} role="search">
         <div
           className={`flex items-center gap-2 rounded-lg border bg-white/70 px-3 py-1.5 transition-all ${
@@ -507,7 +507,7 @@ function HeaderSearch() {
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             placeholder="...query the commons"
             aria-label="Search the catalog"
-            className="flex-1 bg-transparent font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none"
+            className="min-w-0 flex-1 bg-transparent font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none"
           />
           {query && (
             <button
