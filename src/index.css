@@ -224,8 +224,8 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    Knobs: --bg-photo-opacity (strength), --bg-drift (total travel),
    --bg-drift-range (how much scrolling that travel is spread over). */
 .page-background {
-  --bg-photo-opacity: 0.10;
-  --bg-drift: 240px;
+  --bg-photo-opacity: 0.15;
+  --bg-drift: 1080px;
   --bg-drift-range: 4000px;
   position: relative;
   min-height: 100vh;
