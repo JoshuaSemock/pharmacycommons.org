@@ -490,24 +490,54 @@ function HierarchySection({ label, children }: { label: string; children: ReactN
   )
 }
 
+/** "SITAGLIPTIN PHOSPHATE AND METFORMIN HYDROCHLORIDE" → "Sitagliptin phosphate and metformin hydrochloride". */
+function drugNameCase(name: string): string {
+  if (name !== name.toUpperCase()) return name // already mixed case; leave it alone
+  const lower = name.toLowerCase()
+  return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+const HIERARCHY_PREVIEW = 5
+
+/**
+ * One row per related entity. Names wrap onto as many lines as they need
+ * (no truncation) so long combination names stay readable in the narrow rail;
+ * the term type sits on its own line underneath. Long lists show the first
+ * few with a "Show all" toggle.
+ */
 function HierarchyList({ members }: { members: HierarchyMember[] }) {
   const navigate = useNavigate()
+  const [showAll, setShowAll] = useState(false)
+  const sorted = [...members].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+  const visible = showAll ? sorted : sorted.slice(0, HIERARCHY_PREVIEW)
+
   return (
-    <div className="grid gap-1.5">
-      {members.map(m => (
+    <div>
+      <ul className="space-y-1.5">
+        {visible.map(m => (
+          <li key={m.pcid_code}>
+            <button
+              onClick={() => navigate(`/drugs/${m.slug}`)}
+              className="block w-full min-w-0 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-sage-50"
+            >
+              <span className="block break-words font-sans text-sm font-medium leading-snug text-sage-800">
+                {drugNameCase(m.name)}
+              </span>
+              {m.term_type && (
+                <span className="mt-0.5 block font-sans text-2xs text-sage-600">{m.term_type}</span>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {sorted.length > HIERARCHY_PREVIEW && (
         <button
-          key={m.pcid_code}
-          onClick={() => navigate(`/drugs/${m.slug}`)}
-          className="flex items-center justify-between gap-2 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-aqua-50"
+          onClick={() => setShowAll(v => !v)}
+          className="mt-2 font-sans text-sm font-medium text-aqua-700 hover:underline"
         >
-          <span className="truncate font-sans text-sm font-medium text-sage-800">
-            {m.name}
-          </span>
-          {m.term_type && (
-            <span className="shrink-0 font-mono text-xs text-sage-500">{m.term_type}</span>
-          )}
+          {showAll ? 'Show fewer' : `Show all ${sorted.length}`}
         </button>
-      ))}
+      )}
     </div>
   )
 }
