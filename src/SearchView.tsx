@@ -128,7 +128,7 @@ export default function SearchView() {
 
 
   return (
-    <main className="mx-auto max-w-7xl px-4 sm:px-6 pb-24">
+    <main className="mx-auto max-w-page px-4 sm:px-6 pb-24">
 
       {/* Page header and filter */}
       <section className="pt-10 pb-8 sm:pt-14">
@@ -455,7 +455,7 @@ function DataSource({ icon, label, desc }: { icon: string; label: string; desc: 
   return (
     <div className="flex gap-3">
       <span className="text-xl leading-none mt-0.5">{icon}</span>
-      <div>
+      <div className="min-w-0">
         <p className="font-sans text-[13px] font-medium text-sage-800">{label}</p>
         <p className="font-sans text-[12px] text-sage-600 leading-relaxed">{desc}</p>
       </div>
