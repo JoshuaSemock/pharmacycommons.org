@@ -171,7 +171,7 @@ export default function DrugDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6">
+    <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 py-4 font-sans text-sm text-sage-600">
         <button onClick={() => navigate('/')} className="transition-colors hover:text-sage-900">
@@ -216,7 +216,7 @@ export default function DrugDetail() {
       </header>
 
       {/* Reference rail on the left, prescribing information in the main column */}
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-4">
           <IdentifiersCard drug={drug} />
           <GuidelinesCard pcidCode={drug.pcid_code} />
