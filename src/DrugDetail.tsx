@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getDrugBySlug } from './api'
-import type { DrugDetail as DrugDetailType, HierarchyMember } from './api.generated'
+import type { BrandName, DrugDetail as DrugDetailType, HierarchyMember } from './api.generated'
 import { ECO_RISK_COLORS } from './data'
 import type { EcoRisk } from './data'
 import { authErrorMessage, isEntitySaved, saveEntity, unsaveEntity, useSession } from './auth'
@@ -10,6 +10,7 @@ import LabelSections from './LabelSections'
 import { getGuidelines } from './guidelines'
 import type { Guideline } from './guidelines'
 import { sourcedValue } from './identifiers'
+import { formatBrandName, formatDrugName } from './names'
 
 // ─── Page layout (2026-09-22) ─────────────────────────────────────────────────
 //
@@ -143,7 +144,7 @@ export default function DrugDetail() {
   }, [slug])
 
   useEffect(() => {
-    document.title = drug ? `${drug.name} · Pharmacy Commons` : 'Pharmacy Commons'
+    document.title = drug ? `${formatDrugName(drug.name)} · Pharmacy Commons` : 'Pharmacy Commons'
   }, [drug])
 
   if (loading) {
@@ -177,7 +178,7 @@ export default function DrugDetail() {
           Browse
         </button>
         <span aria-hidden="true">/</span>
-        <span className="font-medium text-sage-900">{drug.name}</span>
+        <span className="font-medium text-sage-900">{formatDrugName(drug.name)}</span>
       </nav>
 
       {/* Drug header */}
@@ -192,13 +193,14 @@ export default function DrugDetail() {
                 className="font-display text-3xl font-semibold leading-tight text-sage-900 sm:text-4xl"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                {drug.name}
+                {formatDrugName(drug.name)}
               </h1>
               <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-2xs text-sage-600">
                 INN
               </span>
             </div>
             <p className="font-sans text-md text-sage-600">{drug.entity_type}</p>
+            <BrandLine brands={drug.brands ?? []} />
           </div>
           <SaveButton
             pcidCode={drug.pcid_code}
@@ -218,7 +220,7 @@ export default function DrugDetail() {
         <aside className="space-y-4">
           <IdentifiersCard drug={drug} />
           <GuidelinesCard pcidCode={drug.pcid_code} />
-          {drug.hierarchy && <HierarchyCard hierarchy={drug.hierarchy} moietyName={drug.name} />}
+          {drug.hierarchy && <HierarchyCard hierarchy={drug.hierarchy} moietyName={formatDrugName(drug.name)} />}
           {drug.eco_risk && <EcoPanel eco={drug.eco_risk} />}
         </aside>
 
@@ -429,6 +431,82 @@ function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
   )
 }
 
+// ─── Brand names ──────────────────────────────────────────────────────────────
+//
+// Under the drug name in the header. Current brands first; brands whose every
+// FDA product is discontinued are listed after them, muted. A brand approved
+// under an NDA/BLA links to that application on Drugs@FDA.
+
+const BRAND_PREVIEW = 8
+
+function brandHref(b: BrandName): string | null {
+  const appl = b.appl_nos[0]?.replace(/^(NDA|BLA)/i, '')
+  return appl && /^\d{6}$/.test(appl)
+    ? `https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=${appl}`
+    : null
+}
+
+function BrandLine({ brands }: { brands: BrandName[] }) {
+  const [showAll, setShowAll] = useState(false)
+  if (brands.length === 0) return null
+
+  const current = brands.filter(b => b.marketed !== false)
+  const discontinued = brands.filter(b => b.marketed === false)
+  const visibleCurrent = showAll ? current : current.slice(0, BRAND_PREVIEW)
+  const visibleDisc = showAll ? discontinued : discontinued.slice(0, Math.max(0, BRAND_PREVIEW - visibleCurrent.length))
+  const hidden = brands.length - visibleCurrent.length - visibleDisc.length
+
+  return (
+    <div className="mt-3 space-y-1.5">
+      {visibleCurrent.length > 0 && (
+        <BrandRow label="Brand names" brands={visibleCurrent} />
+      )}
+      {visibleDisc.length > 0 && (
+        <BrandRow label={visibleCurrent.length > 0 ? 'Discontinued' : 'Brand names (discontinued)'} brands={visibleDisc} muted />
+      )}
+      {(hidden > 0 || showAll) && brands.length > BRAND_PREVIEW && (
+        <button
+          onClick={() => setShowAll(v => !v)}
+          className="font-sans text-sm font-medium text-aqua-700 hover:underline"
+        >
+          {showAll ? 'Show fewer' : `Show all ${brands.length} brand names`}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function BrandRow({ label, brands, muted = false }: { label: string; brands: BrandName[]; muted?: boolean }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
+      <span className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</span>
+      {brands.map(b => {
+        const href = brandHref(b)
+        const text = formatBrandName(b.name)
+        const cls = `rounded-md border px-2 py-0.5 font-sans text-sm ${
+          muted ? 'border-dashed border-sage-300 text-sage-600' : 'border-sage-200 bg-white text-sage-800'
+        }`
+        return href ? (
+          <a
+            key={b.name}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`${text} on Drugs@FDA${muted ? ' (discontinued)' : ''}`}
+            className={`${cls} transition-colors hover:border-aqua-300 hover:text-aqua-700`}
+          >
+            {text}
+          </a>
+        ) : (
+          <span key={b.name} className={cls} title={muted ? `${text} (discontinued)` : undefined}>
+            {text}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
 // ─── Hierarchy card ───────────────────────────────────────────────────────────
 //
 // Only moieties carry a hierarchy (see api.ts:getDrugBySlug). Precise forms and
@@ -442,28 +520,13 @@ function HierarchyCard({
   hierarchy: NonNullable<DrugDetailType['hierarchy']>
   moietyName: string
 }) {
-  const { precise_forms: preciseForms, combinations, brand_names: brandNames } = hierarchy
-  const isEmpty = preciseForms.length === 0 && combinations.length === 0 && brandNames.length === 0
-  if (isEmpty) return null
+  const { precise_forms: preciseForms, combinations } = hierarchy
+  if (preciseForms.length === 0 && combinations.length === 0) return null
 
+  // The moiety's own brand names are in the page header (BrandLine); combination rows carry theirs.
   return (
-    <SideCard title="Forms, combinations & brands">
+    <SideCard title="Forms & combinations">
       <div className="space-y-5">
-        {brandNames.length > 0 && (
-          <HierarchySection label="Brand names">
-            <div className="flex flex-wrap gap-1.5">
-              {brandNames.map(b => (
-                <span
-                  key={b}
-                  className="rounded-md border border-sage-200 bg-sage-50 px-2 py-1 font-sans text-sm text-sage-700"
-                >
-                  {b}
-                </span>
-              ))}
-            </div>
-          </HierarchySection>
-        )}
-
         {preciseForms.length > 0 && (
           <HierarchySection label={`Precise forms of ${moietyName}`}>
             <HierarchyList members={preciseForms} />
@@ -491,13 +554,6 @@ function HierarchySection({ label, children }: { label: string; children: ReactN
   )
 }
 
-/** "SITAGLIPTIN PHOSPHATE AND METFORMIN HYDROCHLORIDE" → "Sitagliptin phosphate and metformin hydrochloride". */
-function drugNameCase(name: string): string {
-  if (name !== name.toUpperCase()) return name // already mixed case; leave it alone
-  const lower = name.toLowerCase()
-  return lower.charAt(0).toUpperCase() + lower.slice(1)
-}
-
 const HIERARCHY_PREVIEW = 5
 
 /**
@@ -522,8 +578,13 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
               className="block w-full min-w-0 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-sage-50"
             >
               <span className="block break-words font-sans text-sm font-medium leading-snug text-sage-800">
-                {drugNameCase(m.name)}
+                {formatDrugName(m.name)}
               </span>
+              {m.brands && m.brands.length > 0 && (
+                <span className="mt-0.5 block font-sans text-sm leading-snug text-sage-700">
+                  {m.brands.map(formatBrandName).join(', ')}
+                </span>
+              )}
               {m.term_type && (
                 <span className="mt-0.5 block font-sans text-2xs text-sage-600">{m.term_type}</span>
               )}
