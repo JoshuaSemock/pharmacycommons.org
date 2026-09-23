@@ -7,8 +7,16 @@ import { ECO_RISK_COLORS } from './data'
 import type { EcoRisk } from './data'
 import { authErrorMessage, isEntitySaved, saveEntity, unsaveEntity, useSession } from './auth'
 import LabelSections from './LabelSections'
+import { getGuidelines } from './guidelines'
+import type { Guideline } from './guidelines'
 
-type Tab = 'overview' | 'clinical' | 'classification' | 'interactions'
+// ─── Page layout (2026-09-22) ─────────────────────────────────────────────────
+//
+// No tabs. Left rail: Identifiers (with the satellite-table attributes folded
+// in), Guidelines, then forms/combinations/brands and eco risk when present.
+// Main column: the FDA prescribing information (LabelSections.tsx).
+// The old Overview / Classification / Interactions tabs are gone for now;
+// entity type and status still show in the header and Identifiers card.
 
 // ─── Defensive shapes ─────────────────────────────────────────────────────────
 //
@@ -57,7 +65,7 @@ function humanizeKey(key: string): string {
  * Accepts either shape:
  *   A) [{ attribute_type, strength_value, strength_unit }, ...]
  *   B) { salt_form: ['hydrochloride'], strength: ['500 mg', '850 mg'], ... }
- * Anything else yields an empty list, so the card simply does not render.
+ * Anything else yields an empty list, so nothing renders.
  */
 function normalizeAttributes(raw: unknown): AttributeRow[] {
   if (!raw || typeof raw !== 'object') return []
@@ -97,7 +105,6 @@ export default function DrugDetail() {
   const [drug, setDrug] = useState<DrugDetailType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<Tab>('overview')
 
   useEffect(() => {
     let cancelled = false
@@ -124,7 +131,6 @@ export default function DrugDetail() {
       }
     }
 
-    setTab('overview')
     window.scrollTo(0, 0)
     loadDrug()
 
@@ -206,56 +212,18 @@ export default function DrugDetail() {
         </p>
       </header>
 
-      {/* 3-column layout */}
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr_260px]">
-        {/* Left: identifiers */}
+      {/* Reference rail on the left, prescribing information in the main column */}
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
         <aside className="space-y-4">
-          <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
-            <div className="border-b border-sage-100 px-4 py-3">
-              <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
-                Identifiers
-              </h2>
-            </div>
-            <div className="space-y-2.5 p-4">
-              <IdRow label="PCID" value={drug.pcid_code} />
-              <IdRow label="Entity type" value={drug.entity_type} />
-              {drug.fda_ndc_codes && drug.fda_ndc_codes.length > 0 && (
-                <IdRow label="NDC codes" value={drug.fda_ndc_codes.join(', ')} />
-              )}
-            </div>
-          </div>
-        </aside>
-
-        {/* Center: tabbed content */}
-        <section>
-          <div className="mb-5 flex gap-0.5 rounded-xl bg-sage-100 p-1" role="tablist">
-            {(['overview', 'clinical', 'classification', 'interactions'] as Tab[]).map(t => (
-              <button
-                key={t}
-                role="tab"
-                aria-selected={tab === t}
-                onClick={() => setTab(t)}
-                className={`flex-1 rounded-lg px-3 py-1.5 font-sans text-sm font-medium capitalize transition-all ${
-                  tab === t
-                    ? 'bg-white text-sage-900 shadow-sm'
-                    : 'text-sage-600 hover:text-sage-900'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          {tab === 'overview' && <OverviewTab drug={drug} />}
-          {tab === 'clinical' && <ClinicalTab drug={drug} />}
-          {tab === 'classification' && <ClassificationTab drug={drug} />}
-          {tab === 'interactions' && <InteractionsTab drug={drug} />}
-        </section>
-
-        {/* Right: eco metrics */}
-        <aside className="space-y-4">
+          <IdentifiersCard drug={drug} />
+          <GuidelinesCard pcidCode={drug.pcid_code} />
+          {drug.hierarchy && <HierarchyCard hierarchy={drug.hierarchy} moietyName={drug.name} />}
           {drug.eco_risk && <EcoPanel eco={drug.eco_risk} />}
         </aside>
+
+        <section aria-label="FDA prescribing information" className="min-w-0">
+          <LabelSections key={drug.slug} slug={drug.slug} />
+        </section>
       </div>
     </div>
   )
@@ -365,112 +333,106 @@ function BookmarkIcon({ filled }: { filled: boolean }) {
   )
 }
 
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
+// ─── Left rail ────────────────────────────────────────────────────────────────
 
-function OverviewTab({ drug }: { drug: DrugDetailType }) {
+/** Identifiers (PCID, type, NDCs) followed by the satellite-table attributes (CAS, UNII, legal status…). */
+function IdentifiersCard({ drug }: { drug: DrugDetailType }) {
   const attributes = normalizeAttributes(drug.attributes)
 
   return (
-    <div className="space-y-6">
-      <ContentCard title="Description">
-        <p className="font-sans text-md leading-relaxed text-sage-700">
-          {drug.description || 'No description available'}
-        </p>
-      </ContentCard>
-
-      {drug.hierarchy && <HierarchyCard hierarchy={drug.hierarchy} moietyName={drug.name} />}
-
+    <SideCard title="Identifiers">
+      <div className="space-y-2.5">
+        <IdRow label="PCID" value={drug.pcid_code} />
+        <IdRow label="Entity type" value={drug.entity_type} />
+        {drug.fda_ndc_codes && drug.fda_ndc_codes.length > 0 && (
+          <IdRow label="NDC codes" value={drug.fda_ndc_codes.join(', ')} />
+        )}
+      </div>
       {attributes.length > 0 && (
-        <ContentCard title="Attributes">
-          <div className="space-y-2">
-            {attributes.map((attr, i) => (
-              <div key={`${attr.label}-${i}`} className="rounded-lg bg-sage-50 px-3 py-2">
-                <p className="font-sans text-sm font-medium text-sage-800">{attr.label}</p>
-                <p className="font-mono text-xs text-sage-600">{attr.value}</p>
-              </div>
-            ))}
-          </div>
-        </ContentCard>
+        <div className="mt-4 space-y-2.5 border-t border-sage-100 pt-4">
+          {attributes.map((attr, i) => (
+            <IdRow key={`${attr.label}-${i}`} label={attr.label} value={attr.value} />
+          ))}
+        </div>
       )}
-    </div>
+    </SideCard>
   )
 }
 
 /**
- * The drug's FDA prescribing information as readable sections
- * (boxed warning, uses, dosing, contraindications, warnings, side effects,
- * interactions, special populations, reference). See LabelSections.tsx and
- * src/labels.ts; `key` resets the chosen label when the drug changes.
+ * Clinical practice guidelines linked to this drug (entity_guidelines → guidelines,
+ * see src/guidelines.ts). Each entry links out to the issuing body or journal;
+ * the context line says why it applies to this drug.
  */
-function ClinicalTab({ drug }: { drug: DrugDetailType }) {
-  return <LabelSections key={drug.slug} slug={drug.slug} />
-}
+function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
+  const [guidelines, setGuidelines] = useState<Guideline[] | null>(null)
+  const [failed, setFailed] = useState(false)
 
-function ClassificationTab({ drug }: { drug: DrugDetailType }) {
+  useEffect(() => {
+    let cancelled = false
+    setGuidelines(null)
+    setFailed(false)
+    getGuidelines(pcidCode)
+      .then(result => {
+        if (!cancelled) setGuidelines(result)
+      })
+      .catch(err => {
+        console.error(err)
+        if (!cancelled) setFailed(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [pcidCode])
+
   return (
-    <div className="space-y-6">
-      <ContentCard title="Classification">
-        <div className="space-y-3">
-          <div>
-            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
-              Entity type
-            </p>
-            <span className="rounded-lg border border-violet-200 bg-violet-100 px-3 py-1.5 font-sans text-sm font-medium text-violet-600">
-              {drug.entity_type}
-            </span>
-          </div>
-          <div>
-            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
-              Status
-            </p>
-            <p className="font-sans text-sm text-sage-700">{drug.status}</p>
-          </div>
+    <SideCard title="Guidelines">
+      {failed ? (
+        <p className="font-sans text-sm text-sage-600">Guidelines couldn’t be loaded right now.</p>
+      ) : guidelines === null ? (
+        <div className="space-y-2" aria-busy="true">
+          <div className="h-4 w-4/5 animate-pulse rounded bg-sage-100" />
+          <div className="h-4 w-3/5 animate-pulse rounded bg-sage-100" />
         </div>
-      </ContentCard>
-    </div>
-  )
-}
-
-function InteractionsTab({ drug }: { drug: DrugDetailType }) {
-  if (!drug.interactions || drug.interactions.length === 0) {
-    return (
-      <ContentCard title="Interactions">
-        <p className="font-sans text-sm text-sage-600">No interactions recorded</p>
-      </ContentCard>
-    )
-  }
-
-  return (
-    <div className="space-y-5">
-      <ContentCard title="Recorded interactions">
-        <div className="space-y-2">
-          {drug.interactions.map((interaction, i) => (
-            <div key={i} className="rounded-lg border border-sage-200 bg-sage-50 px-4 py-3">
-              <p className="mb-1 font-sans text-md font-semibold text-sage-900">
-                {interaction.interacting_drug_name}
-              </p>
-              <p className="font-sans text-sm leading-relaxed text-sage-600">
-                {interaction.mechanism || 'Interaction details not available'}
-              </p>
-              {interaction.severity && (
-                <span className="mt-2 inline-block rounded bg-sage-100 px-2 py-1 font-mono text-xs font-medium text-sage-600">
-                  {interaction.severity}
+      ) : guidelines.length === 0 ? (
+        <p className="font-sans text-sm leading-relaxed text-sage-600">
+          No guidelines linked to this drug yet.
+        </p>
+      ) : (
+        <ul className="space-y-3.5">
+          {guidelines.map(g => (
+            <li key={g.guideline_id}>
+              <a
+                href={g.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={g.title}
+                className="group font-sans text-md font-medium leading-snug text-aqua-700 underline-offset-2 hover:underline"
+              >
+                {g.short_title}
+                <span aria-hidden="true" className="ml-0.5 text-sage-400 group-hover:text-aqua-700">
+                  ↗
                 </span>
+              </a>
+              <p className="mt-0.5 font-sans text-sm text-sage-600">
+                {g.organization} · {g.pub_year}
+              </p>
+              {g.context && (
+                <p className="mt-1 font-sans text-sm leading-relaxed text-sage-700">{g.context}</p>
               )}
-            </div>
+            </li>
           ))}
-        </div>
-      </ContentCard>
-    </div>
+        </ul>
+      )}
+    </SideCard>
   )
 }
 
 // ─── Hierarchy card ───────────────────────────────────────────────────────────
 //
-// Only ever passed a non-null hierarchy (OverviewTab guards on drug.hierarchy),
-// and only moieties carry one (see api.ts:getDrugBySlug). Precise forms and
-// combination products used to be their own separate search/browse entries;
-// now they nest here instead, under their parent moiety.
+// Only moieties carry a hierarchy (see api.ts:getDrugBySlug). Precise forms and
+// combination products nest here under their parent moiety instead of being
+// their own search/browse entries. Moved from the old Overview tab into the rail.
 
 function HierarchyCard({
   hierarchy,
@@ -484,7 +446,7 @@ function HierarchyCard({
   if (isEmpty) return null
 
   return (
-    <ContentCard title="Precise forms, combinations & brand names">
+    <SideCard title="Forms, combinations & brands">
       <div className="space-y-5">
         {brandNames.length > 0 && (
           <HierarchySection label="Brand names">
@@ -513,7 +475,7 @@ function HierarchyCard({
           </HierarchySection>
         )}
       </div>
-    </ContentCard>
+    </SideCard>
   )
 }
 
@@ -531,7 +493,7 @@ function HierarchySection({ label, children }: { label: string; children: ReactN
 function HierarchyList({ members }: { members: HierarchyMember[] }) {
   const navigate = useNavigate()
   return (
-    <div className="grid gap-1.5 sm:grid-cols-2">
+    <div className="grid gap-1.5">
       {members.map(m => (
         <button
           key={m.pcid_code}
@@ -676,15 +638,19 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
 // ─── Shared components ────────────────────────────────────────────────────────
 
-function ContentCard({ title, children }: { title: string; children: ReactNode }) {
+/** Left-rail card: small-caps header, padded body. Heading size is inline because index.css sizes bare h2. */
+function SideCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
-      <div className="border-b border-sage-100 px-5 py-3">
-        <h3 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
+      <div className="border-b border-sage-100 px-4 py-3">
+        <h2
+          className="font-semibold uppercase tracking-[0.1em] text-sage-600"
+          style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
+        >
           {title}
-        </h3>
+        </h2>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-4">{children}</div>
     </div>
   )
 }
