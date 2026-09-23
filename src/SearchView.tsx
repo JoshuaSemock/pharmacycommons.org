@@ -20,6 +20,7 @@ import {
   type BucketDef,
   type CatalogEntry,
 } from './catalog'
+import { drugWithBrand, formatBrandName, formatDrugName } from './names'
 
 /** 0 means no cap — every remaining entry renders at once. */
 const PAGE_SIZES = [50, 100, 500, 0] as const
@@ -125,6 +126,7 @@ export default function SearchView() {
     return out
   }, [entries, searching, confined])
 
+
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 pb-24">
 
@@ -150,7 +152,7 @@ export default function SearchView() {
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Filter by name or brand"
+              placeholder="Filter by name or brand, e.g. metformin or Glucophage"
               aria-label="Filter the catalog"
               className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
               autoFocus={!!query}
@@ -272,7 +274,7 @@ export default function SearchView() {
                 )}
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {g.items.map(e => (
-                    <DrugCard key={e.n} entry={e} onSelect={() => navigate(`/drugs/${e.slug}`)} />
+                    <DrugCard key={`${e.n}-${e.matchedBrand ?? ''}`} entry={e} onSelect={() => navigate(`/drugs/${e.slug}`)} />
                   ))}
                 </div>
               </div>
@@ -401,6 +403,15 @@ function ScopeButton({
 function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => void }) {
   const drug = toDrug(entry)
   const monogram = entry.name.replace(/[^a-z0-9]/gi, '').slice(0, 2).toUpperCase() || '··'
+  // A brand hit reads "metformin (Glucophage)"; the line under it lists the drug's other brands.
+  const title = entry.matchedBrand ? drugWithBrand(entry.name, entry.matchedBrand) : formatDrugName(entry.name)
+  const otherBrands = entry.brands.filter(b => b !== entry.matchedBrand).map(formatBrandName)
+  const subtitle =
+    otherBrands.length > 0
+      ? otherBrands.slice(0, 3).join(', ') + (otherBrands.length > 3 ? ` +${otherBrands.length - 3} more` : '')
+      : entry.type === 1
+        ? 'combination product'
+        : drug.entryType
 
   return (
     <button
@@ -412,11 +423,11 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
           {monogram}
         </span>
         <div className="min-w-0">
-          <h3 className="font-display text-[16px] font-semibold text-sage-900 leading-tight group-hover:text-aqua-700 transition-colors" style={{ fontFamily: 'var(--font-display)' }}>
-            {entry.name}
+          <h3 className="font-display font-semibold text-sage-900 group-hover:text-aqua-700 transition-colors" style={{ fontFamily: 'var(--font-display)', fontSize: '16px', lineHeight: 1.25 }}>
+            {title}
           </h3>
-          <p className="truncate font-sans text-[11px] text-sage-600">
-            {entry.brand ?? drug.entryType}
+          <p className="truncate font-sans text-[11px] text-sage-600" title={otherBrands.join(', ') || undefined}>
+            {subtitle}
           </p>
         </div>
       </div>
