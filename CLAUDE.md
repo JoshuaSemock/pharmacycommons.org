@@ -157,7 +157,7 @@ silently does nothing.
 
 | What | Path |
 | --- | --- |
-| Deploy workflow | `.github/workflows/deploy.yml` (root `deploy.yml` is a stale copy and does not run) |
+| Deploy workflow | `.github/workflows/deploy.yml` (the only copy; the stale root `deploy.yml` was deleted 2026-09-24) |
 | React source | `src/` (`pages/`, `tools/`, `content/posts/`) |
 | Static assets at site root | `public/` |
 | SQL migrations mirrored as files | `db/` |
@@ -243,7 +243,7 @@ version history and `/id/PCID-n` permalinks; CrCl tool; blog.
 - Scripts named in `docs/project-history.md` (`02_transform.py`, `04_validate.py`,
   `04b`–`04f`) are not in `scripts/`. `package.json`'s `sitemap` script points at a
   missing `scripts/generate-sitemap.mjs`.
-- Stray/dead files: root `deploy.yml`, `drug.html`, `index-updated.html`, root
+- Stray/dead files: `drug.html`, `index-updated.html`, root
   `index.css`; `public/drug-catalog.json` (~31k lines, nothing reads it);
   `public/drug.html`; `docs/schema-updates.sql` and `docs/data-model-decisions.md` §4
   (legacy API/PIN/FRM); `.md/*` (Figma-Make/Agent-3 era, wrong numbers).
