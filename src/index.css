@@ -181,7 +181,7 @@ body,
 body {
   font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   background-color: oklch(98.2% 0.005 95);  /* floral white — neutral-50 */
-  color: oklch(25.0% 0.033 170);            /* mint-950 */
+  color: oklch(25.9% 0.05 301);            /* hepatica-950 */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -225,7 +225,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    --bg-drift-range (how much scrolling that travel is spread over). */
 .page-background {
   --bg-photo-opacity: 0.15;
-  --bg-drift: 1080px;
+  --bg-drift: 247px;
   --bg-drift-range: 4000px;
   position: relative;
   min-height: 100vh;
