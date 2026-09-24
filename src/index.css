@@ -274,3 +274,15 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   position: relative;
   z-index: 1;
 }
+
+/* Every page wrapper (Nav, <main className="mx-auto max-w-page …">, Footer) is a
+   child of this flex column. `mx-auto` on a flex item turns off stretching, so
+   without an explicit width the wrapper grows to its widest descendant (the A–Z
+   strip on /browse was 1,137px on a 375px phone) and the whole page scrolls
+   sideways. Pin children to the column's width; break long unspaced strings
+   (URLs in citations) instead of letting them push the page wider. */
+.page-content > * {
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+}

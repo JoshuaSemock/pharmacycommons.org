@@ -41,10 +41,12 @@ for every file produced.**
 - Codebase license: **GPL-3.0-or-later** — `LICENSE` and `package.json` both agree as
   of 2026-09-24. The only remaining MIT mention is the open-item line in
   `docs/data-model-decisions.md`; flag any new MIT reference you see.
-- Aggregated datasets: **Creative Commons — exact variant undecided.** `api_meta.
-  data_license` is `NULL`, so API documents report `null`. Upstream terms constrain the
-  choice: CAS Common Chemistry is CC BY-NC 4.0; ATC and DrugBank have their own terms.
-  Do not pick a license; surface conflicts.
+- Aggregated datasets: **CC0 1.0 for Pharmacy Commons–authored content** (decided
+  2026-09-24, matches the site footer). Third-party fields keep their source license —
+  recorded in `api_meta.data_license_scope`. Set by `db/phase8j_data_license.sql`.
+  Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
+  CAS Common Chemistry rows (physiochemical) stay CC BY-NC 4.0 whatever we choose.
+  ATC and ChemOnt restrict commercial redistribution — never present them as CC0.
 - Domain via Porkbun; USPTO Intent-to-Use filing planned (Class 42, "Pharmacy
   Commons"). Joshua decides when the licensing question is settled enough to file.
 
@@ -141,7 +143,7 @@ Public Edge Function `api` (v1, `verify_jwt = false`), design in
 `docs/machine-readable-api.md`. Settings in `api_meta`: `site_base`
 (`https://pharmacycommons.org` — changing it changes every record's `@id`),
 `api_base` (currently the Supabase function URL), `api_version`, `schema_version`
-(`1.0.0` — bump on any document-shape change), `data_license`(_url) (unset).
+(`1.0.0` — bump on any document-shape change), `data_license`(_url) (`CC0-1.0`), `data_license_scope`.
 History: `entity_versions` (immutable snapshots; baseline captured for all PCIDs) and
 `entity_changes` (append-only, trigger-written; read publicly only via
 `api_entity_changes()`, which omits actor). **Tag bulk writes with
@@ -235,8 +237,6 @@ version history and `/id/PCID-n` permalinks; CrCl tool; blog.
 
 ## Known drift & gaps (fix or confirm — don't build on top of them)
 **Repo ↔ Supabase ↔ claude.ai Project out of sync:**
-- No source in the repo for 3 deployed functions: `rxclass-ingest`, `chemont-terms`,
-  `classyfire-ingest` (pull with `get_edge_function` and commit).
 - `db/` lacks `01_core_schema_v2.sql`, `phase4_fda_ingestion_tables.sql`,
   `phase4_physiochemical_table.sql` (exist in the Project docs) and the class /
   RxNorm / label migrations that were applied only via `apply_migration`.
@@ -265,7 +265,7 @@ version history and `/id/PCID-n` permalinks; CrCl tool; blog.
   filtering and hierarchy.
 
 ## Decisions that belong to Joshua — ask, don't decide
-- Data license variant; `/api` hosting on the site domain; trademark timing.
+- `/api` hosting on the site domain; trademark timing.
 - Merge/duplicate calls: `_unresolved_merges.csv` (8 targets), `merge_candidates.csv`
   (`amobrarbital`, THC pair with **disagreeing controlled-substance schedules**),
   manual-review rows.
