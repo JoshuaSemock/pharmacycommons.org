@@ -14,7 +14,7 @@ const SECTIONS = [
   { to: '/about', label: 'About' },
   { to: '/tools', label: 'Tools' },
   { to: '/resources', label: 'Resources' },
-  { to: '/citations', label: 'Citations' },
+  { to: '/references', label: 'References' },
   { to: '/blog', label: 'Blog' },
 ]
 

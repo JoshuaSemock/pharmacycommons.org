@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import OnThisPage, { scrollToId, useHeadings } from './OnThisPage'
 
 /**
- * Layout for the text pages (About, Tools, Resources, Citations, Blog, posts).
+ * Layout for the text pages (About, Tools, Resources, References, Blog, posts).
  *
  * Uses the same container as Nav and SearchView (max-w-page px-4 sm:px-6) so the
  * page edges line up with the wordmark on the left and Contribute on the right.

@@ -14,7 +14,8 @@ Every medicine has a stable identifier, the PCID (Pharmacy Commons Identifier), 
 - [Lists](https://pharmacycommons.org/lists): compendium lists such as the most-used drugs in the US and Georgia MPJE drug lists.
 - [Tools](https://pharmacycommons.org/tools): clinical calculators, including creatinine clearance.
 - [About](https://pharmacycommons.org/about): mission, values, licensing and founder.
-- [Citations](https://pharmacycommons.org/citations): how to cite records and the sources used.
+- [References](https://pharmacycommons.org/references): how to cite records, and the datasets the Commons is built from, with licenses.
+- [Resources](https://pharmacycommons.org/resources): outside guidelines, trial registries, drug lists and safety tools that are not data sources.
 
 ## Data and licensing
 

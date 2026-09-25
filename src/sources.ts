@@ -1,7 +1,8 @@
 import type { SourceCitation } from './cite'
 
 /**
- * Upstream datasets, shared by the Resources and Citations pages.
+ * Upstream datasets, listed and cited on the References page.
+ * Outside links we don't draw data from go in resources.ts instead.
  *
  * `cite` is what we tell users to cite. Where the maintainer publishes a
  * preferred article (ClassyFire, DrugBank, PubChem, ECOTOX), that article is

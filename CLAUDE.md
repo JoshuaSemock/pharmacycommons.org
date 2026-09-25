@@ -154,7 +154,9 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 ## Routes (src/App.tsx)
 `/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
-7- and 8-digit PCIDs) · `/tools` (CrCl calculator) · `/resources` · `/citations`
+7- and 8-digit PCIDs) · `/tools` (CrCl calculator) · `/resources` (outside links we
+don't draw data from; `src/resources.ts`) · `/references` (citable data sources,
+`src/sources.ts`; `/citations` redirects here since 2026-09-25)
 · `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
 `public/404.html` → sessionStorage → `index.html` restore, but known routes no
 longer need it: `scripts/postbuild.mjs` (runs after `vite build`) writes

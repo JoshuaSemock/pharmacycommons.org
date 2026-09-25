@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Nav from './Nav'
 import Footer from './Footer'
 import { ViewProvider } from './views'
@@ -14,7 +14,7 @@ const DrugDetail = lazy(() => import('./DrugDetail'))
 const About = lazy(() => import('./pages/About'))
 const Tools = lazy(() => import('./pages/Tools'))
 const Resources = lazy(() => import('./pages/Resources'))
-const Citations = lazy(() => import('./pages/Citations'))
+const References = lazy(() => import('./pages/References'))
 const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
 const Account = lazy(() => import('./pages/Account'))
@@ -29,6 +29,12 @@ const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
+
+/** Client-side redirect for a renamed route, keeping any query and #fragment. */
+function Moved({ to }: { to: string }) {
+  const { search, hash } = useLocation()
+  return <Navigate to={`${to}${search}${hash}`} replace />
+}
 
 export default function App() {
   return (
@@ -55,7 +61,9 @@ export default function App() {
               element={<CreatinineClearance />}
             />
             <Route path="/resources" element={<Resources />} />
-            <Route path="/citations" element={<Citations />} />
+            <Route path="/references" element={<References />} />
+            {/* Renamed 2026-09-25; old links and bookmarks keep working. */}
+            <Route path="/citations" element={<Moved to="/references" />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/account" element={<Account />} />
