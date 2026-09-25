@@ -45,7 +45,7 @@ export default function Nav() {
       <div className="mx-auto flex h-14 max-w-page items-center gap-4 px-4 sm:px-6">
         <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Pharmacy Commons home">
           <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sage-100">
-            <img src="/logo.png" alt="" className="h-5 w-5 object-contain" />
+            <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
           <span className="hidden font-sans text-[15px] font-medium tracking-[-0.01em] text-sage-900 sm:block">
             Pharmacy Commons
@@ -295,7 +295,9 @@ function ToolsSection({ to, label }: { to: string; label: string }) {
         onClick={() => (open ? closeMenu() : openMenu())}
         onKeyDown={onToggleKeyDown}
         className={[
-          '-ml-2 flex w-6 items-center justify-center transition-colors',
+          // 24px wide and no negative margin: overlapping the Tools link made both
+          // targets fail the WCAG 2.2 target-size check.
+          'flex min-h-6 w-6 items-center justify-center transition-colors',
           'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-aqua-500',
           open ? 'text-sage-900' : 'text-sage-400 hover:text-sage-700',
         ].join(' ')}

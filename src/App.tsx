@@ -2,26 +2,33 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Nav from './Nav'
 import Footer from './Footer'
-import SearchView from './SearchView'
-import DrugDetail from './DrugDetail'
 import { ViewProvider } from './views'
 import Home from './pages/Home'
-import About from './pages/About'
-import Tools from './pages/Tools'
-import Resources from './pages/Resources'
-import Citations from './pages/Citations'
-import Blog from './pages/Blog'
-import BlogPost from './pages/BlogPost'
-import Account from './pages/Account'
-import Permalink from './pages/Permalink'
-import ClassIndex from './pages/ClassIndex'
-import ClassDetail from './pages/ClassDetail'
-import ListIndex from './pages/ListIndex'
-import ListDetail from './pages/ListDetail'
-import ListCompare from './pages/ListCompare'
 
+// Home ships in the entry bundle because it is the landing page. Every other
+// route is split into its own chunk and fetched when first visited, so the
+// homepage no longer downloads and parses the drug detail, account, blog
+// markdown and list code up front (Lighthouse "unused JavaScript", ~576 KiB).
+const SearchView = lazy(() => import('./SearchView'))
+const DrugDetail = lazy(() => import('./DrugDetail'))
+const About = lazy(() => import('./pages/About'))
+const Tools = lazy(() => import('./pages/Tools'))
+const Resources = lazy(() => import('./pages/Resources'))
+const Citations = lazy(() => import('./pages/Citations'))
+const Blog = lazy(() => import('./pages/Blog'))
+const BlogPost = lazy(() => import('./pages/BlogPost'))
+const Account = lazy(() => import('./pages/Account'))
+const Permalink = lazy(() => import('./pages/Permalink'))
+const ClassIndex = lazy(() => import('./pages/ClassIndex'))
+const ClassDetail = lazy(() => import('./pages/ClassDetail'))
+const ListIndex = lazy(() => import('./pages/ListIndex'))
+const ListDetail = lazy(() => import('./pages/ListDetail'))
+const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
+
+/** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
+const routeFallback = <main className="min-h-screen" aria-busy="true" />
 
 export default function App() {
   return (
@@ -29,6 +36,7 @@ export default function App() {
       <div className="min-h-full page-background">
         <div className="page-content flex min-h-screen flex-col">
           <Nav />
+          <Suspense fallback={routeFallback}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<SearchView />} />
@@ -44,11 +52,7 @@ export default function App() {
             <Route path="/tools" element={<Tools />} />
             <Route
               path="/tools/creatinine-clearance"
-              element={
-                <Suspense fallback={<main className="min-h-[60vh]" aria-busy="true" />}>
-                  <CreatinineClearance />
-                </Suspense>
-              }
+              element={<CreatinineClearance />}
             />
             <Route path="/resources" element={<Resources />} />
             <Route path="/citations" element={<Citations />} />
@@ -57,6 +61,7 @@ export default function App() {
             <Route path="/account" element={<Account />} />
             <Route path="*" element={<Home />} />
           </Routes>
+          </Suspense>
           <Footer />
         </div>
       </div>

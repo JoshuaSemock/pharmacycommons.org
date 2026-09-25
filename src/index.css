@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Web fonts are loaded from index.html (one combined Google Fonts request,
+   preconnected and non-render-blocking), not @import-ed here. An @import in
+   this file chains three extra blocking requests behind the main stylesheet,
+   which was the largest render-blocking cost in the 2026-09-25 Lighthouse run. */
 @import 'tailwindcss';
 
 @theme {
@@ -244,7 +245,10 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("/assets/textures/lichen_bg.jpg");
+  /* WebP in public/textures (stable URL, so index.html can preload it: this
+     layer is the page's Largest Contentful Paint element on phones). The
+     original JPEGs stay in assets/textures as source files. */
+  background-image: url("/textures/lichen_bg.webp");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -254,7 +258,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 
 @media (max-width: 780px) {
   .page-background::before {
-    background-image: url("/assets/textures/lichen_bg_mobile.jpg");
+    background-image: url("/textures/lichen_bg_mobile.webp");
   }
 }
 

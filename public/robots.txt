@@ -1,0 +1,7 @@
+# Pharmacy Commons: https://pharmacycommons.org
+# Drug information is public and meant to be read by people and machines alike.
+User-agent: *
+Allow: /
+Disallow: /account
+
+Sitemap: https://pharmacycommons.org/sitemap.xml

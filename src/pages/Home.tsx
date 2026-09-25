@@ -37,11 +37,17 @@ function Hero() {
   const [focused, setFocused] = useState(false)
   const [catalogSize, setCatalogSize] = useState<number | null>(null)
 
+  // The full catalog is ~15,000 rows paged in from Supabase. Fetching and
+  // indexing it on mount was most of the homepage's main-thread blocking time,
+  // so wait until someone actually starts typing (same rule as the header
+  // search). loadCatalog() caches, so a visitor who already browsed pays nothing.
+  const wantsCatalog = query.length > 0
   useEffect(() => {
+    if (!wantsCatalog || catalogSize !== null) return
     loadCatalog()
       .then(() => setCatalogSize(orderedCatalog().length))
       .catch(err => console.error('[catalog] load failed:', err))
-  }, [])
+  }, [wantsCatalog, catalogSize])
 
   const suggestions = catalogSize !== null && query.trim().length > 1 ? searchCatalog(query, 6) : []
 
@@ -62,13 +68,13 @@ function Hero() {
       >
         Query structured data by active ingredients, preparations, pharmacologic classes, and compendium lists.
       </h1>
-      <p className="mx-auto mb-8 max-w-xl font-sans text-[21px] leading-relaxed text-pretty text-mint-600">
+      <p className="mx-auto mb-8 max-w-xl font-sans text-[21px] leading-relaxed text-pretty text-mint-700">
         An open educational source for clinical and public inquiry, not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
       </p>
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
-          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-3 shadow-sm shadow-sage-900/5 transition-all focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200">
+          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-3 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -111,7 +117,7 @@ function Hero() {
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-sans text-[14px] font-medium text-mint-900">{entry.name}</span>
-                    <span className="block truncate font-sans text-[12px] text-mint-600">
+                    <span className="block truncate font-sans text-[12px] text-mint-700">
                       {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
                     </span>
                   </span>
@@ -134,7 +140,7 @@ function Hero() {
         )}
       </div>
 
-      <p className="mt-5 font-sans text-[13.5px] text-mint-600">
+      <p className="mt-5 font-sans text-[13.5px] text-mint-700">
         Or{' '}
         <Link to="/browse" className="font-medium text-hepatica-700 underline-offset-2 hover:underline">
           {catalogSize !== null
@@ -167,7 +173,7 @@ function RecentPosts() {
         >
           From the Community Commons Blog
         </h2>
-        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-mint-600">
+        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-mint-700">
           Decisions, commentary, and methodology, written down as the work happens.
         </p>
         <Link
@@ -182,7 +188,7 @@ function RecentPosts() {
         {posts.map(post => (
           <li key={post.slug} className="py-6 first:pt-0">
             <article>
-              <p className="mb-1.5 font-sans text-[13px] text-mint-600">
+              <p className="mb-1.5 font-sans text-[13px] text-mint-700">
                 <time dateTime={post.date}>{formatDate(post.date)}</time>
                 <span className="ml-3">{post.readingMinutes} minute read</span>
               </p>
@@ -198,7 +204,7 @@ function RecentPosts() {
                 </Link>
               </h3>
               {post.summary && (
-                <p className="mt-2 line-clamp-2 font-sans text-[15px] leading-[1.6] text-pretty text-mint-600">
+                <p className="mt-2 line-clamp-2 font-sans text-[15px] leading-[1.6] text-pretty text-mint-700">
                   {post.summary}
                 </p>
               )}
@@ -234,7 +240,7 @@ function DataSource({ label, desc }: { label: string; desc: string }) {
       </span>
       <div>
         <p className="font-sans text-[13px] font-medium text-mint-800">{label}</p>
-        <p className="font-sans text-[12px] leading-relaxed text-mint-600">{desc}</p>
+        <p className="font-sans text-[12px] leading-relaxed text-mint-700">{desc}</p>
       </div>
     </div>
   )
