@@ -53,16 +53,16 @@ function Hero() {
 
   return (
     <section className="pt-16 pb-14 text-center">
-      <p className="mb-3 font-sans text-[13.5px] font-medium text-aqua-700">
+      <p className="mb-3 font-sans text-[13.5px] font-medium text-hepatica-700">
         Cultivating our pharmacopeial commons: an open compendium of clinical evidence and drug information accessible to all.
       </p>
       <h1
-        className="mb-4 font-display text-4xl font-semibold leading-[1.1] text-balance text-sage-900 sm:text-5xl"
+        className="mb-4 font-display text-4xl font-semibold leading-[1.1] text-balance text-mint-900 sm:text-5xl"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Query structured data by active ingredients, preparations, pharmacologic classes, and compendium lists.
       </h1>
-      <p className="mx-auto mb-8 max-w-xl font-sans text-[15px] leading-relaxed text-pretty text-sage-600">
+      <p className="mx-auto mb-8 max-w-xl font-sans text-[15px] leading-relaxed text-pretty text-salmon-600">
         An open educational source for clinical and public inquiry, not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
       </p>
 
