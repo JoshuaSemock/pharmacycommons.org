@@ -16,6 +16,9 @@ import Account from './pages/Account'
 import Permalink from './pages/Permalink'
 import ClassIndex from './pages/ClassIndex'
 import ClassDetail from './pages/ClassDetail'
+import ListIndex from './pages/ListIndex'
+import ListDetail from './pages/ListDetail'
+import ListCompare from './pages/ListCompare'
 
 // Carries the vanilla calculator bundle; load it only on its own route.
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
@@ -32,6 +35,9 @@ export default function App() {
             <Route path="/drugs/:slug" element={<DrugDetail />} />
             <Route path="/classes" element={<ClassIndex />} />
             <Route path="/classes/:slug" element={<ClassDetail />} />
+            <Route path="/lists" element={<ListIndex />} />
+            <Route path="/lists/compare" element={<ListCompare />} />
+            <Route path="/lists/:slug" element={<ListDetail />} />
             {/* Permanent PCID address → current record page (also the JSON-LD @id) */}
             <Route path="/id/:pcid" element={<Permalink />} />
             <Route path="/about" element={<About />} />

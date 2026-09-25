@@ -1,6 +1,6 @@
 # Pharmacy Commons — Project Instructions for Claude
 
-> Last reconciled against live Supabase and this repo: **2026-09-24**.
+> Last reconciled against live Supabase and this repo: **2026-09-25** (lists added).
 > Detailed phase-by-phase history (Phases 1–4 narratives, validation runs, script
 > notes) moved to `docs/project-history.md` — read it when you need the "why",
 > not on every session.
@@ -51,7 +51,7 @@ for every file produced.**
   Commons"). Joshua decides when the licensing question is settled enough to file.
 
 ## Identifier scheme (PCID only)
-Allocated in 9 blocks, mirrored in `public.pcid_blocks` (and the workbook's
+Allocated in 10 blocks, mirrored in `public.pcid_blocks` (and the workbook's
 `PCID_Blocks` sheet):
 
 | Block | Entity kind | Range | Slug prefix | Table | Workbook sheet |
@@ -65,6 +65,7 @@ Allocated in 9 blocks, mirrored in `public.pcid_blocks` (and the workbook's
 | 7 | Measurement | 7000001–7999999 | `pc:measurement:` | `measurements` | `Measurements` |
 | 8 | Biological target | 8000001–8999999 | `pc:target:` | `biological_targets` | `Biological_Targets` |
 | 9 | Functional group | 9000001–9999999 | `pc:functional:` | `functional_groups` | `Functional_Groups` |
+| 10 | List (added 2026-09-25) | 10000001–10999999 | `pc:list:` | `lists` (+ `list_items`) | — (loaded from `Top_Drugs.xlsx`) |
 
 **Known swap (intentional, do not "fix"):** the original spec had precise forms in
 block 2 and combinations in block 3; live data already used `PCID-2000001…` for
@@ -128,8 +129,9 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   containing apostrophes; format with `oxfmt`.
 
 ## Routes (src/App.tsx)
-`/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/id/:pcid`
-(permanent PCID permalink) · `/tools` (CrCl calculator) · `/resources` · `/citations`
+`/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
+`/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
+7- and 8-digit PCIDs) · `/tools` (CrCl calculator) · `/resources` · `/citations`
 · `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
 `public/404.html` → sessionStorage → `index.html` restore.
 
@@ -222,18 +224,24 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 | `moiety_hierarchy` (matview) | 5,076 |
 | `physiochemical` | **0** (CAS backfill not run) |
 
-`pcid_blocks.next_pcid`: 1→1015612, 2→2002451, 3→3001452, 4→4006582, 5→5004982,
-6→6000077, 7→7000014, 8→8000028, 9→9000060.
+`pcid_blocks.next_pcid` (2026-09-25): 1→1015620, 2→2002470, 3→3001452, 4→4006582,
+5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000023.
+
+Lists (Phase 9, `db/phase9-lists.md`): 22 published lists — `most-used-drugs-us`
+(MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, and three Georgia MPJE
+lists (legend 2,410 · controlled 405 · exceptions 105). Read RPCs: `list_lists`,
+`get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
 Deployed Edge Functions (8): `api` (public), `label-text`, `drugsfda-ingest`,
 `rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`.
-54 migrations applied, latest `phase8h_class_html_links`.
+57 migrations applied, latest `phase9a_lists_schema` (two earlier `lists_staging_*` migrations hold import staging tables).
 
 Shipped: 9-block schema + RLS; full workbook load; Supabase-backed frontend;
 moiety-only search with hierarchy nesting; DailyMed labels + openFDA label-text
 cache; RxNorm brand names; class pages from RxClass/ClassyFire/ChemOnt; clinical
 guidelines; NPI provider verification + saved entities; machine-readable API with
-version history and `/id/PCID-n` permalinks; CrCl tool; blog.
+version history and `/id/PCID-n` permalinks; CrCl tool; blog; lists (sortable list
+pages, compare view, Lists card on drug pages).
 
 ## Known drift & gaps (fix or confirm — don't build on top of them)
 **Repo ↔ Supabase ↔ claude.ai Project out of sync:**

@@ -28,6 +28,10 @@
  * deliberately NOT folded into getDrugBySlug: DrugDetail.tsx loads a drug's
  * classes in its own card (like guidelines), so a slow or failed class lookup
  * never blocks the drug page.
+ *
+ * 2026-09-25: lists — listLists / getListBySlug / getEntityLists call the
+ * `list_lists`, `get_list` and `get_entity_lists` RPCs. Like classes, a drug's
+ * lists load in their own card on the drug page.
  */
 
 import { supabase } from './supabaseClient'
@@ -46,7 +50,10 @@ import type {
   DrugsListQuery,
   DrugsSearchQuery,
   EntityClass,
+  EntityList,
   HierarchyMember,
+  ListDetail,
+  ListSummary,
   MoietyHierarchy,
   SearchResponse,
 } from './api.generated'
@@ -488,6 +495,46 @@ export async function listClasses(type?: ClassType | null, search?: string | nul
   })
   if (error) throw new Error(`Failed to list classes${q ? ` matching '${q}'` : ''}: ${error.message}`)
   return (data ?? []) as ClassSummary[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lists (RPCs: list_lists, get_list, get_entity_lists)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// numeric columns can arrive as strings depending on the PostgREST version, so
+// rank/value are coerced to numbers here once rather than in every component.
+
+function toNum(v: unknown): number | null {
+  if (v === null || v === undefined || v === '') return null
+  const n = typeof v === 'number' ? v : Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+/** Every published list, in index order (sub-lists carry `parent_slug`). */
+export async function listLists(): Promise<ListSummary[]> {
+  const { data, error } = await supabase.rpc('list_lists')
+  if (error) throw new Error(`Failed to load lists: ${error.message}`)
+  return ((data ?? []) as ListSummary[]).map(l => ({ ...l, item_count: toNum(l.item_count) ?? 0 }))
+}
+
+/** One list with all its items. Returns null when no published list has this slug. */
+export async function getListBySlug(slug: string): Promise<ListDetail | null> {
+  const { data, error } = await supabase.rpc('get_list', { p_slug: slug })
+  if (error) throw new Error(`Failed to load list '${slug}': ${error.message}`)
+  if (!data) return null
+  const detail = data as ListDetail
+  return {
+    ...detail,
+    children: detail.children ?? [],
+    items: (detail.items ?? []).map(i => ({ ...i, rank: toNum(i.rank), value: toNum(i.value) })),
+  }
+}
+
+/** The lists one drug is on; for a moiety this includes lists that name its forms or combinations. */
+export async function getEntityLists(pcid: number): Promise<EntityList[]> {
+  const { data, error } = await supabase.rpc('get_entity_lists', { p_pcid: pcid })
+  if (error) throw new Error(`Failed to load lists for PCID-${pcid}: ${error.message}`)
+  return ((data ?? []) as EntityList[]).map(l => ({ ...l, rank: toNum(l.rank), value: toNum(l.value) }))
 }
 
 export function isApiError(data: unknown): data is ApiError {

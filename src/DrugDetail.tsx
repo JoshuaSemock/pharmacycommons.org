@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { getDrugBySlug, getEntityClasses } from './api'
-import type { BrandName, DrugDetail as DrugDetailType, EntityClass, HierarchyMember } from './api.generated'
+import { getDrugBySlug, getEntityClasses, getEntityLists } from './api'
+import type { BrandName, DrugDetail as DrugDetailType, EntityClass, EntityList, HierarchyMember } from './api.generated'
 import { ECO_RISK_COLORS } from './data'
 import type { EcoRisk } from './data'
 import { authErrorMessage, isEntitySaved, saveEntity, unsaveEntity, useSession } from './auth'
@@ -227,6 +227,7 @@ export default function DrugDetail() {
           <IdentifiersCard drug={drug} />
           <GuidelinesCard pcidCode={drug.pcid_code} />
           <ClassesCard pcidCode={drug.pcid_code} />
+          <ListsCard pcidCode={drug.pcid_code} />
           {drug.hierarchy && <HierarchyCard hierarchy={drug.hierarchy} moietyName={formatDrugName(drug.name)} />}
           {drug.eco_risk && <EcoPanel eco={drug.eco_risk} />}
           <MachinePanels pcidCode={drug.pcid_code} slug={drug.slug} />
@@ -846,6 +847,64 @@ function EcoPanel({ eco }: { eco: unknown }) {
         )}
       </div>
     </div>
+  )
+}
+
+// ─── Lists card ───────────────────────────────────────────────────────────────
+//
+// The lists this drug is on (get_entity_lists), each linking to /lists/:slug
+// with the drug's rank, patient count or legal status there. For a moiety this
+// includes lists that name one of its forms or combinations — hydrocodone is
+// #15 on the most-used list through hydrocodone/acetaminophen — and says so.
+// Loaded in its own request and hidden when empty or when the lookup fails.
+
+function ListsCard({ pcidCode }: { pcidCode: string }) {
+  const [lists, setLists] = useState<EntityList[] | null>(null)
+
+  useEffect(() => {
+    const m = /^PCID-(\d+)$/.exec(pcidCode)
+    if (!m) return
+    let cancelled = false
+    setLists(null)
+    getEntityLists(Number(m[1]))
+      .then(rows => {
+        if (!cancelled) setLists(rows)
+      })
+      .catch(err => {
+        console.error(err)
+        if (!cancelled) setLists([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [pcidCode])
+
+  if (!lists || lists.length === 0) return null
+
+  return (
+    <SideCard title="Lists">
+      <ul className="space-y-2">
+        {lists.map(l => {
+          const detail = l.rank !== null ? `#${l.rank}` : l.legal_status
+          return (
+            <li key={l.slug}>
+              <Link
+                to={`/lists/${l.slug}`}
+                className="flex items-baseline justify-between gap-3 rounded-lg border border-sage-200 bg-white px-3 py-2 transition-colors hover:border-aqua-300 hover:bg-sage-50"
+              >
+                <span className="min-w-0 break-words font-sans text-sm leading-snug text-sage-800">
+                  {l.title}
+                  {l.via_name && (
+                    <span className="block text-2xs text-sage-600">as {formatDrugName(l.via_name)}</span>
+                  )}
+                </span>
+                {detail && <span className="shrink-0 font-mono text-2xs text-sage-700">{detail}</span>}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </SideCard>
   )
 }
 

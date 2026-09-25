@@ -28,7 +28,7 @@ export default function Permalink() {
   const [state, setState] = useState<State>({ kind: 'loading' })
 
   useEffect(() => {
-    const m = /^(?:PCID-)?(\d{7})$/i.exec(raw.trim())
+    const m = /^(?:PCID-)?(\d{7,8})$/i.exec(raw.trim())
     if (!m) {
       setState({ kind: 'invalid' })
       return
@@ -45,7 +45,8 @@ export default function Permalink() {
         return
       }
       if (data?.slug) {
-        navigate(data.entity_type === 'class' ? `/classes/${data.slug}` : `/drugs/${data.slug}`, { replace: true })
+        const base = data.entity_type === 'class' ? '/classes' : data.entity_type === 'list' ? '/lists' : '/drugs'
+        navigate(`${base}/${data.slug}`, { replace: true })
         return
       }
       const { data: retired } = await supabase.from('pcid_retired').select('reason').eq('pcid', n).maybeSingle()
