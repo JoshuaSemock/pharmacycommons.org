@@ -897,8 +897,13 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
                   {l.via_name && (
                     <span className="block text-2xs text-sage-600">as {formatDrugName(l.via_name)}</span>
                   )}
+                  {l.note && <span className="block text-2xs text-sage-600">{l.note}</span>}
                 </span>
-                {detail && <span className="shrink-0 font-mono text-2xs text-sage-700">{detail}</span>}
+                {detail && (
+                  <span className="max-w-[45%] break-words text-right font-mono text-2xs text-sage-700">
+                    {detail.replace(/;\s*/g, ' · ')}
+                  </span>
+                )}
               </Link>
             </li>
           )

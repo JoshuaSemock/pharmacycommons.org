@@ -224,17 +224,17 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 | `moiety_hierarchy` (matview) | 5,076 |
 | `physiochemical` | **0** (CAS backfill not run) |
 
-`pcid_blocks.next_pcid` (2026-09-25): 1→1015620, 2→2002470, 3→3001452, 4→4006582,
-5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000023.
+`pcid_blocks.next_pcid` (2026-09-25): 1→1015620, 2→2002471, 3→3001452, 4→4006582,
+5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000024.
 
-Lists (Phase 9, `db/phase9-lists.md`): 22 published lists — `most-used-drugs-us`
+Lists (Phase 9, `db/phase9-lists.md`): 23 published lists — `most-used-drugs-us`
 (MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, and three Georgia MPJE
-lists (legend 2,410 · controlled 405 · exceptions 105). Read RPCs: `list_lists`,
+lists (legend 2,410 · controlled 405 · exceptions 105), and `do-not-crush` (226; reason per drug in `legal_status`, named by `lists.status_label`). Read RPCs: `list_lists`,
 `get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
 Deployed Edge Functions (8): `api` (public), `label-text`, `drugsfda-ingest`,
 `rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`.
-57 migrations applied, latest `phase9a_lists_schema` (two earlier `lists_staging_*` migrations hold import staging tables).
+59 migrations applied, latest `phase9b_lists_status_label_sources` (`phase10a_fda_product_ingredients`, the in-progress FDA → PCID linking pass, landed just before it) (two earlier `lists_staging_*` migrations hold import staging tables).
 
 Shipped: 9-block schema + RLS; full workbook load; Supabase-backed frontend;
 moiety-only search with hierarchy nesting; DailyMed labels + openFDA label-text

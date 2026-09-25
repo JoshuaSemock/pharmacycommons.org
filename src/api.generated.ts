@@ -254,9 +254,14 @@ export type ListItem = {
   rank: number | null
   /** Measured value (see ListDetail.measure_label); null when the list has none. */
   value: number | null
-  /** E.g. "CS-2" or "Legend" — only on lists with a jurisdiction. */
+  /** The list's category for this drug: a legal status ("CS-2", "Legend") or, on
+   *  lists that say so in `ListDetail.status_label`, something else ("Modified-release").
+   *  Several values are separated by "; ". */
   legal_status: string | null
+  /** Free text shown under the name, e.g. the brands and dosage forms the entry is about. */
   note: string | null
+  /** Other references that also list this drug, e.g. ["MPR", "Pharmacist's Letter"]. */
+  sources: string[] | null
   /** The name exactly as the source wrote it. */
   source_name: string
   pcid: number
@@ -284,6 +289,8 @@ export type ListDetail = {
   measure_unit: string | null
   /** What `ListItem.rank` means, e.g. "Rank within category". */
   rank_label: string | null
+  /** What `ListItem.legal_status` means on this list, e.g. "Schedule" or "Reason"; null = legal status. */
+  status_label: string | null
   default_sort: ListSort
   item_count: number
   updated_at: string
@@ -300,6 +307,8 @@ export type EntityList = {
   rank: number | null
   value: number | null
   legal_status: string | null
+  status_label: string | null
+  note: string | null
   /** Set when the drug is on the list through a form or combination of it, e.g. hydrocodone via hydrocodone/acetaminophen. */
   via_pcid: number | null
   via_name: string | null

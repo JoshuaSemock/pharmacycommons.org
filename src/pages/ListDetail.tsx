@@ -26,6 +26,7 @@ import {
   listToCsv,
   sortItems,
   sortOptions,
+  statusLabel,
   statusValues,
   topChoices,
   valueIsRank,
@@ -227,6 +228,7 @@ function Items({ list }: { list: ListRecord }) {
   const showStatus = statuses.length > 0
   const maxValue = useMemo(() => list.items.reduce((m, i) => (i.value !== null && i.value > m ? i.value : m), 0), [list])
   const vLabel = valueLabel(list)
+  const sLabel = statusLabel(list)
 
   function download() {
     const blob = new Blob([listToCsv(list, rows)], { type: 'text/csv;charset=utf-8' })
@@ -307,7 +309,7 @@ function Items({ list }: { list: ListRecord }) {
         )}
         {showStatus && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-mint-800">
-            Status
+            {sLabel}
             <select
               value={status ?? ''}
               onChange={e => update({ status: e.target.value || null })}
@@ -384,7 +386,7 @@ function Items({ list }: { list: ListRecord }) {
             {showRank && <span>Rank</span>}
             <span>Drug</span>
             {showValue && <span>{vLabel}</span>}
-            {showStatus && <span>Status</span>}
+            {showStatus && <span>{sLabel}</span>}
           </div>
           <ol>
             {rows.slice(0, limit).map(i => (
@@ -458,6 +460,10 @@ function Row({
         {sourceDiffers && (
           <span className="block break-words font-sans text-[11.5px] text-mint-700">listed as “{item.source_name}”</span>
         )}
+        {item.note && <span className="block break-words font-sans text-[12.5px] text-mint-800">{item.note}</span>}
+        {item.sources && item.sources.length > 0 && (
+          <span className="block break-words font-sans text-[11.5px] text-mint-700">Also listed by {item.sources.join(' and ')}</span>
+        )}
       </span>
       {showValue && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
@@ -479,8 +485,19 @@ function Row({
       {showStatus && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {item.legal_status && (
-            <span className="inline-block max-w-full break-words rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-rose-700">
-              {item.legal_status}
+            <span className="flex flex-wrap gap-1">
+              {item.legal_status
+                .split(';')
+                .map(part => part.trim())
+                .filter(Boolean)
+                .map(part => (
+                  <span
+                    key={part}
+                    className="inline-block max-w-full break-words rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-rose-700"
+                  >
+                    {part}
+                  </span>
+                ))}
             </span>
           )}
         </span>

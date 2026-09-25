@@ -19,6 +19,7 @@ function item(p: Partial<ListItem> & { name: string }): ListItem {
     value: null,
     legal_status: null,
     note: null,
+    sources: null,
     source_name: p.name,
     pcid: 1000001,
     slug: p.name,
@@ -111,6 +112,33 @@ describe('list options', () => {
 
   it('offers top-N cut-offs smaller than the list', () => {
     expect(topChoices(247)).toEqual([10, 25, 50, 100, 200])
+  })
+})
+
+describe('lists with a reason instead of a legal status', () => {
+  const dnc = [
+    item({ name: 'metoprolol succinate', legal_status: 'Modified-release', note: 'Toprol-XL · tablet', sources: ['MPR', "Pharmacist's Letter"] }),
+    item({ name: 'aspirin', legal_status: 'Modified-release; Irritant', note: 'Ecotrin · tablet', sources: ['MPR'] }),
+  ]
+
+  it('names the status column after the list', () => {
+    const opts = sortOptions({ items: dnc, measure_label: null, measure_unit: null, status_label: 'Reason' })
+    expect(opts.find(o => o.key === 'status')?.label).toBe('Reason')
+    expect(sortOptions({ items: dnc, measure_label: null, measure_unit: null }).find(o => o.key === 'status')?.label).toBe('Status')
+  })
+
+  it('finds a drug by the brand in its note', () => {
+    expect(filterItems(dnc, { query: 'toprol' }).map(i => i.name)).toEqual(['metoprolol succinate'])
+  })
+
+  it('filters on one reason of several', () => {
+    expect(filterItems(dnc, { status: 'Irritant' }).map(i => i.name)).toEqual(['aspirin'])
+  })
+
+  it('exports the note and corroborating sources', () => {
+    const csv = listToCsv({ measure_label: null, status_label: 'Reason' }, dnc)
+    expect(csv.split('\n')[0]).toBe('rank,drug,pcid,name_in_source,reason,note,also_listed_by')
+    expect(csv).toContain("MPR; Pharmacist's Letter")
   })
 })
 

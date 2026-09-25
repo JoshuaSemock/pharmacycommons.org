@@ -13,13 +13,20 @@ export type SortKey = 'rank' | 'value' | 'name' | 'status'
 export type SortOption = { key: SortKey; label: string }
 
 /** The sort options that make sense for this list, in display order. */
-export function sortOptions(list: Pick<ListDetail, 'items' | 'measure_label' | 'measure_unit'>): SortOption[] {
+export function sortOptions(
+  list: Pick<ListDetail, 'items' | 'measure_label' | 'measure_unit'> & { status_label?: string | null },
+): SortOption[] {
   const opts: SortOption[] = []
   if (list.items.some(i => i.rank !== null)) opts.push({ key: 'rank', label: 'Rank' })
   if (list.items.some(i => i.value !== null)) opts.push({ key: 'value', label: valueLabel(list) })
   opts.push({ key: 'name', label: 'A–Z' })
-  if (list.items.some(i => i.legal_status)) opts.push({ key: 'status', label: 'Status' })
+  if (list.items.some(i => i.legal_status)) opts.push({ key: 'status', label: statusLabel(list) })
   return opts
+}
+
+/** What the `legal_status` column is called on this list ("Status", "Schedule", "Reason"). */
+export function statusLabel(list: { status_label?: string | null }): string {
+  return list.status_label || 'Status'
 }
 
 /** Short column / button label for `value`. */
@@ -92,7 +99,13 @@ export type ItemFilter = {
 export function filterItems(items: ListItem[], f: ItemFilter): ListItem[] {
   const q = f.query?.trim().toLowerCase() ?? ''
   return items.filter(i => {
-    if (q && !i.name.toLowerCase().includes(q) && !i.source_name.toLowerCase().includes(q)) return false
+    if (
+      q &&
+      !i.name.toLowerCase().includes(q) &&
+      !i.source_name.toLowerCase().includes(q) &&
+      !(i.note ?? '').toLowerCase().includes(q)
+    )
+      return false
     if (f.top && (i.rank === null || i.rank > f.top)) return false
     if (f.status && !statusParts(i.legal_status).includes(f.status)) return false
     return true
@@ -127,17 +140,26 @@ function csvCell(v: string | number | null): string {
 }
 
 /** CSV of the rows as currently shown, with a PCID column so the file joins back to the API. */
-export function listToCsv(list: Pick<ListDetail, 'measure_label'>, items: ListItem[]): string {
+export function listToCsv(
+  list: Pick<ListDetail, 'measure_label'> & { status_label?: string | null },
+  items: ListItem[],
+): string {
   const header = ['rank', 'drug', 'pcid', 'name_in_source']
   const hasValue = items.some(i => i.value !== null)
   const hasStatus = items.some(i => i.legal_status)
+  const hasNote = items.some(i => i.note)
+  const hasSources = items.some(i => i.sources?.length)
   if (hasValue) header.push(list.measure_label ?? 'value')
-  if (hasStatus) header.push('legal_status')
+  if (hasStatus) header.push(list.status_label ? list.status_label.toLowerCase() : 'legal_status')
+  if (hasNote) header.push('note')
+  if (hasSources) header.push('also_listed_by')
   const lines = [header.map(csvCell).join(',')]
   for (const i of items) {
     const row: (string | number | null)[] = [i.rank, formatDrugName(i.name), `PCID-${i.pcid}`, i.source_name]
     if (hasValue) row.push(i.value)
     if (hasStatus) row.push(i.legal_status)
+    if (hasNote) row.push(i.note)
+    if (hasSources) row.push(i.sources?.join('; ') ?? null)
     lines.push(row.map(csvCell).join(','))
   }
   return lines.join('\n') + '\n'
