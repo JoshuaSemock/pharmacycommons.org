@@ -53,16 +53,16 @@ function Hero() {
 
   return (
     <section className="pt-16 pb-14 text-center">
-      <p className="mb-3 font-sans text-[13.5px] font-medium text-hepatica-700">
+      <p className="mb-3 font-sans text-[13px] font-medium text-hepatica-700">
         Cultivating our pharmacopeial commons: an open compendium of clinical evidence and drug information accessible to all.
       </p>
       <h1
-        className="mb-4 font-display text-4xl font-semibold leading-[1.1] text-balance text-mint-900 sm:text-5xl"
+        className="mb-4 font-display text-4.2xl font-semibold leading-[1.1] text-balance text-mint-950 sm:text-5xl"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Query structured data by active ingredients, preparations, pharmacologic classes, and compendium lists.
       </h1>
-      <p className="mx-auto mb-8 max-w-xl font-sans text-[15px] leading-relaxed text-pretty text-salmon-600">
+      <p className="mx-auto mb-8 max-w-xl font-sans text-[21px] leading-relaxed text-pretty text-mint-600">
         An open educational source for clinical and public inquiry, not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
       </p>
 
@@ -81,14 +81,14 @@ function Hero() {
               onBlur={() => setTimeout(() => setFocused(false), 150)}
               placeholder="...ibuprofen, Advil, NSAID, analgesic, pain, etc."
               aria-label="Search the catalog"
-              className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
+              className="flex-1 bg-transparent font-sans text-[14px] text-mint-900 placeholder-mint-400 outline-none"
               autoFocus
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="text-sage-400 hover:text-sage-600"
+                className="text-mint-400 hover:text-sage-600"
                 aria-label="Clear search"
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -100,33 +100,33 @@ function Hero() {
         </form>
 
         {focused && suggestions.length > 0 && (
-          <div className="absolute top-full z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-sage-200 bg-white shadow-lg shadow-sage-900/5">
+          <div className="absolute top-full z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-mint-200 bg-white shadow-lg shadow-mint-900/5">
             {suggestions.map(entry => {
               const schedule = toDrug(entry).schedule
               return (
                 <button
                   key={entry.n}
                   onMouseDown={() => navigate(`/drugs/${entry.slug}`)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-sage-50"
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-mint-50"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-sans text-[14px] font-medium text-sage-900">{entry.name}</span>
-                    <span className="block truncate font-sans text-[12px] text-sage-600">
+                    <span className="block truncate font-sans text-[14px] font-medium text-mint-900">{entry.name}</span>
+                    <span className="block truncate font-sans text-[12px] text-mint-600">
                       {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
                     </span>
                   </span>
                   {schedule && (
-                    <span className="rounded-md border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-coral-600">
+                    <span className="rounded-md border border-coral-200 bg-salmon-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-salmon-600">
                       {schedule}
                     </span>
                   )}
-                  <span className="font-mono text-[11px] text-sage-400">{pcidOf(entry)}</span>
+                  <span className="font-mono text-[11px] text-mint-400">{pcidOf(entry)}</span>
                 </button>
               )
             })}
             <Link
               to={`/browse?q=${encodeURIComponent(query.trim())}`}
-              className="block border-t border-sage-100 px-4 py-2.5 font-sans text-[13px] text-aqua-700 hover:bg-sage-50"
+              className="block border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-hepatica-700 hover:bg-mint-50"
             >
               See every match for “{query.trim()}”
             </Link>
@@ -134,9 +134,9 @@ function Hero() {
         )}
       </div>
 
-      <p className="mt-5 font-sans text-[13.5px] text-sage-600">
+      <p className="mt-5 font-sans text-[13.5px] text-mint-600">
         Or{' '}
-        <Link to="/browse" className="font-medium text-aqua-700 underline-offset-2 hover:underline">
+        <Link to="/browse" className="font-medium text-hepatica-700 underline-offset-2 hover:underline">
           {catalogSize !== null
             ? `browse all ${catalogSize.toLocaleString()} entries, A to Z`
             : 'browse the full catalog, A to Z'}
@@ -157,37 +157,37 @@ function RecentPosts() {
   return (
     <section
       aria-labelledby="recent-posts-heading"
-      className="border-t border-sage-200 pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
+      className="border-t border-mint-200 pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
     >
       <div className="mb-6 lg:mb-0">
         <h2
           id="recent-posts-heading"
-          className="font-display text-[26px] font-semibold leading-snug text-sage-900"
+          className="font-display text-[26px] font-semibold leading-snug text-mint-900"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           From the Community Commons Blog
         </h2>
-        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-sage-600">
+        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-mint-600">
           Decisions, commentary, and methodology, written down as the work happens.
         </p>
         <Link
           to="/blog"
-          className="mt-4 inline-block font-sans text-[13.5px] font-medium text-aqua-700 underline-offset-2 hover:underline"
+          className="mt-4 inline-block font-sans text-[13.5px] font-medium text-hepatica-700 underline-offset-2 hover:underline"
         >
           All posts
         </Link>
       </div>
 
-      <ul className="max-w-[46rem] divide-y divide-sage-200">
+      <ul className="max-w-[46rem] divide-y divide-mint-200">
         {posts.map(post => (
           <li key={post.slug} className="py-6 first:pt-0">
             <article>
-              <p className="mb-1.5 font-sans text-[13px] text-sage-600">
+              <p className="mb-1.5 font-sans text-[13px] text-mint-600">
                 <time dateTime={post.date}>{formatDate(post.date)}</time>
                 <span className="ml-3">{post.readingMinutes} minute read</span>
               </p>
               <h3
-                className="font-display text-[21px] font-semibold leading-snug text-balance text-sage-900"
+                className="font-display text-[21px] font-semibold leading-snug text-balance text-mint-900"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 <Link
@@ -198,7 +198,7 @@ function RecentPosts() {
                 </Link>
               </h3>
               {post.summary && (
-                <p className="mt-2 line-clamp-2 font-sans text-[15px] leading-[1.6] text-pretty text-sage-600">
+                <p className="mt-2 line-clamp-2 font-sans text-[15px] leading-[1.6] text-pretty text-mint-600">
                   {post.summary}
                 </p>
               )}
@@ -216,11 +216,11 @@ function RecentPosts() {
 
 function SourcesFooter() {
   return (
-    <footer className="mt-16 border-t border-sage-200 pt-8">
+    <footer className="mt-16 border-t border-mint-200 pt-8">
       <div className="grid gap-6 sm:grid-cols-3">
         <DataSource
           label="Founded by Dr. Joshua Semock, PharmD"
-          desc="(Sep. 2026) contact@pharmacycommons.org"
+          desc="(2026) contact@pharmacycommons.org"
         />
       </div>
     </footer>
@@ -233,8 +233,8 @@ function DataSource({ label, desc }: { label: string; desc: string }) {
       <span className="mt-0.5 text-xl leading-none" aria-hidden="true">
       </span>
       <div>
-        <p className="font-sans text-[13px] font-medium text-sage-800">{label}</p>
-        <p className="font-sans text-[12px] leading-relaxed text-sage-600">{desc}</p>
+        <p className="font-sans text-[13px] font-medium text-mint-800">{label}</p>
+        <p className="font-sans text-[12px] leading-relaxed text-mint-600">{desc}</p>
       </div>
     </div>
   )
