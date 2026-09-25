@@ -1,0 +1,757 @@
+# Internet Metrics
+
+### Paloalto Networks
+
+Test A Site
+URL: https://pharmacycommons.org/
+Categories: Health-and-Medicine, Newly-Registered-Domain
+Risk Level: Low-Risk
+Category: Health-and-Medicine
+Description: Sites containing information regarding general health information, issues, and traditional and non-traditional tips, remedies, and treatments. Also includes sites for various medical specialties, practices and facilities (such as gyms and fitness clubs) as well as professionals. Sites relating to medical insurance and cosmetic surgery are also included
+Example Sites: www.kaiserpermanente.org, www.webmd.com, www.24hourfitness.com
+Category: Newly-Registered-Domain
+Description: Identifies sites that have been registered within the last 32 days. Newly-registered domains are often generated purposefully or by domain generation algorithms and can be used for malicious activity
+Example Sites:
+Risk Level: Low-Risk
+Description: Any site that is not High Risk or Medium Risk. This includes sites that were previously confirmed as malicious but have displayed benign activity for at least 90 days
+Example Sites: www.google.com, www.schwab.com, www.amazon.com
+
+
+### Cisco Talos
+
+Owner Details
+URI	pharmacycommons.org/
+Hostname	pharmacycommons.org
+Domain	pharmacycommons.org
+Network Owner	github inc.
+Content Details
+Content Category	No established content categories
+Think these category details are incorrect?
+Submit Content Categorization Ticket
+Reputation Details
+Web Reputation	Unknown	Submit Web Reputation Ticket
+Block Lists 
+Talos Security Intelligence Block List	
+Added to Block List	No
+
+
+### Google Search Console
+
+https://pharmacycommons.org
+URL is on Google
+It can appear in Google Search results with all relevant enhancements.
+View crawled page
+"<!doctype html>
+<html lang="en"><head>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharmacy Commons</title>
+    <meta
+      name="description"
+      content="Pharmacy Commons is a free, open-access pharmacology reference. Restructured drug data from the FDA, WHO, and NIH, with environmental impact metrics for greener prescribing."
+    />
+    <link rel="canonical" href="https://pharmacycommons.org/" />
+
+    <!-- Icons. Verify each of these exists in public/ — a missing file here is
+         a silent 404 that only shows up in the network tab. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="Ph. Commons" />
+    <meta name="theme-color" content="#f2f5f0" />
+
+    <!-- Link previews. These are static for every route: a shared blog post
+         shows the site-level card, not the post's own title. Per-page cards
+         need prerendering at build time. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pharmacy Commons" />
+    <meta property="og:title" content="Pharmacy Commons" />
+    <meta
+      property="og:description"
+      content="A free, open-access pharmacology reference with environmental impact metrics for greener prescribing."
+    />
+    <meta property="og:url" content="https://pharmacycommons.org/" />
+    <meta property="og:image" content="https://pharmacycommons.org/logo.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <!--
+      GitHub Pages SPA routing, half two.
+
+      Pages has no server-side rewrite, so a direct request to /blog/some-post
+      returns 404.html. That file stashes the requested path and bounces here.
+      This script puts the path back into the address bar before main.tsx runs,
+      so React Router boots on the correct route.
+
+      Must stay in <head> and stay non-module. The module script at the bottom
+      of <body> is deferred, so this always runs first.
+    -->
+    <script>
+      (function () {
+        try {
+          var redirect = sessionStorage.getItem('pc:redirect')
+          if (!redirect) return
+          sessionStorage.removeItem('pc:redirect')
+          // Same-origin absolute paths only. Rejecting a leading "//" keeps a
+          // crafted value from turning into a protocol-relative URL.
+          if (redirect.charAt(0) === '/' && redirect.charAt(1) !== '/') {
+            window.history.replaceState(null, '', redirect)
+          }
+        } catch (e) {
+          /* sessionStorage unavailable (private mode, blocked cookies) —
+             the user lands on the homepage, which is an acceptable fallback. */
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="/assets/index-CTlCRxfi.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CPxq0rXJ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      Pharmacy Commons needs JavaScript to run. Source and data exports are at
+      <a href="https://github.com/JoshuaSemock/pharmacycommons.org">github.com/JoshuaSemock/pharmacycommons.org</a>.
+    </noscript>
+  
+
+</body></html>"
+
+HTTP Response
+200 OK
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 1511
+Server: GitHub.com
+Content-Type: text/html; charset=utf-8
+Last-Modified: Sun, 20 Sep 2026 13:46:50 GMT
+Access-Control-Allow-Origin: *
+ETag: W/"6aafe3ca-d73"
+expires: Sun, 20 Sep 2026 16:09:39 GMT
+Cache-Control: max-age=600
+Content-Encoding: gzip
+x-proxy-cache: MISS
+X-GitHub-Request-Id: A366:2DB97:28A49FB:2D829A9:6AB002EB
+x-github-edge-region: iad
+Accept-Ranges: bytes
+Age: 0
+Date: Sun, 20 Sep 2026 16:33:41 GMT
+Via: 1.1 varnish
+X-Served-By: cache-iad-kiad7000020-IAD
+X-Cache: HIT
+X-Cache-Hits: 0
+X-Timer: S1789922021.223724,VS0,VE32
+Vary: Accept-Encoding
+X-Fastly-Request-ID: 60a00537d830d232dade85f607ed214ae79606cd
+X-Google-Crawl-Date: Sun, 20 Sep 2026 16:33:41 GMT
+
+Page indexing
+Page is indexed
+Discovery
+Sitemaps
+No referring sitemaps detected
+Referring page
+None detected
+URL might be known from other sources that are currently not reported
+Crawl
+Last crawl
+Sep 20, 2026, 12:33:41 PM
+Crawled as
+Googlebot smartphone
+Crawl allowed?
+Yes
+Page fetch
+Successful
+Indexing allowed?
+Yes
+Indexing
+User-declared canonical
+https://pharmacycommons.org/
+Google-selected canonical
+
+Inspected URL
+
+
+Report from Sep 25, 2026, 2:18:36 PM
+https://pharmacycommons.org/
+Enter a valid URL
+
+
+smartphone
+Mobile
+
+computer
+Desktop
+
+Discover what your real users are experiencing
+No Data
+
+Diagnose performance issues
+69
+Performance
+93
+Accessibility
+100
+Best Practices
+100
+SEO
+2/2
+Agentic Browsing
+69
+FCP
++10
+LCP
++20
+TBT
++6
+CLS
++25
+SI
++8
+Performance
+Values are estimated and may vary. The performance score is calculated directly from these metrics.See calculator.
+0–49
+50–89
+90–100
+Final Screenshot
+
+Metrics
+Expand view
+First Contentful Paint
+0.8 s
+Largest Contentful Paint
+1.5 s
+Total Blocking Time
+620 ms
+Cumulative Layout Shift
+0
+Speed Index
+1.5 s
+Captured at Sep 25, 2026, 2:18 PM EDT
+Emulated Desktop with Lighthouse 13.5.0
+Single page session
+Initial page load
+Custom throttling
+Using HeadlessChromium 153.0.8010.36 with lr
+View Treemap
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Show audits relevant to:
+
+All
+
+FCP
+
+LCP
+
+TBT
+
+CLS
+Insights
+Use efficient cache lifetimes Est savings of 883 KiB
+Render-blocking requests Est savings of 410 ms
+Improve image delivery Est savings of 90 KiB
+Forced reflow
+LCP request discovery
+Network dependency tree
+Layout shift culprits
+Optimize DOM size
+LCP breakdown
+3rd parties
+These insights are also available in the Chrome DevTools Performance Panel - record a trace to view more detailed information.
+Diagnostics
+Reduce unused JavaScript Est savings of 165 KiB
+Avoid long main-thread tasks 4 long tasks found
+Avoid non-composited animations 1 animated element found
+More information about the performance of your application. These numbers don't directly affect the Performance score.
+Passed audits (14)
+Show
+93
+Accessibility
+These checks highlight opportunities to improve the accessibility of your web app. Automatic detection can only detect a subset of issues and does not guarantee the accessibility of your web app, so manual testing is also encouraged.
+Contrast
+Background and foreground colors do not have a sufficient contrast ratio.
+These are opportunities to improve the legibility of your content.
+Best practices
+Touch targets do not have sufficient size or spacing.
+These items highlight common accessibility best practices.
+Additional items to manually check (10)
+Show
+These items address areas which an automated testing tool cannot cover. Learn more in our guide on conducting an accessibility review.
+Passed audits (25)
+Show
+Not applicable (36)
+Show
+100
+Best Practices
+Trust and Safety
+Ensure CSP is effective against XSS attacks
+Use a strong HSTS policy
+Ensure proper origin isolation with COOP
+Mitigate clickjacking with XFO or CSP
+Mitigate DOM-based XSS with Trusted Types
+Browser Compatibility
+Baseline Features
+General
+Missing source maps for large first-party JavaScript
+Passed audits (12)
+Show
+Not applicable (2)
+Show
+100
+SEO
+These checks ensure that your page is following basic search engine optimization advice. There are many additional factors Lighthouse does not score here that may affect your search ranking, including performance on Core Web Vitals. Learn more about Google Search Essentials.
+Additional items to manually check (1)
+Hide
+Structured data is valid
+Run these additional validators on your site to check additional SEO best practices.
+Passed audits (9)
+Show
+Not applicable (1)
+Show
+2/2
+Agentic Browsing
+These checks ensure high-quality, browsable websites for AI agents and validate the correctness of WebMCP integrations. This category is still under development and subject to change.
+Passed audits (2)
+Hide
+Accessibility tree is well-formed All audits passed
+Cumulative Layout Shift 0
+Not applicable (5)
+Hide
+WebMCP form coverage
+WebMCP tools registered
+WebMCP schemas are valid
+llms.txt follows recommendations
+ai-catalog.json schema is valid
+
+ Lighthouse Scoring Calculator
+Device type: 
+Desktop
+Versions: 
+v10, v11, v12
+latest
+v10
+Value		Metric Score	Weighting
+FCP (First Contentful Paint)	
+800 ms
+
+95
+10%
+SI (Speed Index)	
+1,513 ms
+
+83
+10%
+LCP (Largest Contentful Paint)	
+1,475 ms
+
+82
+25%
+TBT (Total Blocking Time)	
+617 ms
+
+20
+30%
+CLS (Cumulative Layout Shift)	
+0.00
+
+100
+25%
+69
+FCP
++10
+SI
++8
+LCP
++21
+TBT
+
+Report from Sep 25, 2026, 2:18:36 PM
+https://pharmacycommons.org/
+Enter a valid URL
+
+
+smartphone
+Mobile
+
+computer
+Desktop
+
+Discover what your real users are experiencing
+No Data
+
+Diagnose performance issues
+48
+Performance
+93
+Accessibility
+100
+Best Practices
+100
+SEO
+2/2
+Agentic Browsing
+48
+FCP
++3
+LCP
++4
+TBT
++11
+CLS
++25
+SI
++6
+Performance
+Values are estimated and may vary. The performance score is calculated directly from these metrics.See calculator.
+0–49
+50–89
+90–100
+Final Screenshot
+
+Metrics
+Expand view
+First Contentful Paint
+3.8 s
+Largest Contentful Paint
+5.9 s
+Total Blocking Time
+790 ms
+Cumulative Layout Shift
+0
+Speed Index
+5.1 s
+Captured at Sep 25, 2026, 2:18 PM EDT
+Emulated Moto G Power with Lighthouse 13.5.0
+Single page session
+Initial page load
+Slow 4G throttling
+Using HeadlessChromium 153.0.8010.36 with lr
+View Treemap
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Show audits relevant to:
+
+All
+
+FCP
+
+LCP
+
+TBT
+
+CLS
+Insights
+Use efficient cache lifetimes Est savings of 413 KiB
+Render-blocking requests Est savings of 2,100 ms
+Improve image delivery Est savings of 46 KiB
+Forced reflow
+LCP request discovery
+Network dependency tree
+Layout shift culprits
+Optimize DOM size
+LCP breakdown
+3rd parties
+These insights are also available in the Chrome DevTools Performance Panel - record a trace to view more detailed information.
+Diagnostics
+Reduce unused JavaScript Est savings of 165 KiB
+Avoid long main-thread tasks 3 long tasks found
+Avoid non-composited animations 1 animated element found
+More information about the performance of your application. These numbers don't directly affect the Performance score.
+Passed audits (14)
+Show
+93
+Accessibility
+These checks highlight opportunities to improve the accessibility of your web app. Automatic detection can only detect a subset of issues and does not guarantee the accessibility of your web app, so manual testing is also encouraged.
+Contrast
+Background and foreground colors do not have a sufficient contrast ratio.
+These are opportunities to improve the legibility of your content.
+Best practices
+Touch targets do not have sufficient size or spacing.
+These items highlight common accessibility best practices.
+Additional items to manually check (10)
+Hide
+Interactive controls are keyboard focusable
+Interactive elements indicate their purpose and state
+The page has a logical tab order
+Visual order on the page follows DOM order
+User focus is not accidentally trapped in a region
+The user's focus is directed to new content added to the page
+HTML5 landmark elements are used to improve navigation
+Offscreen content is hidden from assistive technology
+Custom controls have associated labels
+Custom controls have ARIA roles
+These items address areas which an automated testing tool cannot cover. Learn more in our guide on conducting an accessibility review.
+Passed audits (25)
+Hide
+[aria-*] attributes match their roles
+[aria-hidden="true"] is not present on the document <body>
+[role]s have all required [aria-*] attributes
+[role] values are valid
+[aria-*] attributes have valid values
+[aria-*] attributes are valid and not misspelled
+Buttons have an accessible name
+Image elements have [alt] attributes
+Form elements have associated labels
+[user-scalable="no"] is not used in the <meta name="viewport"> element and the [maximum-scale] attribute is not less than 5.
+Select elements have associated label elements.
+ARIA attributes are used as specified for the element's role
+[aria-hidden="true"] elements do not contain focusable descendents
+Elements use only permitted ARIA attributes
+Document has a <title> element
+<html> element has a [lang] attribute
+<html> element has a valid value for its [lang] attribute
+Links are distinguishable without relying on color.
+Links have a discernible name
+Lists contain only <li> elements and script supporting elements (<script> and <template>).
+List items (<li>) are contained within <ul>, <ol> or <menu> parent elements
+Heading elements appear in a sequentially-descending order
+Document has a main landmark.
+Deprecated ARIA roles were not used
+Elements with role="none" or role="presentation" do not have conflicts
+Not applicable (36)
+Hide
+[accesskey] values are unique
+button, link, and menuitem elements have accessible names
+Elements with role="dialog" or role="alertdialog" have accessible names.
+ARIA input fields have accessible names
+ARIA meter elements have accessible names
+ARIA progressbar elements have accessible names
+Elements with an ARIA [role] that require children to contain a specific [role] have all required children.
+[role]s are contained by their required parent element
+Elements with the role=text attribute do not have focusable descendents.
+ARIA toggle fields have accessible names
+ARIA tooltip elements have accessible names
+ARIA treeitem elements have accessible names
+The page contains a heading, skip link, or landmark region
+<dl>'s contain only properly-ordered <dt> and <dd> groups, <script>, <template> or <div> elements.
+Definition list items are wrapped in <dl> elements
+ARIA IDs are unique
+No form fields have multiple labels
+<frame> or <iframe> elements have a title
+<html> element has an [xml:lang] attribute with the same base language as the [lang] attribute.
+Input buttons have discernible text.
+<input type="image"> elements have [alt] text
+The document does not use <meta http-equiv="refresh">
+<object> elements have alternate text
+Skip links are focusable.
+No element has a [tabindex] value greater than 0
+Cells in a <table> element that use the [headers] attribute refer to table cells within the same table.
+<th> elements and elements with [role="columnheader"/"rowheader"] have data cells they describe.
+[lang] attributes have a valid value
+<video> elements contain a <track> element with [kind="captions"]
+autocomplete attributes are used correctly
+SVG elements with an img role have an accessible text alternative
+Tables have different content in the summary attribute and <caption>.
+All heading elements contain content.
+Uses ARIA roles only on compatible elements
+Image elements do not have [alt] attributes that are redundant text.
+Identical links have the same purpose.
+100
+Best Practices
+Trust and Safety
+Ensure CSP is effective against XSS attacks
+Use a strong HSTS policy
+Ensure proper origin isolation with COOP
+Mitigate clickjacking with XFO or CSP
+Mitigate DOM-based XSS with Trusted Types
+Browser Compatibility
+Baseline Features
+General
+Missing source maps for large first-party JavaScript
+Passed audits (12)
+Hide
+Uses HTTPS
+Avoids deprecated APIs
+Avoids third-party cookies
+Allows users to paste into input fields
+Avoids requesting the geolocation permission on page load
+Avoids requesting the notification permission on page load
+Displays images with correct aspect ratio
+Serves images with appropriate resolution
+Page has the HTML doctype
+Properly defines charset
+No browser errors logged to the console
+No issues in the Issues panel in Chrome Devtools
+Not applicable (2)
+Show
+100
+SEO
+These checks ensure that your page is following basic search engine optimization advice. There are many additional factors Lighthouse does not score here that may affect your search ranking, including performance on Core Web Vitals. Learn more about Google Search Essentials.
+Additional items to manually check (1)
+Hide
+Structured data is valid
+Run these additional validators on your site to check additional SEO best practices.
+Passed audits (9)
+Show
+Not applicable (1)
+Show
+2/2
+Agentic Browsing
+These checks ensure high-quality, browsable websites for AI agents and validate the correctness of WebMCP integrations. This category is still under development and subject to change.
+
+ Lighthouse Scoring Calculator
+Device type: 
+Mobile
+Versions: 
+v10, v11, v12
+latest
+v10
+Value		Metric Score	Weighting
+FCP (First Contentful Paint)	
+3,790 ms
+
+28
+10%
+SI (Speed Index)	
+5,106 ms
+
+62
+10%
+LCP (Largest Contentful Paint)	
+5,910 ms
+
+14
+25%
+TBT (Total Blocking Time)	
+790 ms
+
+37
+30%
+CLS (Cumulative Layout Shift)	
+0.00
+
+100
+25%
+49
+FCP
++3
+SI
++6
+LCP
++4
+
+
+### Google Gemini
+
+"### Executive Diagnostic Summary
+
+Your site (hosted on GitHub Pages) is securely provisioned, successfully indexed by Google, and has a clean reputation with enterprise firewalls (Palo Alto, Cisco Talos).
+
+However, your audit reveals a **severe performance bifurcation**:
+
+* **Desktop:** **69 / 100** (FCP: 0.8s, LCP: 1.5s, TBT: 620ms)
+* **Mobile (Moto G Power, Slow 4G):** **48 / 100** (FCP: 3.8s, LCP: 5.9s, TBT: 790ms)
+
+Your Best Practices (100) and SEO (100) are excellent, but **Mobile Performance (48) directly violates Google Core Web Vitals thresholds** (LCP must be $\le$ 2.5s; TBT must be $\le$ 200ms).
+
+---
+
+### Root-Cause Breakdown
+
+```
+[ Slow 4G Network ] ──> Render-blocking CSS (410ms - 2,100ms penalty)
+                                │
+[ Low-end Mobile CPU ] ──> index-CTlCRxfi.js execution (790ms Total Blocking Time)
+                                │
+[ Client-side SPA Boot ] ──> Empty <div id="root"> (Blank screen until JS completes)
+
+```
+
+1. **JavaScript Main-Thread Saturation (TBT 620ms–790ms)**
+* Lighthouse identified **3–4 long tasks** on the main thread and **165 KiB of unused JavaScript**.
+* Vite bundled components, dependencies, and client-side logic into a monolithic `index-CTlCRxfi.js` asset that blocks interactive readiness while parsing.
+
+
+2. **Render-Blocking CSS (Savings: 410ms Desktop / 2,100ms Mobile)**
+* `<link rel="stylesheet" href="/assets/index-CPxq0rXJ.css">` in the `<head>` completely halts layout paint on mobile connections.
+
+
+3. **Empty Initial Shell / SPA Ingestion Gap**
+* Google crawled your raw HTML on **Sep 20, 2026** and parsed `<div id="root"></div>`. Because content depends on client-side JS boot and Supabase queries, rendering is delayed for search bots and mobile users alike.
+
+
+
+
+4. **Contrast & Target Size (Accessibility 93)**
+* Low contrast ratios detected in pastel accent colors (e.g., light moss, pastel orange/purple against off-white background).
+
+
+* Interactive touch targets (buttons, links) are under the minimum 48×48px tap recommendation.
+
+
+
+---
+
+### Direct Optimization Plan
+
+#### 1. Eliminate Main-Thread Jam & Chunk the JS Bundle
+
+In your `vite.config.ts`, split out vendor chunks so the browser does not parse third-party libraries (e.g., Supabase client, UI engines) before painting:
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
+});
+
+```
+
+#### 2. Fix Render-Blocking CSS
+
+If your critical CSS is small, inline the essential layout/OKLCH variables directly into `index.html`, and load the primary stylesheet asynchronously:
+
+```html
+<link rel="preload" href="/assets/index-CPxq0rXJ.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/assets/index-CPxq0rXJ.css"></noscript>
+
+```
+
+#### 3. Prerender Shell Content to `<div id="root">`
+
+Instead of shipping a blank root node, inject a static HTML hero layout inside `<div id="root">` at build time. When React boots, it hydrates the container. This guarantees:
+
+* **FCP drops immediately** to under 1.2s on mobile.
+* Search crawlers ingest real text without waiting on headless JS execution.
+
+
+
+#### 4. Resolve Accessibility Deductions (93 $\rightarrow$ 100)
+
+* **Touch Targets:** Add `min-height: 48px; min-width: 48px; display: inline-flex; align-items: center;` to touch elements, navigation buttons, and footer links.
+* **OKLCH Contrast:** Adjust text ink variables. For light mode, ensure high-contrast foreground values (e.g., push `oklch(42% ...)` down to `oklch(25% ...)` for descriptive body text) to satisfy WCAG AA 4.5:1 standards.
+
+
+
+#### 5. Network & Domain Hygiene
+
+* **Cisco Talos Categorization:** Talos shows `Content Category: No established content categories`. Click **Submit Content Categorization Ticket** in Talos and register `pharmacycommons.org` under *Health and Medicine* (matching Palo Alto) so enterprise and hospital VPNs do not flag the domain as unclassified.
+* **Sitemap Generation:** Add a static `sitemap.xml` to `public/` listing your root and core entity routes, then submit it directly in Google Search Console to eliminate the `No referring sitemaps detected` discovery warning."
+
+
