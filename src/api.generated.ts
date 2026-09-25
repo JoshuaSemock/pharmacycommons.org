@@ -212,3 +212,95 @@ export type EntityClass = {
   is_direct: boolean
   level: number | null
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lists (2026-09-25)
+//
+// A list is a collection of drugs made for a purpose — a usage ranking, an
+// exam's drugs to know — kept separate from classes. Pharmacy Commons lists
+// have PCIDs in block 10. Shapes mirror the `list_lists`, `get_list` and
+// `get_entity_lists` RPCs (db/phase9a_lists_schema.sql).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** curated = Pharmacy Commons; authority = published by an agency or body; community = made by members. */
+export type ListKind = 'curated' | 'authority' | 'community'
+
+/** How a list is ordered when first opened. */
+export type ListSort = 'rank' | 'value_desc' | 'name' | 'position'
+
+/** One row of `list_lists`. */
+export type ListSummary = {
+  pcid: number
+  slug: string
+  title: string
+  description: string | null
+  kind: ListKind
+  /** Set for sub-lists, e.g. the Notable Drugs categories. */
+  parent_slug: string | null
+  /** 'US', 'US-GA', … null when the list has no legal scope. */
+  jurisdiction: string | null
+  item_count: number
+  /** What `ListItem.value` means, e.g. "Mean people per year with at least one fill (2019–2023)". */
+  measure_label: string | null
+  default_sort: ListSort
+  sort_order: number
+}
+
+/** One drug on a list. */
+export type ListItem = {
+  /** 1-based order within the list as stored. */
+  position: number
+  /** The list's own rank; null for unranked lists. */
+  rank: number | null
+  /** Measured value (see ListDetail.measure_label); null when the list has none. */
+  value: number | null
+  /** E.g. "CS-2" or "Legend" — only on lists with a jurisdiction. */
+  legal_status: string | null
+  note: string | null
+  /** The name exactly as the source wrote it. */
+  source_name: string
+  pcid: number
+  slug: string
+  name: string
+  entity_type: string
+}
+
+export type ListRef = { slug: string; title: string }
+export type ListChild = ListRef & { item_count: number }
+
+/** `get_list` — one list page. */
+export type ListDetail = {
+  pcid: number
+  pcid_code: string
+  slug: string
+  title: string
+  description: string | null
+  kind: ListKind
+  jurisdiction: string | null
+  source_citation: string
+  source_url: string | null
+  license: string
+  measure_label: string | null
+  measure_unit: string | null
+  /** What `ListItem.rank` means, e.g. "Rank within category". */
+  rank_label: string | null
+  default_sort: ListSort
+  item_count: number
+  updated_at: string
+  parent: ListRef | null
+  children: ListChild[]
+  items: ListItem[]
+}
+
+/** One row of `get_entity_lists` — a list a drug appears on. */
+export type EntityList = {
+  slug: string
+  title: string
+  kind: ListKind
+  rank: number | null
+  value: number | null
+  legal_status: string | null
+  /** Set when the drug is on the list through a form or combination of it, e.g. hydrocodone via hydrocodone/acetaminophen. */
+  via_pcid: number | null
+  via_name: string | null
+}

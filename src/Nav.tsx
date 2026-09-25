@@ -10,6 +10,7 @@ import { useSession } from './auth'
 const SECTIONS = [
   { to: '/browse', label: 'Browse' },
   { to: '/classes', label: 'Classes' },
+  { to: '/lists', label: 'Lists' },
   { to: '/about', label: 'About' },
   { to: '/tools', label: 'Tools' },
   { to: '/resources', label: 'Resources' },
