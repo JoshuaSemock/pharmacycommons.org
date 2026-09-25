@@ -1,7 +1,7 @@
 import PageShell, { Section } from './PageShell'
 
 const linkClass =
-  'text-hepatica-700 underline decoration-mint-300 underline-offset-2 hover:decoration-mint-600'
+  'text-hepatica-700 underline decoration-hepatica-500 underline-offset-2 hover:decoration-hepatica-600'
 
 export default function About() {
   return (
