@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import PageShell, { Section } from './PageShell'
 
 const linkClass =
@@ -9,10 +8,11 @@ export default function About() {
     <PageShell
       kicker="About"
       title="About Pharmacy Commons"
-      lede="title="About Pharmacy Commons"
-lede="This platform provides an open interface to structured pharmaceutical records, enabling users to query by active ingredients, preparations, pharmacologic classes, and compendium lists. 
-    The information is sourced from public and federal repositories, the data is then modeled in relational PostgreSQL so both human researchers and AI language models can retrieve evidence-bearing answers with clear citations. 
-    However, this is currently provided as an educational resource for clinical and public inquiry, thus, it is not intended as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner."
+      lede={
+        'This platform provides an open interface to structured pharmaceutical records, enabling users to query by active ingredients, preparations, pharmacologic classes, and compendium lists. ' +
+        'The information is sourced from public and federal repositories, the data is then modeled in relational PostgreSQL so both human researchers and AI language models can retrieve evidence-bearing answers with clear citations. ' +
+        'However, this is currently provided as an educational resource for clinical and public inquiry, thus, it is not intended as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.'
+      }
     >
       <Section heading="Our Mission">
         <p>
@@ -21,7 +21,7 @@ lede="This platform provides an open interface to structured pharmaceutical reco
           </p>
         </Section>
 
-        <Section heading="Our Vision Statment">
+        <Section heading="Our Vision Statement">
           <p>
           Building a world where essential medical evidence is managed as a self-sustaining clinical commons, making information freely accessible, traceable to its source, and perpetually protected from commercial enclosure.
         </p>
@@ -60,14 +60,14 @@ lede="This platform provides an open interface to structured pharmaceutical reco
       <Section heading="Our Land, Knowledge, and Environment Acknowledgment">
         <p>
 
-        Pharmacy Commons may be a website in "the cloud", but it depends on physical things which impact our enviornment: servers, cables, 
+        Pharmacy Commons may be a website in "the cloud", but it depends on physical things which impact our environment: servers, cables, 
         power grids, and notably the water that cools data centers. All of it sits on the ancestral 
         lands of Indigenous nations who still hold them as sacred. Most of these lands were 
         never ceded. Others were taken by force or through treaties signed under pressure. 
-        Like all websites, Pharmacy Commons is made possible only by being maintained on the lands of the nations through it's physical presence.
+        Like all websites, Pharmacy Commons is made possible only by being maintained on the lands of the nations through its physical presence.
        </p>
       <p>
-        We would like to recognize the specific lands and peoples with are being implicated.
+        We would like to recognize the specific lands and peoples that are being implicated.
         Our domain name is registered through Porkbun, based in the Portland, Oregon area. This
         is the homeland of the Atfalati (Tualatin Kalapuya) and of Chinookan peoples, including 
         the Multnomah and Clackamas. The Cowlitz, Molalla, Wasco, and other peoples also have ties
@@ -88,7 +88,7 @@ lede="This platform provides an open interface to structured pharmaceutical reco
         often been usurped and commodified, then patented, and sold without consent, credit, or a fair share of the proceeds. The
         resulting medicines are not always affordable to the communities they originated from. We seek to 
         not treat Indigenous knowledge as a commodity. We aim to document where medicine's origins are,
-        we will credit them and not publish traditional knowledge that is not already in the public domain. These prinicples are recognized
+        we will credit them and not publish traditional knowledge that is not already in the public domain. These principles are recognized
         under the CARE Principles for Indigenous Data Governance.
        </p>
       <p>
@@ -113,7 +113,7 @@ lede="This platform provides an open interface to structured pharmaceutical reco
         The project establishes an auditable legal position against enclosure by using the copyleft protections of the GNU General Public License v3.0 (GPL-3.0). 
         Meanwhile, original relational data structures and curated schemas are dedicated to the worldwide public domain under Creative Commons Zero (CC0 1.0). 
         This architecture ingests regulatory records from federal agencies like the FDA and CDC, which are barred from copyright protection under 17 U.S.C. § 105.
-        We aim to explicit provenance—link directly to, for example, FDA document identifiers or clinical study citations. Artificial intelligence functions are allowed by consumers.
+        We aim to provide explicit provenance—link directly to, for example, FDA document identifiers or clinical study citations. Artificial intelligence functions are allowed by consumers.
         Pharmacy Commons operates as an open-access public utility and research index. Where clinical statements reference proprietary literature, private academic publications, or copyrighted clinical practice guidelines, Pharmacy Commons extracts strictly factual relationships and metadata (e.g., therapeutic classifications, dosing ranges, or study endpoints) rather than replicating expressive commentary. Every external claim is accompanied by explicit provenance and attribution (e.g., DOI, PMID, or publisher citation) to direct researchers back to the primary source.
         We respect the intellectual property rights of private publishers, institutions, and individual authors. 
         If you are a copyright owner, publisher, or authorized representative and believe that any content, excerpt, or reference indexed within Pharmacy Commons infringes upon your copyright or exceeds fair use, you may request its immediate review and removal.
@@ -124,7 +124,7 @@ lede="This platform provides an open interface to structured pharmaceutical reco
       <Section heading="Our Founder">
         <p>
           Pharmacy Commons is founded and maintained by Dr. Joshua Semock, PharmD, who
-          operates as a single-member for now. His almamatter is the University of Colorado
+          operates as a single-member for now. His alma mater is the University of Colorado
           at the Anschutz Medical campus, Skaggs School of Pharmacy and Pharmaceutical
           Sciences. He attended a post-graduate year one (PGY1) residency program at
           Buffalo Psychiatric Center with the New York State Office of Mental Health and
