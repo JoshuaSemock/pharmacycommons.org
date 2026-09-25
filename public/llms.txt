@@ -1,0 +1,27 @@
+# Pharmacy Commons
+
+> Pharmacy Commons is a free, open-access pharmacology reference that manages drug knowledge as a public commons. Records are built from public and federal sources (FDA, WHO, NIH, NLM and others), modeled in a relational PostgreSQL database, and every fact traces back to its source. Where sources disagree, the disagreement is shown rather than resolved silently.
+
+Pharmacy Commons is an educational resource for clinical and public inquiry. It is not a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
+
+Every medicine has a stable identifier, the PCID (Pharmacy Commons Identifier), and a permanent address at `https://pharmacycommons.org/id/PCID-<number>`. Search and browse list active moieties; salts, precise forms, brands and combinations nest under the moiety's page.
+
+## Main pages
+
+- [Browse the catalog](https://pharmacycommons.org/browse): every active ingredient, A to Z. Search with `/browse?q=<term>`.
+- [Drug pages](https://pharmacycommons.org/drugs/metformin): one page per active moiety at `/drugs/<slug>`, with identifiers, classes, FDA labeling, brands and sources.
+- [Drug classes](https://pharmacycommons.org/classes): pharmacologic, therapeutic and chemical classes from RxClass, ClassyFire and ChemOnt.
+- [Lists](https://pharmacycommons.org/lists): compendium lists such as the most-used drugs in the US and Georgia MPJE drug lists.
+- [Tools](https://pharmacycommons.org/tools): clinical calculators, including creatinine clearance.
+- [About](https://pharmacycommons.org/about): mission, values, licensing and founder.
+- [Citations](https://pharmacycommons.org/citations): how to cite records and the sources used.
+
+## Data and licensing
+
+- Code: GPL-3.0-or-later. Content authored by Pharmacy Commons: CC0 1.0. Third-party fields keep their source license, and each record states the scope.
+- [Source code and data exports](https://github.com/JoshuaSemock/pharmacycommons.org)
+- [Machine-readable API design](https://github.com/JoshuaSemock/pharmacycommons.org/blob/main/docs/machine-readable-api.md)
+
+## Contact
+
+- Corrections and questions: contact@pharmacycommons.org

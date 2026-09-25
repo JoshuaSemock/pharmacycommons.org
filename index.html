@@ -3,48 +3,142 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pharmacy Commons</title>
+
+    <!--
+      The only HTML entry point. (index-updated.html was an older draft of this
+      file and has been removed.)
+
+      Everything between the pc:meta markers below, and between the pc:shell
+      markers in <body>, is rewritten per route by scripts/postbuild.mjs, which
+      writes dist/<route>.html copies so deep links return HTTP 200 with the
+      right title, description and canonical. Keep the markers.
+    -->
+    <!-- pc:meta -->
+    <title>Pharmacy Commons: open drug information and pharmacology reference</title>
     <meta
       name="description"
-      content="Pharmacy Commons is a free, open-access pharmacology reference. Restructured drug data from the FDA, WHO, and NIH, with environmental impact metrics for greener prescribing."
+      content="Pharmacy Commons is a free, open-access pharmacology reference. Search drugs by active ingredient, preparation, pharmacologic class, and compendium list, with every fact traced to public sources such as the FDA, WHO, and NIH."
     />
     <link rel="canonical" href="https://pharmacycommons.org/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pharmacy Commons" />
+    <meta
+      property="og:description"
+      content="A free, open-access pharmacology reference. Structured drug data from public sources, traceable to its origin, with environmental impact alongside clinical information."
+    />
+    <meta property="og:url" content="https://pharmacycommons.org/" />
+    <!-- /pc:meta -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:site_name" content="Pharmacy Commons" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://pharmacycommons.org/logo.png" />
+    <meta property="og:image:width" content="700" />
+    <meta property="og:image:height" content="700" />
+    <meta property="og:image:alt" content="Pharmacy Commons logo: a bowl of Hygieia on a green cross" />
+    <meta name="twitter:card" content="summary" />
 
-    <!-- Icons. Verify each of these exists in public/ — a missing file here is
-         a silent 404 that only shows up in the network tab. -->
+    <!-- Icons. favicon.svg is deliberately not linked: it is a 207 KB Canva
+         export, and browsers that support SVG icons prefer it over the 2 KB PNG. -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="apple-mobile-web-app-title" content="Ph. Commons" />
     <meta name="theme-color" content="#f2f5f0" />
+    <meta name="color-scheme" content="light" />
 
-    <!-- Link previews. These are static for every route: a shared blog post
-         shows the site-level card, not the post's own title. Per-page cards
-         need prerendering at build time. -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Pharmacy Commons" />
-    <meta property="og:title" content="Pharmacy Commons" />
-    <meta
-      property="og:description"
-      content="A free, open-access pharmacology reference with environmental impact metrics for greener prescribing."
+    <!-- The lichen background is the Largest Contentful Paint element, but CSS
+         only discovers it after the stylesheet loads. Preload whichever one the
+         breakpoint in src/index.css (780px) will use. -->
+    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg_mobile.webp" media="(max-width: 780px)" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg.webp" media="(min-width: 781px)" fetchpriority="high" />
+
+    <!-- Machine-readable entry points for crawlers and AI agents. -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />
+
+    <!--
+      Web fonts: one combined request, preconnected, loaded without blocking
+      first paint (the page renders in the fallback fonts, then swaps). These
+      used to be three chained @imports inside src/index.css.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
-    <meta property="og:url" content="https://pharmacycommons.org/" />
-    <meta property="og:image" content="https://pharmacycommons.org/logo.png" />
-    <meta name="twitter:card" content="summary" />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap"
+      />
+    </noscript>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://pharmacycommons.org/#organization",
+            "name": "Pharmacy Commons",
+            "url": "https://pharmacycommons.org/",
+            "logo": "https://pharmacycommons.org/logo.png",
+            "email": "contact@pharmacycommons.org",
+            "description": "An open-access pharmacology reference that manages drug knowledge as a public commons: structured records from public and federal sources, each fact traceable to its source.",
+            "foundingDate": "2026",
+            "founder": { "@id": "https://pharmacycommons.org/#founder" },
+            "sameAs": ["https://github.com/JoshuaSemock/pharmacycommons.org"]
+          },
+          {
+            "@type": "Person",
+            "@id": "https://pharmacycommons.org/#founder",
+            "name": "Joshua Semock",
+            "honorificSuffix": "PharmD",
+            "jobTitle": "Founder",
+            "alumniOf": "University of Colorado Anschutz Medical Campus, Skaggs School of Pharmacy and Pharmaceutical Sciences"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://pharmacycommons.org/#website",
+            "name": "Pharmacy Commons",
+            "url": "https://pharmacycommons.org/",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://pharmacycommons.org/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://pharmacycommons.org/browse?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
 
     <!--
       GitHub Pages SPA routing, half two.
 
-      Pages has no server-side rewrite, so a direct request to /blog/some-post
-      returns 404.html. That file stashes the requested path and bounces here.
-      This script puts the path back into the address bar before main.tsx runs,
-      so React Router boots on the correct route.
+      Pages has no server-side rewrite, so a request for a path with no file
+      behind it returns 404.html. That file stashes the requested path and
+      bounces here. This script puts the path back into the address bar before
+      main.tsx runs, so React Router boots on the correct route.
 
-      Must stay in <head> and stay non-module. The module script at the bottom
-      of <body> is deferred, so this always runs first.
+      It also marks the document so the static homepage shell below stays
+      hidden: a visitor headed for /drugs/x should not see the homepage flash
+      before React renders their page.
+
+      Must stay in <head> and stay non-module. The module script is deferred,
+      so this always runs first.
     -->
+    <style>
+      html.pc-deeplink #pc-shell { display: none; }
+    </style>
     <script>
       (function () {
         try {
@@ -55,20 +149,117 @@
           // crafted value from turning into a protocol-relative URL.
           if (redirect.charAt(0) === '/' && redirect.charAt(1) !== '/') {
             window.history.replaceState(null, '', redirect)
+            if (redirect !== '/') document.documentElement.className += ' pc-deeplink'
           }
         } catch (e) {
-          /* sessionStorage unavailable (private mode, blocked cookies) —
-             the user lands on the homepage, which is an acceptable fallback. */
+          /* sessionStorage unavailable (private mode, blocked cookies): the
+             user lands on the homepage, which is an acceptable fallback. */
         }
       })()
     </script>
+    <script type="module" src="/src/main.tsx"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!--
+        Static shell. Painted straight from the HTML, before any JavaScript
+        runs, so first paint no longer waits on the bundle, and crawlers and
+        agents that do not execute JavaScript still get real content.
+        React's createRoot() replaces all of it on mount. The hero reuses
+        Home.tsx's classes so the swap does not visibly move anything; keep
+        the two in step when either changes.
+      -->
+      <!-- pc:shell -->
+      <div id="pc-shell" class="page-background min-h-full">
+        <div class="page-content flex min-h-screen flex-col">
+          <header class="sticky top-0 z-50 border-b border-sage-200 bg-sage-50/90">
+            <div class="mx-auto flex h-14 max-w-page items-center gap-4 px-4 sm:px-6">
+              <a href="/" class="flex shrink-0 items-center gap-2.5" aria-label="Pharmacy Commons home">
+                <span class="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sage-100">
+                  <img src="/logo-40.png" alt="" width="20" height="20" class="h-5 w-5 object-contain" />
+                </span>
+                <span class="hidden font-sans text-[15px] font-medium tracking-[-0.01em] text-sage-900 sm:block">Pharmacy Commons</span>
+              </a>
+            </div>
+          </header>
+
+          <main class="mx-auto max-w-page px-4 pb-24 sm:px-6">
+            <section class="pt-16 pb-14 text-center">
+              <p class="mb-3 font-sans text-[13px] font-medium text-hepatica-700">
+                Cultivating our pharmacopeial commons: an open compendium of clinical evidence and drug information accessible to all.
+              </p>
+              <h1 class="mb-4 font-display text-4.2xl font-semibold leading-[1.1] text-balance text-mint-950 sm:text-5xl">
+                Query structured data by active ingredients, preparations, pharmacologic classes, and compendium lists.
+              </h1>
+              <p class="mx-auto mb-8 max-w-xl font-sans text-[21px] leading-relaxed text-pretty text-mint-700">
+                An open educational source for clinical and public inquiry, not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
+              </p>
+              <p class="mt-5 font-sans text-[13.5px] text-mint-700">
+                <a href="/browse" class="font-medium text-hepatica-700 underline-offset-2 hover:underline">Browse the full catalog, A to Z</a>
+                · <a href="/classes" class="font-medium text-hepatica-700 underline-offset-2 hover:underline">Drug classes</a>
+                · <a href="/lists" class="font-medium text-hepatica-700 underline-offset-2 hover:underline">Lists</a>
+                · <a href="/tools" class="font-medium text-hepatica-700 underline-offset-2 hover:underline">Tools</a>
+              </p>
+            </section>
+
+            <div class="mx-auto max-w-4xl text-left font-sans text-[16px] leading-relaxed text-sage-900">
+              <section class="border-t border-sage-200 py-9">
+                <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900">About Pharmacy Commons</h2>
+                <p>
+                  Pharmacy Commons is an open interface to structured pharmaceutical records. Information is sourced from public and
+                  federal repositories such as the FDA, WHO, NIH, and NLM, then modeled in a relational PostgreSQL database so that
+                  both human researchers and AI language models can retrieve evidence-bearing answers with clear citations.
+                </p>
+              </section>
+
+              <section class="border-t border-sage-200 py-9">
+                <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900">Our mission</h2>
+                <p>
+                  To unenclose pharmaceutical knowledge as a durable public trust. Since the public finances the discovery and
+                  validation of medical science, authoritative clinical evidence and drug facts should remain permanently transparent
+                  and portable for all.
+                </p>
+              </section>
+
+              <section class="border-t border-sage-200 py-9">
+                <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900">What you can do here</h2>
+                <ul class="list-disc space-y-2 pl-5">
+                  <li>Look up a medicine by its colloquial name. Each one has a stable identifier (a PCID) and a permanent address.</li>
+                  <li>Browse by pharmacologic class, with links back to source classification systems such as RxNorm and PubChem.</li>
+                  <li>Search and compare compendium lists, such as the most-used drugs in the US and MPJE testable drugs.</li>
+                  <li>Use clinical tools, starting with the <a href="/tools/creatinine-clearance" class="text-hepatica-700 underline decoration-hepatica-500 underline-offset-2">creatinine clearance calculator</a>.</li>
+                </ul>
+              </section>
+
+              <section class="border-t border-sage-200 py-9">
+                <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900">Every fact traces to its source</h2>
+                <p>
+                  Each record links to where it came from, for example an FDA document identifier or a clinical study citation.
+                  Where sources disagree, the disagreement is shown rather than a side being chosen. Where reliable data exist,
+                  estimated environmental risk sits alongside clinical information, so prescribers can weigh it among clinically
+                  appropriate options.
+                </p>
+              </section>
+
+              <section class="border-t border-sage-200 py-9">
+                <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900">Founder and contact</h2>
+                <p>
+                  Pharmacy Commons is founded and maintained by Dr. Joshua Semock, PharmD. Corrections and questions are welcome at
+                  <a href="mailto:contact@pharmacycommons.org" class="text-hepatica-700 underline decoration-hepatica-500 underline-offset-2">contact@pharmacycommons.org</a>.
+                  <a href="/about" class="text-hepatica-700 underline decoration-hepatica-500 underline-offset-2">Read more about the project</a>.
+                </p>
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+      <!-- /pc:shell -->
+    </div>
     <noscript>
-      Pharmacy Commons needs JavaScript to run. Source and data exports are at
-      <a href="https://github.com/JoshuaSemock/pharmacycommons.org">github.com/JoshuaSemock/pharmacycommons.org</a>.
+      <p style="max-width: 40rem; margin: 1rem auto; padding: 0 1rem; font-family: system-ui, sans-serif; overflow-wrap: anywhere">
+        Search and drug pages on Pharmacy Commons need JavaScript. Source code and data exports are at
+        <a href="https://github.com/JoshuaSemock/pharmacycommons.org">github.com/JoshuaSemock/pharmacycommons.org</a>.
+      </p>
     </noscript>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

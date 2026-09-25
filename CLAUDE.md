@@ -155,7 +155,20 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools` (CrCl calculator) · `/resources` · `/citations`
 · `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
-`public/404.html` → sessionStorage → `index.html` restore.
+`public/404.html` → sessionStorage → `index.html` restore, but known routes no
+longer need it: `scripts/postbuild.mjs` (runs after `vite build`) writes
+`dist/<route>.html` copies of `index.html` with per-route title, description,
+canonical and a static heading, so they return HTTP 200, and writes
+`dist/sitemap.xml`. Static routes, blog posts and lists always; every class and
+moiety page only with `PRERENDER_ALL=1`. Keep the `<!-- pc:meta -->` and
+`<!-- pc:shell -->` markers in `index.html`.
+
+**index.html** is the single entry point (`index-updated.html` removed
+2026-09-25). `#root` holds a static shell (hero + About summary) that paints
+before JS and that React replaces on mount; its hero mirrors `Home.tsx`, keep
+them in step. Fonts load from `index.html` (one Google Fonts request, non-blocking),
+not `@import` in `src/index.css`. All routes except Home are `lazy()` in `App.tsx`.
+Lighthouse baseline and fixes: `docs/performance-2026-09-25.md`.
 
 **Search/browse shows moieties only.** `src/catalog.ts` `loadCatalog()` filters
 `catalog_entries` to `entity_type='moiety'`; precise forms, brands and combinations
@@ -278,10 +291,10 @@ formulations in the moiety hierarchy (phase 10).
   `phase4_physiochemical_table.sql` (exist in the Project docs) and the class /
   RxNorm / label migrations that were applied only via `apply_migration`.
 - Scripts named in `docs/project-history.md` (`02_transform.py`, `04_validate.py`,
-  `04b`–`04f`) are not in `scripts/`. `package.json`'s `sitemap` script points at a
-  missing `scripts/generate-sitemap.mjs`.
-- Stray/dead files: `drug.html`, `index-updated.html`, root
-  `index.css`; `public/drug-catalog.json` (~31k lines, nothing reads it);
+  `04b`–`04f`) are not in `scripts/`.
+- Stray/dead files: `drug.html`, root `index.css`; `public/favicon.svg` and
+  `public/Pharmacy_Commons_Logo_Canva_144.svg` (207 KB each, no longer linked);
+  `assets/textures/*.jpg` (source files; the site serves `public/textures/*.webp`); `public/drug-catalog.json` (~31k lines, nothing reads it);
   `public/drug.html`; `docs/schema-updates.sql` and `docs/data-model-decisions.md` §4
   (legacy API/PIN/FRM); `.md/*` (Figma-Make/Agent-3 era, wrong numbers).
   Confirm with Joshua before deleting.

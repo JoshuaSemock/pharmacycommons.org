@@ -18,3 +18,6 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Written by scripts/postbuild.mjs into dist/, never into public/
+public/sitemap.xml
