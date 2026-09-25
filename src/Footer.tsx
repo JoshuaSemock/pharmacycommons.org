@@ -13,8 +13,8 @@ const YEAR = new Date().getFullYear()
 
 const LINKS = [
   { to: '/about', label: 'About' },
-  { to: '/resources', label: 'Sources' },
-  { to: '/citations', label: 'Cite' },
+  { to: '/references', label: 'References' },
+  { to: '/resources', label: 'Resources' },
 ]
 
 export default function Footer() {

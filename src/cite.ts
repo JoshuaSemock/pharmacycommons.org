@@ -1,5 +1,5 @@
 /**
- * Citation formatting for the Citations page.
+ * Citation formatting for the References page.
  *
  * Two inputs: a Commons page (user-entered fields) and an upstream reference
  * (structured metadata in sources.ts). Anything missing is dropped rather than

@@ -8,11 +8,12 @@ import { ALL_SOURCES, SOURCE_GROUPS } from '../sources'
 import type { Source } from '../sources'
 
 /**
- * Citations. Style and access date live in the rail and apply to every
+ * References (formerly Citations, /citations still redirects here). Style and
+ * access date live in the rail and apply to every
  * citation on the page, so a reader picks them once. Below lg the rail stacks
  * above the content, which keeps the style picker ahead of what it controls.
  */
-export default function Citations() {
+export default function References() {
   const [style, setStyle] = useState<Style>('ama')
   const [accessed, setAccessed] = useState(todayISO())
   const { copiedKey, copy } = useCopy()
@@ -45,7 +46,7 @@ export default function Citations() {
 
   return (
     <PageShell
-      kicker="Citations"
+      kicker="References"
       title="Cite the Commons and its sources"
       lede="Pick a citation style once and every citation on this page follows it. Blank fields are dropped rather than filled with placeholders — check the output against your target journal's instructions before submitting."
       aside={
@@ -60,13 +61,14 @@ export default function Citations() {
       <PageCitation style={style} accessed={accessed} copied={copiedKey === 'page'} onCopy={copy} />
 
       <section className="border-t border-sage-200 py-9">
-        <SectionHeading id="references">References</SectionHeading>
+        <SectionHeading id="source-datasets">Source datasets</SectionHeading>
         <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
           <p>
             For anything load-bearing — a dose, a contraindication, an approval date — cite
             the primary record, not this site. These are the datasets the Commons is built
             from. Where a maintainer asks to be cited through a paper, the paper is given
-            instead of the website. License terms and what each source feeds are on the{' '}
+            instead of the website. Each entry shows its license and what it feeds on this
+            site. Sites we point readers to but don't draw data from are on the{' '}
             <Link to="/resources" className={linkClass}>
               Resources
             </Link>{' '}
@@ -111,11 +113,45 @@ export default function Citations() {
           </div>
         ))}
       </section>
+
+      <Reuse />
     </PageShell>
   )
 }
 
 /* ----------------------------------------------------------------- sections */
+
+/** Licensing of what this site publishes. Moved here from Resources. */
+function Reuse() {
+  return (
+    <section className="border-t border-sage-200 py-9">
+      <SectionHeading id="reuse">Reuse</SectionHeading>
+      <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
+        <p>
+          The application code is GPL-3.0. Data original to Pharmacy Commons is dedicated to
+          the public domain under{' '}
+          <a
+            href="https://creativecommons.org/publicdomain/zero/1.0/"
+            target="_blank"
+            rel="noreferrer"
+            className={linkClass}
+          >
+            CC0 1.0
+          </a>
+          . Third-party data keeps its source license: anything drawn from a source marked
+          CC BY-NC 4.0 above still restricts commercial reuse.
+        </p>
+        <p>
+          If you need a dataset export for research, write to{' '}
+          <a href="mailto:contact@pharmacycommons.org?subject=Dataset%20request" className={linkClass}>
+            contact@pharmacycommons.org
+          </a>{' '}
+          and say what you intend to do with it.
+        </p>
+      </div>
+    </section>
+  )
+}
 
 function PageCitation({
   style,
