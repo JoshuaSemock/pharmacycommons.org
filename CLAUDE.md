@@ -135,8 +135,9 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   neutral (floral white `#faf9f5` → black olive `#3a3a3a`). Steps 50–950, base 400;
   50–600 fills only, 700+ text (≥5:1 on floral white). Legacy sage/aqua/violet/coral/
   amber names are aliases pending migration. Fonts **as shipped**: Newsreader
-  (display) + IBM Plex Sans Condensed / IBM Plex Mono. Lichen texture overlay
-  (`public/assets/textures/lichen_seamless.jpg`, multiply, 6% desktop / 8% mobile);
+  (display) + IBM Plex Sans Condensed / IBM Plex Mono. Lichen photo overlay
+  (`public/textures/lichen_bg.webp`, `lichen_bg_mobile.webp` below 780px, multiply,
+  15%, preloaded in `index.html` as the LCP element);
   phi (1.618) type scale.
   ⚠ An older note named Playfair + Figtree — that is **not** what the code uses. Ask
   Joshua before changing fonts either way.
