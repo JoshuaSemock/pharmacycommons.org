@@ -27,6 +27,13 @@ UWorld RxPrep and McGraw Hill lists were **dropped by Joshua** and never loaded.
 | 10000021 | georgia-mpje-controlled-substances (O.C.G.A. §§ 16-13-25 to 16-13-29) | 405 |
 | 10000022 | georgia-mpje-exceptions | 105 |
 | 10000023 | do-not-crush (source: `Do_Not_Drugs.xlsx`, run `lists-do-not-crush-2026-09-25`) | 226 |
+| 10000024 | georgia-mpje — parent of 10000020–22 (run `lists-sublists-2026-09-25`) | 2,919 (union of the three parts; statuses combined) |
+| 10000025–30 | do-not-crush-* — one sub-list per reason, parent = do-not-crush | modified-release 142 · transmucosal 7 · irritant 25 · unpleasant-taste 14 · hazardous-teratogenic 33 · other 41 |
+
+### Sub-lists (2026-09-25, Joshua)
+
+- **Georgia MPJE** is one list with three parts. The three existing lists keep their PCIDs and slugs and now have `parent_pcid = 10000024`; titles became "Georgia MPJE: Legend drugs / Controlled substances / Exceptions". The parent holds every drug on any part (2,920 rows → 2,919 drugs; one drug is on two parts), with `legal_status` = the part's status (Legend, CS-n, non-Rx, …), so its Status filter reproduces each part.
+- **Do Not Crush** has a sub-list per reason. A drug with two reasons is on both sub-lists; each entry keeps its full reason, note and sources.
 
 ### Do Not Crush (added 2026-09-25, migration `phase9b_lists_status_label_sources`)
 

@@ -225,11 +225,12 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 | `physiochemical` | **0** (CAS backfill not run) |
 
 `pcid_blocks.next_pcid` (2026-09-25): 1→1015620, 2→2002471, 3→3001452, 4→4006582,
-5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000024.
+5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000031.
 
-Lists (Phase 9, `db/phase9-lists.md`): 23 published lists — `most-used-drugs-us`
-(MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, and three Georgia MPJE
-lists (legend 2,410 · controlled 405 · exceptions 105), and `do-not-crush` (226; reason per drug in `legal_status`, named by `lists.status_label`). Read RPCs: `list_lists`,
+Lists (Phase 9, `db/phase9-lists.md`): 30 published lists — `most-used-drugs-us`
+(MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, `georgia-mpje` (2,919) +
+3 parts (legend 2,410 · controlled 405 · exceptions 105), and `do-not-crush` (226; reason per
+drug in `legal_status`, named by `lists.status_label`) + 6 reason sub-lists. Read RPCs: `list_lists`,
 `get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
 Deployed Edge Functions (8): `api` (public), `label-text`, `drugsfda-ingest`,

@@ -55,3 +55,8 @@ grant execute on function public.list_lists(), public.get_list(text), public.get
 -- Data (run `lists-do-not-crush-2026-09-25`, via execute_sql, not part of the migration):
 --   PCID-2002470 combination drospirenone/estetrol minted (block 2 next_pcid → 2002471)
 --   PCID-10000023 list do-not-crush, 226 items, published (block 10 next_pcid → 10000024)
+--
+-- Follow-up data run `lists-sublists-2026-09-25` (execute_sql):
+--   PCID-10000024 georgia-mpje (parent of 10000020–22; items = union, statuses combined)
+--   PCID-10000025–30 do-not-crush-* reason sub-lists (parent 10000023)
+--   block 10 next_pcid → 10000031
