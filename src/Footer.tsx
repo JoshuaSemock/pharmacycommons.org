@@ -66,6 +66,10 @@ export default function Footer() {
               <li>
                 <a href={REPO_URL} target="_blank" rel="noreferrer" className={link}>GitHub</a>
               </li>
+              <li>
+                {/* A static file written at build time, not a React route, so a plain <a>. */}
+                <a href="/sitemap.xml" className={link}>Sitemap</a>
+              </li>
             </ul>
           </nav>
         </div>
