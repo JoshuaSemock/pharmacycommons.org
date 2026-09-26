@@ -2,21 +2,38 @@
 title: "Build Log: From Twelve Mock Drugs to 31,306 Records"
 author: Joshua Semock, PharmD
 date: 2026-09-26
-summary: "How Pharmacy Commons went from a prototype to a versioned, machine-readable drug knowledge base in September 2026, and what shipped this week: lists, FDA product linking, and a faster site."
+summary: "How Pharmacy Commons went from spreadsheets in July to a versioned, machine-readable drug knowledge base, and what shipped this week: lists, FDA product linking, and a faster site."
 tags: [Pharmacy Commons,Build Log]
 ---
 **September 26th, 2026
 Joshua Semock, PharmD · pharmacycommons.org**
 
-This is the first build log for Pharmacy Commons. It covers the month from the first prototype to today: what we built, what we threw away, and what's still open. The [founding essay](/blog/This-is-Our-Commons) explains why the project exists. This post is about how it is being built.
+This is the first build log for Pharmacy Commons. It covers everything from the first spreadsheets in July to today: what we built, what we threw away, and what's still open. The [founding essay](/blog/This-is-Our-Commons) explains why the project exists. This post is about how it is being built.
 
 ## The rule everything follows
 
 One principle shapes every decision: **humans → machines → humans.** Every drug record should have a page a person can read, a stable address, a permanent identifier, a structured JSON version a program can read, its sources, and a history of every change. The website is one way into that knowledge, not the place where it is locked up. And when two public sources disagree, the site shows the disagreement instead of quietly picking a winner.
 
+## July 3 – September 1: spreadsheets before SQL
+
+Pharmacy Commons started as research, not code. From July 3 I spent two months tracking down public drug data and working out what each source actually covers, who publishes it, and on what terms. Those sources include FDA, NLM's RxNorm and DailyMed, NIH, WHO's ATC classification, UNII and CAS identifiers, and the chemical taxonomies. All of it went into Excel.
+
+That workbook became the first version of the data model. There was one sheet per kind of thing: active moieties, combination products, salts and esters, marketed formulations, pharmacologic classes. Alongside those sat a sheet for identifier blocks, a dispatch log recording every batch of new entries, a sandbox for incoming rows, and a holding sheet for anything I couldn't classify yet. Most of the hard questions were answered here before there was a database to answer them in:
+
+- What counts as one drug?
+- When is a salt its own entry?
+- How do you split a combination into its parts?
+- What do you do with a name that matches nothing?
+
+The database that came later is largely this workbook turned into tables, and it is still where batch imports start.
+
+## September 2: a name worth protecting
+
+On September 2 I searched the USPTO trademark records for "Pharmacy Commons" and decided to file an intent-to-use application. The name is meant to point to one open, trustworthy reference. Protecting it keeps it from being picked up for something that isn't open. The filing is still on the to-do list.
+
 ## Early September: a prototype, then a restart
 
-The first version was a design scaffold (React, Vite and Tailwind) showing twelve made-up drugs from a static file. Next came a real database in Supabase (PostgreSQL) holding 23 test drugs, including metformin, sertraline, lisinopril and a few combinations like Augmentin, along with an API layer and a set of tests.
+With the data model settled on paper, the first version was a design scaffold (React, Vite and Tailwind) showing twelve made-up drugs from a static file. Next came a real database in Supabase (PostgreSQL) holding 23 test drugs, including metformin, sertraline, lisinopril and a few combinations like Augmentin, along with an API layer and a set of tests.
 
 A lot of that first pass did not survive. The first drug identifier was a hash of the drug's name. That breaks the moment a name is corrected, so we dropped it, along with two other identifier schemes that came after it. The lesson stuck: **an identifier has to outlive every fact attached to it.**
 
