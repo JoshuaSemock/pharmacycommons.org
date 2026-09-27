@@ -17,6 +17,12 @@ const CLINICAL: Tool[] = [
     to: '/tools/creatinine-clearance',
   },
   {
+    name: 'Medication reconciliation',
+    blurb: 'One complete list of prescriptions, over-the-counter products, supplements, herbals and alternative medicines, plus allergies and caffeine, nicotine, alcohol and recreational substance use. Directions are written out in full with no abbreviations, with the dose and 24-hour maximum calculated so they always agree. The list stays in your browser: save it as CSV, reopen it later, or print it.',
+    status: 'live',
+    to: '/tools/medication-reconciliation',
+  },
+  {
     name: 'Body surface area',
     blurb: 'Mosteller and Du Bois, with the divergence between them shown — it matters at the extremes of size.',
     status: 'planned',

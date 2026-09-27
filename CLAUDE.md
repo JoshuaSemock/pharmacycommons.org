@@ -149,12 +149,15 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 - **Tests:** vitest. `tests/api.test.ts` mocks `@/supabaseClient` with an in-memory
   query builder so CI runs offline — keep it that way.
 - **Code style:** default-export components; no `any`; double quotes for strings
-  containing apostrophes; format with `oxfmt`.
+  containing apostrophes; format with `oxfmt` — but not 0.2, which corrupts code
+  (see Known drift). Match the existing style by hand: single quotes, no
+  semicolons, `x => …` arrows.
 
 ## Routes (src/App.tsx)
 `/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
-7- and 8-digit PCIDs) · `/tools` (CrCl calculator) · `/resources` (outside links we
+7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
+`/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`) · `/resources` (outside links we
 don't draw data from; `src/resources.ts`) · `/references` (citable data sources,
 `src/sources.ts`; `/citations` redirects here since 2026-09-25)
 · `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
@@ -319,6 +322,15 @@ formulations in the moiety hierarchy (phase 10).
   `needs_manual_review.csv`.
 - Tests: `api.test.ts` / `integration.test.ts` not yet updated for moiety-only
   filtering and hierarchy.
+- **Heading sizes:** the `h1`–`h6` font-size rules in `src/index.css` are unlayered,
+  so they outrank Tailwind's `text-*` utilities (which live in `@layer utilities`).
+  A `text-[22px]` on an `h2` is ignored site-wide. Wrapping them in `@layer base`
+  fixes it but resizes headings everywhere — Joshua's design call. New code sets
+  heading sizes inline until then.
+- **`oxfmt` 0.2 is unsafe:** it deletes the separators in one-line object types
+  (`{ a: string; b: number }` → `{ a: string b: number }`), and it would reformat
+  nearly every file in `src/` (the code is not actually kept in its style). Don't
+  run `pnpm format` until it's upgraded or replaced.
 
 ## Decisions that belong to Joshua — ask, don't decide
 - `/api` hosting on the site domain; trademark timing.
