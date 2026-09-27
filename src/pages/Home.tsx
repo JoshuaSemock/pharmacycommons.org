@@ -8,6 +8,12 @@ import { formatDate, listPosts } from '../blog'
 const BROWSE_PARAMS = ['q', 'letter', 'mode', 'per']
 const RECENT_POSTS = 3
 
+/** Autofocus the search box only with a mouse or trackpad. On a phone it pops
+    the keyboard (Android) or zooms the page (iOS) before the visitor has
+    looked at anything. */
+const FINE_POINTER =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
+
 export default function Home() {
   const { search } = useLocation()
   const legacyBrowse = BROWSE_PARAMS.some(k => new URLSearchParams(search).has(k))
@@ -88,7 +94,7 @@ function Hero() {
               placeholder="...ibuprofen, Advil, NSAID, analgesic, pain, etc."
               aria-label="Search the catalog"
               className="flex-1 bg-transparent font-sans text-[14px] text-mint-900 placeholder-mint-400 outline-none"
-              autoFocus
+              autoFocus={FINE_POINTER}
             />
             {query && (
               <button
