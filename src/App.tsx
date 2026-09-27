@@ -26,6 +26,7 @@ const ListDetail = lazy(() => import('./pages/ListDetail'))
 const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
+const MedicationReconciliation = lazy(() => import('./tools/MedicationReconciliation'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
@@ -59,6 +60,10 @@ export default function App() {
             <Route
               path="/tools/creatinine-clearance"
               element={<CreatinineClearance />}
+            />
+            <Route
+              path="/tools/medication-reconciliation"
+              element={<MedicationReconciliation />}
             />
             <Route path="/resources" element={<Resources />} />
             <Route path="/references" element={<References />} />

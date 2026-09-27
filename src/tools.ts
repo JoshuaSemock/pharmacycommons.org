@@ -30,6 +30,15 @@ export const TOOLS: Tool[] = [
     to: '/tools/creatinine-clearance',
   },
   {
+    id: 'medication-reconciliation',
+    name: 'Medication reconciliation',
+    blurb: 'One complete list of prescriptions, over-the-counter products, supplements, herbals and alternative medicines, plus allergies and substance use. Directions are written out in full with no abbreviations, and the list stays in your browser: save it as CSV, reopen it later, or print it.',
+    summary: 'Medication list, allergies, and directions builder',
+    status: 'live',
+    group: 'clinical',
+    to: '/tools/medication-reconciliation',
+  },
+  {
     id: 'body-surface-area',
     name: 'Body surface area',
     blurb: 'Mosteller and Du Bois, with the divergence between them shown — it matters at the extremes of size.',

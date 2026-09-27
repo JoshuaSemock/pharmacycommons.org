@@ -313,3 +313,20 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
     font-size: max(16px, 1em);
   }
 }
+
+/* Print: a page whose <main> carries data-print-page prints without the nav,
+   footer and lichen texture; inside it, print:hidden removes everything but
+   the [data-print] block. Landscape is set by that page itself (an @page rule
+   added while it is mounted) — a named page (`page:` on <main>) made Chrome
+   break the table onto a new sheet at every row. Other pages print as before. */
+@media print {
+  body:has(main[data-print-page]) .page-content > :not(main) {
+    display: none !important;
+  }
+  body:has(main[data-print-page]) .page-background::before {
+    display: none;
+  }
+  body:has(main[data-print-page]) {
+    background: #fff;
+  }
+}

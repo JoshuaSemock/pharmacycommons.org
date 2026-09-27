@@ -80,6 +80,11 @@ const STATIC_ROUTES = [
     description: 'Estimate creatinine clearance with the Cockcroft-Gault equation, with weight adjustments and medication dosing references.',
   },
   {
+    path: '/tools/medication-reconciliation',
+    title: 'Medication reconciliation',
+    description: 'Build a complete medication list with allergies and substance use. Directions are written out in full with no abbreviations. The list stays in your browser and saves as CSV or PDF.',
+  },
+  {
     path: '/resources',
     title: 'Resources',
     heading: 'Resources beyond the Commons',
