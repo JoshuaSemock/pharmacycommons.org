@@ -27,6 +27,11 @@ import { drugWithBrand, formatBrandName, formatDrugName } from './names'
 
 /** 0 means no cap — every remaining entry renders at once. */
 const PAGE_SIZES = [50, 100, 500, 0] as const
+
+/** Refocus the search box on arrival only with a mouse or trackpad; on a
+    phone it pops the keyboard (Android) or zooms the page (iOS). */
+const FINE_POINTER =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
 const DEFAULT_PAGE = 50
 
 /**
@@ -198,7 +203,7 @@ export default function SearchView() {
               placeholder="e.g. metformin, Glucophage, metformin/sitagliptin, SSRI"
               aria-label="Filter the catalog"
               className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
-              autoFocus={!!query}
+              autoFocus={!!query && FINE_POINTER}
             />
             {query && (
               <button onClick={() => setQuery('')} className="text-sage-400 hover:text-sage-600" aria-label="Clear search">

@@ -295,3 +295,21 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   min-width: 0;
   overflow-wrap: break-word;
 }
+
+/* Phones: form controls at 16px minimum. iOS Safari zooms the page in
+   whenever a field with text under 16px gets focus, and never zooms back
+   out, so the page sits at ~114% with the right edge cut off until the
+   user pinches. The home search box autofocuses, and /browse focuses its
+   box whenever the URL carries a query, so this happened on page load.
+   The layout itself was not overflowing (every route measures 375px at
+   375px). This is unlayered, so it beats the text-[12px]/text-[14px]
+   utilities (which live in @layer utilities) without !important. Do not
+   "fix" this with maximum-scale=1 in the viewport meta: on Android that
+   also blocks pinch-zoom, which is an accessibility failure. */
+@media (max-width: 767px), (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
