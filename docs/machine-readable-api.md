@@ -102,7 +102,7 @@ record is next read, so its version date would be the read date.
 |---|---|---|
 | `site_base` | `https://pharmacycommons.org` | base of `@id` IRIs — changing it changes every record's identity |
 | `api_base` | Supabase function URL | switch when the API moves to the site domain |
-| `data_license` / `data_license_url` | **unset** | documents report `null` until the Creative Commons variant is chosen |
+| `data_license` / `data_license_url` / `data_license_scope` | `CC0-1.0` (applied 2026-09-28, `db/phase8j_data_license.sql`) | Pharmacy Commons–authored content; third-party fields keep their source terms |
 | `schema_version` | `1.0.0` | bump with any document shape change |
 
 ## Serving from pharmacycommons.org

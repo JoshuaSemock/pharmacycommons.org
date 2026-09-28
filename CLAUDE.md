@@ -341,13 +341,15 @@ formulations in the moiety hierarchy (phase 10).
   A `text-[22px]` on an `h2` is ignored site-wide. Wrapping them in `@layer base`
   fixes it but resizes headings everywhere — Joshua's design call. New code sets
   heading sizes inline until then.
-- **Migrations `phase8i_public_read_surfaces` and `phase8j_data_license` were never
-  applied** (checked 2026-09-28 against `supabase_migrations.schema_migrations`), although
-  both files say they were. Live effect: `api_meta.data_license` is NULL, so every API
-  document reports `"license": null`; the class RPCs are still SECURITY DEFINER; and
-  `entity_labels` is a SECURITY DEFINER view with INSERT/UPDATE/DELETE/TRUNCATE granted to
-  anon (not exploitable today — the view is not updatable — but untidy). Apply both once
-  Joshua confirms.
+- `phase8i_public_read_surfaces` and `phase8j_data_license` were **not actually applied
+  until 2026-09-28** (both files had said 2026-09-24). Now applied as written: API documents
+  report `license.data = "CC0-1.0"`; the class RPCs are SECURITY INVOKER; label tables have
+  `public_read` policies and `entity_labels` is security_invoker, SELECT-only. Verified: the
+  anon role sees the same label and class counts before and after. `api_snapshot_all()` was
+  run for every type afterwards and recorded 15,688 versions — the license change plus
+  edits and derived refreshes pending since phase 10 (25 Sept) that had never been
+  snapshotted. **Lesson: after any migration, confirm it in
+  `supabase_migrations.schema_migrations` before writing "applied" in a file.**
 - `db/CLAUDE.md` is a stale copy of this file from 2026-09-24; the root `CLAUDE.md` is
   authoritative.
 - Duplicate combination records exist under different name orders, e.g. "hydrochlorothiazide;
