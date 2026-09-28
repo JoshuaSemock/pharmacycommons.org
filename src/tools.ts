@@ -71,6 +71,14 @@ export const TOOLS: Tool[] = [
     section: 'calculators',
   },
   {
+    id: 'days-supply',
+    name: 'Days supply and quantity',
+    blurb:
+      'Quantity from directions and days, or days from quantity, with package size, priming, drops per mL, and in-use limits counted in. Covers tablets, liquids, eye and ear drops, inhalers, insulin, and injectables including GLP-1 pens. Where the manufacturer and the payer disagree, both results are shown.',
+    status: 'planned',
+    section: 'calculators',
+  },
+  {
     id: 'mme',
     name: 'Morphine milligram equivalents',
     blurb: 'Opioid conversion with the conversion factor and its source shown for every step, not just the total.',
