@@ -169,6 +169,11 @@ canonical and a static heading, so they return HTTP 200, and writes
 moiety page only with `PRERENDER_ALL=1`. Keep the `<!-- pc:meta -->` and
 `<!-- pc:shell -->` markers in `index.html`.
 
+**What's new (home page):** `src/updates.ts` holds one entry per shipped feature
+or tool (date, kind, title, summary, link); blog posts join the feed
+automatically. **When you ship something user-facing, add an entry there** — the
+home page shows the newest five.
+
 **index.html** is the single entry point (`index-updated.html` removed
 2026-09-25). `#root` holds a static shell (hero + About summary) that paints
 before JS and that React replaces on mount; its hero mirrors `Home.tsx`, keep

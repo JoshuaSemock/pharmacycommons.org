@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
-import { formatDate, listPosts } from '../blog'
+import { formatDate } from '../blog'
+import { ctaFor, whatsNew, type UpdateKind } from '../updates'
 
 /** Old links put browse state on `/`; those parameters now belong to /browse. */
 const BROWSE_PARAMS = ['q', 'letter', 'mode', 'per']
-const RECENT_POSTS = 3
+/** Entries shown in What's new; older ones stay on /tools, /lists and /blog. */
+const RECENT_UPDATES = 5
 
 /** Autofocus the search box only with a mouse or trackpad. On a phone it pops
     the keyboard (Android) or zooms the page (iOS) before the visitor has
@@ -27,7 +29,7 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <Hero />
-      <RecentPosts />
+      <WhatsNew />
       <SourcesFooter />
     </main>
   )
@@ -159,61 +161,80 @@ function Hero() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Recent posts
+// What's new — shipped features (src/updates.ts) and blog posts, newest first
 // ─────────────────────────────────────────────────────────────────────────────
 
-function RecentPosts() {
-  const posts = useMemo(() => listPosts().slice(0, RECENT_POSTS), [])
-  if (posts.length === 0) return null
+const KIND_TAG: Record<UpdateKind, string> = {
+  Tool: 'border-mint-300 bg-mint-50 text-mint-800',
+  Feature: 'border-hepatica-200 bg-hepatica-50 text-hepatica-800',
+  'Blog post': 'border-salmon-200 bg-salmon-50 text-salmon-800',
+}
+
+function WhatsNew() {
+  const items = useMemo(() => whatsNew(RECENT_UPDATES), [])
+  if (items.length === 0) return null
 
   return (
     <section
-      aria-labelledby="recent-posts-heading"
+      aria-labelledby="whats-new-heading"
       className="border-t border-mint-200 pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
     >
       <div className="mb-6 lg:mb-0">
         <h2
-          id="recent-posts-heading"
+          id="whats-new-heading"
           className="font-display text-[26px] font-semibold leading-snug text-mint-900"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          From the Community Commons Blog
+          What's new in the Commons
         </h2>
         <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-mint-700">
-          Decisions, commentary, and methodology, written down as the work happens.
+          New tools, features, and writing from the Community Commons Blog, as they ship.
         </p>
-        <Link
-          to="/blog"
-          className="mt-4 inline-block font-sans text-[13.5px] font-medium text-hepatica-700 underline-offset-2 hover:underline"
-        >
-          All posts
-        </Link>
+        <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-sans text-[13.5px] font-medium">
+          <Link to="/tools" className="text-hepatica-700 underline-offset-2 hover:underline">
+            All tools
+          </Link>
+          <Link to="/blog" className="text-hepatica-700 underline-offset-2 hover:underline">
+            All posts
+          </Link>
+        </p>
       </div>
 
       <ul className="max-w-[46rem] divide-y divide-mint-200">
-        {posts.map(post => (
-          <li key={post.slug} className="py-6 first:pt-0">
+        {items.map(item => (
+          <li key={item.id} className="py-6 first:pt-0">
             <article>
-              <p className="mb-1.5 font-sans text-[13px] text-mint-700">
-                <time dateTime={post.date}>{formatDate(post.date)}</time>
-                <span className="ml-3">{post.readingMinutes} minute read</span>
+              <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-mint-700">
+                <time dateTime={item.date}>{formatDate(item.date)}</time>
+                <span className={`rounded border px-1.5 py-0.5 font-sans text-[11.5px] font-medium ${KIND_TAG[item.kind]}`}>
+                  {item.kind}
+                </span>
               </p>
               <h3
                 className="font-display text-[21px] font-semibold leading-snug text-balance text-mint-900"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 <Link
-                  to={`/blog/${post.slug}`}
+                  to={item.to}
                   className="transition-colors hover:text-aqua-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
                 >
-                  {post.title}
+                  {item.title}
                 </Link>
               </h3>
-              {post.summary && (
-                <p className="mt-2 line-clamp-2 font-sans text-[15px] leading-[1.6] text-pretty text-mint-700">
-                  {post.summary}
+              {item.summary ? (
+                <p className="mt-2 line-clamp-3 font-sans text-[15px] leading-[1.6] text-pretty text-mint-700">
+                  {item.summary}
                 </p>
+              ) : (
+                item.detail && <p className="mt-1.5 font-sans text-[13px] text-mint-700">{item.detail}</p>
               )}
+              <Link
+                to={item.to}
+                aria-label={`${ctaFor(item)}: ${item.title}`}
+                className="mt-2 inline-block font-sans text-[13.5px] font-medium text-hepatica-700 underline-offset-2 hover:underline"
+              >
+                {ctaFor(item)}
+              </Link>
             </article>
           </li>
         ))}
