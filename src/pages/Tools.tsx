@@ -1,98 +1,51 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import PageShell from './PageShell'
+import { THIRD_PARTY_TOOLS, TOOL_SECTIONS, toolsIn } from '../tools'
+import type { Tool, ToolStatus } from '../tools'
 
-type Tool = {
-  name: string
-  blurb: string
-  status: 'live' | 'building' | 'planned'
-  to?: string
-}
-
-const CLINICAL: Tool[] = [
-  {
-    name: 'Creatinine clearance',
-    blurb: 'Cockcroft-Gault with actual, ideal, adjusted, and lean body weight side by side, so the weight choice is explicit rather than buried. Adds CKD-EPI 2021 eGFR, CKD and AKI staging, amputation correction, and a renal dose check.',
-    status: 'live',
-    to: '/tools/creatinine-clearance',
-  },
-  {
-    name: 'Medication reconciliation',
-    blurb: 'One complete list of prescriptions, over-the-counter products, supplements, herbals and alternative medicines, plus allergies and caffeine, nicotine, alcohol and recreational substance use. Directions are written out in full with no abbreviations, with the dose and 24-hour maximum calculated so they always agree. The list stays in your browser: save it as CSV, reopen it later, or print it.',
-    status: 'live',
-    to: '/tools/medication-reconciliation',
-  },
-  {
-    name: 'Body surface area',
-    blurb: 'Mosteller and Du Bois, with the divergence between them shown — it matters at the extremes of size.',
-    status: 'planned',
-  },
-  {
-    name: 'Morphine milligram equivalents',
-    blurb: 'Opioid conversion with the conversion factor and its source shown for every step, not just the total.',
-    status: 'planned',
-  },
-  {
-    name: 'Corrected calcium, anion gap, osmolal gap',
-    blurb: 'The short arithmetic that gets done wrong under time pressure.',
-    status: 'planned',
-  },
-]
-
-const ENVIRONMENTAL: Tool[] = [
-  {
-    name: 'Risk quotient calculator',
-    blurb: 'PEC ÷ PNEC from consumption data, excretion fraction, and wastewater removal rate — the same computation that drives the eco-risk field on each monograph.',
-    status: 'planned',
-  },
-  {
-    name: 'PEC estimator',
-    blurb: 'Predicted environmental concentration from defined daily dose, population served, and per-capita wastewater volume.',
-    status: 'planned',
-  },
-]
+const LINK =
+  'underline decoration-aqua-300 underline-offset-2 transition-colors hover:text-aqua-700 hover:decoration-aqua-600'
 
 export default function Tools() {
   return (
     <PageShell
       kicker="Tools"
-      title="Calculators and query aids"
+      title="Calculators, lists and data access"
       lede="Small, auditable tools. Every result shows its inputs, its formula, and the source of its constants — a number you cannot check is a number you should not use."
     >
-      {/* Pharmacopoe Ai — lead item, not a grid cell */}
-      <section className="border-t border-sage-200 py-8">
-        <div className="rounded-xl border border-aqua-200 bg-aqua-100/40 p-6">
-          <div className="mb-2 flex items-center gap-3">
-            <h2
-              className="font-display text-[22px] font-semibold text-sage-900"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Pharmacopoe Ai
-            </h2>
-            <StatusTag status="building" />
-          </div>
-          <p className="font-sans text-[14.5px] text-sage-700 leading-relaxed">
-            A retrieval-grounded assistant answering from the Commons itself — monograph
-            fields, label text, and environmental data — with every claim linked back to
-            the record it came from. Scoped deliberately: it will decline questions the
-            underlying data cannot support rather than generate a plausible answer.
-          </p>
-          <p className="mt-3 font-sans text-[13px] text-sage-600">
-            Not a diagnostic tool, and not a prescribing aid.
-          </p>
-        </div>
-      </section>
+      <GroupHeading id="pharmacy-commons">Pharmacy Commons</GroupHeading>
+      {TOOL_SECTIONS.map(section => (
+        <ToolList key={section.id} id={section.id} heading={section.label} tools={toolsIn(section.id)} />
+      ))}
 
-      <ToolList heading="Clinical" tools={CLINICAL} />
-      <ToolList heading="Environmental" tools={ENVIRONMENTAL} />
+      <GroupHeading id="third-party">Third party</GroupHeading>
+      <section className="py-8">
+        <p className="mb-5 font-sans text-[14px] text-sage-600 leading-relaxed">
+          Calculators on other sites that we reach for too. They open in a new tab; Pharmacy Commons does not check or
+          maintain them.
+        </p>
+        <ul className="space-y-3">
+          {THIRD_PARTY_TOOLS.map(tool => (
+            <li key={tool.url} className="min-w-0 border-l-2 border-sage-200 pl-4">
+              <a
+                href={tool.url}
+                target="_blank"
+                rel="noreferrer"
+                className={`font-sans text-[14.5px] font-medium text-sage-900 [overflow-wrap:anywhere] ${LINK}`}
+              >
+                {tool.name}
+              </a>
+              <span className="ml-2 font-sans text-[13px] text-sage-600">{tool.publisher}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="border-t border-sage-200 py-8">
         <p className="font-sans text-[14px] text-sage-600 leading-relaxed">
           Missing a calculator you reach for daily?{' '}
-          <a
-            href="mailto:contact@pharmacycommons.org?subject=Tool%20request"
-            className="text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
-          >
+          <a href="mailto:contact@pharmacycommons.org?subject=Tool%20request" className={`text-aqua-700 ${LINK}`}>
             Ask for it
           </a>
           .
@@ -102,31 +55,35 @@ export default function Tools() {
   )
 }
 
-function ToolList({ heading, tools }: { heading: string; tools: Tool[] }) {
+function GroupHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <section className="border-t border-sage-200 py-8">
-      <h2
+    <h2
+      id={id}
+      className="scroll-mt-28 border-t-2 border-sage-300 pt-8 font-display text-[26px] font-semibold text-sage-900"
+      style={{ fontFamily: 'var(--font-display)' }}
+    >
+      {children}
+    </h2>
+  )
+}
+
+function ToolList({ id, heading, tools }: { id: string; heading: string; tools: Tool[] }) {
+  if (tools.length === 0) return null
+  return (
+    <section id={id} className="scroll-mt-28 border-t border-sage-200 py-8 first-of-type:border-t-0">
+      <h3
         className="mb-5 font-display text-[21px] font-semibold text-sage-900"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {heading}
-      </h2>
+      </h3>
       <ul className="space-y-5">
         {tools.map(tool => (
-          <li key={tool.name} className="border-l-2 border-sage-200 pl-4">
+          <li key={tool.id} className="min-w-0 border-l-2 border-sage-200 pl-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h3 className="font-sans text-[14.5px] font-medium text-sage-900">
-                {tool.to ? (
-                  <Link
-                    to={tool.to}
-                    className="underline decoration-aqua-300 underline-offset-2 transition-colors hover:text-aqua-700 hover:decoration-aqua-600"
-                  >
-                    {tool.name}
-                  </Link>
-                ) : (
-                  tool.name
-                )}
-              </h3>
+              <h4 className="font-sans text-[14.5px] font-medium text-sage-900">
+                <ToolName tool={tool} />
+              </h4>
               <StatusTag status={tool.status} />
             </div>
             <p className="mt-1 font-sans text-[14px] text-sage-600 leading-relaxed">{tool.blurb}</p>
@@ -137,20 +94,36 @@ function ToolList({ heading, tools }: { heading: string; tools: Tool[] }) {
   )
 }
 
-function StatusTag({ status }: { status: Tool['status'] }): ReactNode {
-  const styles: Record<Tool['status'], string> = {
+function ToolName({ tool }: { tool: Tool }) {
+  if (tool.to) {
+    return (
+      <Link to={tool.to} className={LINK}>
+        {tool.name}
+      </Link>
+    )
+  }
+  if (tool.href) {
+    return (
+      <a href={tool.href} target="_blank" rel="noreferrer" className={LINK}>
+        {tool.name}
+      </a>
+    )
+  }
+  return <>{tool.name}</>
+}
+
+function StatusTag({ status }: { status: ToolStatus }) {
+  const styles: Record<ToolStatus, string> = {
     live: 'border-aqua-300 bg-aqua-100 text-aqua-700',
     building: 'border-violet-200 bg-violet-100 text-violet-600',
     planned: 'border-sage-200 bg-sage-100 text-sage-600',
   }
-  const labels: Record<Tool['status'], string> = {
+  const labels: Record<ToolStatus, string> = {
     live: 'live',
     building: 'in progress',
     planned: 'planned',
   }
   return (
-    <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] ${styles[status]}`}>
-      {labels[status]}
-    </span>
+    <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] ${styles[status]}`}>{labels[status]}</span>
   )
 }

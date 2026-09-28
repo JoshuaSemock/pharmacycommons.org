@@ -2,7 +2,8 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from
 import type { FocusEvent, FormEvent, KeyboardEvent, PointerEvent } from 'react'
 import { Link, NavLink as RouterNavLink, useLocation, useNavigate } from 'react-router-dom'
 import { loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
-import { ROUTED_TOOLS } from './tools'
+import { ACTIVE_TOOL_SECTIONS } from './tools'
+import type { Tool } from './tools'
 import { useView, VIEWS, VIEW_GROUPS, viewDef } from './views'
 import type { ViewKey } from './views'
 import { useSession } from './auth'
@@ -69,7 +70,7 @@ export default function Nav() {
 
           <ul className="-mr-3 ml-auto flex min-w-0 items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SECTIONS.map(section =>
-              section.to === '/tools' && ROUTED_TOOLS.length > 0 ? (
+              section.to === '/tools' && ACTIVE_TOOL_SECTIONS.length > 0 ? (
                 <ToolsSection key={section.to} to={section.to} label={section.label} />
               ) : (
                 <li key={section.to} className="shrink-0">
@@ -143,7 +144,7 @@ function SectionLink({ to, label }: { to: string; label: string }) {
 
 /**
  * "Tools" stays a plain link to /tools. Hovering it with a mouse opens a menu
- * of the tools that have their own page; the chevron beside it does the same
+ * of the active tools, under their section headers (src/tools.ts); the chevron beside it does the same
  * for keyboard and touch. This is disclosure navigation, not an ARIA menu, so
  * Tab moves through the items in DOM order.
  *
@@ -314,42 +315,68 @@ function ToolsSection({ to, label }: { to: string; label: string }) {
         className="absolute z-10 pt-1.5"
       >
         <div className="overflow-hidden rounded-lg border border-sage-200 bg-white shadow-lg shadow-sage-900/5">
-          <ul className="py-1.5">
-            {ROUTED_TOOLS.map(tool => {
-              const current = pathname === tool.to
-              return (
-                <li key={tool.id}>
-                  <Link
-                    to={tool.to}
-                    aria-current={current ? 'page' : undefined}
-                    onClick={closeMenu}
-                    className={[
-                      'block border-l-2 px-3.5 py-2 transition-colors',
-                      'focus-visible:bg-sage-50 focus-visible:outline-none',
-                      current ? 'border-aqua-500 bg-sage-50' : 'border-transparent hover:bg-sage-50',
-                    ].join(' ')}
-                  >
-                    <span className="block font-sans text-[13px] font-medium text-sage-900">{tool.name}</span>
-                    {tool.summary && (
-                      <span className="mt-0.5 block font-sans text-[11.5px] leading-snug text-sage-600">
-                        {tool.summary}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+          <div className="max-h-[calc(100dvh-var(--nav-h,6rem)-4rem)] overflow-y-auto py-1">
+            {ACTIVE_TOOL_SECTIONS.map(section => (
+              <div key={section.id} className="py-1">
+                <p className="px-3.5 pt-1.5 pb-1 font-mono text-[10.5px] tracking-[0.06em] text-sage-500 uppercase">
+                  {section.label}
+                </p>
+                <ul>
+                  {section.tools.map(tool => (
+                    <li key={tool.id}>
+                      <MenuToolLink tool={tool} current={pathname === tool.to} onNavigate={closeMenu} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
           <Link
             to={to}
             onClick={closeMenu}
             className="block border-t border-sage-200 px-3.5 py-2 font-sans text-[12.5px] text-sage-600 transition-colors hover:bg-sage-50 hover:text-sage-900 focus-visible:bg-sage-50 focus-visible:text-sage-900 focus-visible:outline-none"
           >
-            All tools, including planned ones
+            All tools, including planned and third-party
           </Link>
         </div>
       </div>
     </li>
+  )
+}
+
+function MenuToolLink({ tool, current, onNavigate }: { tool: Tool; current: boolean; onNavigate: () => void }) {
+  const className = [
+    'block border-l-2 px-3.5 py-2 transition-colors',
+    'focus-visible:bg-sage-50 focus-visible:outline-none',
+    current ? 'border-aqua-500 bg-sage-50' : 'border-transparent hover:bg-sage-50',
+  ].join(' ')
+  const body = (
+    <>
+      <span className="block font-sans text-[13px] font-medium text-sage-900">
+        {tool.name}
+        {tool.href && (
+          <span className="ml-1 text-sage-400" aria-hidden="true">
+            ↗
+          </span>
+        )}
+      </span>
+      {tool.summary && (
+        <span className="mt-0.5 block font-sans text-[11.5px] leading-snug text-sage-600">{tool.summary}</span>
+      )}
+    </>
+  )
+  if (tool.to) {
+    return (
+      <Link to={tool.to} aria-current={current ? 'page' : undefined} onClick={onNavigate} className={className}>
+        {body}
+      </Link>
+    )
+  }
+  return (
+    <a href={tool.href} target="_blank" rel="noreferrer" onClick={onNavigate} className={className}>
+      {body}
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
   )
 }
 
