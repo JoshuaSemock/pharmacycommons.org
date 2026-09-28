@@ -27,6 +27,7 @@ const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 const MedicationReconciliation = lazy(() => import('./tools/MedicationReconciliation'))
+const Developers = lazy(() => import('./pages/Developers'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
@@ -65,6 +66,7 @@ export default function App() {
               path="/tools/medication-reconciliation"
               element={<MedicationReconciliation />}
             />
+            <Route path="/developers" element={<Developers />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/references" element={<References />} />
             {/* Renamed 2026-09-25; old links and bookmarks keep working. */}

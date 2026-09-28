@@ -29,6 +29,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { formatBrandName, formatDrugName } from '../src/names.ts'
+import { llmsTxt, openApiSpec } from '../src/developers/endpoints.ts'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
@@ -83,6 +84,12 @@ const STATIC_ROUTES = [
     path: '/tools/medication-reconciliation',
     title: 'Medication reconciliation',
     description: 'Build a complete medication list with allergies and substance use. Directions are written out in full with no abbreviations. The list stays in your browser and saves as CSV or PDF.',
+  },
+  {
+    path: '/developers',
+    title: 'Developers',
+    heading: 'Pharmacy Commons API for developers',
+    description: 'A free, open, read-only API for drug knowledge: search, full records as JSON and JSON-LD, versions and field-level change history. No key needed. Live console, OpenAPI spec and code in curl, JavaScript, Python, R and Excel.',
   },
   {
     path: '/resources',
@@ -329,5 +336,10 @@ const unique = routes.filter(r => {
 const parents = new Set(unique.map(r => r.path.split('/').slice(0, -1).join('/')).filter(Boolean))
 for (const route of unique) writeRoute(template, route, homeShell, parents)
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap(unique))
+
+// Machine descriptions of the API, generated from the same endpoint list the
+// Developers page uses (src/developers/endpoints.ts), so they cannot drift.
+fs.writeFileSync(path.join(DIST, 'openapi.json'), JSON.stringify(openApiSpec(), null, 2) + '\n')
+fs.writeFileSync(path.join(DIST, 'llms.txt'), llmsTxt())
 
 console.log(`[postbuild] wrote ${unique.length} route pages and sitemap.xml (${unique.filter(r => r.sitemap !== false && r.index !== false).length + 1} URLs)`)

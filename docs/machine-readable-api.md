@@ -18,8 +18,12 @@ PCID therefore has, from one source of truth:
 | Version history | `{API}/v1/entities/PCID-n/versions`, each version at `/versions/{n}` forever |
 | Change history | `{API}/v1/entities/PCID-n/changes` — field-level diffs, newest first |
 | Schema definition | `{API}/v1/schema/entity.json` (JSON Schema 2020-12), `{API}/v1/context.jsonld` |
+| Search by name, brand or class | `{API}/v1/search?q=` (added 2026-09-28, `api_search()`, `db/phase11a_api_search.sql`) |
+| API description | `https://pharmacycommons.org/openapi.json` (OpenAPI 3.1) and `/llms.txt`, generated at build from `src/developers/endpoints.ts` |
+| Documentation and live console | `https://pharmacycommons.org/developers` |
 
 `{API}` is today `https://nenwovhyrdcdkhxzjiiv.supabase.co/functions/v1/api`
+and will be `https://pharmacycommons.org/api` once the Cloudflare Worker is live
 (see *Serving from pharmacycommons.org* below).
 
 ## Architecture
@@ -103,17 +107,28 @@ record is next read, so its version date would be the read date.
 
 ## Serving from pharmacycommons.org
 
-GitHub Pages is static, so `pharmacycommons.org/api/v1/...` cannot be answered
-dynamically there. The function already accepts both `/functions/v1/api/v1/…`
-and `/api/v1/…` paths, so either option below is a configuration change, not a
-rewrite:
+**Decided (Joshua, 2026-09-28): proxy through Cloudflare.** Static export was
+rejected because versions, changes and class members cannot be static, so the
+API would have had two base URLs. The function already accepts both
+`/functions/v1/api/v1/…` and `/api/v1/…` paths.
 
-1. **Proxy `/api/*`** (e.g. Cloudflare in front of Pages) to the function, then
-   set `api_meta.api_base = 'https://pharmacycommons.org/api'`, the function's
-   `PC_API_BASE` secret to the same, and `VITE_PC_API_BASE` for the site build.
-2. **Static export** at build time into `dist/api/v1/entities/PCID-n.json` —
-   exact URLs with no new infrastructure, but only as fresh as the last deploy,
-   and version/change endpoints would stay on the function.
+Set-up:
+
+1. DNS moved from Porkbun to Cloudflare (nameservers `athena` / `igor.ns.cloudflare.com`).
+   The GitHub Pages A/AAAA records and `www` CNAME are **proxied**; the Porkbun MX
+   and SPF records stay **DNS only**. SSL/TLS mode **Full (strict)** — never
+   Flexible, which loops against GitHub Pages' forced HTTPS.
+2. A Worker, `pharmacycommons-api`, on the route `pharmacycommons.org/api/*`,
+   forwards GET/HEAD/OPTIONS to the function (passing `Accept`, `If-None-Match`
+   and the CORS preflight headers) and caches at the edge: 2xx 5 min, 404 1 min,
+   410 1 hour, 5xx not at all. Every other path still comes from GitHub Pages.
+3. **Switch-over, only after the Worker answers correctly** (document, ETag and
+   304, 410, CORS from another origin):
+   - `update api_meta set value = 'https://pharmacycommons.org/api' where key = 'api_base';`
+     (changes the links inside every document)
+   - Supabase → Edge Functions → Secrets: `PC_API_BASE = https://pharmacycommons.org/api`
+   - `src/developers/endpoints.ts`: `CURRENT_API_BASE = API_BASES.site` (the site,
+     the Developers page, `openapi.json` and `llms.txt` all read this one value)
 
 ## Known gaps
 

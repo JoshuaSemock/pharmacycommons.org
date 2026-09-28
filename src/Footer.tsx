@@ -15,6 +15,7 @@ const LINKS = [
   { to: '/about', label: 'About' },
   { to: '/references', label: 'References' },
   { to: '/resources', label: 'Resources' },
+  { to: '/developers', label: 'Developers' },
 ]
 
 export default function Footer() {

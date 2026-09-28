@@ -14,11 +14,11 @@
  */
 
 import { useEffect } from 'react'
+import { CURRENT_API_BASE } from './developers/endpoints.ts'
 
-/** Where /v1/... is served. Override with VITE_PC_API_BASE once a proxy fronts pharmacycommons.org/api. */
-export const API_BASE: string =
-  (import.meta.env.VITE_PC_API_BASE as string | undefined) ??
-  'https://nenwovhyrdcdkhxzjiiv.supabase.co/functions/v1/api'
+/** Where /v1/... is served. One switch for the whole site: CURRENT_API_BASE in
+ *  src/developers/endpoints.ts (VITE_PC_API_BASE still overrides it for a build). */
+export const API_BASE: string = (import.meta.env.VITE_PC_API_BASE as string | undefined) ?? CURRENT_API_BASE
 
 export const SITE_BASE = 'https://pharmacycommons.org'
 
