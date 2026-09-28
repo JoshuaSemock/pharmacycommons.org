@@ -157,7 +157,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
-`/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`) · `/resources` (outside links we
+`/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`) · `/developers` (API console
+and reference; `src/developers/`) · `/resources` (outside links we
 don't draw data from; `src/resources.ts`) · `/references` (citable data sources,
 `src/sources.ts`; `/citations` redirects here since 2026-09-25)
 · `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
@@ -198,8 +199,16 @@ History: `entity_versions` (immutable snapshots; baseline captured for all PCIDs
 `entity_changes` (append-only, trigger-written; read publicly only via
 `api_entity_changes()`, which omits actor). **Tag bulk writes with
 `SET LOCAL pc.change_source = '<run id>'`.**
-Undecided (Joshua): how `/api` is served on the site domain — proxy `/api/*` to the
-function, or static JSON export at build time.
+**Serving `/api` on the site domain — decided 2026-09-28: Cloudflare proxy.** DNS is on
+Cloudflare; a Worker on `pharmacycommons.org/api/*` forwards to the function. Switch-over
+steps (after the Worker is verified) are in `docs/machine-readable-api.md`; in code the
+only switch is `CURRENT_API_BASE` in `src/developers/endpoints.ts`.
+
+**Endpoints are listed once**, in `src/developers/endpoints.ts`. The Developers page
+console and reference, the code snippets, `dist/openapi.json` and `dist/llms.txt` are all
+generated from it, so **when you add or change an endpoint in
+`supabase/functions/api/index.ts`, change `endpoints.ts` too.** `/v1/search` (2026-09-28)
+is backed by `api_search()` (`db/phase11a_api_search.sql`, security invoker).
 
 ## Repository layout — get paths right
 GitHub's web UI makes it easy to commit a correct file to the wrong path, where it
@@ -332,6 +341,18 @@ formulations in the moiety hierarchy (phase 10).
   A `text-[22px]` on an `h2` is ignored site-wide. Wrapping them in `@layer base`
   fixes it but resizes headings everywhere — Joshua's design call. New code sets
   heading sizes inline until then.
+- **Migrations `phase8i_public_read_surfaces` and `phase8j_data_license` were never
+  applied** (checked 2026-09-28 against `supabase_migrations.schema_migrations`), although
+  both files say they were. Live effect: `api_meta.data_license` is NULL, so every API
+  document reports `"license": null`; the class RPCs are still SECURITY DEFINER; and
+  `entity_labels` is a SECURITY DEFINER view with INSERT/UPDATE/DELETE/TRUNCATE granted to
+  anon (not exploitable today — the view is not updatable — but untidy). Apply both once
+  Joshua confirms.
+- `db/CLAUDE.md` is a stale copy of this file from 2026-09-24; the root `CLAUDE.md` is
+  authoritative.
+- Duplicate combination records exist under different name orders, e.g. "hydrochlorothiazide;
+  lisinopril" and "LISINOPRIL AND HYDROCHLOROTHIAZIDE" (both surfaced by `/v1/search`).
+  Merge calls are Joshua's.
 - **`oxfmt` 0.2 is unsafe:** it deletes the separators in one-line object types
   (`{ a: string; b: number }` → `{ a: string b: number }`), and it would reformat
   nearly every file in `src/` (the code is not actually kept in its style). Don't

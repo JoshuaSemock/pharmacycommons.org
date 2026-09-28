@@ -7,7 +7,8 @@ describe("what's new", () => {
     const dates = all.map(u => u.date)
     expect(dates).toEqual([...dates].sort().reverse())
     expect(all.some(u => u.kind === 'Blog post')).toBe(true)
-    expect(all[0].id).toBe('medication-reconciliation')
+    expect(all[0].date).toBe(dates[0])
+    expect(all.map(u => u.id)).toEqual(expect.arrayContaining(['developers', 'medication-reconciliation']))
   })
 
   it('limits the feed and gives every entry a link and call to action', () => {

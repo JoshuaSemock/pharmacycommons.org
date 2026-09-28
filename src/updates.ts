@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'developers',
+    date: '2026-09-28',
+    kind: 'Feature',
+    title: 'The API, for developers',
+    summary:
+      'Every record is also open data: search by name or brand, fetch full records as JSON or JSON-LD, and compare any two versions. Try it in a live console, then copy the request as curl, JavaScript, Python, R or an Excel query. No key needed.',
+    to: '/developers',
+    cta: 'Open the console',
+  },
+  {
     id: 'medication-reconciliation',
     date: '2026-09-27',
     kind: 'Tool',

@@ -2,6 +2,8 @@
 //
 // Every record reachable on the website is reachable here as structured JSON(-LD):
 //   GET /v1                                   index: entity types, counts, sources, license
+//   GET /v1/search?q=                         find records by generic name, brand, slug or class abbreviation
+//                                             (?limit= 1–100, default 20; ?type= comma list, default moiety,combination,class)
 //   GET /v1/entities/{ref}[.json|.jsonld]     canonical document (ref = PCID-1001923 | 1001923 | slug | slug URI)
 //   GET /v1/drugs/{ref}                       alias of /entities
 //   GET /v1/entities/{ref}/versions           version list
@@ -29,6 +31,9 @@ const CORS: Record<string, string> = {
 };
 
 type Json = Record<string, unknown>;
+
+/** Entity types /v1/search can return (the types that have a search surface). */
+const SEARCH_TYPES = ["moiety", "combination", "class", "precise_form", "formulation"];
 
 async function rpc(fn: string, args: Json): Promise<Json> {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
@@ -138,6 +143,7 @@ Deno.serve(async (req) => {
       return send(req, {
         ...index,
         endpoints: {
+          search: `${API_BASE}/v1/search?q={name, brand or class}&limit=20&type=moiety,combination,class`,
           entity: `${API_BASE}/v1/entities/{PCID|slug}`,
           entity_json: `${API_BASE}/v1/entities/PCID-1001923.json`,
           drug_alias: `${API_BASE}/v1/drugs/{PCID|slug}`,
@@ -151,6 +157,31 @@ Deno.serve(async (req) => {
         identifiers:
           "PCID is the only native key. Slugs and slug URIs resolve to it; permanent IRIs are https://pharmacycommons.org/id/PCID-n.",
       }, { compact });
+    }
+
+    // /v1/search?q=
+    if (parts[1] === "search" && parts.length === 2) {
+      const text = (q.get("q") ?? "").trim();
+      if (text.length < 2) {
+        return fail(req, 400, "bad_query", "Give at least 2 characters in ?q=, e.g. /v1/search?q=metformin.");
+      }
+      if (text.length > 200) return fail(req, 400, "bad_query", "?q= is limited to 200 characters.");
+      const limitRaw = q.get("limit");
+      const limit = limitRaw === null ? 20 : Number(limitRaw);
+      if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+        return fail(req, 400, "bad_limit", "?limit= must be a whole number from 1 to 100.");
+      }
+      let types: string[] | null = null;
+      const typeRaw = q.get("type");
+      if (typeRaw) {
+        types = typeRaw.split(",").map((t) => t.trim()).filter(Boolean);
+        const bad = types.filter((t) => !SEARCH_TYPES.includes(t));
+        if (bad.length) {
+          return fail(req, 400, "bad_type", `Unknown type ${bad.join(", ")}. Use any of: ${SEARCH_TYPES.join(", ")}.`);
+        }
+      }
+      const r = await rpc("api_search", { p_q: text, p_limit: limit, p_types: types });
+      return send(req, { ...r, links: { self: `${API_BASE}/v1/search?${q.toString()}`, docs: `${API_BASE}/v1` } }, { compact });
     }
 
     // /v1/schema/entity.json, /v1/context.jsonld
