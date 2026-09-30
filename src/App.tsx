@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Nav from './Nav'
 import Footer from './Footer'
-import { ViewProvider } from './views'
 import Home from './pages/Home'
 
 // Home ships in the entry bundle because it is the landing page. Every other
@@ -45,50 +44,48 @@ function Moved({ to }: { to: string }) {
 
 export default function App() {
   return (
-    <ViewProvider>
-      <div className="min-h-full page-background">
-        <div className="page-content flex min-h-screen flex-col">
-          <Nav />
-          <Suspense fallback={routeFallback}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/browse" element={<SearchView />} />
-            <Route path="/drugs/:slug" element={<DrugDetail />} />
-            <Route path="/classes" element={<ClassIndex />} />
-            <Route path="/classes/:slug" element={<ClassDetail />} />
-            <Route path="/lists" element={<ListIndex />} />
-            <Route path="/lists/compare" element={<ListCompare />} />
-            <Route path="/lists/:slug" element={<ListDetail />} />
-            {/* Permanent PCID address → current record page (also the JSON-LD @id) */}
-            <Route path="/id/:pcid" element={<Permalink />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route
-              path="/tools/creatinine-clearance"
-              element={<CreatinineClearance />}
-            />
-            <Route
-              path="/tools/medication-reconciliation"
-              element={<MedicationReconciliation />}
-            />
-            <Route path="/developers" element={<Developers />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/references" element={<References />} />
-            {/* Renamed 2026-09-25; old links and bookmarks keep working. */}
-            <Route path="/citations" element={<Moved to="/references" />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-            <Route path="/licensing" element={<Licensing />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-          </Suspense>
-          <Footer />
-        </div>
+    <div className="min-h-full page-background">
+      <div className="page-content flex min-h-screen flex-col">
+        <Nav />
+        <Suspense fallback={routeFallback}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/browse" element={<SearchView />} />
+          <Route path="/drugs/:slug" element={<DrugDetail />} />
+          <Route path="/classes" element={<ClassIndex />} />
+          <Route path="/classes/:slug" element={<ClassDetail />} />
+          <Route path="/lists" element={<ListIndex />} />
+          <Route path="/lists/compare" element={<ListCompare />} />
+          <Route path="/lists/:slug" element={<ListDetail />} />
+          {/* Permanent PCID address → current record page (also the JSON-LD @id) */}
+          <Route path="/id/:pcid" element={<Permalink />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/tools" element={<Tools />} />
+          <Route
+            path="/tools/creatinine-clearance"
+            element={<CreatinineClearance />}
+          />
+          <Route
+            path="/tools/medication-reconciliation"
+            element={<MedicationReconciliation />}
+          />
+          <Route path="/developers" element={<Developers />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/references" element={<References />} />
+          {/* Renamed 2026-09-25; old links and bookmarks keep working. */}
+          <Route path="/citations" element={<Moved to="/references" />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/licensing" element={<Licensing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+        </Suspense>
+        <Footer />
       </div>
-    </ViewProvider>
+    </div>
   )
 }

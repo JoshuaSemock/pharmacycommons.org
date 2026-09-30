@@ -4,20 +4,8 @@ import { Link, NavLink as RouterNavLink, useLocation, useNavigate } from 'react-
 import { loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
 import { ACTIVE_TOOL_SECTIONS } from './tools'
 import type { Tool } from './tools'
-import { useView, VIEWS, VIEW_GROUPS, viewDef } from './views'
-import type { ViewKey } from './views'
 import { useSession } from './auth'
-
-const SECTIONS = [
-  { to: '/browse', label: 'Browse' },
-  { to: '/classes', label: 'Classes' },
-  { to: '/lists', label: 'Lists' },
-  { to: '/about', label: 'About' },
-  { to: '/tools', label: 'Tools' },
-  { to: '/resources', label: 'Resources' },
-  { to: '/references', label: 'References' },
-  { to: '/blog', label: 'Blog' },
-]
+import SiteMenu, { PRIMARY_LINKS } from './SiteMenu'
 
 /** Pages with their own prominent search field don't need the header one. */
 const PAGES_WITH_SEARCH = new Set(['/', '/browse'])
@@ -42,8 +30,8 @@ export default function Nav() {
 
   return (
     <nav ref={navRef} className="sticky top-0 z-50 border-b border-sage-200 bg-sage-50/90 backdrop-blur-md">
-      {/* Row 1 — wordmark, search, account actions */}
-      <div className="mx-auto flex h-14 max-w-page items-center gap-4 px-4 sm:px-6">
+      {/* Row 1 — wordmark, search, account actions, menu */}
+      <div className="mx-auto flex h-14 max-w-page items-center gap-2 px-4 sm:gap-4 sm:px-6">
         <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Pharmacy Commons home">
           <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sage-100">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
@@ -55,21 +43,20 @@ export default function Nav() {
 
         {showSearch ? <HeaderSearch /> : <div className="flex-1" />}
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
+        <div className="-mr-2 ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <button className="hidden rounded-lg border border-aqua-400 bg-aqua-400/10 px-3 py-1.5 font-sans text-[12.5px] font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 sm:block">
             Contribute
           </button>
           <AccountLink />
+          <SiteMenu />
         </div>
       </div>
 
-      {/* Row 2 — view switcher on the left, sections on the right */}
-      <div className="border-t border-sage-200/70">
-        <div className="mx-auto flex max-w-page items-center gap-4 px-4 sm:px-6">
-          <ViewSwitcher />
-
-          <ul className="-mr-3 ml-auto flex min-w-0 items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {SECTIONS.map(section =>
+      {/* Row 2 — primary sections, md+ only (below md they live in the drawer) */}
+      <div className="hidden border-t border-sage-200/70 md:block">
+        <div className="mx-auto flex max-w-page items-center justify-center px-4 sm:px-6">
+          <ul className="flex min-w-0 items-stretch gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {PRIMARY_LINKS.map(section =>
               section.to === '/tools' && ACTIVE_TOOL_SECTIONS.length > 0 ? (
                 <ToolsSection key={section.to} to={section.to} label={section.label} />
               ) : (
@@ -392,96 +379,6 @@ function ChevronIcon({ open }: { open: boolean }) {
     >
       <path d="M2 3.75L5 6.75L8 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// View switcher
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * A radio group on md+ (arrow keys move and select, as native radios do), a
- * grouped <select> below md. The options sit in an inset track; the selected
- * one is raised out of it and reads "Patient View", the rest just "Patient".
- * Hairlines separate Explore / Access / Contribute.
- */
-const TRACK =
-  'rounded-lg bg-sage-100 ring-1 ring-inset ring-sage-200 shadow-[inset_0_1px_2px_rgb(0_0_0/0.07)]'
-const RAISED =
-  'shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-
-function ViewSwitcher() {
-  const { view, setView } = useView()
-  const buttons = useRef<Partial<Record<ViewKey, HTMLButtonElement | null>>>({})
-
-  function onKeyDown(e: KeyboardEvent<HTMLButtonElement>, index: number) {
-    const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
-    const back = e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-    if (!forward && !back) return
-    e.preventDefault()
-    const next = VIEWS[(index + (forward ? 1 : -1) + VIEWS.length) % VIEWS.length]
-    setView(next.key)
-    buttons.current[next.key]?.focus()
-  }
-
-  return (
-    <>
-      <div
-        role="radiogroup"
-        aria-label="View"
-        className={`my-1.5 hidden shrink-0 items-center gap-0.5 p-0.5 md:flex ${TRACK}`}
-      >
-        {VIEWS.map((v, i) => {
-          const active = v.key === view
-          const startsGroup = i > 0 && VIEWS[i - 1].group !== v.group
-          const contribute = v.group === 'contribute'
-          return (
-            <span key={v.key} className="flex items-center">
-              {startsGroup && <span className="mx-1 h-4 w-px bg-sage-300/70" aria-hidden="true" />}
-              <button
-                ref={el => {
-                  buttons.current[v.key] = el
-                }}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                tabIndex={active ? 0 : -1}
-                title={v.tagline}
-                onClick={() => setView(v.key)}
-                onKeyDown={e => onKeyDown(e, i)}
-                className={[
-                  'rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap transition-colors',
-                  'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
-                  active
-                    ? `${RAISED} font-medium ${contribute ? 'bg-aqua-100 text-aqua-700' : 'bg-white text-sage-900'}`
-                    : 'text-sage-600 hover:text-sage-900',
-                ].join(' ')}
-              >
-                {active ? `${v.label} View` : v.label}
-              </button>
-            </span>
-          )
-        })}
-      </div>
-
-      <select
-        value={view}
-        onChange={e => setView(e.target.value as ViewKey)}
-        aria-label="View"
-        title={viewDef(view).tagline}
-        className={`my-1.5 shrink-0 px-2 py-1 font-sans text-[12.5px] font-medium text-sage-900 outline-none focus:ring-2 focus:ring-aqua-200 md:hidden ${TRACK}`}
-      >
-        {VIEW_GROUPS.map(g => (
-          <optgroup key={g.key} label={g.label}>
-            {VIEWS.filter(v => v.group === g.key).map(v => (
-              <option key={v.key} value={v.key}>
-                {v.key === view ? `${v.label} View` : v.label}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-    </>
   )
 }
 
