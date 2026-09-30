@@ -1,34 +1,43 @@
 import { useEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
-import { createPortal } from 'react-dom'
-import { NavLink, useLocation } from 'react-router-dom'
+import type { FocusEvent } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { ACTIVE_TOOL_SECTIONS } from './tools'
+import type { Tool } from './tools'
+import { useSession } from './auth'
 
 /**
- * The hamburger button and the slide-out drawer it opens.
+ * The hamburger button and the menu it opens.
  *
- * The button sits at the right end of the header's first row at every width.
- * Below md it is the only way to reach the sections, because the ribbon of
- * primary links is hidden there; on md+ it holds the secondary pages that no
- * longer fit in the ribbon.
+ * The menu drops down from the bottom edge of the header bar, full width,
+ * instead of sliding in from the side. It is positioned `absolute` against the
+ * sticky <nav> (its nearest positioned ancestor), so it always starts exactly
+ * where the bar ends, including on phones where the bar is two lines tall.
+ * Do not add `relative` to any element between this component and the <nav>.
  *
- * The drawer is portaled to <body>. The <nav> uses backdrop-filter, which makes
- * it the containing block for fixed-position descendants, so a drawer rendered
- * inside it would be clipped to the header's height.
+ * The nav uses backdrop-filter, which makes it the containing block for
+ * `fixed` descendants too, so nothing in here uses `fixed`: the dimmed
+ * backdrop is an absolute layer one viewport tall under the bar.
  */
 
-export const PRIMARY_LINKS = [
+/** Always visible in the bar, in this order. */
+export const BAR_LINKS = [
   { to: '/browse', label: 'Browse' },
-  { to: '/classes', label: 'Classes' },
   { to: '/lists', label: 'Lists' },
   { to: '/tools', label: 'Tools' },
 ]
 
+const EXPLORE_LINKS = [
+  { to: '/browse', label: 'Browse A to Z' },
+  { to: '/classes', label: 'Drug classes' },
+  { to: '/lists', label: 'Lists' },
+  { to: '/tools', label: 'All tools' },
+]
+
 const REFERENCE_LINKS = [
   { to: '/about', label: 'About' },
+  { to: '/blog', label: 'Blog' },
   { to: '/references', label: 'References' },
   { to: '/resources', label: 'Resources' },
-  { to: '/developers', label: 'Developers' },
-  { to: '/blog', label: 'Blog' },
 ]
 
 const LEGAL_LINKS = [
@@ -38,23 +47,25 @@ const LEGAL_LINKS = [
   { to: '/licensing', label: 'Data licensing' },
 ]
 
-const MENU_ID = 'mobile-menu'
+const MENU_ID = 'site-menu'
 
 export default function SiteMenu() {
   const { pathname, search } = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
-  const wasOpen = useRef(false)
 
-  // Navigating anywhere (including a link inside the drawer) closes it.
+  // Navigating anywhere (including a link inside the menu) closes it.
   useEffect(() => setIsOpen(false), [pathname, search])
 
-  // Escape closes; the page behind stops scrolling while the drawer is open.
+  // Escape closes and returns focus to the button; the page behind stops
+  // scrolling while the menu covers it.
   useEffect(() => {
     if (!isOpen) return
     const onKeyDown = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false)
+      if (e.key !== 'Escape') return
+      setIsOpen(false)
+      triggerRef.current?.focus()
     }
     document.addEventListener('keydown', onKeyDown)
     document.body.classList.add('overflow-hidden')
@@ -64,73 +75,13 @@ export default function SiteMenu() {
     }
   }, [isOpen])
 
-  // Focus moves into the drawer on open and back to the button on close.
-  useEffect(() => {
-    if (isOpen) panelRef.current?.querySelector<HTMLElement>('a, button')?.focus()
-    else if (wasOpen.current && panelRef.current?.contains(document.activeElement)) triggerRef.current?.focus()
-    wasOpen.current = isOpen
-  }, [isOpen])
-
-  // Keep Tab inside the drawer while it is open (it is modal).
-  function onPanelKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    if (e.key !== 'Tab') return
-    const items = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('a, button') ?? [])
-    if (items.length === 0) return
-    const first = items[0]
-    const last = items[items.length - 1]
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault()
-      last.focus()
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault()
-      first.focus()
-    }
+  // Tabbing out past the last item closes the menu (it is a disclosure, not
+  // a modal, so focus is not trapped).
+  function onPanelBlur(e: FocusEvent<HTMLDivElement>) {
+    const next = e.relatedTarget
+    if (next instanceof Node && (panelRef.current?.contains(next) || triggerRef.current?.contains(next))) return
+    if (next) setIsOpen(false)
   }
-
-  const drawer = (
-    <>
-      <div
-        aria-hidden="true"
-        onClick={() => setIsOpen(false)}
-        className={[
-          'fixed inset-0 z-[60] bg-neutral-950/40 backdrop-blur-xs transition-opacity duration-300 motion-reduce:transition-none',
-          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
-        ].join(' ')}
-      />
-      <div
-        ref={panelRef}
-        id={MENU_ID}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Site menu"
-        onKeyDown={onPanelKeyDown}
-        className={[
-          'fixed inset-y-0 right-0 z-[70] flex w-[min(20rem,calc(100vw-3rem))] flex-col',
-          'border-l border-sage-200 bg-sage-50 shadow-xl shadow-sage-900/10',
-          'transition-[translate,visibility] duration-300 ease-out motion-reduce:transition-none',
-          isOpen ? 'visible translate-x-0' : 'invisible translate-x-full',
-        ].join(' ')}
-      >
-        <div className="flex h-14 shrink-0 items-center justify-between border-b border-sage-200 pr-2 pl-5">
-          <span className="font-sans text-[15px] font-medium tracking-[-0.01em] text-sage-900">Menu</span>
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close navigation"
-            className="flex h-11 w-11 items-center justify-center rounded-lg text-sage-600 transition-colors hover:bg-sage-100 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-          <MenuGroup label="Explore" links={PRIMARY_LINKS} size="primary" />
-          <MenuGroup label="Reference" links={REFERENCE_LINKS} size="secondary" />
-          <MenuGroup label="Legal" links={LEGAL_LINKS} size="legal" />
-        </div>
-      </div>
-    </>
-  )
 
   return (
     <>
@@ -140,45 +91,136 @@ export default function SiteMenu() {
         onClick={() => setIsOpen(open => !open)}
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
-        aria-label="Toggle navigation"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sage-700 transition-colors hover:bg-sage-100 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg max-[359px]:w-9 text-mint-800 transition-colors hover:bg-mint-100 hover:text-mint-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500"
       >
-        <HamburgerIcon />
+        {isOpen ? <CloseIcon /> : <HamburgerIcon />}
       </button>
-      {typeof document !== 'undefined' && createPortal(drawer, document.body)}
+
+      {/* Dimmed page under the bar; tapping it closes the menu. */}
+      <div
+        aria-hidden="true"
+        onClick={() => setIsOpen(false)}
+        className={[
+          'absolute inset-x-0 top-full h-[100dvh] bg-neutral-950/30 transition-opacity duration-200 motion-reduce:transition-none',
+          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+        ].join(' ')}
+      />
+
+      <div
+        ref={panelRef}
+        id={MENU_ID}
+        aria-label="Site menu"
+        onBlur={onPanelBlur}
+        className={[
+          'absolute inset-x-0 top-full border-b border-mint-200 bg-neutral-50 shadow-lg shadow-mint-900/10',
+          'max-h-[calc(100dvh-var(--nav-h,3.5rem))] overflow-y-auto overscroll-contain',
+          'transition-[opacity,translate,visibility] duration-200 ease-out motion-reduce:transition-none',
+          isOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0',
+        ].join(' ')}
+      >
+        <div className="mx-auto max-w-page px-4 pt-2 pb-6 sm:px-6 md:grid md:grid-cols-[1fr_1.6fr_1fr] md:gap-x-10 md:pt-5">
+          <div>
+            {/* The bar shows the account button from md up; below that it lives here. */}
+            <div className="border-b border-mint-200/70 py-3 md:hidden">
+              <AccountButton block />
+            </div>
+            <MenuGroup label="Explore" links={EXPLORE_LINKS} />
+          </div>
+
+          <div className="border-t border-mint-200/70 md:border-t-0">
+            <GroupLabel>Tools</GroupLabel>
+            <div className="sm:grid sm:grid-cols-2 sm:gap-x-6">
+              {ACTIVE_TOOL_SECTIONS.map(section => (
+                <section key={section.id} aria-label={section.label} className="pb-2">
+                  <p className="px-3 pt-2 pb-0.5 font-sans text-[12.5px] text-mint-700">{section.label}</p>
+                  <ul>
+                    {section.tools.map(tool => (
+                      <li key={tool.id}>
+                        <ToolLink tool={tool} current={pathname === tool.to} />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-t border-mint-200/70 md:border-t-0">
+            <MenuGroup label="About the Commons" links={REFERENCE_LINKS} />
+            <MenuGroup label="Legal" links={LEGAL_LINKS} small />
+          </div>
+        </div>
+      </div>
     </>
   )
 }
 
-type MenuLink = { to: string; label: string }
-type GroupSize = 'primary' | 'secondary' | 'legal'
+/**
+ * "Log in / Register" when signed out, "Signed In" once signed in; both go to
+ * /account. The email address is deliberately not shown in the bar.
+ */
+export function AccountButton({ block = false }: { block?: boolean }) {
+  const { user, loading } = useSession()
+  const base = [
+    'items-center justify-center rounded-lg border px-3 font-sans text-[13px] font-medium whitespace-nowrap transition-colors',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500',
+    block ? 'flex h-11 w-full' : 'inline-flex h-9',
+  ].join(' ')
 
-const LINK_SIZE: Record<GroupSize, string> = {
-  primary: 'min-h-12 text-[15px] font-medium',
-  secondary: 'min-h-11 text-[14px]',
-  legal: 'min-h-11 text-[13px] text-sage-600',
+  if (loading) {
+    return <span className={`${base} border-transparent bg-mint-100 ${block ? '' : 'w-[8.5rem]'}`} aria-hidden="true" />
+  }
+
+  if (user) {
+    return (
+      <Link
+        to="/account"
+        title={user.email ?? undefined}
+        className={`${base} gap-1.5 border-mint-300 bg-mint-50 text-mint-800 hover:border-mint-500 hover:text-mint-950`}
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-mint-600" aria-hidden="true" />
+        Signed In
+      </Link>
+    )
+  }
+
+  return (
+    <Link to="/account" className={`${base} border-mint-300 bg-white text-mint-800 hover:border-mint-500 hover:text-mint-950`}>
+      Log in / Register
+    </Link>
+  )
 }
 
-function MenuGroup({ label, links, size }: { label: string; links: MenuLink[]; size: GroupSize }) {
+type MenuLink = { to: string; label: string }
+
+/* Not headings: the unlayered h1–h6 sizes in index.css would override text-*. */
+function GroupLabel({ children }: { children: string }) {
   return (
-    <section aria-label={label} className="border-b border-sage-200/70 py-2 last:border-b-0">
-      {/* Not an <h2>: the unlayered heading sizes in index.css override text-* here. */}
-      <p aria-hidden="true" className="px-3 pt-2 pb-1 font-sans text-[12px] font-medium text-sage-500">
-        {label}
-      </p>
+    <p aria-hidden="true" className="px-3 pt-4 pb-1 font-display text-[17px] font-semibold text-mint-900 md:pt-0">
+      {children}
+    </p>
+  )
+}
+
+function MenuGroup({ label, links, small = false }: { label: string; links: MenuLink[]; small?: boolean }) {
+  return (
+    <section aria-label={label} className="pb-2">
+      <GroupLabel>{label}</GroupLabel>
       <ul>
         {links.map(link => (
           <li key={link.to}>
             <NavLink
               to={link.to}
+              end
               className={({ isActive }) =>
                 [
-                  'flex items-center rounded-r-lg border-l-2 px-3 font-sans transition-colors',
-                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-aqua-500',
-                  LINK_SIZE[size],
+                  'flex min-h-11 items-center rounded-r-lg border-l-2 px-3 font-sans transition-colors md:min-h-9',
+                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
+                  small ? 'text-[13px]' : 'text-[14.5px]',
                   isActive
-                    ? 'border-aqua-500 bg-white text-sage-900'
-                    : `border-transparent hover:bg-sage-100 ${size === 'legal' ? 'hover:text-sage-900' : 'text-sage-800'}`,
+                    ? 'border-hepatica-500 bg-white text-mint-950'
+                    : `border-transparent hover:bg-mint-100 ${small ? 'text-mint-700 hover:text-mint-950' : 'text-mint-900'}`,
                 ].join(' ')
               }
             >
@@ -188,6 +230,30 @@ function MenuGroup({ label, links, size }: { label: string; links: MenuLink[]; s
         ))}
       </ul>
     </section>
+  )
+}
+
+function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
+  const className = [
+    'flex min-h-11 items-center rounded-r-lg border-l-2 px-3 font-sans text-[14.5px] transition-colors md:min-h-9',
+    'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
+    current ? 'border-hepatica-500 bg-white text-mint-950' : 'border-transparent text-mint-900 hover:bg-mint-100',
+  ].join(' ')
+  if (tool.to) {
+    return (
+      <Link to={tool.to} aria-current={current ? 'page' : undefined} className={className}>
+        {tool.name}
+      </Link>
+    )
+  }
+  return (
+    <a href={tool.href} target="_blank" rel="noreferrer" className={className}>
+      {tool.name}
+      <span className="ml-1 text-mint-600" aria-hidden="true">
+        ↗
+      </span>
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
   )
 }
 
