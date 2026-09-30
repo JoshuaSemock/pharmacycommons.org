@@ -28,6 +28,11 @@ const ListCompare = lazy(() => import('./pages/ListCompare'))
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 const MedicationReconciliation = lazy(() => import('./tools/MedicationReconciliation'))
 const Developers = lazy(() => import('./pages/Developers'))
+// Legal & governance pages; text comes from docs/*.md (see src/legal.ts).
+const Terms = lazy(() => import('./pages/Terms'))
+const Disclaimer = lazy(() => import('./pages/Disclaimer'))
+const Licensing = lazy(() => import('./pages/Licensing'))
+const Privacy = lazy(() => import('./pages/Privacy'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
@@ -74,6 +79,10 @@ export default function App() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/licensing" element={<Licensing />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<Home />} />
           </Routes>
           </Suspense>

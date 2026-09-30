@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
+import { LEGAL_PAGES } from './legal'
 
 /**
- * Site-wide footer: disclaimer, US crisis lines, links, licensing.
+ * Site-wide footer: disclaimer, US crisis lines, legal pages, links, licensing.
  * Rendered once in App.tsx below every route.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -40,6 +41,16 @@ export default function Footer() {
             <a href="tel:18002221222" className={strongLink}>1-800-222-1222</a>
           </li>
         </ul>
+
+        <nav aria-label="Legal">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+            {LEGAL_PAGES.map(l => (
+              <li key={l.to}>
+                <Link to={l.to} className={link}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div className="flex flex-col gap-3 border-t border-sage-200 pt-4 text-[12px] text-sage-600 sm:flex-row sm:items-baseline sm:justify-between">
           <p>

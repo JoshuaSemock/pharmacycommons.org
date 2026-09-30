@@ -117,6 +117,26 @@ const STATIC_ROUTES = [
     description: 'Decisions, commentary and methodology from Pharmacy Commons, written down as the work happens.',
   },
   {
+    path: '/terms',
+    title: 'Terms of Use',
+    description: 'The Terms of Use for Pharmacy Commons: accounts and verification, community contributions, prohibited submissions, liability, Georgia governing law and arbitration.',
+  },
+  {
+    path: '/disclaimer',
+    title: 'Medical Information Disclaimer',
+    description: 'Pharmacy Commons is an educational reference, not medical advice. Clinical responsibility, primary source verification and the limits of automated and AI features.',
+  },
+  {
+    path: '/licensing',
+    title: 'Data Provenance and Licensing Policy',
+    description: 'How Pharmacy Commons is licensed: GPL-3.0 code, CC0 1.0 original structured data, federal public-domain sources, third-party license retention and the takedown protocol.',
+  },
+  {
+    path: '/privacy',
+    title: 'Privacy Policy',
+    description: 'What Pharmacy Commons collects and why: no patient information, Supabase account data, GitHub Pages server logs, no advertising trackers, and how to delete your account.',
+  },
+  {
     path: '/account',
     title: 'Account',
     description: 'Sign in to Pharmacy Commons to save drugs and verify your provider status.',

@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import PageShell, { Section } from './PageShell'
+import { LEGAL_VERSION } from '../legal'
 import {
   authErrorMessage,
+  legalAgreementMetadata,
   getMyProviderVerification,
   getSavedEntities,
   sendPasswordReset,
@@ -822,12 +824,21 @@ function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'check-email'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const loading = status === 'loading'
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    // The button is disabled until the box is ticked; this also covers
+    // pressing Enter in a field, which submits the form directly.
+    if (!agreedToTerms) {
+      setError('Please agree to the Terms of Use and policies to create an account.')
+      return
+    }
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters.')
@@ -840,7 +851,11 @@ function RegisterForm() {
 
     setStatus('loading')
     try {
-      const { session } = await signUpWithPassword(email, password)
+      const { session } = await signUpWithPassword(
+        email,
+        password,
+        legalAgreementMetadata(LEGAL_VERSION),
+      )
       // A session comes back immediately only if email confirmation is off
       // for this project; otherwise Supabase sends a confirmation link and
       // there's nothing signed in yet.
@@ -900,8 +915,33 @@ function RegisterForm() {
         the dataset.
       </p>
 
-      <button type="submit" disabled={status === 'loading'} className={primaryButtonClass}>
-        {status === 'loading' ? 'Creating account…' : 'Create account'}
+      {/* Clickwrap: registration stays disabled until this is ticked. Links open in a new tab so the form keeps its input. */}
+      <div className="mt-4 mb-4 rounded border border-mint-200 bg-white/70 p-3.5 text-xs text-mint-700">
+        <label className="flex cursor-pointer items-start gap-2.5">
+          <input
+            type="checkbox"
+            checked={agreedToTerms}
+            onChange={e => setAgreedToTerms(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-mint-600 focus:ring-mint-500"
+          />
+          <span className="font-sans leading-relaxed">
+            I agree to the Pharmacy Commons{' '}
+            <Link to="/terms" target="_blank" rel="noreferrer" className={consentLinkClass}>Terms of Use</Link>,{' '}
+            <Link to="/disclaimer" target="_blank" rel="noreferrer" className={consentLinkClass}>Medical Disclaimer</Link>,{' '}
+            <Link to="/privacy" target="_blank" rel="noreferrer" className={consentLinkClass}>Privacy Policy</Link>, and{' '}
+            <Link to="/licensing" target="_blank" rel="noreferrer" className={consentLinkClass}>Data Provenance Policy</Link>.
+            I understand this platform is an educational utility and not a substitute for clinical
+            judgment.
+          </span>
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        disabled={!agreedToTerms || loading}
+        className={registerButtonClass}
+      >
+        {loading ? 'Creating account…' : 'Create account'}
       </button>
     </form>
   )
@@ -937,6 +977,12 @@ const buttonClass =
 
 const primaryButtonClass =
   'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
+
+// primaryButtonClass already sets disabled:opacity-50; swap it rather than stack
+// two opacity utilities whose winner depends on stylesheet order.
+const registerButtonClass = `${primaryButtonClass.replace('disabled:opacity-50', 'disabled:opacity-40')} disabled:cursor-not-allowed`
+
+const consentLinkClass = 'font-medium underline hover:text-mint-950'
 
 const errorClass =
   'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-coral-600'
