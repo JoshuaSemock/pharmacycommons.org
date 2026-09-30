@@ -5,6 +5,7 @@ import PageShell, { Section } from './PageShell'
 import { LEGAL_VERSION } from '../legal'
 import {
   authErrorMessage,
+  authRedirectError,
   legalAgreementMetadata,
   getMyProviderVerification,
   getSavedEntities,
@@ -42,6 +43,15 @@ import type { ProviderVerification, SavedEntity } from '../auth'
  */
 export default function Account() {
   const { user, loading } = useSession()
+  // Read once: a failed email link lands here with #error=… in the URL.
+  const [linkError] = useState(() =>
+    authRedirectError(window.location.hash, window.location.search),
+  )
+
+  useEffect(() => {
+    // Drop the error params so a reload or a shared URL doesn't repeat them.
+    if (linkError) window.history.replaceState(null, '', window.location.pathname)
+  }, [linkError])
 
   return (
     <PageShell
@@ -53,6 +63,15 @@ export default function Account() {
       }
       toc={false}
     >
+      {linkError && (
+        <p
+          role="alert"
+          className="mt-8 rounded-lg border border-marigold-300 bg-marigold-50 px-3.5 py-3 font-sans text-md leading-relaxed text-marigold-900"
+        >
+          {linkError}
+        </p>
+      )}
+
       {loading ? (
         <Section heading="Loading">
           <p>Checking your session…</p>

@@ -74,6 +74,36 @@ export function legalAgreementMetadata(version: string, now: Date = new Date()):
   }
 }
 
+/**
+ * Where Supabase sends people after they click an emailed link (signup
+ * confirmation, password reset, email change). Without it Supabase falls back
+ * to the project's Site URL, which was still the default http://localhost:3000.
+ * The URL must also be allow-listed under Authentication → URL Configuration →
+ * Redirect URLs, or Supabase ignores it and uses the Site URL anyway.
+ */
+export function authRedirectUrl(): string {
+  return `${window.location.origin}/account`
+}
+
+/**
+ * Supabase reports a failed email link by redirecting with
+ * #error=…&error_code=…&error_description=… (or the same in the query string).
+ * Returns a message to show, or null when the URL carries no auth error.
+ */
+export function authRedirectError(hash: string, search = ''): string | null {
+  for (const raw of [hash.replace(/^#/, ''), search.replace(/^\?/, '')]) {
+    if (!raw) continue
+    const params = new URLSearchParams(raw)
+    if (!params.has('error') && !params.has('error_code')) continue
+    const code = params.get('error_code')
+    if (code === 'otp_expired') {
+      return 'That email link has already been used or has expired. If you already confirmed your email, just sign in below; otherwise register again to get a new link.'
+    }
+    return params.get('error_description') ?? 'That email link could not be used. Please try again.'
+  }
+  return null
+}
+
 export async function signUpWithPassword(
   email: string,
   password: string,
@@ -82,7 +112,7 @@ export async function signUpWithPassword(
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: consent },
+    options: { data: consent, emailRedirectTo: authRedirectUrl() },
   })
   if (error) throw error
   return data
@@ -101,7 +131,7 @@ export async function signOut() {
 
 export async function sendPasswordReset(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/account`,
+    redirectTo: authRedirectUrl(),
   })
   if (error) throw error
 }
@@ -117,7 +147,10 @@ export async function sendPasswordReset(email: string) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function updateEmail(newEmail: string) {
-  const { error } = await supabase.auth.updateUser({ email: newEmail })
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: authRedirectUrl() },
+  )
   if (error) throw error
 }
 
