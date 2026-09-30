@@ -167,9 +167,11 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`) · `/developers` (API console
-and reference; `src/developers/`) · `/resources` (outside links we
-don't draw data from; `src/resources.ts`) · `/references` (citable data sources,
-`src/sources.ts`; `/citations` redirects here since 2026-09-25)
+and reference; `src/developers/`) · `/resources` (outside links, grouped by
+`headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
+source datasets marked; `/citations` redirects here since 2026-09-25) — both read
+`public.references_resources` through `src/references.ts` (phase 12, 2026-09-30; replaced
+`src/sources.ts` and `src/resources.ts`). Edit those rows in Supabase, not in code
 · `/blog`, `/blog/:slug` · `/about` · `/account` · `/terms`, `/disclaimer`,
 `/licensing`, `/privacy` (legal pages; see Legal & governance context). GitHub Pages deep links work via
 `public/404.html` → sessionStorage → `index.html` restore, but known routes no
@@ -290,6 +292,7 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 | `fda_product_ingredients` | 15,630 (14,893 linked to a moiety) |
 | `label_documents` / `label_sections` / `label_document_formulations` | 52,571 / 2.33M / 98,251 |
 | `rxnorm_brands` / `guidelines` | 12,417 / 14 |
+| `references_resources` (phase 12, 2026-09-30) | 80 (25 `Source datasets`; 14 linked to `guidelines` by `guideline_id`) |
 | `entity_versions` / `entity_changes` | 31,248 (baseline) / 12,962 |
 | `moiety_hierarchy` (matview) | 11,544 (1,360 precise_form · 6,437 combination · 3,747 formulation) |
 | `entity_brand_names` / `ingredient_moiety_map` | 6,896 / 16,559 |
@@ -367,6 +370,15 @@ formulations in the moiety hierarchy (phase 10).
   (`{ a: string; b: number }` → `{ a: string b: number }`), and it would reformat
   nearly every file in `src/` (the code is not actually kept in its style). Don't
   run `pnpm format` until it's upgraded or replaced.
+
+- **References catalog (phase 12):** `guidelines` was *not* dropped — `entity_guidelines`
+  (drug-page guideline links) has an FK to it; its 14 rows are mirrored in
+  `references_resources.guideline_id`. Retiring it means repointing `entity_guidelines`
+  first. Some rows marked `headers = 'Source datasets'` — WebMD, RxList, NHS.uk, MACPAC,
+  NIPH, MedChemExpress — aren't referenced anywhere in code or data today (checked
+  2026-09-30), yet /references labels them "Source dataset". ClinCalc (CrCl tool
+  cross-check) and ISMP error-prone abbreviations (medrec tool) are. Confirm or re-file. `db/references-resources.csv.xlsx` was committed as a raw blob although
+  `.gitattributes` routes `*.xlsx` through LFS, so git shows it modified on every checkout.
 
 ## Decisions that belong to Joshua — ask, don't decide
 - `/api` hosting on the site domain; trademark timing.

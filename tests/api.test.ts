@@ -48,6 +48,41 @@ const { db, TOTAL, MOIETIES, COMBINATIONS } = vi.hoisted(() => {
   const moiety_hierarchy: Row[] = [] // empty: no test exercises a populated hierarchy
   const entity_brand_names: Row[] = [] // empty: brand chips aren't exercised here
 
+  // 2026-09-30: References and Resources read public.references_resources
+  // (src/references.ts). Three rows: one source dataset (kept off /resources),
+  // one guideline with a journal reference, one link with no structured cite.
+  const references_resources: Row[] = [
+    {
+      id: 'openfda', sort_order: 56, name: 'openFDA', subtitle: null, href: 'https://open.fda.gov/',
+      organization: 'U.S. Food and Drug Administration (FDA)', pub_year: 2026,
+      description: 'Adverse event reports, NDC directory, and structured product labeling.',
+      type_badge: null, license_badge: 'US public domain', badges: null,
+      headers: 'Source datasets', reference_section: 'Regulatory and product information',
+      commons_use: 'The primary feed for US product-level data.', version: null, current_as_of: null,
+      download_url: null, citation_text: null,
+      cite: { kind: 'web', title: 'openFDA', publisher: 'US Food and Drug Administration', place: 'Silver Spring (MD)', nlmPublisher: 'Food and Drug Administration (US)' },
+    },
+    {
+      id: 'ada-soc-2026-s9', sort_order: 1, name: 'ADA Standards of Care 2026, Section 9', subtitle: null,
+      href: 'https://diabetesjournals.org/care/article/49/Supplement_1/S183',
+      organization: 'American Diabetes Association', pub_year: 2026, description: null,
+      type_badge: null, license_badge: 'Copyrighted', badges: null,
+      headers: 'Guideline recommendations', reference_section: 'Clinical guidelines',
+      commons_use: null, version: null, current_as_of: null, download_url: null,
+      citation_text: 'Diabetes Care 2026;49(Suppl 1):S183',
+      cite: { kind: 'web', title: 'Pharmacologic Approaches to Glycemic Treatment', publisher: 'American Diabetes Association', nlmPublisher: 'American Diabetes Association' },
+    },
+    {
+      id: 'poison', sort_order: 53, name: 'Poison Control', subtitle: null, href: 'https://www.poison.org/',
+      organization: 'National Capital Poison Center', pub_year: 2026, description: null,
+      type_badge: null, license_badge: null, badges: ['24/7'],
+      headers: 'Report and dispose', reference_section: 'Safety, toxicology, and public health',
+      commons_use: null, version: null, current_as_of: null, download_url: null,
+      citation_text: 'National Capital Poison Center. (2026). Poison Control. https://www.poison.org/',
+      cite: { kind: 'web' }, // malformed on purpose: must be dropped, not rendered
+    },
+  ]
+
   function addMoiety(pcid: number, slug: string, name: string, primary_brand: string | null = null) {
     entities.push({ pcid, slug, name, entity_type: 'moiety' })
     moieties.push({ pcid, primary_brand, class_name: null })
@@ -88,6 +123,7 @@ const { db, TOTAL, MOIETIES, COMBINATIONS } = vi.hoisted(() => {
     db: {
       entities, moieties, combinations, precise_forms: [], formulations: [],
       clinical_statements, catalog_entries, moiety_hierarchy, entity_brand_names,
+      references_resources,
     } as Record<string, Row[]>,
     TOTAL,
     MOIETIES,
@@ -406,4 +442,61 @@ describe('isApiError', () => {
       expect(isApiError(value)).toBe(false)
     },
   )
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// References & Resources (src/references.ts)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const { fetchAllReferences, resourcesOnly, groupBy, isSourceDataset, journalReference, SOURCE_DATASETS } =
+  await import('@/references')
+
+describe('fetchAllReferences', () => {
+  it('reads references_resources in sort_order and maps to camelCase', async () => {
+    const rows = await fetchAllReferences()
+    expect(rows.map(r => r.id)).toEqual(['ada-soc-2026-s9', 'poison', 'openfda'])
+    const openfda = rows.find(r => r.id === 'openfda')!
+    expect(openfda).toMatchObject({
+      referenceSection: 'Regulatory and product information',
+      licenseBadge: 'US public domain',
+      commonsUse: 'The primary feed for US product-level data.',
+      badges: [],
+      subtitle: undefined,
+    })
+    expect(openfda.cite).toMatchObject({ kind: 'web', place: 'Silver Spring (MD)' })
+  })
+
+  it('drops a malformed cite instead of passing it to the formatter', async () => {
+    const poison = (await fetchAllReferences()).find(r => r.id === 'poison')!
+    expect(poison.cite).toBeUndefined()
+    expect(poison.citationText).toContain('Poison Control')
+  })
+})
+
+describe('/resources filtering', () => {
+  it(`excludes rows whose headers = '${SOURCE_DATASETS}'`, async () => {
+    const rows = await fetchAllReferences()
+    const shown = resourcesOnly(rows)
+    expect(shown.map(r => r.id)).toEqual(['ada-soc-2026-s9', 'poison'])
+    expect(shown.some(r => r.headers === 'Source datasets')).toBe(false)
+  })
+
+  it('/references keeps every row and puts source datasets first in a section', async () => {
+    const rows = await fetchAllReferences()
+    const groups = groupBy(rows, r => r.referenceSection, isSourceDataset)
+    expect(groups.flatMap(g => g.items)).toHaveLength(rows.length)
+    expect(groups.map(g => g.id)).toEqual([
+      'clinical-guidelines',
+      'safety-toxicology-and-public-health',
+      'regulatory-and-product-information',
+    ])
+  })
+
+  it('shows a journal reference only when it adds something', async () => {
+    const rows = await fetchAllReferences()
+    const byId = (id: string) => rows.find(r => r.id === id)!
+    expect(journalReference(byId('ada-soc-2026-s9'))).toBe('Diabetes Care 2026;49(Suppl 1):S183')
+    expect(journalReference(byId('poison'))).toBeNull() // restates the URL
+    expect(journalReference(byId('openfda'))).toBeNull() // none supplied
+  })
 })

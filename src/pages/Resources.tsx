@@ -1,25 +1,41 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import PageShell from './PageShell'
-import { LINK_GROUPS, LINKS_CHECKED } from '../resources'
-import type { ExternalLink } from '../resources'
+import { groupBy, resourcesOnly, useReferences } from '../references'
+import type { ReferenceResource } from '../references'
 
 /**
- * Resources: outside sites worth knowing about that the Commons does not draw
- * data from. The datasets we do use, with licenses and citations, are on
- * References (src/sources.ts). Links live in src/resources.ts.
+ * Resources: outside sites worth knowing about. Rows come from
+ * public.references_resources, grouped by `headers`; the datasets the Commons
+ * is built from (`headers = 'Source datasets'`) are left to References.
  */
+
+/** Short intro per group. Presentation only; a header without one just shows its links. */
+const INTROS: Record<string, string> = {
+  'Guideline recommendations':
+    'Who recommends what, and when to use it. Check the edition year: most of these are revised every one to three years.',
+  'Clinical trials and evidence':
+    'Registries for ongoing and completed studies, and places to find the reviews that summarize them.',
+  'Drug lists kept elsewhere':
+    'Authority lists we have not imported into Lists yet. The source keeps the current edition.',
+  'Specialty references': 'Useful references that are not upstream of anything on this site.',
+  'Report and dispose': 'Where to report a problem with a medicine, and how to get rid of one safely.',
+}
+
 export default function Resources() {
+  const { rows, failed } = useReferences()
+  const groups = useMemo(() => (rows ? groupBy(resourcesOnly(rows), r => r.headers) : []), [rows])
+
   return (
     <PageShell
       kicker="Resources"
       title="Resources beyond the Commons"
       lede="Guidelines, trial registries, drug lists and safety tools kept by other organizations. None of it feeds a Pharmacy Commons record. They are here because they are worth knowing."
+      contentKey={`resources:${groups.length}`}
     >
       <section className="border-t border-sage-200 py-8">
         <p className="font-sans text-[14.5px] leading-relaxed text-sage-700">
-          These sites are run by others and change without notice. Links were last checked{' '}
-          <time dateTime={LINKS_CHECKED}>{formatDate(LINKS_CHECKED)}</time>. Our own sources and how to
-          cite them are on{' '}
+          These sites are run by others and change without notice. Our own sources and how to cite them are on{' '}
           <Link to="/references" className={linkClass}>
             References
           </Link>
@@ -27,7 +43,19 @@ export default function Resources() {
         </p>
       </section>
 
-      {LINK_GROUPS.map(group => (
+      {failed && (
+        <p role="alert" className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-rose-700">
+          The resource list could not be loaded. Refresh the page to try again.
+        </p>
+      )}
+
+      {!rows && !failed && (
+        <p className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-sage-600" aria-live="polite">
+          Loading resources…
+        </p>
+      )}
+
+      {groups.map(group => (
         <section key={group.id} className="border-t border-sage-200 py-8">
           <h2
             id={group.id}
@@ -36,9 +64,11 @@ export default function Resources() {
           >
             {group.heading}
           </h2>
-          <p className="mb-5 font-sans text-[14.5px] leading-relaxed text-sage-600">{group.intro}</p>
+          {INTROS[group.heading] && (
+            <p className="mb-5 font-sans text-[14.5px] leading-relaxed text-sage-600">{INTROS[group.heading]}</p>
+          )}
           <ul className="space-y-5">
-            {group.links.map(link => (
+            {group.items.map(link => (
               <LinkItem key={link.id} link={link} />
             ))}
           </ul>
@@ -68,19 +98,20 @@ export default function Resources() {
   )
 }
 
-function LinkItem({ link }: { link: ExternalLink }) {
+function LinkItem({ link }: { link: ReferenceResource }) {
+  const badges = [link.typeBadge, link.licenseBadge, ...link.badges].filter((b): b is string => Boolean(b))
   return (
     <li className="min-w-0 border-l-2 border-sage-200 pl-4">
-      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
         <a
           href={link.href}
           target="_blank"
           rel="noreferrer"
-          className="break-words font-sans text-[14.5px] font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
         >
           {link.name}
         </a>
-        {link.badges?.map(badge => (
+        {badges.map(badge => (
           <span
             key={badge}
             className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-[10px] text-sage-600"
@@ -89,21 +120,14 @@ function LinkItem({ link }: { link: ExternalLink }) {
           </span>
         ))}
       </div>
-      <p className="mt-0.5 font-sans text-[12.5px] text-sage-600">{link.publisher}</p>
-      <p className="mt-1 font-sans text-[14px] leading-relaxed text-sage-600">{link.note}</p>
+      {link.organization && (
+        <p className="mt-0.5 break-words font-sans text-[12.5px] text-sage-600">{link.organization}</p>
+      )}
+      {link.description && (
+        <p className="mt-1 break-words font-sans text-[14px] leading-relaxed text-sage-600">{link.description}</p>
+      )}
     </li>
   )
-}
-
-/** "2026-09-25" → "September 25, 2026", without a time-zone shift. */
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number)
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
 }
 
 const linkClass =

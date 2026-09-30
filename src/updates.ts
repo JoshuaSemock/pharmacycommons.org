@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'references-resources',
+    date: '2026-09-30',
+    kind: 'Feature',
+    title: 'One catalog for references and resources',
+    summary:
+      'References now lists every source we cite or point to (80 in all), grouped by topic, with the datasets the Commons is built from marked. Every entry can be copied as a citation in AMA, APA, Vancouver, NLM or BibTeX. Resources draws on the same catalog.',
+    to: '/references',
+    cta: 'See the references',
+  },
+  {
     id: 'legal-policies',
     date: '2026-09-30',
     kind: 'Feature',

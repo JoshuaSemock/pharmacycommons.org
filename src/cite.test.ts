@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { abbreviatePages, formatList, formatPage, formatSource } from './cite'
-import { ALL_SOURCES } from './sources'
+import { CITE_FIXTURES } from './cite.fixtures'
 
 const byId = (id: string) => {
-  const s = ALL_SOURCES.find(x => x.id === id)
+  const s = CITE_FIXTURES.find(x => x.id === id)
   if (!s) throw new Error(id)
   return s
 }
@@ -39,6 +39,19 @@ describe('upstream sources', () => {
   it('NLM web with open-ended start year', () => {
     expect(cite('nlm', 'lactmed')).toBe(
       'Drugs and Lactation Database (LactMed) [Internet]. Bethesda (MD): National Institute of Child Health and Human Development; 2006- [cited 2026 Sep 16]. Available from: https://www.ncbi.nlm.nih.gov/books/NBK501922/',
+    )
+  })
+  it('NLM web without a place drops it rather than printing a placeholder', () => {
+    expect(
+      formatSource(
+        'nlm',
+        'poison',
+        'https://www.poison.org/',
+        { kind: 'web', title: 'Poison Control', publisher: 'National Capital Poison Center', nlmPublisher: 'National Capital Poison Center' },
+        '2026-09-16',
+      ),
+    ).toBe(
+      'Poison Control [Internet]. National Capital Poison Center; [cited 2026 Sep 16]. Available from: https://www.poison.org/',
     )
   })
   it('WHO index takes the access year as its edition', () => {

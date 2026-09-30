@@ -136,17 +136,23 @@ type PageShellProps = {
   lede?: string
   aside?: ReactNode
   toc?: boolean
+  /**
+   * Re-scans headings (TOC) and re-resolves a #hash when it changes. Defaults
+   * to the title; pages that load their sections async pass something that
+   * changes once the data arrives.
+   */
+  contentKey?: string
   children: ReactNode
 }
 
-export default function PageShell({ title, lede, aside, toc, children }: PageShellProps) {
+export default function PageShell({ title, lede, aside, toc, contentKey, children }: PageShellProps) {
   useEffect(() => {
     document.title = `${title} · Pharmacy Commons`
   }, [title])
 
   return (
     <PageFrame
-      contentKey={title}
+      contentKey={contentKey ?? title}
       aside={aside}
       toc={toc}
       header={<PageTitle title={title} lede={lede} />}
