@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'legal-policies',
+    date: '2026-09-30',
+    kind: 'Feature',
+    title: 'Terms, disclaimer, privacy and licensing',
+    summary:
+      'The Terms of Use, Medical Information Disclaimer, Privacy Policy and Data Provenance and Licensing Policy now have their own pages, linked from every footer. New accounts agree to them when registering.',
+    to: '/terms',
+    cta: 'Read the terms',
+  },
+  {
     id: 'developers',
     date: '2026-09-28',
     kind: 'Feature',

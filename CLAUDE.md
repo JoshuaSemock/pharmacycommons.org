@@ -47,6 +47,15 @@ for every file produced.**
   Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
   CAS Common Chemistry rows (physiochemical) stay CC BY-NC 4.0 whatever we choose.
   ATC and ChemOnt restrict commercial redistribution — never present them as CC0.
+- **Legal documents** (effective 2026-09-29; operator Pharmacy of the Commons, LLC):
+  canonical text is `docs/terms-of-use.md`, `docs/medical-disclaimer.md`,
+  `docs/privacy-policy.md`, `docs/data-provenance-and-licensing.md`. The `/terms`,
+  `/disclaimer`, `/privacy`, `/licensing` pages import those files `?raw` and render them
+  (`src/pages/LegalPage.tsx`, `src/legal.ts`) — edit the markdown, never the pages.
+  Registration is clickwrap-gated; signups store `legal_agreements_accepted`,
+  `legal_agreements_version`, `legal_agreements_accepted_at` in
+  `auth.users.raw_user_meta_data`. **When a document's Effective Date changes, bump
+  `LEGAL_VERSION` in `src/legal.ts`** (`src/legal.test.ts` fails until you do).
 - Domain via Porkbun; USPTO Intent-to-Use filing planned (Class 42, "Pharmacy
   Commons"). Joshua decides when the licensing question is settled enough to file.
 
@@ -161,7 +170,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 and reference; `src/developers/`) · `/resources` (outside links we
 don't draw data from; `src/resources.ts`) · `/references` (citable data sources,
 `src/sources.ts`; `/citations` redirects here since 2026-09-25)
-· `/blog`, `/blog/:slug` · `/about` · `/account`. GitHub Pages deep links work via
+· `/blog`, `/blog/:slug` · `/about` · `/account` · `/terms`, `/disclaimer`,
+`/licensing`, `/privacy` (legal pages; see Legal & governance context). GitHub Pages deep links work via
 `public/404.html` → sessionStorage → `index.html` restore, but known routes no
 longer need it: `scripts/postbuild.mjs` (runs after `vite build`) writes
 `dist/<route>.html` copies of `index.html` with per-route title, description,
