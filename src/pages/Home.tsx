@@ -66,24 +66,31 @@ function Hero() {
   }
 
   return (
-    <section className="pt-16 pb-14 text-center">
-      <p className="mb-3 font-sans text-[13px] font-medium text-hepatica-700">
-        Cultivating our pharmacopeial commons: an open compendium of clinical evidence and drug information accessible to all.
+    <section className="pt-8 pb-8 text-center sm:pt-16 sm:pb-14">
+      {/* Kicker. Sizes are pixel values on purpose: this site's phi scale makes
+          text-xs 9.9px, too small for a sentence. */}
+      <p className="mx-auto mb-2.5 max-w-2xl font-sans text-[12.5px] font-medium leading-snug text-pretty text-hepatica-700 sm:text-[13px]">
+        Together we can cultivate our commons to create an open compendium of drug information and clinical evidence accessible to all.
       </p>
+
+      {/* Title. Size comes from .pc-hero-title in src/index.css: the bare h1 rule
+          there is unlayered, so text-* utilities on an h1 are ignored. */}
       <h1
-        className="mb-4 font-display text-4.2xl font-semibold leading-[1.1] text-balance text-mint-950 sm:text-5xl"
+        className="pc-hero-title mx-auto mb-3 max-w-4xl font-display font-semibold text-balance text-mint-950"
         style={{ fontFamily: 'var(--font-display)' }}
       >
-        Query structured data by active ingredients, preparations, pharmacologic classes, and compendium lists.
+        Pharmacy Commons
       </h1>
-      <p className="mx-auto mb-8 max-w-xl font-sans text-[21px] leading-relaxed text-pretty text-mint-700">
-        An open educational source for clinical and public inquiry, not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
+
+      {/* Scope and educational disclaimer */}
+      <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-relaxed text-pretty text-hepatica-800 sm:text-[13.5px] sm:leading-normal">
+        Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
       </p>
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
-          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-3 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
+          <div className="flex items-center gap-2 rounded-xl border border-mint-200 bg-white px-4 py-3 shadow-sm shadow-mint-900/5 focus-within:border-hepatica-400 focus-within:ring-3 focus-within:ring-hepatica-200">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-mint-500">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
@@ -93,16 +100,16 @@ function Hero() {
               onChange={e => setQuery(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setTimeout(() => setFocused(false), 150)}
-              placeholder="...ibuprofen, Advil, NSAID, analgesic, pain, etc."
-              aria-label="Search the catalog"
-              className="flex-1 bg-transparent font-sans text-[14px] text-mint-900 placeholder-mint-400 outline-none"
+              placeholder="drug, brand name, combination product, class..."
+              aria-label="Search the commons"
+              className="min-w-0 flex-1 bg-transparent font-sans text-[14px] text-mint-900 placeholder-mint-400 outline-none"
               autoFocus={FINE_POINTER}
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="text-mint-400 hover:text-sage-600"
+                className="-my-2 -mr-2 inline-flex min-h-[32px] min-w-[32px] items-center justify-center text-mint-400 hover:text-mint-700"
                 aria-label="Clear search"
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -121,7 +128,7 @@ function Hero() {
                 <button
                   key={entry.n}
                   onMouseDown={() => navigate(`/drugs/${entry.slug}`)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-mint-50"
+                  className="flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-mint-50"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-sans text-[14px] font-medium text-mint-900">{entry.name}</span>
@@ -130,17 +137,17 @@ function Hero() {
                     </span>
                   </span>
                   {schedule && (
-                    <span className="rounded-md border border-coral-200 bg-salmon-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-salmon-600">
+                    <span className="rounded-md border border-rose-200 bg-salmon-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-salmon-700">
                       {schedule}
                     </span>
                   )}
-                  <span className="font-mono text-[11px] text-mint-400">{pcidOf(entry)}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-mint-700">{pcidOf(entry)}</span>
                 </button>
               )
             })}
             <Link
               to={`/browse?q=${encodeURIComponent(query.trim())}`}
-              className="block border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-hepatica-700 hover:bg-mint-50"
+              className="flex min-h-[48px] items-center border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-hepatica-700 hover:bg-mint-50"
             >
               See every match for “{query.trim()}”
             </Link>
@@ -148,7 +155,7 @@ function Hero() {
         )}
       </div>
 
-      <p className="mt-5 font-sans text-[13.5px] text-mint-700">
+      <p className="mt-5 font-sans text-[13px] text-mint-700 sm:text-[13.5px]">
         Or{' '}
         <Link to="/browse" className="font-medium text-hepatica-700 underline-offset-2 hover:underline">
           {catalogSize !== null
