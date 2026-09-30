@@ -52,8 +52,38 @@ export function authErrorMessage(err: unknown): string {
   return 'Something went wrong. Please try again.'
 }
 
-export async function signUpWithPassword(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+/**
+ * Clickwrap consent recorded with each new account, stored by Supabase in
+ * auth.users.raw_user_meta_data. `version` is the Effective Date of the
+ * documents agreed to (LEGAL_VERSION in src/legal.ts).
+ *
+ * `legal_agreements_accepted_at` is the browser's clock; auth.users.created_at
+ * is the server-side timestamp for the same signup.
+ */
+export type LegalAgreementMetadata = {
+  legal_agreements_accepted: true
+  legal_agreements_version: string
+  legal_agreements_accepted_at: string
+}
+
+export function legalAgreementMetadata(version: string, now: Date = new Date()): LegalAgreementMetadata {
+  return {
+    legal_agreements_accepted: true,
+    legal_agreements_version: version,
+    legal_agreements_accepted_at: now.toISOString(),
+  }
+}
+
+export async function signUpWithPassword(
+  email: string,
+  password: string,
+  consent: LegalAgreementMetadata,
+) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: consent },
+  })
   if (error) throw error
   return data
 }
