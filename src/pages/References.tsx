@@ -4,27 +4,40 @@ import { Link } from 'react-router-dom'
 import PageShell, { RailHeading } from './PageShell'
 import { STYLES, formatList, formatPage, formatSource, todayISO } from '../cite'
 import type { Style } from '../cite'
-import { ALL_SOURCES, SOURCE_GROUPS } from '../sources'
-import type { Source } from '../sources'
+import { groupBy, isSourceDataset, journalReference, useReferences } from '../references'
+import type { ReferenceResource } from '../references'
 
 /**
  * References (formerly Citations, /citations still redirects here). Style and
  * access date live in the rail and apply to every
  * citation on the page, so a reader picks them once. Below lg the rail stacks
  * above the content, which keeps the style picker ahead of what it controls.
+ *
+ * Every row of public.references_resources is listed here, grouped by
+ * `reference_section`, with the datasets the Commons is built from first in
+ * each group and marked. Citations are formatted from the row's structured
+ * `cite`; a row without one falls back to its supplied `citation_text`.
  */
 export default function References() {
   const [style, setStyle] = useState<Style>('ama')
   const [accessed, setAccessed] = useState(todayISO())
   const { copiedKey, copy } = useCopy()
+  const { rows, failed } = useReferences()
 
   const references = useMemo(
     () =>
-      ALL_SOURCES.map(source => ({
+      (rows ?? []).map(source => ({
         source,
-        text: formatSource(style, source.id, source.href, source.cite, accessed),
+        text: source.cite
+          ? formatSource(style, source.id, source.href, source.cite, accessed)
+          : source.citationText ?? '',
       })),
-    [style, accessed],
+    [rows, style, accessed],
+  )
+
+  const groups = useMemo(
+    () => (rows ? groupBy(rows, r => r.referenceSection, isSourceDataset) : []),
+    [rows],
   )
 
   const citationFor = useMemo(() => {
@@ -36,10 +49,9 @@ export default function References() {
     () =>
       formatList(
         style,
-        references.map(({ source, text }) => ({
-          sortKey: source.cite.kind === 'article' ? source.cite.authors[0] : source.cite.publisher,
-          text,
-        })),
+        references
+          .filter(({ text }) => text)
+          .map(({ source, text }) => ({ sortKey: sortKeyFor(source), text })),
       ),
     [style, references],
   )
@@ -49,6 +61,7 @@ export default function References() {
       kicker="References"
       title="Cite the Commons and its sources"
       lede="Pick a citation style once and every citation on this page follows it. Blank fields are dropped rather than filled with placeholders — check the output against your target journal's instructions before submitting."
+      contentKey={`references:${groups.length}`}
       aside={
         <CitationSettings
           style={style}
@@ -61,18 +74,19 @@ export default function References() {
       <PageCitation style={style} accessed={accessed} copied={copiedKey === 'page'} onCopy={copy} />
 
       <section className="border-t border-sage-200 py-9">
-        <SectionHeading id="source-datasets">Source datasets</SectionHeading>
+        <SectionHeading id="source-datasets">Sources and references</SectionHeading>
         <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
           <p>
             For anything load-bearing — a dose, a contraindication, an approval date — cite
-            the primary record, not this site. These are the datasets the Commons is built
-            from. Where a maintainer asks to be cited through a paper, the paper is given
-            instead of the website. Each entry shows its license and what it feeds on this
-            site. Sites we point readers to but don't draw data from are on the{' '}
+            the primary record, not this site. Entries marked{' '}
+            <span className={sourceBadgeClass}>Source dataset</span> are the datasets the Commons is
+            built from; each says what it feeds on this site. The rest are guidelines,
+            registries and references we point readers to, also listed by topic on the{' '}
             <Link to="/resources" className={linkClass}>
               Resources
             </Link>{' '}
-            page.
+            page. Where a maintainer asks to be cited through a paper, the paper is given
+            instead of the website.
           </p>
           <p>
             Cite Pharmacy Commons itself when you are referencing the aggregation: a derived
@@ -80,17 +94,32 @@ export default function References() {
           </p>
         </div>
 
-        <div className="mt-5">
-          <button
-            type="button"
-            onClick={() => copy('all', fullList)}
-            className={buttonClass}
-          >
-            {copiedKey === 'all' ? 'Copied all references' : `Copy all ${ALL_SOURCES.length} references`}
-          </button>
-        </div>
+        {failed && (
+          <p role="alert" className="mt-5 font-sans text-md text-rose-700">
+            The reference list could not be loaded. Refresh the page to try again.
+          </p>
+        )}
 
-        {SOURCE_GROUPS.map(group => (
+        {!rows && !failed && (
+          <p className="mt-5 font-sans text-md text-sage-600" aria-live="polite">
+            Loading references…
+          </p>
+        )}
+
+        {rows && (
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={() => copy('all', fullList)}
+              disabled={!fullList}
+              className={buttonClass}
+            >
+              {copiedKey === 'all' ? 'Copied all references' : `Copy all ${rows.length} references`}
+            </button>
+          </div>
+        )}
+
+        {groups.map(group => (
           <div key={group.id} className="mt-10">
             <h3
               id={group.id}
@@ -100,7 +129,7 @@ export default function References() {
               {group.heading}
             </h3>
             <ul className="space-y-7">
-              {group.sources.map(source => (
+              {group.items.map(source => (
                 <ReferenceItem
                   key={source.id}
                   source={source}
@@ -138,8 +167,8 @@ function Reuse() {
           >
             CC0 1.0
           </a>
-          . Third-party data keeps its source license: anything drawn from a source marked
-          CC BY-NC 4.0 above still restricts commercial reuse.
+          . Third-party data keeps its source license: anything drawn from a source dataset
+          marked CC BY-NC 4.0 above still restricts commercial reuse.
         </p>
         <p>
           If you need a dataset export for research, write to{' '}
@@ -224,42 +253,70 @@ function ReferenceItem({
   copied,
   onCopy,
 }: {
-  source: Source
+  source: ReferenceResource
   citation: string
   copied: boolean
   onCopy: (key: string, text: string) => void
 }) {
+  const journal = journalReference(source)
+  const badges = [source.typeBadge, source.licenseBadge, ...source.badges].filter((b): b is string => Boolean(b))
   return (
-    <li className="border-l-2 border-sage-200 pl-4">
-      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+    <li className="min-w-0 border-l-2 border-sage-200 pl-4">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
         <a
           href={source.href}
           target="_blank"
           rel="noreferrer"
-          className="font-sans text-md font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="min-w-0 break-words font-sans text-md font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
         >
           {source.name}
         </a>
-        {source.license && (
-          <span className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-sage-600">
-            {source.license}
-          </span>
+        {isSourceDataset(source) && (
+          <span className={sourceBadgeClass}>Source dataset</span>
         )}
+        {badges.map(badge => (
+          <span key={badge} className={badgeClass}>
+            {badge}
+          </span>
+        ))}
       </div>
-      <p className="mt-1 font-sans text-md leading-relaxed text-sage-600">{source.role}</p>
+      {source.organization && (
+        <p className="mt-0.5 break-words font-sans text-sm text-sage-600">{source.organization}</p>
+      )}
+      {source.description && (
+        <p className="mt-1 break-words font-sans text-md leading-relaxed text-sage-600">{source.description}</p>
+      )}
+      {source.commonsUse && source.commonsUse !== source.description && (
+        <p className="mt-1 break-words font-sans text-md leading-relaxed text-sage-700">
+          <span className="font-medium text-sage-900">Used here for: </span>
+          {source.commonsUse}
+        </p>
+      )}
+      {journal && (
+        <p className="mt-1 break-words font-sans text-sm text-sage-600">Published in {journal}</p>
+      )}
 
-      <div className="mt-3 flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <CitationText>{citation}</CitationText>
+      {citation && (
+        <div className="mt-3 flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <CitationText>{citation}</CitationText>
+          </div>
+          <CopyButton
+            copied={copied}
+            onClick={() => onCopy(source.id, citation)}
+            label={`Copy citation for ${source.name}`}
+          />
         </div>
-        <CopyButton
-          copied={copied}
-          onClick={() => onCopy(source.id, citation)}
-          label={`Copy citation for ${source.name}`}
-        />
-      </div>
+      )}
     </li>
   )
+}
+
+/** First author for articles, corporate author for web citations; APA sorts on it. */
+function sortKeyFor(source: ReferenceResource): string {
+  if (source.cite?.kind === 'article') return source.cite.authors[0] ?? source.name
+  if (source.cite?.kind === 'web') return source.cite.publisher
+  return source.organization ?? source.name
 }
 
 /* --------------------------------------------------------------------- rail */
@@ -412,6 +469,12 @@ const inputClass =
 
 const buttonClass =
   'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+
+const sourceBadgeClass =
+  'rounded border border-mint-300 bg-mint-100 px-1.5 py-0.5 font-mono text-xs text-mint-800'
+
+const badgeClass =
+  'rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-sage-600'
 
 const linkClass =
   'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'

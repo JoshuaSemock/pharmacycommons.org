@@ -2,7 +2,7 @@
  * Citation formatting for the References page.
  *
  * Two inputs: a Commons page (user-entered fields) and an upstream reference
- * (structured metadata in sources.ts). Anything missing is dropped rather than
+ * (structured metadata from public.references_resources, see src/references.ts). Anything missing is dropped rather than
  * filled with a placeholder, so the output never claims more than we know.
  *
  * Output is plain text — no italics — because it is meant to be pasted.
@@ -24,8 +24,12 @@ export type WebCitation = {
   title: string
   /** Corporate author, as AMA/APA print it ("US Food and Drug Administration"). */
   publisher: string
-  /** Citing Medicine place and publisher ("Silver Spring (MD)", "Food and Drug Administration (US)"). */
-  place: string
+  /**
+   * Citing Medicine place and publisher ("Silver Spring (MD)", "Food and Drug
+   * Administration (US)"). Place is optional: when unknown it is dropped, not
+   * replaced with "[place unknown]".
+   */
+  place?: string
   nlmPublisher: string
   /** First year of publication, for NLM's open-ended "2006-". Omit if unknown. */
   since?: number
@@ -247,7 +251,8 @@ function formatWeb(style: Style, key: string, url: string, c: WebCitation, ac: D
     case 'vancouver':
     case 'nlm': {
       const since = c.since ? ` ${c.since}-` : ''
-      const parts = [`${title} [Internet].`, `${c.place}: ${c.nlmPublisher};${since}`]
+      const where = c.place ? `${c.place}: ${c.nlmPublisher}` : c.nlmPublisher
+      const parts = [`${title} [Internet].`, `${where};${since}`]
       if (ac) parts.push(`[cited ${medDate(ac)}].`)
       else parts[1] = parts[1].replace(/;$/, '.')
       parts.push(`Available from: ${url}`)

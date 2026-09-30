@@ -101,13 +101,13 @@ const STATIC_ROUTES = [
     path: '/references',
     title: 'References',
     heading: 'Cite the Commons and its sources',
-    description: 'How to cite Pharmacy Commons records, and the public datasets its data comes from, with licenses.',
+    description: 'How to cite Pharmacy Commons records, the public datasets its data comes from, and the guidelines, registries and references it points to, with licenses.',
   },
   {
     // Old name for /references; the app redirects it. Kept so existing links still get a 200.
     path: '/citations',
     title: 'References',
-    description: 'How to cite Pharmacy Commons records, and the public datasets its data comes from, with licenses.',
+    description: 'How to cite Pharmacy Commons records, the public datasets its data comes from, and the guidelines, registries and references it points to, with licenses.',
     index: false,
     sitemap: false,
   },
