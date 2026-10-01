@@ -66,7 +66,7 @@ export default function Account() {
       {linkError && (
         <p
           role="alert"
-          className="mt-8 rounded-lg border border-marigold-300 bg-marigold-50 px-3.5 py-3 font-sans text-md leading-relaxed text-ink"
+          className="lp-sunken mt-8 rounded-md bg-marigold-50 px-3.5 py-3 font-sans text-md leading-relaxed text-ink"
         >
           {linkError}
         </p>
@@ -162,7 +162,7 @@ function SignedIn({ email }: { email: string }) {
       <div
         role="tablist"
         aria-label="Account sections"
-        className="inline-flex flex-wrap rounded-lg border border-sage-200 bg-sage-100 p-0.5"
+        className="inline-flex flex-wrap gap-1.5"
       >
         {DASHBOARD_TABS.map(t => (
           <button
@@ -172,11 +172,9 @@ function SignedIn({ email }: { email: string }) {
             aria-selected={tab === t.key}
             onClick={() => setTab(t.key)}
             className={[
-              'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
+              'lp-toggle rounded-md px-3.5 py-1.5 font-sans text-sm font-medium text-ink',
               'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
-              tab === t.key
-                ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-                : 'text-ink',
+              '',
             ].join(' ')}
           >
             {t.label}
@@ -215,7 +213,7 @@ function OverviewPanel({
 }) {
   return (
     <div className="space-y-5">
-      <div className="border-t border-sage-200 pt-3.5">
+      <div className="border-t border-ink/15 pt-3.5">
         <p className="font-sans text-sm text-ink">Signed in as</p>
         <p className="font-sans text-md font-medium text-ink">{email}</p>
       </div>
@@ -241,7 +239,7 @@ function OverviewPanel({
 
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint: string }) {
   return (
-    <div className="border-t border-sage-200 pt-3.5">
+    <div className="border-t border-ink/15 pt-3.5">
       <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</p>
       <p className="mt-0.5 font-mono text-lg font-semibold text-ink">{value}</p>
       <p className="mt-0.5 font-sans text-2xs text-ink">{hint}</p>
@@ -275,7 +273,7 @@ function NpiStatCard() {
   const verified = verification?.status === 'active'
 
   return (
-    <div className="border-t border-sage-200 pt-3.5">
+    <div className="border-t border-ink/15 pt-3.5">
       <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
         Contribution status
       </p>
@@ -349,7 +347,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
 
   if (rows.length === 0) {
     return (
-      <div className="border-t border-sage-200 px-1 py-6 text-center">
+      <div className="border-t border-ink/15 px-1 py-6 text-center">
         <p className="font-sans text-sm text-ink">
           Nothing saved yet. Look for the <span className="font-medium text-ink">Save</span>{' '}
           button on any drug page to bookmark it here.
@@ -359,11 +357,11 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   }
 
   return (
-    <div className="border-t border-sage-200">
+    <div className="border-t border-ink/15">
       {rows.map(row => (
         <div
           key={row.pcid_code}
-          className="flex items-center justify-between gap-3 border-b border-sage-200 py-3"
+          className="flex items-center justify-between gap-3 border-b border-ink/15 py-3"
         >
           <div className="min-w-0">
             <Link
@@ -438,7 +436,7 @@ function ChangeEmailForm({ currentEmail }: { currentEmail: string }) {
         sends a confirmation link to the new address before it takes effect.
       </p>
       {status === 'sent' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm leading-relaxed text-ink">
+        <p className="lp-sunken rounded-md px-3.5 py-3 font-sans text-sm leading-relaxed text-ink">
           Check {newEmail.trim()} for a confirmation link to finish the change.
         </p>
       ) : (
@@ -501,7 +499,7 @@ function ChangePasswordForm() {
         Takes effect immediately — you'll stay signed in on this device.
       </p>
       {status === 'done' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm text-ink">
+        <p className="lp-sunken rounded-md px-3.5 py-3 font-sans text-sm text-ink">
           Password updated.
         </p>
       ) : (
@@ -553,7 +551,7 @@ function SignOutRow() {
   }
 
   return (
-    <div className="border-t border-sage-200 pt-5">
+    <div className="border-t border-ink/15 pt-5">
       <h3 className="mb-1 font-sans text-sm font-semibold text-ink">Sign out</h3>
       <p className="mb-3 font-sans text-sm text-ink">Ends your session on this device.</p>
       {error && <p className={`mb-2 ${errorClass}`}>{error}</p>}
@@ -633,7 +631,7 @@ function NpiVerification() {
 
   if (checking) {
     return (
-      <div className="border-t border-sage-200 pt-3.5">
+      <div className="border-t border-ink/15 pt-3.5">
         <p className="font-sans text-sm text-ink">Checking NPI verification status…</p>
       </div>
     )
@@ -645,7 +643,7 @@ function NpiVerification() {
 
   if (verification && verification.status === 'active') {
     return (
-      <div className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-4 py-3.5">
+      <div className="lp-sunken rounded-md px-4 py-3.5">
         <p className="font-sans text-sm font-medium text-ink">
           NPI verified — {verification.verified_name ?? verification.npi}
         </p>
@@ -660,7 +658,7 @@ function NpiVerification() {
   }
 
   return (
-    <div className="border-t border-sage-200 pt-3.5">
+    <div className="border-t border-ink/15 pt-3.5">
       <p className="mb-3 font-sans text-sm font-medium text-ink">Verify your NPI</p>
       <p className="mb-4 font-sans text-sm leading-relaxed text-ink">
         Required before you can submit an edit. Checked against the CMS NPI Registry — your last
@@ -710,7 +708,7 @@ function SignedOut() {
       <div
         role="tablist"
         aria-label="Sign in or register"
-        className="inline-flex rounded-lg border border-sage-200 bg-sage-100 p-0.5"
+        className="inline-flex gap-1.5"
       >
         <TabButton active={mode === 'signin'} onClick={() => setMode('signin')}>
           Sign in
@@ -741,11 +739,9 @@ function TabButton({
       aria-selected={active}
       onClick={onClick}
       className={[
-        'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
+        'lp-toggle rounded-md px-3.5 py-1.5 font-sans text-sm font-medium text-ink',
         'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
-        active
-          ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-          : 'text-ink',
+        '',
       ].join(' ')}
     >
       {children}
@@ -791,7 +787,7 @@ function SignInForm() {
 
   if (status === 'reset-sent') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
+      <p className="lp-sunken mt-5 rounded-md px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
         If an account exists for {email}, a password reset link is on its way.
       </p>
     )
@@ -887,7 +883,7 @@ function RegisterForm() {
 
   if (status === 'check-email') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
+      <p className="lp-sunken mt-5 rounded-md px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
         Check {email} for a confirmation link to finish setting up your account.
       </p>
     )
@@ -935,13 +931,13 @@ function RegisterForm() {
       </p>
 
       {/* Clickwrap: registration stays disabled until this is ticked. Links open in a new tab so the form keeps its input. */}
-      <div className="mt-4 mb-4 rounded border border-mint-200 bg-white/70 p-3.5 text-xs text-ink">
+      <div className="lp-sunken mt-4 mb-4 rounded p-3.5 text-xs text-ink">
         <label className="flex cursor-pointer items-start gap-2.5">
           <input
             type="checkbox"
             checked={agreedToTerms}
             onChange={e => setAgreedToTerms(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-ink focus:ring-ink/20"
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/30 accent-neutral-700 text-ink focus:ring-ink/20"
           />
           <span className="font-sans leading-relaxed">
             I agree to the Pharmacy Commons{' '}
@@ -989,13 +985,13 @@ function Field({
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-ink/40 focus:bg-white focus:ring-2 focus:ring-ink/20'
+  'lp-field w-full rounded-md px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
+  'lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
 
 const primaryButtonClass =
-  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-50'
+  'lp-raised lp-press rounded-md px-4 py-2 font-sans text-sm font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-50'
 
 // primaryButtonClass already sets disabled:opacity-50; swap it rather than stack
 // two opacity utilities whose winner depends on stylesheet order.
@@ -1004,4 +1000,4 @@ const registerButtonClass = `${primaryButtonClass.replace('disabled:opacity-50',
 const consentLinkClass = 'font-medium underline'
 
 const errorClass =
-  'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-ink'
+  'lp-sunken rounded-md bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-ink'

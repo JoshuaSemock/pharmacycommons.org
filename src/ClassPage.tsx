@@ -141,7 +141,7 @@ function ClassHeader({ cls }: { cls: ClassDetail }) {
         </span>
       </nav>
 
-      <span className="inline-block rounded-md border border-aqua-200 bg-aqua-100 px-2 py-0.5 font-mono text-[11.5px] font-medium text-ink">
+      <span className="lp-raised inline-block rounded-md px-2 py-0.5 font-mono text-[11.5px] font-medium text-ink">
         {classBadgeText(cls.class_type_label, cls.source_code)}
       </span>
 
@@ -204,9 +204,9 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 
 function SubClasses({ cls }: { cls: ClassDetail }) {
   return (
-    <section className="border-t border-sage-200 py-9">
+    <section className="border-t border-ink/15 py-9">
       <SectionHeading>Sub-classes</SectionHeading>
-      <ul className="divide-y divide-sage-100 border-y border-sage-200">
+      <ul className="divide-y divide-ink/10 border-y border-ink/15">
         {cls.children.map(c => (
           <li key={c.slug}>
             <Link
@@ -250,7 +250,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
   const visible = filtered.slice(0, limit)
 
   return (
-    <section className="border-t border-sage-200 py-9">
+    <section className="border-t border-ink/15 py-9">
       <SectionHeading>
         Drugs in this class
         <span className="ml-2 font-mono text-[13px] font-normal text-ink">
@@ -263,7 +263,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <div className="flex min-w-[14rem] max-w-sm flex-1 items-center gap-2 rounded-lg border border-sage-200 bg-white px-3 py-1.5 transition-all focus-within:border-ink/40 focus-within:ring-2 focus-within:ring-ink/20">
+            <div className="lp-field flex min-w-[14rem] max-w-sm flex-1 items-center gap-2 rounded-md px-3 py-1.5">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
                 <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -328,7 +328,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
               <button
                 type="button"
                 onClick={() => setLimit(l => l + MEMBER_PAGE)}
-                className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
+                className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13px] font-medium text-ink"
               >
                 Show {Math.min(MEMBER_PAGE, filtered.length - visible.length).toLocaleString()} more
               </button>
@@ -349,8 +349,8 @@ function MemberLink({ member }: { member: ClassMember }) {
       <Link
         to={`/drugs/${member.slug}`}
         title={member.is_direct ? undefined : 'Filed under a sub-class of this class'}
-        className={`flex items-baseline justify-between gap-3 rounded-lg border px-3 py-2 transition-colors hover:border-aqua-300 hover:bg-sage-50 ${
-          member.is_direct ? 'border-sage-200 bg-white' : 'border-dashed border-sage-300 bg-white/60'
+        className={`flex items-baseline justify-between gap-3 rounded-md px-3 py-2 ${
+          member.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
         }`}
       >
         <span

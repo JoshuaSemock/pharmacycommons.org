@@ -118,7 +118,7 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-lg border border-mint-200 bg-white py-1 shadow-lg"
+          className="bg-paper shadow-lg shadow-black/15 absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-md py-1"
         >
           {options.map((o, i) => (
             <li

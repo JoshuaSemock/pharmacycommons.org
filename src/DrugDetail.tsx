@@ -185,9 +185,9 @@ export default function DrugDetail() {
       </nav>
 
       {/* Drug header */}
-      <header className="mb-8 border-b border-sage-200 pb-6">
+      <header className="mb-8 border-b border-ink/15 pb-6">
         <div className="mb-2 flex flex-wrap items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-aqua-200 font-mono text-sm font-medium text-ink">
+          <div className="lp-sunken flex h-10 w-10 items-center justify-center rounded-md font-mono text-sm font-medium text-ink">
             {drug.name.slice(0, 2).toUpperCase()}
           </div>
           {/* min-w-0 on this column and the h1: flex items default to min-width:auto,
@@ -357,7 +357,7 @@ function IdentifiersCard({ drug }: { drug: DrugDetailType }) {
         )}
       </div>
       {attributes.length > 0 && (
-        <div className="mt-4 space-y-2.5 border-t border-sage-100 pt-4">
+        <div className="mt-4 space-y-2.5 border-t border-ink/10 pt-4">
           {attributes.map((attr, i) => (
             <IdRow key={`${attr.label}-${i}`} label={attr.label} value={attr.value} name={drug.name} />
           ))}
@@ -501,7 +501,7 @@ function ClassesCard({ pcidCode }: { pcidCode: string }) {
         ))}
       </div>
       {hasInherited && (
-        <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-snug text-ink">
+        <p className="mt-4 border-t border-ink/10 pt-3 font-sans text-2xs leading-snug text-ink">
           Dashed: a broader class this drug belongs to through one of its sub-classes.
         </p>
       )}
@@ -731,7 +731,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
   const riskKey = toRiskKey(metrics.rq_category)
   const riskMeta = riskKey
     ? ECO_RISK_COLORS[riskKey]
-    : { bg: 'bg-sage-100', text: 'text-ink', border: 'border-sage-200', label: 'Unknown' }
+    : { bg: '', text: 'text-ink', border: '', label: 'Unknown' }
 
   // Log scale so an RQ of 0.01 and an RQ of 50 are visually distinguishable.
   const riskBarWidth =
@@ -740,15 +740,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
   const rqFormatted =
     rqValue === null ? '—' : rqValue >= 10 ? rqValue.toFixed(1) : rqValue.toFixed(2)
 
-  const borderColor =
-    riskKey === 'high'
-      ? 'var(--color-coral-300)'
-      : riskKey === 'moderate'
-        ? 'var(--color-amber-400)'
-        : 'var(--color-sage-200)'
 
-  const headerBg =
-    riskKey === 'high' ? 'bg-coral-100' : riskKey === 'moderate' ? 'bg-amber-100' : 'bg-sage-100'
 
   const rqTextColor =
     riskKey === 'high'
@@ -767,21 +759,21 @@ function EcoPanel({ eco }: { eco: unknown }) {
           : 'bg-sage-300'
 
   return (
-    <div className="overflow-hidden rounded-xl border" style={{ borderColor }}>
-      <div className={`px-4 py-3 ${headerBg}`}>
+    <div className="lp-raised overflow-hidden rounded-md">
+      <div className="lp-rule-b px-4 py-3">
         <div className="mb-0.5 flex items-center justify-between gap-2">
           <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
             Environmental risk
           </h2>
           <span
-            className={`shrink-0 rounded-md border px-2 py-0.5 font-mono text-xs font-semibold uppercase ${riskMeta.bg} ${riskMeta.text} ${riskMeta.border}`}
+            className={`lp-raised shrink-0 rounded px-2 py-0.5 font-mono text-xs font-semibold uppercase ${riskMeta.bg} ${riskMeta.text}`}
           >
             {riskMeta.label} risk
           </span>
         </div>
       </div>
 
-      <div className="space-y-4 bg-white p-4">
+      <div className="space-y-4 p-4">
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
             <span className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
@@ -791,7 +783,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
               {rqFormatted}
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-sage-100">
+          <div className="lp-sunken h-2 w-full overflow-hidden rounded-full">
             <div
               className={`h-full rounded-full transition-all ${barColor}`}
               style={{ width: `${riskBarWidth}%` }}
@@ -907,7 +899,7 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
 /** Left-rail section: a rule, a small-caps header, then the body (no box since 2026-10-01). Heading size is inline because index.css sizes bare h2. */
 function SideCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-sage-200">
+    <div className="border-t border-ink/15">
       <div className="py-3">
         <h2
           className="font-semibold uppercase tracking-[0.1em] text-ink"

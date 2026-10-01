@@ -37,7 +37,7 @@ type ItemKey = 'caffeine' | 'nicotine' | 'recreational'
 
 function Card({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <article className="grid min-w-0 content-start gap-3 border-t border-mint-200 pt-4">
+    <article className="grid min-w-0 content-start gap-3 border-t border-ink/15 pt-4">
       <div>
         <h3 className="font-display font-semibold text-ink" style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}>
           {title}
@@ -69,7 +69,7 @@ function Remove({ onClick }: { onClick: () => void }) {
   )
 }
 
-const rowClass = 'grid min-w-0 grid-cols-2 items-end gap-2 border-b border-mint-100 pb-3 last:border-b-0 sm:border-0 sm:pb-0'
+const rowClass = 'grid min-w-0 grid-cols-2 items-end gap-2 border-b border-ink/10 pb-3 last:border-b-0 sm:border-0 sm:pb-0'
 
 export default function Substances({ subs, onChange }: Props) {
   const setStatus = (key: keyof SubstanceState, status: UseStatus) => {
@@ -119,7 +119,7 @@ export default function Substances({ subs, onChange }: Props) {
   const al = subs.alcohol
 
   return (
-    <section aria-labelledby="substances" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-8">
+    <section aria-labelledby="substances" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-ink/15 pt-8">
       <SectionHeading
         id="substances"
         title="Substance use"
@@ -285,7 +285,7 @@ export default function Substances({ subs, onChange }: Props) {
                   ['AUDIT-C', audit == null ? 'not answered' : `${audit} of 12`],
                 ]}
               />
-              <details open={al.audit.some(x => x !== '')} className="rounded-lg border border-mint-100 p-3">
+              <details open={al.audit.some(x => x !== '')} className="lp-raised rounded-md p-3">
                 <summary className="cursor-pointer font-sans text-[13.5px] font-medium text-ink">AUDIT-C screening questions</summary>
                 <div className="mt-3 grid gap-3">
                   {AUDIT_C.map(([q, answers], qi) => (

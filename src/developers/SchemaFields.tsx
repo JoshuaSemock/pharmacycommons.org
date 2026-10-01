@@ -41,14 +41,14 @@ export default function SchemaFields({ apiBase }: { apiBase: string }) {
         onChange={e => setFilter(e.target.value)}
         placeholder={`Filter ${fields.length} fields, e.g. unii, version, brands`}
         aria-label="Filter schema fields"
-        className="w-full max-w-md rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20"
+        className="lp-field w-full max-w-md rounded-md px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink"
       />
-      <div role="region" aria-label="Schema fields" tabIndex={0} className="relative max-h-[30rem] min-w-0 overflow-auto border-y border-mint-200">
+      <div role="region" aria-label="Schema fields" tabIndex={0} className="relative max-h-[30rem] min-w-0 overflow-auto border-y border-ink/15">
         <table className="w-full min-w-[40rem] border-separate border-spacing-0 font-sans text-[13px]">
           <thead className="sticky top-0 z-10 bg-mint-50">
             <tr>
               {['Field', 'Type', 'What it is'].map(h => (
-                <th key={h} scope="col" className="border-b border-mint-200 px-3 py-2 text-left font-medium text-ink">
+                <th key={h} scope="col" className="border-b border-ink/15 px-3 py-2 text-left font-medium text-ink">
                   {h}
                 </th>
               ))}
@@ -57,13 +57,13 @@ export default function SchemaFields({ apiBase }: { apiBase: string }) {
           <tbody>
             {shown.map(f => (
               <tr key={f.path} className="align-top">
-                <td className="border-b border-mint-100 px-3 py-1.5" style={{ paddingLeft: `${0.75 + f.depth * 1}rem` }}>
+                <td className="border-b border-ink/10 px-3 py-1.5" style={{ paddingLeft: `${0.75 + f.depth * 1}rem` }}>
                   <code className="font-mono text-[12.5px] text-ink">{f.path.split('.').pop()}</code>
                   {f.required && <span className="ml-1.5 font-sans text-[11px] text-ink">required</span>}
                   {f.depth > 0 && <span className="block font-mono text-[10.5px] text-ink">{f.path}</span>}
                 </td>
-                <td className="border-b border-mint-100 px-3 py-1.5 font-mono text-[12px] text-ink">{f.type}</td>
-                <td className="border-b border-mint-100 px-3 py-1.5 text-ink">{f.description ?? ''}</td>
+                <td className="border-b border-ink/10 px-3 py-1.5 font-mono text-[12px] text-ink">{f.type}</td>
+                <td className="border-b border-ink/10 px-3 py-1.5 text-ink">{f.description ?? ''}</td>
               </tr>
             ))}
           </tbody>

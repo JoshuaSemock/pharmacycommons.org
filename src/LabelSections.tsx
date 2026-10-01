@@ -134,7 +134,7 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
   const appl = formatApplication(label.application_number)
 
   return (
-    <div className="border-b border-sage-200 px-1 pb-4">
+    <div className="border-b border-ink/15 px-1 pb-4">
       <p className="mb-1 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
         FDA prescribing information
       </p>
@@ -224,7 +224,7 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
           <button
             key={s.key}
             onClick={() => jumpTo(s.key)}
-            className="rounded-full border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-aqua-300"
+            className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink"
           >
             {s.title}
           </button>
@@ -265,7 +265,7 @@ function BoxedWarning({ section }: { section: LabelSection }) {
   return (
     <section
       aria-label="Boxed warning"
-      className="overflow-hidden rounded-xl border-2 border-coral-400 bg-white"
+      className="overflow-hidden rounded-md border-2 border-ink"
     >
       <div className="flex items-center gap-2 bg-coral-100 px-5 py-2.5">
         <WarningIcon />
@@ -300,7 +300,7 @@ function SectionAccordion({
   const panelId = `label-panel-${section.key}`
 
   return (
-    <section id={`label-${section.key}`} className="scroll-mt-20 border-b border-sage-200 first-of-type:border-t">
+    <section id={`label-${section.key}`} className="scroll-mt-20 border-b border-ink/15 first-of-type:border-t">
       <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
         <button
           onClick={onToggle}
@@ -318,7 +318,7 @@ function SectionAccordion({
         </button>
       </h3>
       {open && (
-        <div id={panelId} className="space-y-4 border-t border-sage-100 px-1 pt-4 pb-6">
+        <div id={panelId} className="space-y-4 border-t border-ink/10 px-1 pt-4 pb-6">
           {section.blocks.map((b, i) => (
             <Block key={i} block={b} tables={section.tables_html} />
           ))}
@@ -459,10 +459,10 @@ function TrailingTables({ tables }: { tables: LabelTable[] | null }) {
 }
 
 const TABLE_CLASSES =
-  'overflow-x-auto border-y border-sage-200 font-sans text-sm leading-snug text-ink ' +
+  'overflow-x-auto border-y border-ink/15 font-sans text-sm leading-snug text-ink ' +
   '[&_caption]:px-3 [&_caption]:py-2 [&_caption]:text-left [&_caption]:font-semibold ' +
   '[&_table]:w-full [&_table]:border-collapse ' +
-  '[&_td]:border-t [&_td]:border-sage-100 [&_td]:px-3 [&_td]:py-1.5 [&_td]:align-top ' +
+  '[&_td]:border-t [&_td]:border-ink/10 [&_td]:px-3 [&_td]:py-1.5 [&_td]:align-top ' +
   '[&_th]:bg-sage-50 [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-left [&_th]:align-bottom [&_th]:font-semibold ' +
   '[&_tr:first-child_td]:bg-sage-50 [&_tr:first-child_td]:font-semibold'
 
@@ -477,9 +477,9 @@ function LabelTableView({ html }: { html: string }) {
 function LabelSkeleton() {
   return (
     <div className="space-y-3" aria-busy="true" aria-label="Loading label">
-      <div className="h-24 animate-pulse rounded-xl bg-sage-100" />
+      <div className="lp-raised h-24 animate-pulse rounded-md" />
       {[0, 1, 2, 3].map(i => (
-        <div key={i} className="h-12 animate-pulse rounded-xl bg-sage-100" />
+        <div key={i} className="lp-raised h-12 animate-pulse rounded-md" />
       ))}
       <p className="px-1 font-sans text-sm text-ink">
         Loading prescribing information… the first view of a label takes a few seconds.
@@ -490,7 +490,7 @@ function LabelSkeleton() {
 
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <div className="border-l-2 border-sage-300 py-1 pl-4 font-sans text-md leading-relaxed text-ink">
+    <div className="border-l-2 border-ink/25 py-1 pl-4 font-sans text-md leading-relaxed text-ink">
       {children}
     </div>
   )

@@ -49,7 +49,7 @@ function Paragraph({ children }: { children?: ReactNode }) {
 function CodeBlockWrapper({ children }: { children?: ReactNode }) {
   return (
     <InsidePre.Provider value={true}>
-      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-sm leading-relaxed text-ink">
+      <pre className="lp-sunken overflow-x-auto rounded-md p-4 font-mono text-sm leading-relaxed text-ink">
         {children}
       </pre>
     </InsidePre.Provider>
@@ -159,7 +159,7 @@ const components: Components = {
   blockquote: ({ children }) => (
     <InsideQuote.Provider value={true}>
       <blockquote
-        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-lg leading-[1.5] text-ink italic"
+        className="my-8 space-y-3 border-l-2 border-ink/25 py-1 pl-5 font-display text-lg leading-[1.5] text-ink italic"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {children}
@@ -170,15 +170,15 @@ const components: Components = {
   pre: ({ children }) => <CodeBlockWrapper>{children}</CodeBlockWrapper>,
   code: ({ children }) => <CodeSpan>{children}</CodeSpan>,
 
-  hr: () => <hr className="my-4 border-sage-200" />,
+  hr: () => <hr className="my-4 border-ink/15" />,
 
   table: ({ children }) => (
-    <div className="overflow-x-auto border-y border-sage-200">
+    <div className="overflow-x-auto border-y border-ink/15">
       <table className="w-full border-collapse font-sans text-md">{children}</table>
     </div>
   ),
   thead: ({ children }) => <thead className="bg-sage-100">{children}</thead>,
-  tr: ({ children }) => <tr className="border-b border-sage-200 last:border-0">{children}</tr>,
+  tr: ({ children }) => <tr className="border-b border-ink/15 last:border-0">{children}</tr>,
   th: ({ node: _node, children, ...props }) => (
     <th
       {...props}
@@ -200,7 +200,7 @@ const components: Components = {
         src={typeof src === 'string' ? src : undefined}
         alt={alt ?? ''}
         loading="lazy"
-        className="w-full rounded-lg border border-sage-200"
+        className="w-full rounded-md"
       />
       {alt && <figcaption className="font-sans text-sm text-ink">{alt}</figcaption>}
     </figure>
@@ -225,7 +225,7 @@ const components: Components = {
     return isFootnotes ? (
       <section
         data-toc-skip=""
-        className="mt-12 border-t border-sage-200 pt-6 font-sans text-md text-ink [&_h2]:pt-0 [&_h2]:text-base [&_ol]:text-md [&_p]:text-md"
+        className="mt-12 border-t border-ink/15 pt-6 font-sans text-md text-ink [&_h2]:pt-0 [&_h2]:text-base [&_ol]:text-md [&_p]:text-md"
       >
         {children}
       </section>

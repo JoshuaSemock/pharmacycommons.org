@@ -149,7 +149,7 @@ export default function Developers() {
           </li>
         </ul>
 
-        <nav aria-label="On this page" className="flex flex-wrap gap-x-5 gap-y-1 border-y border-mint-200 py-2 font-sans text-[14px]">
+        <nav aria-label="On this page" className="flex flex-wrap gap-x-5 gap-y-1 border-y border-ink/15 py-2 font-sans text-[14px]">
           {SECTIONS.map(([id, label]) => (
             <a key={id} href={`#${id}`} className="text-ink hover:underline">
               {label}
@@ -197,12 +197,12 @@ export default function Developers() {
           </H2>
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5">
             {ENDPOINTS.map(e => (
-              <article key={e.id} id={`endpoint-${e.id}`} className="grid min-w-0 scroll-mt-28 gap-3 border-t border-mint-200 pt-4">
+              <article key={e.id} id={`endpoint-${e.id}`} className="grid min-w-0 scroll-mt-28 gap-3 border-t border-ink/15 pt-4">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
                   <span className="rounded bg-mint-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
                   <code className="min-w-0 break-all font-mono text-[14px] font-medium text-ink">{e.path}</code>
                   <span className="font-sans text-[14px] text-ink">{e.summary}</span>
-                  <button type="button" onClick={() => tryIt(e)} className="ml-auto rounded-lg border border-mint-300 px-3 py-1 font-sans text-[12.5px] font-medium text-ink hover:border-mint-400">
+                  <button type="button" onClick={() => tryIt(e)} className="lp-raised lp-press ml-auto rounded-md px-3 py-1 font-sans text-[12.5px] font-medium text-ink">
                     Try it
                   </button>
                 </div>
@@ -213,7 +213,7 @@ export default function Developers() {
                       <thead>
                         <tr>
                           {['Parameter', 'Where', 'Type', 'What it does'].map(h => (
-                            <th key={h} scope="col" className="border-b border-mint-200 py-1.5 pr-3 text-left font-medium text-ink">
+                            <th key={h} scope="col" className="border-b border-ink/15 py-1.5 pr-3 text-left font-medium text-ink">
                               {h}
                             </th>
                           ))}
@@ -222,16 +222,16 @@ export default function Developers() {
                       <tbody>
                         {e.params.map(p => (
                           <tr key={p.name} className="align-top">
-                            <td className="border-b border-mint-100 py-1.5 pr-3">
+                            <td className="border-b border-ink/10 py-1.5 pr-3">
                               <code className="font-mono text-[12.5px] text-ink">{p.name}</code>
                               {p.required && <span className="ml-1.5 text-[11px] text-ink">required</span>}
                             </td>
-                            <td className="border-b border-mint-100 py-1.5 pr-3 text-ink">{p.in}</td>
-                            <td className="border-b border-mint-100 py-1.5 pr-3 font-mono text-[12px] text-ink">
+                            <td className="border-b border-ink/10 py-1.5 pr-3 text-ink">{p.in}</td>
+                            <td className="border-b border-ink/10 py-1.5 pr-3 font-mono text-[12px] text-ink">
                               {p.type === 'ref' ? 'PCID or slug' : p.type === 'types' ? 'comma list' : p.type}
                               {p.min != null && p.max != null && ` ${p.min}–${p.max}`}
                             </td>
-                            <td className="border-b border-mint-100 py-1.5 text-ink">
+                            <td className="border-b border-ink/10 py-1.5 text-ink">
                               {p.description}
                               {p.default && <span className="text-ink"> Default {p.default}.</span>}
                             </td>
@@ -309,12 +309,12 @@ export default function Developers() {
                 Record types
               </h3>
               <p className="font-sans text-[14px] text-ink">Each type has its own block of PCIDs, so the number alone tells you what kind of record it is.{index ? ' Counts are live.' : ''}</p>
-              <div role="region" aria-label="Record types" tabIndex={0} className="relative min-w-0 overflow-x-auto border-y border-mint-200">
+              <div role="region" aria-label="Record types" tabIndex={0} className="relative min-w-0 overflow-x-auto border-y border-ink/15">
                 <table className="w-full min-w-[28rem] border-collapse font-sans text-[13px]">
                   <thead className="bg-mint-50">
                     <tr>
                       {['Block', 'Type', 'PCID range', 'Records'].map(h => (
-                        <th key={h} scope="col" className="border-b border-mint-200 px-3 py-2 text-left font-medium text-ink">
+                        <th key={h} scope="col" className="border-b border-ink/15 px-3 py-2 text-left font-medium text-ink">
                           {h}
                         </th>
                       ))}
@@ -323,14 +323,14 @@ export default function Developers() {
                   <tbody>
                     {(index?.entity_types ?? FALLBACK_TYPES).map(t => (
                       <tr key={t.type}>
-                        <td className="border-b border-mint-100 px-3 py-1.5 font-mono text-[12.5px]">{t.block}</td>
-                        <td className="border-b border-mint-100 px-3 py-1.5">
+                        <td className="border-b border-ink/10 px-3 py-1.5 font-mono text-[12.5px]">{t.block}</td>
+                        <td className="border-b border-ink/10 px-3 py-1.5">
                           {t.label} <code className="font-mono text-[11.5px] text-ink">{t.type}</code>
                         </td>
-                        <td className="border-b border-mint-100 px-3 py-1.5 font-mono text-[12px] text-ink">
+                        <td className="border-b border-ink/10 px-3 py-1.5 font-mono text-[12px] text-ink">
                           {t.pcid_range[0]}–{t.pcid_range[1].replace('PCID-', '')}
                         </td>
-                        <td className="border-b border-mint-100 px-3 py-1.5 text-right font-mono text-[12.5px] tabular-nums">{t.count ? t.count.toLocaleString() : '—'}</td>
+                        <td className="border-b border-ink/10 px-3 py-1.5 text-right font-mono text-[12.5px] tabular-nums">{t.count ? t.count.toLocaleString() : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -412,7 +412,7 @@ export default function Developers() {
               ['API index', `${API_BASE}/v1`, 'Record types, counts, data sources and every endpoint, as JSON.'],
               ['Source code', 'https://github.com/JoshuaSemock/pharmacycommons.org/tree/main/supabase/functions/api', 'The API is open source (GPL-3.0). Issues and pull requests welcome.'],
             ].map(([title, href, text]) => (
-              <li key={title} className="grid min-w-0 content-start gap-1 border-t border-mint-200 pt-3">
+              <li key={title} className="grid min-w-0 content-start gap-1 border-t border-ink/15 pt-3">
                 <a href={href} target={href.startsWith('/') ? undefined : '_blank'} rel="noreferrer" className={`font-sans text-[15px] font-semibold ${link}`}>
                   {title}
                 </a>

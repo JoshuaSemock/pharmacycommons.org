@@ -128,7 +128,7 @@ export default function ListDetail() {
                   <li key={c.slug}>
                     <Link
                       to={`/lists/${c.slug}`}
-                      className="flex items-baseline justify-between gap-2 rounded-lg border border-mint-200 bg-white px-3 py-2 transition-colors hover:border-hepatica-300 hover:bg-mint-50"
+                      className="lp-raised lp-press flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
                     >
                       <span className="min-w-0 break-words font-sans text-[13px] leading-snug text-ink">
                         {c.title.replace(/^.*?:\s*/, '')}
@@ -151,14 +151,14 @@ export default function ListDetail() {
 function ListHeader({ list }: { list: ListRecord }) {
   const place = jurisdictionLabel(list.jurisdiction)
   return (
-    <header className="border-b border-mint-200 pb-8">
+    <header className="border-b border-ink/15 pb-8">
       <div className="flex flex-wrap gap-1.5">
         {place && (
-          <span className="rounded-md border border-sky-200 bg-sky-50 px-2 py-0.5 font-mono text-[11px] font-medium text-ink">
+          <span className="lp-raised rounded-md px-2 py-0.5 font-mono text-[11px] font-medium text-ink">
             {place}
           </span>
         )}
-        <span className="rounded-md border border-mint-200 bg-mint-50 px-2 py-0.5 font-mono text-[11px] text-ink">
+        <span className="lp-raised rounded-md px-2 py-0.5 font-mono text-[11px] text-ink">
           {list.pcid_code}
         </span>
       </div>
@@ -176,7 +176,7 @@ function ListHeader({ list }: { list: ListRecord }) {
       <div className="mt-6 flex flex-wrap gap-2.5">
         <Link
           to={`/lists/compare?l=${encodeURIComponent(list.slug)}`}
-          className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-ink transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
+          className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink"
         >
           Compare with another list
         </Link>
@@ -272,7 +272,7 @@ function Items({ list }: { list: ListRecord }) {
         <button
           type="button"
           onClick={download}
-          className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink transition-colors hover:border-mint-400"
+          className="lp-raised lp-press rounded-md px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink"
         >
           Download CSV
         </button>
@@ -286,7 +286,7 @@ function Items({ list }: { list: ListRecord }) {
           onChange={e => setQuery(e.target.value)}
           placeholder={`Filter ${list.items.length.toLocaleString()} drugs`}
           aria-label="Filter drugs on this list"
-          className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20 sm:w-64"
+          className="lp-field w-full rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink sm:w-64"
         />
         {tops.length > 0 && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
@@ -294,7 +294,7 @@ function Items({ list }: { list: ListRecord }) {
             <select
               value={top ?? ''}
               onChange={e => update({ top: e.target.value || null })}
-              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-ink"
+              className="lp-field rounded-md px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All ranks</option>
               {tops.map(n => (
@@ -311,7 +311,7 @@ function Items({ list }: { list: ListRecord }) {
             <select
               value={status ?? ''}
               onChange={e => update({ status: e.target.value || null })}
-              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-ink"
+              className="lp-field rounded-md px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All</option>
               {statuses.map(s => (
@@ -331,7 +331,7 @@ function Items({ list }: { list: ListRecord }) {
         <div
           role="radiogroup"
           aria-labelledby="list-sort-label"
-          className="flex flex-wrap gap-0.5 rounded-lg bg-mint-100 p-0.5 ring-1 ring-inset ring-mint-200"
+          className="flex flex-wrap gap-1.5"
         >
           {options.map(o => {
             const active = o.key === sort
@@ -342,11 +342,7 @@ function Items({ list }: { list: ListRecord }) {
                 role="radio"
                 aria-checked={active}
                 onClick={() => update({ sort: o.key, dir: null })}
-                className={`rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap transition-colors ${
-                  active
-                    ? 'bg-white font-medium text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14)] ring-1 ring-mint-200'
-                    : 'text-ink'
-                }`}
+                className={`lp-toggle rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap text-ink ${active ? 'font-medium' : ''}`}
               >
                 {o.label}
               </button>
@@ -357,7 +353,7 @@ function Items({ list }: { list: ListRecord }) {
           type="button"
           onClick={() => update({ dir: reverse ? null : 'rev' })}
           aria-label={`Reverse order (now ${directionText})`}
-          className="flex items-center gap-1.5 rounded-lg border border-mint-200 bg-white px-2.5 py-1 font-sans text-[12.5px] text-ink hover:border-mint-300"
+          className="lp-raised lp-press flex items-center gap-1.5 rounded-md px-2.5 py-1 font-sans text-[12.5px] text-ink"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path
@@ -375,9 +371,9 @@ function Items({ list }: { list: ListRecord }) {
       {rows.length === 0 ? (
         <p className="py-6 font-sans text-[14px] text-ink">No drugs match these filters.</p>
       ) : (
-        <div className="overflow-hidden border-y border-mint-200">
+        <div className="overflow-hidden border-y border-ink/15">
           <div
-            className="hidden gap-x-4 border-b border-mint-200 bg-mint-50 px-4 py-2 font-sans text-[12px] text-ink sm:grid"
+            className="hidden gap-x-4 border-b border-ink/15 bg-mint-50 px-4 py-2 font-sans text-[12px] text-ink sm:grid"
             style={{ gridTemplateColumns: gridCols }}
             aria-hidden="true"
           >
@@ -408,7 +404,7 @@ function Items({ list }: { list: ListRecord }) {
         <button
           type="button"
           onClick={() => setLimit(l => l + BATCH * 2)}
-          className="mt-4 rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink hover:bg-hepatica-400/20"
+          className="lp-raised lp-press mt-4 rounded-md px-4 py-2 font-sans text-[13px] font-medium text-ink"
         >
           Show more ({(rows.length - limit).toLocaleString()} left)
         </button>
@@ -440,7 +436,7 @@ function Row({
   const sourceDiffers = item.source_name.trim().toLowerCase().replace(/\s*\/\s*/g, '/') !== item.name.trim().toLowerCase()
   return (
     <li
-      className="grid grid-cols-[2.25rem_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 border-b border-mint-100 px-4 py-2.5 last:border-b-0-0 sm:items-center sm:gap-x-4 sm:[grid-template-columns:var(--cols)]"
+      className="grid grid-cols-[2.25rem_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 border-b border-ink/10 px-4 py-2.5 last:border-b-0-0 sm:items-center sm:gap-x-4 sm:[grid-template-columns:var(--cols)]"
       style={{ ['--cols' as string]: gridCols }}
     >
       {showRank ? (
@@ -479,7 +475,7 @@ function Row({
       {showStatus && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {item.legal_status && (
-            <span className="inline-block max-w-full break-words rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
+            <span className="lp-raised inline-block max-w-full break-words rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
               {item.legal_status}
             </span>
           )}
@@ -532,7 +528,7 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-mint-200">
+    <div className="border-t border-ink/15">
       <div className="py-3">
         {/* Inline size and family: index.css styles bare h2 with the display face at --text-3xl. */}
         <h2 className="font-medium text-ink" style={{ fontSize: '12.5px', lineHeight: 1.4, fontFamily: 'var(--font-sans)' }}>

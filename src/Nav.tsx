@@ -169,7 +169,7 @@ function HeaderSearch() {
                   </span>
                 </span>
                 {schedule && (
-                  <span className="rounded-md border border-rose-200 bg-rose-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
+                  <span className="lp-raised rounded-md bg-rose-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                     {schedule}
                   </span>
                 )}

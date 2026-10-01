@@ -187,7 +187,7 @@ export default function MedicationReconciliation() {
           />
         </div>
 
-        <p className="flex max-w-[48rem] gap-2.5 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] leading-relaxed text-ink">
+        <p className="lp-sunken flex max-w-[48rem] gap-2.5 rounded-md bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] leading-relaxed text-ink">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="mt-0.5 shrink-0">
             <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
           </svg>
@@ -220,7 +220,7 @@ export default function MedicationReconciliation() {
             Print or save as PDF
           </button>
           {confirmClear ? (
-            <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-ink">
+            <span className="lp-raised inline-flex flex-wrap items-center gap-1.5 rounded-md bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-ink">
               Clear the whole list?
               <button type="button" className={dangerQuietButton} onClick={clearAll}>
                 Yes, clear it
@@ -243,7 +243,7 @@ export default function MedicationReconciliation() {
 
         <div aria-live="polite" className="grid gap-2 empty:hidden">
           {state.example && (
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] text-ink">
+            <p className="lp-sunken flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] text-ink">
               <span>
                 <b className="font-semibold">Example list.</b> These entries show how the tool works. They are not a real person's medications.
               </span>
@@ -254,8 +254,8 @@ export default function MedicationReconciliation() {
           )}
           {notice && (
             <p
-              className={`rounded-lg border px-3.5 py-2.5 font-sans text-[14px] ${
-                notice.tone === 'ok' ? 'border-mint-200 bg-mint-50 text-ink' : 'border-marigold-300 bg-marigold-100 text-ink'
+              className={`lp-sunken rounded-md px-3.5 py-2.5 font-sans text-[14px] ${
+                notice.tone === 'ok' ? 'text-ink' : 'bg-marigold-100 text-ink'
               }`}
             >
               {notice.text}
@@ -263,7 +263,7 @@ export default function MedicationReconciliation() {
           )}
         </div>
 
-        <nav aria-label="Sections" className="flex flex-wrap gap-x-5 gap-y-1 border-y border-mint-200 py-2 font-sans text-[14px]">
+        <nav aria-label="Sections" className="flex flex-wrap gap-x-5 gap-y-1 border-y border-ink/15 py-2 font-sans text-[14px]">
           {[
             ['allergies', 'Allergies', state.allergies.length],
             ['medications', 'Medications', state.meds.length],
@@ -295,7 +295,7 @@ export default function MedicationReconciliation() {
             </Field>
           </div>
           {flags.length ? (
-            <div className="grid gap-2 rounded-xl border border-mint-200 bg-white/80 p-4">
+            <div className="lp-raised grid gap-2 rounded-md p-4">
               <p className="font-sans font-medium text-[12.5px] text-ink">Check before you finish · {flags.length}</p>
               <ul className="grid gap-1.5">
                 {flags.map((f, i) => (
@@ -310,7 +310,7 @@ export default function MedicationReconciliation() {
               </ul>
             </div>
           ) : (
-            <p className="rounded-lg border border-mint-200 bg-mint-50 px-3.5 py-2.5 font-sans text-[14px] text-ink">
+            <p className="lp-sunken rounded-md px-3.5 py-2.5 font-sans text-[14px] text-ink">
               Nothing to review. Every entry has a strength and a reason for use, and allergies are recorded.
             </p>
           )}
@@ -354,7 +354,7 @@ export default function MedicationReconciliation() {
 
       <section
         aria-labelledby="printable"
-        className="mt-10 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-8 print:mt-0 print:block print:border-0 print:pt-0"
+        className="mt-10 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-ink/15 pt-8 print:mt-0 print:block print:border-0 print:pt-0"
       >
         <div className="print:hidden">
           <SectionHeading id="printable" title="Printable list" lede="This is what prints or saves as a PDF. It updates as you edit above." />

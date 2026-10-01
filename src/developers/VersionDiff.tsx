@@ -72,7 +72,7 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
   const versionSelect = (label: string, value: number | null, set: (n: number) => void) => (
     <label className="grid min-w-0 gap-1">
       <span className="font-sans text-[12.5px] font-medium text-ink">{label}</span>
-      <select value={value ?? ''} onChange={e => set(Number(e.target.value))} className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink">
+      <select value={value ?? ''} onChange={e => set(Number(e.target.value))} className="lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink">
         {versions?.map(v => (
           <option key={v.number} value={v.number}>
             Version {v.number} · {v.reason} · {fmtDate(v.created_at)}
@@ -83,7 +83,7 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
   )
 
   return (
-    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-4">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-ink/15 pt-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
         <div className="grid min-w-0 gap-1">
           <label htmlFor="diff-ref" className="font-sans text-[12.5px] font-medium text-ink">
@@ -91,7 +91,7 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
           </label>
           <RefPicker id="diff-ref" value={ref} onChange={setRef} apiBase={apiBase} placeholder="Type a name, or a PCID" onEnter={() => void loadVersions()} />
         </div>
-        <button type="button" onClick={() => void loadVersions()} className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[13px] font-medium text-ink hover:border-mint-400">
+        <button type="button" onClick={() => void loadVersions()} className="lp-raised lp-press rounded-md px-3 py-1.5 font-sans text-[13px] font-medium text-ink">
           Load history
         </button>
         {versions && versions.length > 0 ? (
@@ -102,7 +102,7 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
               type="button"
               disabled={busy || from == null || to == null || from === to}
               onClick={() => void compare()}
-              className="rounded-lg border border-mint-700 bg-mint-100 px-4 py-1.5 font-sans text-[13.5px] font-semibold text-ink hover:bg-mint-200 disabled:opacity-50"
+              className="lp-raised lp-press rounded-md px-4 py-1.5 font-sans text-[13.5px] font-semibold text-ink disabled:opacity-50"
             >
               {busy ? 'Comparing…' : 'Compare'}
             </button>

@@ -52,7 +52,7 @@ export default function BlogPost() {
               {post.readingMinutes} minute read
             </p>
             {post.draft && (
-              <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+              <span className="lp-raised rounded bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                 draft
               </span>
             )}
@@ -71,7 +71,7 @@ export default function BlogPost() {
             <li key={tag}>
               <Link
                 to={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="block rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+                className="lp-raised lp-press block rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
               >
                 {tag}
               </Link>
@@ -99,7 +99,7 @@ export default function BlogPost() {
       {(newer || older) && (
         <nav
           aria-label="More posts"
-          className="mt-16 grid gap-6 border-t border-sage-200 pt-8 sm:grid-cols-2"
+          className="mt-16 grid gap-6 border-t border-ink/15 pt-8 sm:grid-cols-2"
         >
           {newer ? (
             <Link to={`/blog/${newer.slug}`} className="group block">

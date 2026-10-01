@@ -23,7 +23,7 @@ const LEVEL_BORDER = ['border-l-neutral-300', 'border-l-marigold-400', 'border-l
 
 export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onRemove }: Props) {
   return (
-    <section aria-labelledby="allergies" className="grid gap-4 border-t border-mint-200 pt-8">
+    <section aria-labelledby="allergies" className="grid gap-4 border-t border-ink/15 pt-8">
       <SectionHeading
         id="allergies"
         title="Allergies and intolerances"
@@ -51,7 +51,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
           <article
             key={a.id}
             aria-label={a.substance || 'New allergy'}
-            className={`grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 rounded-xl border border-l-4 border-mint-200 bg-white/80 p-4 ${LEVEL_BORDER[level]}`}
+            className={`grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 lp-raised rounded-md border-l-4 p-4 ${LEVEL_BORDER[level]}`}
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">

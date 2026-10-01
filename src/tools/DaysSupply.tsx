@@ -96,7 +96,7 @@ function startMed(): Medication {
 
 function Group({ title, children, hint }: { title: string; children: ReactNode; hint?: ReactNode }) {
   return (
-    <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-mint-200 pt-4">
+    <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-ink/15 pt-4">
       <legend className="float-left mb-1 w-full font-sans text-[12.5px] font-medium text-ink">{title}</legend>
       {hint && <p className="font-sans text-[13px] leading-snug text-ink">{hint}</p>}
       {children}
@@ -253,12 +253,12 @@ export default function DaysSupply() {
         </div>
       </header>
 
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 border-t border-mint-200 pt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 border-t border-ink/15 pt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
         {/* ── Inputs ─────────────────────────────────────────────────────── */}
         <div className="grid min-w-0 content-start gap-6">
           <SectionHeading id="directions" title="Directions" lede="Built the same way as in medication reconciliation: the form decides which actions, units and routes are offered." />
 
-          <div aria-live="polite" className="grid gap-1.5 rounded-lg border border-mint-200 bg-mint-50 px-4 py-3">
+          <div aria-live="polite" className="lp-sunken grid gap-1.5 rounded-md px-4 py-3">
             <span className="font-sans text-[12.5px] font-medium text-ink">Directions as written</span>
             <p className="[overflow-wrap:anywhere] font-display text-[19px] leading-snug text-ink" style={{ fontFamily: 'var(--font-display)' }}>
               <SigText segments={sigSegments(m)} />
@@ -451,7 +451,7 @@ export default function DaysSupply() {
             {columns.length ? (
               <Results columns={columns} fill={fill} threshold={thresholdN} onCopy={copy} />
             ) : (
-              <p className="rounded-lg border border-marigold-300 bg-marigold-100 px-3.5 py-2.5 font-sans text-[14px] text-ink">
+              <p className="lp-sunken rounded-md bg-marigold-100 px-3.5 py-2.5 font-sans text-[14px] text-ink">
                 Still needed: {missing.join(', ')}.
               </p>
             )}

@@ -57,7 +57,7 @@ export default function ListIndex() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
-      <header className="border-b border-mint-200 pb-10 pt-10 sm:pt-14">
+      <header className="border-b border-ink/15 pb-10 pt-10 sm:pt-14">
         <h1
           className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-ink sm:text-[2.618rem]"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -72,7 +72,7 @@ export default function ListIndex() {
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
             to="/lists/compare"
-            className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-ink transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
+            className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink"
           >
             Compare lists
           </Link>
@@ -84,7 +84,7 @@ export default function ListIndex() {
       ) : !lists ? (
         <div className="grid gap-4 py-9 sm:grid-cols-2" aria-busy="true">
           {[0, 1, 2, 3].map(i => (
-            <div key={i} className="h-40 animate-pulse rounded-xl bg-mint-100" />
+            <div key={i} className="lp-raised h-40 animate-pulse rounded-md" />
           ))}
         </div>
       ) : (
@@ -101,7 +101,7 @@ export default function ListIndex() {
             </div>
           </section>
 
-          <section className="border-t border-mint-200 py-9">
+          <section className="border-t border-ink/15 py-9">
             <SectionHeading>Authority lists</SectionHeading>
             {authority.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -110,14 +110,14 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
+              <p className="max-w-[42rem] border-l-2 border-ink/25 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
                 Lists published by agencies and professional bodies, such as the NIOSH hazardous drugs list, will
                 appear here with their own license terms.
               </p>
             )}
           </section>
 
-          <section className="border-t border-mint-200 py-9">
+          <section className="border-t border-ink/15 py-9">
             <SectionHeading>Community lists</SectionHeading>
             {community.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -126,7 +126,7 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
+              <p className="max-w-[42rem] border-l-2 border-ink/25 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
                 Lists made by people with a Pharmacy Commons account are coming. They will be public, and anyone
                 will be able to copy one to start their own.
               </p>
@@ -142,7 +142,7 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
   const place = jurisdictionLabel(list.jurisdiction)
   return (
     <article
-      className={`flex min-w-0 flex-col gap-3 rounded-xl border border-mint-200 bg-white p-5 ${sublists.length > 0 ? 'sm:col-span-2' : ''}`}
+      className={`lp-raised flex min-w-0 flex-col gap-3 rounded-md p-5 ${sublists.length > 0 ? 'sm:col-span-2' : ''}`}
     >
       <div className="flex flex-wrap gap-1.5">
         {place && <Badge tone="sky">{place}</Badge>}
@@ -164,7 +164,7 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
             <li key={s.slug} className="min-w-0 max-w-full">
               <Link
                 to={`/lists/${s.slug}`}
-                className="inline-flex max-w-full items-baseline gap-1.5 rounded-md border border-mint-200 bg-white px-2 py-0.5 font-sans text-[13px] text-ink transition-colors hover:border-hepatica-300"
+                className="lp-raised lp-press inline-flex max-w-full items-baseline gap-1.5 rounded-md px-2 py-0.5 font-sans text-[13px] text-ink"
               >
                 <span className="min-w-0 break-words">{s.title.replace(/^.*?:\s*/, '')}</span>
                 <span className="shrink-0 font-mono text-[11px] text-ink">{s.item_count}</span>
@@ -174,7 +174,7 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
         </ul>
       )}
 
-      <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-mint-100 pt-3">
+      <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-ink/10 pt-3">
         <span className="font-mono text-[11.5px] text-ink">{list.item_count.toLocaleString()} drugs</span>
         <Link to={`/lists/${list.slug}`} className="font-sans text-[13px] font-medium text-ink hover:underline">
           Open list →
@@ -186,8 +186,8 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
 
 function Badge({ tone, children }: { tone: 'mint' | 'sky'; children: string }) {
   const cls =
-    tone === 'sky' ? 'border-sky-200 bg-sky-50 text-ink' : 'border-mint-200 bg-mint-50 text-ink'
-  return <span className={`rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium ${cls}`}>{children}</span>
+    tone === 'sky' ? 'bg-sky-50 text-ink' : 'text-ink'
+  return <span className={`lp-raised rounded px-2 py-0.5 font-mono text-[11px] font-medium ${cls}`}>{children}</span>
 }
 
 function SectionHeading({ children }: { children: string }) {

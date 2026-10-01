@@ -187,7 +187,7 @@ export default function OnThisPage({ headings }: { headings: TocHeading[] }) {
   return (
     <nav aria-label="On this page">
       <p className="mb-3 font-sans text-[12.5px] font-medium text-ink">On this page</p>
-      <ol className="border-l border-sage-200">
+      <ol className="border-l border-ink/15">
         {headings.map(h => {
           const isActive = active === h.id
           return (
@@ -201,8 +201,8 @@ export default function OnThisPage({ headings }: { headings: TocHeading[] }) {
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
                   h.level === 3 ? 'pl-6' : 'pl-3',
                   isActive
-                    ? 'border-aqua-500 text-ink'
-                    : 'border-transparent text-ink hover:border-sage-300',
+                    ? 'border-ink text-ink'
+                    : 'border-transparent text-ink hover:border-ink/25',
                 ].join(' ')}
               >
                 {h.text}

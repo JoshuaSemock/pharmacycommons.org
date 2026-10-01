@@ -73,7 +73,7 @@ export default function References() {
     >
       <PageCitation style={style} accessed={accessed} copied={copiedKey === 'page'} onCopy={copy} />
 
-      <section className="border-t border-sage-200 py-9">
+      <section className="border-t border-ink/15 py-9">
         <SectionHeading id="source-datasets">Sources and references</SectionHeading>
         <div className="space-y-3 font-sans text-md leading-relaxed text-ink">
           <p>
@@ -153,7 +153,7 @@ export default function References() {
 /** Licensing of what this site publishes. Moved here from Resources. */
 function Reuse() {
   return (
-    <section className="border-t border-sage-200 py-9">
+    <section className="border-t border-ink/15 py-9">
       <SectionHeading id="reuse">Reuse</SectionHeading>
       <div className="space-y-3 font-sans text-md leading-relaxed text-ink">
         <p>
@@ -204,7 +204,7 @@ function PageCitation({
   )
 
   return (
-    <section className="border-t border-sage-200 py-9">
+    <section className="border-t border-ink/15 py-9">
       <SectionHeading id="cite-a-page">Cite a page from the Commons</SectionHeading>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -261,7 +261,7 @@ function ReferenceItem({
   const journal = journalReference(source)
   const badges = [source.typeBadge, source.licenseBadge, ...source.badges].filter((b): b is string => Boolean(b))
   return (
-    <li className="min-w-0 border-l-2 border-sage-200 pl-4">
+    <li className="min-w-0 border-l-2 border-ink/15 pl-4">
       <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
         <a
           href={source.href}
@@ -347,11 +347,9 @@ function CitationSettings({
                 aria-checked={selected}
                 onClick={() => onStyle(s.id)}
                 className={[
-                  'rounded-md border px-2.5 py-1 font-sans text-sm transition-colors',
+                  'lp-toggle rounded-md px-2.5 py-1 font-sans text-sm text-ink',
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
-                  selected
-                    ? 'border-aqua-400 bg-aqua-100 text-ink'
-                    : 'border-sage-200 bg-white/60 text-ink hover:border-sage-300',
+                  selected ? 'font-medium' : '',
                 ].join(' ')}
               >
                 {s.label}
@@ -396,7 +394,7 @@ function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
 
 function CitationText({ children, muted = false }: { children: ReactNode; muted?: boolean }) {
   return (
-    <div className="rounded-lg border border-sage-200 bg-white/70 px-3.5 py-3">
+    <div className="lp-raised rounded-md px-3.5 py-3">
       <p
         className={`whitespace-pre-wrap break-words font-mono text-sm leading-relaxed ${
           muted ? 'text-ink' : 'text-ink'
@@ -465,16 +463,16 @@ function useCopy() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-ink/40 focus:bg-white focus:ring-2 focus:ring-ink/20'
+  'lp-field w-full rounded-md px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
+  'lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
 
 const sourceBadgeClass =
-  'rounded border border-mint-300 bg-mint-100 px-1.5 py-0.5 font-mono text-xs text-ink'
+  'lp-raised rounded px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const badgeClass =
-  'rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-ink'
+  'lp-raised rounded px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const linkClass =
   'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'

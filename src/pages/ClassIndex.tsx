@@ -89,7 +89,7 @@ export default function ClassIndex() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
-      <header className="mb-6 border-b border-sage-200 pb-6 pt-8">
+      <header className="mb-6 border-b border-ink/15 pb-6 pt-8">
         <h1
           className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -111,11 +111,7 @@ export default function ClassIndex() {
               setQuery('')
               setParams({ type: t.key }, { replace: true })
             }}
-            className={`rounded-lg border px-3 py-1.5 font-sans text-sm transition-colors ${
-              t.key === type
-                ? 'border-aqua-300 bg-aqua-100 font-medium text-ink'
-                : 'border-sage-200 bg-white text-ink hover:border-sage-300'
-            }`}
+            className={`lp-toggle rounded-md px-3 py-1.5 font-sans text-sm text-ink ${t.key === type ? 'font-medium' : ''}`}
           >
             {t.label}
           </button>
@@ -143,14 +139,14 @@ export default function ClassIndex() {
               onChange={e => setQuery(e.target.value)}
               placeholder={showCodes ? 'Filter by name or code' : 'Filter by name'}
               aria-label="Filter classes"
-              className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none sm:w-64"
+              className="lp-field w-full rounded-md px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink sm:w-64"
             />
           </div>
 
           {filtered.length === 0 ? (
             <p className="font-sans text-sm text-ink">No classes match “{query}”.</p>
           ) : (
-            <ul className="divide-y divide-sage-100 border-y border-sage-200">
+            <ul className="divide-y divide-ink/10 border-y border-ink/15">
               {filtered.slice(0, limit).map(r => (
                 <li key={r.slug}>
                   <Link

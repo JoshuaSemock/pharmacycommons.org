@@ -10,22 +10,22 @@ import { CATEGORIES, SUBSTANCE_KEYS, type MedRecState } from './model'
 import { MED_COLUMNS, allergyTypeText, medColumns, reactionText, severityText, sigText, substanceSummary } from './sig'
 import { cell } from './ui'
 
-const th = 'border-b border-mint-200 py-1.5 pr-3 text-left align-bottom font-sans text-[12.5px] font-medium text-ink'
-const td = 'border-b border-mint-100 py-1.5 pr-3 align-top'
+const th = 'border-b border-ink/15 py-1.5 pr-3 text-left align-bottom font-sans text-[12.5px] font-medium text-ink'
+const td = 'border-b border-ink/10 py-1.5 pr-3 align-top'
 
 export default function PrintableList({ state, prepared }: { state: MedRecState; prepared: string }) {
   const named = state.allergies.filter(a => a.substance.trim())
   const groups = CATEGORIES.map(([k, label]) => [label, state.meds.filter(m => m.category === k)] as const).filter(([, ms]) => ms.length)
-  const h3 = 'mb-2 border-b border-mint-300 pb-1 font-display font-semibold text-ink'
+  const h3 = 'mb-2 border-b border-ink/25 pb-1 font-display font-semibold text-ink'
   // Inline size: the global h3 rule in index.css is unlayered and outranks text-* utilities.
   const h3Style = { fontFamily: 'var(--font-display)', fontSize: '17px' }
 
   return (
     <div
       data-print
-      className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 rounded border border-mint-300 bg-white p-5 font-sans text-[13px] text-ink shadow-sm sm:p-8 print:block print:border-0 print:p-0 print:shadow-none print:[&>*+*]:mt-6"
+      className="lp-raised grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 rounded p-5 font-sans text-[13px] text-ink sm:p-8 print:block print:border-0 print:p-0 print:shadow-none print:[&>*+*]:mt-6"
     >
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b-2 border-mint-950 pb-2.5">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b-2 border-ink pb-2.5">
         <div>
           <p className="font-sans font-medium text-[12.5px] text-ink">Medication list</p>
           <p className="font-display text-[24px] font-semibold leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
@@ -101,7 +101,7 @@ export default function PrintableList({ state, prepared }: { state: MedRecState;
                     <th
                       colSpan={MED_COLUMNS.length}
                       scope="colgroup"
-                      className="border-b border-mint-300 pt-3 pb-1 text-left font-sans text-[12.5px] font-medium text-ink"
+                      className="border-b border-ink/25 pt-3 pb-1 text-left font-sans text-[12.5px] font-medium text-ink"
                     >
                       {label}
                     </th>
@@ -155,7 +155,7 @@ export default function PrintableList({ state, prepared }: { state: MedRecState;
         </table>
       </div>
 
-      <p className="border-t border-mint-200 pt-2.5 text-[11.5px] text-ink">
+      <p className="border-t border-ink/15 pt-2.5 text-[11.5px] text-ink">
         Made with the Pharmacy Commons medication reconciliation tool (pharmacycommons.org/tools/medication-reconciliation). This list is not a medical record.
         Bring it to every appointment and pharmacy visit, and review it with a pharmacist or prescriber.
       </p>

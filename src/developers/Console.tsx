@@ -42,7 +42,7 @@ export const EXAMPLES: ConsoleExample[] = [
 ]
 
 const STATUS_TONE = (s: number) =>
-  s >= 200 && s < 300 ? 'bg-white/10 ring-1 ring-inset ring-mint-400 text-ink' : s === 304 ? 'bg-white/10 ring-1 ring-inset ring-sky-300 text-ink' : s >= 400 && s < 500 ? 'bg-white/10 ring-1 ring-inset ring-marigold-400 text-ink' : 'bg-white/10 ring-1 ring-inset ring-rose-400 text-ink'
+  s >= 200 && s < 300 ? 'bg-mint-400/25 text-ink' : s === 304 ? 'bg-sky-300/25 text-ink' : s >= 400 && s < 500 ? 'bg-marigold-400/25 text-ink' : 'bg-rose-400/25 text-ink'
 
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -141,7 +141,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
           <select
             value={ep.id}
             onChange={e => isEndpointId(e.target.value) && update({ ep: e.target.value })}
-            className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink"
+            className="lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink"
           >
             {ENDPOINTS.map(e => (
               <option key={e.id} value={e.id}>
@@ -172,7 +172,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
         {/* Request */}
-        <div className="grid min-w-0 gap-3 border-t border-mint-200 pt-4">
+        <div className="grid min-w-0 gap-3 border-t border-ink/15 pt-4">
           <div>
             <p className="font-sans text-[15px] font-semibold text-ink">{ep.summary}</p>
             <p className="mt-0.5 max-w-[60rem] font-sans text-[13.5px] leading-relaxed text-ink">{ep.description}</p>
@@ -236,7 +236,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                     {(['json', 'jsonld'] as const).map(f => (
                       <label key={f} className="relative cursor-pointer">
                         <input type="radio" name="console-fmt" checked={format === f} onChange={() => update({ fmt: f })} className="peer sr-only" />
-                        <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-mono text-[12.5px] text-ink peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
+                        <span className="inline-block rounded-md shadow-emboss peer-checked:shadow-deboss px-3 py-1 font-mono text-[12.5px] text-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
                           {f === 'json' ? '.json' : '.jsonld'}
                         </span>
                       </label>
@@ -251,7 +251,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
           {/* URL bar */}
           <div className="flex min-w-0 flex-wrap items-stretch gap-2">
             <div className={`${CODE_SURFACE} flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2`}>
-              <span className="shrink-0 rounded bg-white/10 ring-1 ring-inset ring-mint-400 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
+              <span className="shrink-0 rounded bg-mint-400/25 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
               <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12.5px] text-ink" aria-label="Request URL">
                 {url}
               </code>
@@ -263,7 +263,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
               type="button"
               disabled={busy || missing.length > 0}
               onClick={() => void run()}
-              className="inline-flex items-center gap-2 rounded-lg border border-mint-700 bg-mint-100 px-4 font-sans text-[14px] font-semibold text-ink transition-colors hover:bg-mint-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="lp-raised lp-press inline-flex items-center gap-2 rounded-md px-4 font-sans text-[14px] font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy ? 'Running…' : 'Run'}
               <kbd className="hidden rounded border border-white/30 px-1 font-mono text-[10.5px] font-normal sm:inline">Ctrl ↵</kbd>
@@ -279,7 +279,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2.5">
             {result ? (
               result.networkError ? (
-                <span className="rounded bg-white/10 ring-1 ring-inset ring-rose-400 px-2 py-0.5 font-mono text-[12px] font-semibold text-ink">No response</span>
+                <span className="rounded bg-rose-400/25 px-2 py-0.5 font-mono text-[12px] font-semibold text-ink">No response</span>
               ) : (
                 <>
                   <span className={`rounded px-2 py-0.5 font-mono text-[12px] font-semibold ${STATUS_TONE(result.status)}`}>{result.status}</span>
@@ -321,7 +321,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                           update({ ep: x.ep, values: vals, fmt: x.fmt ?? 'json' })
                           void run({ target: buildUrl(e, vals, apiBase, x.fmt ?? 'json') })
                         }}
-                        className="rounded-full border border-white/20 px-3 py-1 text-ink hover:border-mint-300"
+                        className="rounded-full border border-white/20 px-3 py-1 text-ink hover:border-white/40"
                       >
                         {x.label}
                       </button>
@@ -374,8 +374,8 @@ export default function Console({ apiBase }: { apiBase: string }) {
         </div>
 
         {/* Code */}
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] overflow-hidden rounded-xl border border-mint-200 bg-white">
-          <div role="tablist" aria-label="Code language" className="flex flex-wrap items-center gap-1 border-b border-mint-100 px-3 py-2">
+        <div className="lp-raised grid min-w-0 grid-cols-[minmax(0,1fr)] overflow-hidden rounded-md">
+          <div role="tablist" aria-label="Code language" className="flex flex-wrap items-center gap-1 border-b border-ink/10 px-3 py-2">
             <span className="mr-2 font-sans text-[12.5px] font-medium text-ink">The same request in</span>
             {SNIPPET_LANGS.map(([id, label]) => (
               <button
@@ -389,7 +389,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                 {label}
               </button>
             ))}
-            <button type="button" onClick={() => copy(snippet(lang, url, ep), 'code')} className="ml-auto rounded-md border border-mint-300 px-2.5 py-1 font-sans text-[12.5px] font-medium text-ink hover:border-mint-400">
+            <button type="button" onClick={() => copy(snippet(lang, url, ep), 'code')} className="lp-raised lp-press ml-auto rounded-md px-2.5 py-1 font-sans text-[12.5px] font-medium text-ink">
               {copied === 'code' ? 'Copied' : 'Copy code'}
             </button>
           </div>
@@ -406,4 +406,4 @@ export default function Console({ apiBase }: { apiBase: string }) {
 export const CODE_SURFACE = 'pc-code bg-neutral-900 text-ink'
 const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10'
 const fieldClass =
-  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20'
+  'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink'

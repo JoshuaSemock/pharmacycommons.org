@@ -86,7 +86,7 @@ function SourcesCard({ doc, failed }: { doc: EntityDocument | null; failed: bool
             ))}
           </ul>
           {(prov?.record_created || prov?.record_updated) && (
-            <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-relaxed text-ink">
+            <p className="mt-4 border-t border-ink/10 pt-3 font-sans text-2xs leading-relaxed text-ink">
               {prov.record_created && <>Record created {formatDate(prov.record_created)}</>}
               {prov.record_created && prov.record_updated && ' · '}
               {prov.record_updated && <>updated {formatDate(prov.record_updated)}</>}
@@ -172,7 +172,7 @@ function MachineCard({
         <UrlRow label="JSON" display={`…/v1/entities/${pcidCode}.json`} copy={urls.json} href={urls.json} />
       </div>
 
-      <div className="mt-4 border-t border-sage-100 pt-3">
+      <div className="mt-4 border-t border-ink/10 pt-3">
         {failed ? (
           <p className="font-sans text-sm leading-relaxed text-ink">
             The structured record couldn’t be loaded right now. The addresses above still work.
@@ -213,7 +213,7 @@ function MachineCard({
       <dialog
         ref={dialog}
         aria-label={`${pcidCode} as structured data`}
-        className="m-auto w-[min(56rem,calc(100%-2rem))] max-h-[85vh] overflow-hidden rounded-xl border border-sage-200 bg-white p-0 text-ink backdrop:bg-sage-900/40"
+        className="m-auto w-[min(56rem,calc(100%-2rem))] max-h-[85vh] overflow-hidden rounded-md border-0 bg-paper p-0 text-ink shadow-xl shadow-black/25 backdrop:bg-black/40"
         onClick={e => {
           if (e.target === dialog.current) dialog.current?.close() // click on backdrop
         }}
@@ -237,7 +237,7 @@ function RecordDialog({
 }) {
   return (
     <div className="flex max-h-[85vh] flex-col">
-      <div className="flex items-center justify-between gap-3 border-b border-sage-100 px-5 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-5 py-3">
         <div role="tablist" className="flex gap-1">
           <TabButton active={tab === 'json'} onClick={() => setTab('json')}>
             Record JSON
@@ -332,7 +332,7 @@ function HistoryView({ doc }: { doc: EntityDocument }) {
         <h3 className="mb-3 font-sans text-sm font-semibold text-ink">Versions</h3>
         <ol className="space-y-2.5">
           {versions.map(v => (
-            <li key={v.number} className="border-b border-sage-100 pb-2.5 last:border-b-0">
+            <li key={v.number} className="border-b border-ink/10 pb-2.5 last:border-b-0">
               <div className="flex items-baseline justify-between gap-2">
                 <a
                   href={v.url}
@@ -366,7 +366,7 @@ function HistoryView({ doc }: { doc: EntityDocument }) {
         ) : (
           <ol className="space-y-3">
             {changes.changes.map(c => (
-              <li key={c.change_id} className="border-l-2 border-sage-200 pl-3">
+              <li key={c.change_id} className="border-l-2 border-ink/15 pl-3">
                 <p className="font-sans text-2xs text-ink">
                   {formatDate(c.changed_at)} · {sourceLabel(c)} · {c.table.replace(/_/g, ' ')}
                   {c.row_key && ` #${c.row_key}`}
@@ -460,7 +460,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 /** Same look as DrugDetail's SideCard, so the rail reads as one column. */
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-sage-200">
+    <div className="border-t border-ink/15">
       <div className="py-3">
         <h2
           className="font-semibold uppercase tracking-[0.1em] text-ink"

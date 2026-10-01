@@ -111,7 +111,7 @@ export default function ClassDetail() {
         <span className="min-w-0 break-words font-medium text-ink">{cls.name}</span>
       </nav>
 
-      <header className="mb-8 border-b border-sage-200 pb-6">
+      <header className="mb-8 border-b border-ink/15 pb-6">
         <p className="mb-1 font-sans text-md text-ink">
           {cls.class_type_label ?? 'Drug class'}
           {cls.source_code && (
@@ -172,7 +172,7 @@ function SubclassesCard({
           <li key={c.slug}>
             <Link
               to={`/classes/${c.slug}`}
-              className="flex items-baseline justify-between gap-2 rounded-lg border border-sage-200 bg-white px-3 py-2 transition-colors hover:border-aqua-300 hover:bg-sage-50"
+              className="lp-raised lp-press flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
             >
               <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">
                 {showCodes && c.source_code && (
@@ -235,7 +235,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
             onChange={e => setQuery(e.target.value)}
             placeholder={`Filter ${members.length.toLocaleString()} drugs`}
             aria-label="Filter drugs in this class"
-            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none sm:w-64"
+            className="lp-field w-full rounded-md px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink sm:w-64"
           />
         )}
       </div>
@@ -249,8 +249,8 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
               <Link
                 to={`/drugs/${m.slug}`}
                 title={m.is_direct ? undefined : 'In this class through one of its sub-classes'}
-                className={`inline-block max-w-full break-words rounded-md border px-2 py-0.5 font-sans text-sm leading-snug transition-colors hover:border-aqua-300 ${
-                  m.is_direct ? 'border-sage-200 bg-white text-ink' : 'border-dashed border-sage-300 text-ink'
+                className={`inline-block max-w-full break-words rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink ${
+                  m.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
                 }`}
               >
                 {formatDrugName(m.name)}
@@ -270,7 +270,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
       )}
 
       {hasInherited && (
-        <p className="mt-6 border-t border-sage-100 pt-3 font-sans text-2xs leading-snug text-ink">
+        <p className="mt-6 border-t border-ink/10 pt-3 font-sans text-2xs leading-snug text-ink">
           Dashed: in this class through one of its sub-classes.
         </p>
       )}
@@ -282,7 +282,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-sage-200">
+    <div className="border-t border-ink/15">
       <div className="py-3">
         <h2
           className="font-semibold uppercase tracking-[0.1em] text-ink"
