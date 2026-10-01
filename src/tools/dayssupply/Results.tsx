@@ -23,7 +23,7 @@ function Stat({ label, value, note, strong = false }: { label: string; value: st
     <div className="grid min-w-0 content-start gap-0.5">
       <dt className="font-sans text-[12.5px] font-medium text-mint-800">{label}</dt>
       <dd
-        className={`[overflow-wrap:anywhere] font-display leading-tight text-mint-950 ${strong ? 'text-[26px] font-semibold' : 'text-[19px]'}`}
+        className={`[overflow-wrap:anywhere] font-display leading-tight text-mint-950 ${strong ? 'text-[22px] font-semibold whitespace-nowrap' : 'text-[17px]'}`}
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {value}
