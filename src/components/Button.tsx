@@ -1,39 +1,41 @@
 import type { ButtonHTMLAttributes } from 'react'
 
 /**
- * A paper-relief button: embossed (raised out of the sheet) at rest, debossed
- * (stamped in, a step darker) when selected. Tokens and the grain overlay live
- * in src/index.css (search "Paper relief").
+ * A paper-relief button (plan 4.1): raised out of the sheet at rest, stamped
+ * in when selected. Only the shadow changes between the two states. The fill
+ * stays the same color and there is no texture layer on top. Tokens live in
+ * src/index.css (search "Paper relief").
  *
  * `selected` makes it a toggle button. Leave it undefined for an ordinary
  * action button, so screen readers don't announce "toggle button, not
  * pressed" on a button that can't be pressed. When it is set, aria-pressed
- * carries the state and drives the debossed styling (Tailwind's `aria-pressed:`
- * variant), so the look can't drift from what assistive tech hears.
+ * carries the state and drives the stamped-in styling (Tailwind's
+ * `aria-pressed:` variant), so the look can't drift from what assistive tech
+ * hears.
  *
- * Layout classes passed in `className` are appended. Don't pass classes that
- * fight the built-in ones (padding, radius, background, shadow); use `size`
- * and `variant` instead, because Tailwind resolves those conflicts by
- * stylesheet order, not by class order.
+ * Text is ink (the site rule), dimmed to 80% when pressed. Layout classes
+ * passed in `className` are appended; don't pass ones that fight the built-in
+ * padding, radius, background or shadow (Tailwind resolves conflicts by
+ * stylesheet order, not class order). Use `size` and `variant` instead.
  */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'mint' | 'hepatica'
+  variant?: 'hepatica' | 'mint'
   size?: 'sm' | 'md'
   selected?: boolean
 }
 
 const VARIANTS: Record<NonNullable<ButtonProps['variant']>, string> = {
-  mint: 'bg-mint-emboss border-mint-300 aria-pressed:bg-mint-deboss aria-pressed:border-mint-500 dark:aria-pressed:border-mint-200',
-  hepatica: 'bg-hepatica-emboss border-hepatica-300 aria-pressed:bg-hepatica-deboss aria-pressed:border-hepatica-500 dark:aria-pressed:border-hepatica-200',
+  hepatica: 'bg-hepatica-base focus-visible:outline-hepatica-700',
+  mint: 'bg-mint-base focus-visible:outline-mint-700',
 }
 
 const SIZES: Record<NonNullable<ButtonProps['size']>, string> = {
-  sm: 'rounded-md px-2.5 py-1 text-[12.5px] font-medium',
-  md: 'rounded-md px-5 py-2.5 text-sm font-semibold tracking-wide',
+  sm: 'px-3 py-1 text-[12.5px]',
+  md: 'px-4 py-2 text-sm',
 }
 
 export default function Button({
-  variant = 'mint',
+  variant = 'hepatica',
   size = 'md',
   selected,
   type = 'button',
@@ -46,13 +48,10 @@ export default function Button({
       type={type}
       aria-pressed={selected}
       className={[
-        'pc-relief inline-flex items-center justify-center gap-1.5 font-sans text-ink',
-        'border',
-        'shadow-emboss aria-pressed:shadow-deboss',
-        'transition-[box-shadow,background-color,translate] duration-150 motion-reduce:transition-none',
-        'not-aria-pressed:enabled:hover:shadow-emboss-hover not-aria-pressed:enabled:hover:-translate-y-0.5',
-        'aria-pressed:translate-y-px motion-reduce:translate-none',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-700',
+        'inline-flex items-center justify-center gap-1.5 rounded-lg font-sans font-medium text-ink',
+        'shadow-emboss transition-all duration-150 motion-reduce:transition-none',
+        'aria-pressed:shadow-deboss aria-pressed:translate-y-px aria-pressed:text-ink/80',
+        'focus-visible:outline-2 focus-visible:outline-offset-4',
         'disabled:cursor-default disabled:opacity-50',
         VARIANTS[variant],
         SIZES[size],
