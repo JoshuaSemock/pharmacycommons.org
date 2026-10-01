@@ -206,7 +206,7 @@ function SubClasses({ cls }: { cls: ClassDetail }) {
   return (
     <section className="border-t border-sage-200 py-9">
       <SectionHeading>Sub-classes</SectionHeading>
-      <ul className="divide-y divide-sage-100 overflow-hidden rounded-xl border border-sage-200 bg-white">
+      <ul className="divide-y divide-sage-100 border-y border-sage-200">
         {cls.children.map(c => (
           <li key={c.slug}>
             <Link

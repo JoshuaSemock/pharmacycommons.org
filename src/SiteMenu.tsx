@@ -4,6 +4,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ACTIVE_TOOL_SECTIONS } from './tools'
 import type { Tool } from './tools'
 import { useSession } from './auth'
+import { useThemeChoice } from './theme'
+import type { ThemeChoice } from './theme'
 
 /**
  * The hamburger button and the menu it opens.
@@ -102,7 +104,7 @@ export default function SiteMenu() {
         aria-hidden="true"
         onClick={() => setIsOpen(false)}
         className={[
-          'absolute inset-x-0 top-full h-[100dvh] bg-neutral-950/30 transition-opacity duration-200 motion-reduce:transition-none',
+          'absolute inset-x-0 top-full h-[100dvh] bg-black/30 transition-opacity duration-200 motion-reduce:transition-none',
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         ].join(' ')}
       />
@@ -113,7 +115,7 @@ export default function SiteMenu() {
         aria-label="Site menu"
         onBlur={onPanelBlur}
         className={[
-          'absolute inset-x-0 top-full border-b border-mint-200 bg-neutral-50 shadow-lg shadow-mint-900/10',
+          'absolute inset-x-0 top-full border-b border-mint-200 bg-paper shadow-lg shadow-mint-900/10',
           'max-h-[calc(100dvh-var(--nav-h,3.5rem))] overflow-y-auto overscroll-contain',
           'transition-[opacity,translate,visibility] duration-200 ease-out motion-reduce:transition-none',
           isOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0',
@@ -149,6 +151,7 @@ export default function SiteMenu() {
           <div className="border-t border-mint-200/70 md:border-t-0">
             <MenuGroup label="About the Commons" links={REFERENCE_LINKS} />
             <MenuGroup label="Legal" links={LEGAL_LINKS} small />
+            <AppearanceControl />
           </div>
         </div>
       </div>
@@ -254,6 +257,43 @@ function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
       </span>
       <span className="sr-only"> (opens in a new tab)</span>
     </a>
+  )
+}
+
+const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]
+
+/** Light / dark / follow-the-system switch. Saved in this browser only. */
+function AppearanceControl() {
+  const [choice, setChoice] = useThemeChoice()
+  return (
+    <section aria-label="Appearance" className="pb-2">
+      <GroupLabel>Appearance</GroupLabel>
+      <div role="radiogroup" aria-label="Color theme" className="mx-3 mt-1 inline-flex rounded-lg border border-mint-200 p-0.5">
+        {THEME_OPTIONS.map(option => {
+          const selected = choice === option.value
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => setChoice(option.value)}
+              className={[
+                'min-h-9 rounded-md px-3 font-sans text-[13px] transition-colors',
+                'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-hepatica-500',
+                selected ? 'bg-hepatica-100 font-medium text-hepatica-900' : 'text-mint-800 hover:bg-mint-100 hover:text-mint-950',
+              ].join(' ')}
+            >
+              {option.label}
+            </button>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 

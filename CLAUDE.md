@@ -144,9 +144,18 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   neutral (floral white `#faf9f5` → black olive `#3a3a3a`). Steps 50–950, base 400;
   50–600 fills only, 700+ text (≥5:1 on floral white). Legacy sage/aqua/violet/coral/
   amber names are aliases pending migration. Fonts **as shipped**: Newsreader
-  (display) + IBM Plex Sans Condensed / IBM Plex Mono. Lichen photo overlay
-  (`public/textures/lichen_bg.webp`, `lichen_bg_mobile.webp` below 780px, multiply,
-  15%, preloaded in `index.html` as the LCP element);
+  (display) + IBM Plex Sans Condensed / IBM Plex Mono. Page = a torn-edged
+  paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,
+  the reverse) over the lichen photo at full strength (`public/textures/lichen_bg.webp`,
+  `lichen_bg_mobile.webp` below 780px, preloaded in `index.html`). Edge masks come from
+  `scripts/torn-edge.py`. **Dark mode** (2026-10-01): `<html data-theme>` set before paint
+  by the script in `index.html` (saved choice → system), switch in Site menu → Appearance
+  (`src/theme.ts`). Dark flips every ramp end for end in `src/index.css`, so existing
+  classes need no `dark:` copy; `dark:` exists for exceptions; `.pc-code` keeps code
+  panels dark. **Boxes only where they mean something** (design note
+  `docs/design-paper-and-dark-mode.md`): clickable cards and link tiles, alerts/callouts,
+  the FDA boxed warning, the eco-risk card, tool results/editors, form controls, code.
+  Reading sections, rail panels and table wrappers are rules, not boxes.
   phi (1.618) type scale.
   ⚠ An older note named Playfair + Figtree — that is **not** what the code uses. Ask
   Joshua before changing fonts either way.

@@ -213,7 +213,7 @@ export default function ListCompare() {
           </div>
 
           {/* Wide comparisons scroll inside this box, never the page. */}
-          <div className="overflow-x-auto rounded-xl border border-mint-200 bg-white">
+          <div className="overflow-x-auto border-y border-mint-200">
             <table className="w-full min-w-[36rem] border-collapse font-sans text-[13.5px]">
               <thead>
                 <tr className="border-b border-mint-200 bg-mint-50 text-left text-[12px] text-mint-700">

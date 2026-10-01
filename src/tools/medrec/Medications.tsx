@@ -91,7 +91,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
             role="region"
             aria-label="Medication table"
             tabIndex={0}
-            className="relative min-w-0 overflow-x-auto rounded-xl border border-mint-200 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300"
+            className="relative min-w-0 overflow-x-auto border-y border-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300"
           >
             <table className="w-full border-separate border-spacing-0 font-sans text-[13.5px] text-mint-950">
               <thead>
@@ -116,7 +116,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                 {list.map(m => {
                   const c = medColumns(m)
                   const isOpen = m.id === openId
-                  const bg = isOpen ? 'bg-hepatica-50' : 'bg-white group-hover:bg-neutral-50'
+                  const bg = isOpen ? 'bg-hepatica-50' : 'bg-paper group-hover:bg-mint-50'
                   const td = `border-b border-mint-100 px-2.5 py-2.5 align-top ${bg}`
                   return (
                     <tr key={m.id} className="group">

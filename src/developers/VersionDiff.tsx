@@ -83,7 +83,7 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
   )
 
   return (
-    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 rounded-xl border border-mint-200 bg-white p-4">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
         <div className="grid min-w-0 gap-1">
           <label htmlFor="diff-ref" className="font-sans text-[12.5px] font-medium text-mint-900">

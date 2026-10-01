@@ -110,7 +110,7 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] rounded-xl border border-dashed border-mint-300 bg-white/50 px-5 py-4 font-sans text-[14px] leading-relaxed text-mint-700">
+              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-mint-700">
                 Lists published by agencies and professional bodies, such as the NIOSH hazardous drugs list, will
                 appear here with their own license terms.
               </p>
@@ -126,7 +126,7 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] rounded-xl border border-dashed border-mint-300 bg-white/50 px-5 py-4 font-sans text-[14px] leading-relaxed text-mint-700">
+              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-mint-700">
                 Lists made by people with a Pharmacy Commons account are coming. They will be public, and anyone
                 will be able to copy one to start their own.
               </p>

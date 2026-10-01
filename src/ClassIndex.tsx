@@ -253,7 +253,7 @@ export default function ClassIndex() {
                 <span className="ml-2 font-mono text-[12px] text-sage-400">{sorted.length.toLocaleString()}</span>
               </p>
 
-              <ul className="divide-y divide-sage-100 overflow-hidden rounded-xl border border-sage-200 bg-white">
+              <ul className="divide-y divide-sage-100 border-y border-sage-200">
                 {visible.map(c => (
                   <ClassRow key={c.slug} cls={c} showType={tab === 'all'} indent={tab === 'atc' && !query} />
                 ))}

@@ -375,7 +375,7 @@ function Items({ list }: { list: ListRecord }) {
       {rows.length === 0 ? (
         <p className="py-6 font-sans text-[14px] text-mint-700">No drugs match these filters.</p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-mint-200 bg-white">
+        <div className="overflow-hidden border-y border-mint-200">
           <div
             className="hidden gap-x-4 border-b border-mint-200 bg-mint-50 px-4 py-2 font-sans text-[12px] text-mint-700 sm:grid"
             style={{ gridTemplateColumns: gridCols }}
@@ -440,7 +440,7 @@ function Row({
   const sourceDiffers = item.source_name.trim().toLowerCase().replace(/\s*\/\s*/g, '/') !== item.name.trim().toLowerCase()
   return (
     <li
-      className="grid grid-cols-[2.25rem_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 border-b border-mint-100 px-4 py-2.5 last:border-b-0 sm:items-center sm:gap-x-4 sm:[grid-template-columns:var(--cols)]"
+      className="grid grid-cols-[2.25rem_minmax(0,1fr)] items-baseline gap-x-3 gap-y-1 border-b border-mint-100 px-4 py-2.5 last:border-b-0-0 sm:items-center sm:gap-x-4 sm:[grid-template-columns:var(--cols)]"
       style={{ ['--cols' as string]: gridCols }}
     >
       {showRank ? (
@@ -532,14 +532,14 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-mint-200 bg-white">
-      <div className="border-b border-mint-100 px-4 py-3">
+    <div className="border-t border-mint-200">
+      <div className="py-3">
         {/* Inline size and family: index.css styles bare h2 with the display face at --text-3xl. */}
         <h2 className="font-medium text-mint-950" style={{ fontSize: '12.5px', lineHeight: 1.4, fontFamily: 'var(--font-sans)' }}>
           {title}
         </h2>
       </div>
-      <div className="p-4">{children}</div>
+      <div className="pb-4">{children}</div>
     </div>
   )
 }

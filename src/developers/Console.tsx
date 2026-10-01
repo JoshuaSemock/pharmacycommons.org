@@ -172,7 +172,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
         {/* Request */}
-        <div className="grid min-w-0 gap-3 rounded-xl border border-mint-200 bg-white p-4">
+        <div className="grid min-w-0 gap-3 border-t border-mint-200 pt-4">
           <div>
             <p className="font-sans text-[15px] font-semibold text-mint-950">{ep.summary}</p>
             <p className="mt-0.5 max-w-[60rem] font-sans text-[13.5px] leading-relaxed text-neutral-700">{ep.description}</p>
@@ -403,7 +403,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 }
 
 /** The dark "code" surface: black olive from the palette, not pure black. */
-export const CODE_SURFACE = 'bg-neutral-900 text-neutral-100'
+export const CODE_SURFACE = 'pc-code bg-neutral-900 text-neutral-100'
 const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-neutral-300 hover:bg-white/10 hover:text-white'
 const fieldClass =
   'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-mint-950 placeholder:text-neutral-400 focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200'

@@ -195,9 +195,9 @@ export default function Developers() {
           <H2 id="endpoints" lede="All endpoints answer GET (and HEAD). Errors are JSON with a stable code: {&quot;error&quot;: true, &quot;status&quot;, &quot;code&quot;, &quot;message&quot;}.">
             Endpoints
           </H2>
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5">
             {ENDPOINTS.map(e => (
-              <article key={e.id} id={`endpoint-${e.id}`} className="grid min-w-0 scroll-mt-28 gap-3 rounded-xl border border-mint-200 bg-white p-4">
+              <article key={e.id} id={`endpoint-${e.id}`} className="grid min-w-0 scroll-mt-28 gap-3 border-t border-mint-200 pt-4">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
                   <span className="rounded bg-mint-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-mint-800">GET</span>
                   <code className="min-w-0 break-all font-mono text-[14px] font-medium text-mint-950">{e.path}</code>
@@ -309,7 +309,7 @@ export default function Developers() {
                 Record types
               </h3>
               <p className="font-sans text-[14px] text-neutral-700">Each type has its own block of PCIDs, so the number alone tells you what kind of record it is.{index ? ' Counts are live.' : ''}</p>
-              <div role="region" aria-label="Record types" tabIndex={0} className="relative min-w-0 overflow-x-auto rounded-xl border border-mint-200 bg-white">
+              <div role="region" aria-label="Record types" tabIndex={0} className="relative min-w-0 overflow-x-auto border-y border-mint-200">
                 <table className="w-full min-w-[28rem] border-collapse font-sans text-[13px]">
                   <thead className="bg-mint-50">
                     <tr>
@@ -412,7 +412,7 @@ export default function Developers() {
               ['API index', `${API_BASE}/v1`, 'Record types, counts, data sources and every endpoint, as JSON.'],
               ['Source code', 'https://github.com/JoshuaSemock/pharmacycommons.org/tree/main/supabase/functions/api', 'The API is open source (GPL-3.0). Issues and pull requests welcome.'],
             ].map(([title, href, text]) => (
-              <li key={title} className="grid min-w-0 content-start gap-1 rounded-xl border border-mint-200 bg-white p-4">
+              <li key={title} className="grid min-w-0 content-start gap-1 border-t border-mint-200 pt-3">
                 <a href={href} target={href.startsWith('/') ? undefined : '_blank'} rel="noreferrer" className={`font-sans text-[15px] font-semibold ${link}`}>
                   {title}
                 </a>

@@ -44,8 +44,29 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="apple-mobile-web-app-title" content="Ph. Commons" />
-    <meta name="theme-color" content="#f2f5f0" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#faf9f5" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Theme, before first paint: the saved choice (Site menu → Appearance),
+         else the system setting, which it keeps following while nothing is
+         saved. Sets <html data-theme>, which src/index.css keys off. Keep in
+         step with src/theme.ts. -->
+    <script>
+      (function () {
+        var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
+        function saved() {
+          try { var v = localStorage.getItem('pc-theme'); return v === 'light' || v === 'dark' ? v : null } catch (e) { return null }
+        }
+        function apply() {
+          var t = saved() || (mq && mq.matches ? 'dark' : 'light')
+          document.documentElement.setAttribute('data-theme', t)
+          var m = document.querySelector('meta[name="theme-color"]')
+          if (m) m.setAttribute('content', t === 'dark' ? '#3a3a3a' : '#faf9f5')
+        }
+        apply()
+        if (mq && mq.addEventListener) mq.addEventListener('change', function () { if (!saved()) apply() })
+      })()
+    </script>
 
     <!-- The lichen background is the Largest Contentful Paint element, but CSS
          only discovers it after the stylesheet loads. Preload whichever one the
@@ -172,9 +193,10 @@
       <!-- pc:shell -->
       <div id="pc-shell" class="page-background min-h-full">
         <div class="page-content flex min-h-screen flex-col">
+          <div class="paper-sheet" aria-hidden="true"></div>
           <!-- Mirrors src/Nav.tsx. The search is a plain GET form, so it works before
                (and without) JavaScript; the menu button is a placeholder until React mounts. -->
-          <header class="sticky top-0 z-50 border-b border-mint-200 bg-mint-50/90">
+          <header class="sticky top-0 z-50 border-b border-mint-200 bg-paper/90">
             <div class="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
               <a href="/" class="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 md:h-auto" aria-label="Pharmacy Commons home">
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-mint-100 max-[359px]:h-7 max-[359px]:w-7">

@@ -47,6 +47,8 @@ export default function App() {
   return (
     <div className="min-h-full page-background">
       <div className="page-content flex min-h-screen flex-col">
+        {/* The paper face of the page sheet: torn-edged, painted behind everything (see "Background" in index.css). */}
+        <div className="paper-sheet" aria-hidden="true" />
         <Nav />
         <Suspense fallback={routeFallback}>
         <Routes>

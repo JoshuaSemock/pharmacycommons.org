@@ -223,7 +223,7 @@ export default function DrugDetail() {
 
       {/* Reference rail on the left, prescribing information in the main column */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="space-y-4">
+        <aside className="space-y-4 [&>:first-child]:border-t-0">
           <IdentifiersCard drug={drug} />
           <GuidelinesCard pcidCode={drug.pcid_code} />
           <ClassesCard pcidCode={drug.pcid_code} />
@@ -910,11 +910,11 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
 
 // ─── Shared components ────────────────────────────────────────────────────────
 
-/** Left-rail card: small-caps header, padded body. Heading size is inline because index.css sizes bare h2. */
+/** Left-rail section: a rule, a small-caps header, then the body (no box since 2026-10-01). Heading size is inline because index.css sizes bare h2. */
 function SideCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
-      <div className="border-b border-sage-100 px-4 py-3">
+    <div className="border-t border-sage-200">
+      <div className="py-3">
         <h2
           className="font-semibold uppercase tracking-[0.1em] text-sage-600"
           style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
@@ -922,7 +922,7 @@ function SideCard({ title, children }: { title: string; children: ReactNode }) {
           {title}
         </h2>
       </div>
-      <div className="p-4">{children}</div>
+      <div className="pb-4">{children}</div>
     </div>
   )
 }

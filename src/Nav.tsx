@@ -35,7 +35,7 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav ref={navRef} className="sticky top-0 z-50 border-b border-mint-200 bg-mint-50/90 backdrop-blur-md">
+    <nav ref={navRef} className="sticky top-0 z-50 border-b border-mint-200 bg-paper/90 backdrop-blur-md">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
         <Link
           to="/"

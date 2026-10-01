@@ -390,7 +390,7 @@ function CharacterIndex({
   return (
     <nav
       aria-label="Browse by first character"
-      className="sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 border-y border-sage-200 bg-sage-50/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
+      className="sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 border-y border-sage-200 bg-paper/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
     >
       <div className="flex items-center gap-1 overflow-x-auto sm:flex-wrap sm:overflow-visible">
         <button
