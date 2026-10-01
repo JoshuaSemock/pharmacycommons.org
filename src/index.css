@@ -365,11 +365,14 @@ body {
   /* Behind the paper: the lichen photo's average color, for overscroll
      and the moment before the photo arrives. The page color itself is the
      paper sheet (.paper-sheet below). */
-  background-color: #878a6e;
+  background-color: #faf9f5;
   color: var(--color-ink);                  /* black olive / floral white */
   -webkit-font-smoothing: antialiased;
 }
 
+:root[data-theme="dark"] body {
+  background-color: #3a3a3a;   /* behind the lichen in dark mode only */
+}
 h1, h2, h3, .article-body h1 {
   font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
 }
