@@ -75,8 +75,10 @@ export const TOOLS: Tool[] = [
     name: 'Days supply and quantity',
     blurb:
       'Quantity from directions and days, or days from quantity, with package size, priming, drops per mL, and in-use limits counted in. Covers tablets, liquids, eye and ear drops, inhalers, insulin, and injectables including GLP-1 pens. Where the manufacturer and the payer disagree, both results are shown.',
-    status: 'planned',
+    summary: 'Quantity to dispense, or days a quantity lasts',
+    status: 'live',
     section: 'calculators',
+    to: '/tools/days-supply',
   },
   {
     id: 'mme',
