@@ -37,7 +37,7 @@ function OneColumn({ col, fill, threshold, onCopy }: { col: Column } & Omit<Prop
   const { plan, result: r } = col
   const refill = threshold ? refillDate(fill, r.days, threshold) : null
   return (
-    <section aria-label={col.label ?? 'Result'} className="grid min-w-0 content-start gap-4 rounded-xl border border-mint-200 bg-white p-4 sm:p-5">
+    <section aria-label={col.label ?? 'Result'} className="lp-raised grid min-w-0 content-start gap-4 rounded-md p-4 sm:p-5">
       {/* Inline size: the site's unlayered h3 rule would otherwise override text-* (CLAUDE.md, Known drift). */}
       {col.label && (
         <h3 className="font-sans font-semibold leading-snug text-ink" style={{ fontSize: '14px' }}>
@@ -67,8 +67,8 @@ function OneColumn({ col, fill, threshold, onCopy }: { col: Column } & Omit<Prop
 
       {plan.limitDays != null && (
         <p
-          className={`rounded-lg border px-3 py-2 font-sans text-[13.5px] leading-snug ${
-            r.limitControls ? 'border-marigold-300 bg-marigold-100 text-ink' : 'border-mint-200 bg-mint-50 text-ink'
+          className={`lp-sunken rounded-md px-3 py-2 font-sans text-[13.5px] leading-snug ${
+            r.limitControls ? 'bg-marigold-100 text-ink' : 'text-ink'
           }`}
         >
           {r.limitControls ? (
@@ -84,7 +84,7 @@ function OneColumn({ col, fill, threshold, onCopy }: { col: Column } & Omit<Prop
         </p>
       )}
 
-      <div className="grid gap-1.5 rounded-lg border border-mint-200 bg-mint-50 px-3.5 py-2.5">
+      <div className="lp-sunken grid gap-1.5 rounded-md px-3.5 py-2.5">
         <span className="font-sans text-[12.5px] font-medium text-ink">For the label or the claim</span>
         <p className="[overflow-wrap:anywhere] font-sans text-[14.5px] text-ink">{r.line}</p>
         <div>

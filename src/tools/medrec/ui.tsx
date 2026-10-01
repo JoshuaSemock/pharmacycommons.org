@@ -11,12 +11,12 @@ import type { Seg } from './sig'
 import type { Tone } from './model'
 
 export const inputClass =
-  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20 disabled:bg-neutral-100'
+  'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink disabled:bg-neutral-100'
 export const numberClass = `${inputClass} font-mono text-[13.5px]`
 export const primaryButton =
-  'inline-flex items-center gap-1.5 rounded-lg border border-mint-700 bg-mint-100 px-3.5 py-1.5 font-sans text-[13px] font-medium text-ink transition-colors hover:bg-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
+  'lp-raised lp-press inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 font-sans text-[13px] font-medium text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const secondaryButton =
-  'inline-flex items-center gap-1.5 rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink transition-colors hover:border-mint-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
+  'lp-raised lp-press inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const quietButton =
   'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-mint-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const dangerQuietButton =
@@ -52,7 +52,7 @@ export function ChipRadio<T extends string>({
       {options.map(([v, text]) => (
         <label key={v} className="relative cursor-pointer">
           <input type="radio" name={name} value={v} checked={value === v} onChange={() => onChange(v)} className="peer sr-only" />
-          <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-sans text-[13px] text-ink transition-colors hover:border-mint-400 peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
+          <span className="inline-block rounded-md shadow-emboss peer-checked:shadow-deboss px-3 py-1 font-sans text-[13px] text-ink peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
             {text}
           </span>
         </label>
@@ -62,15 +62,15 @@ export function ChipRadio<T extends string>({
 }
 
 const TAG_TONES: Record<Tone, string> = {
-  ok: 'border-mint-200 bg-mint-50 text-ink',
-  caution: 'border-marigold-300 bg-marigold-100 text-ink',
-  warn: 'border-rose-200 bg-rose-100 text-ink',
-  info: 'border-sky-200 bg-sky-50 text-ink',
-  muted: 'border-neutral-300 bg-neutral-100 text-ink',
+  ok: 'text-ink',
+  caution: 'bg-marigold-100 text-ink',
+  warn: 'bg-rose-100 text-ink',
+  info: 'bg-sky-50 text-ink',
+  muted: 'text-ink',
 }
 
 export function Tag({ tone = 'muted', children }: { tone?: Tone; children: ReactNode }) {
-  return <span className={`inline-block rounded border px-1.5 py-0.5 font-mono text-[10.5px] leading-tight ${TAG_TONES[tone]}`}>{children}</span>
+  return <span className={`lp-raised inline-block rounded px-1.5 py-0.5 font-mono text-[10.5px] leading-tight ${TAG_TONES[tone]}`}>{children}</span>
 }
 
 export function SectionHeading({ id, title, lede, action }: { id: string; title: string; lede?: string; action?: ReactNode }) {

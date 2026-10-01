@@ -46,7 +46,7 @@ type Props = {
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-mint-200 pt-4">
+    <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-ink/15 pt-4">
       <legend className="float-left mb-1 w-full font-sans font-medium text-[12.5px] text-ink">{title}</legend>
       {children}
     </fieldset>
@@ -71,7 +71,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
     <article
       id="med-editor"
       aria-label={`Editing ${m.drug || 'medication'}`}
-      className="grid min-w-0 scroll-mt-28 gap-5 rounded-xl border border-hepatica-300 bg-white p-4 shadow-[0_0_0_3px_var(--color-hepatica-100)] sm:p-5"
+      className="lp-raised grid min-w-0 scroll-mt-28 gap-5 rounded-md p-4 sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -84,7 +84,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
         <Tag tone={STATUS[m.status].tone}>{STATUS[m.status].label}</Tag>
       </div>
 
-      <div aria-live="polite" className="grid gap-1.5 rounded-lg border border-mint-200 bg-mint-50 px-4 py-3">
+      <div aria-live="polite" className="lp-sunken grid gap-1.5 rounded-md px-4 py-3">
         <span className="font-sans font-medium text-[12.5px] text-ink">Directions</span>
         <p className="font-display text-[20px] leading-snug text-ink [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-display)' }}>
           <SigText segments={sigSegments(m)} />

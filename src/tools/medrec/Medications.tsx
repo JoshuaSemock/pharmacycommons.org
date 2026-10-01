@@ -57,7 +57,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
   ])
 
   return (
-    <section aria-labelledby="medications" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-8">
+    <section aria-labelledby="medications" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-ink/15 pt-8">
       <SectionHeading
         id="medications"
         title="Medications and products"
@@ -91,7 +91,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
             role="region"
             aria-label="Medication table"
             tabIndex={0}
-            className="relative min-w-0 overflow-x-auto border-y border-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
+            className="relative min-w-0 overflow-x-auto border-y border-ink/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
           >
             <table className="w-full border-separate border-spacing-0 font-sans text-[13.5px] text-ink">
               <thead>
@@ -100,14 +100,14 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                     <th
                       key={key}
                       scope="col"
-                      className={`border-b border-mint-200 bg-mint-50 px-2.5 py-2 text-left align-bottom font-sans text-[12.5px] font-medium text-ink ${
+                      className={`border-b border-ink/15 bg-mint-50 px-2.5 py-2 text-left align-bottom font-sans text-[12.5px] font-medium text-ink ${
                         key === 'name' ? 'sticky left-0 z-10 min-w-[11rem] border-r' : MIN_WIDTH[key]
                       }`}
                     >
                       {label}
                     </th>
                   ))}
-                  <th scope="col" className="border-b border-mint-200 bg-mint-50 px-2.5 py-2">
+                  <th scope="col" className="border-b border-ink/15 bg-mint-50 px-2.5 py-2">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -117,7 +117,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                   const c = medColumns(m)
                   const isOpen = m.id === openId
                   const bg = isOpen ? 'bg-hepatica-50' : 'bg-paper group-hover:bg-mint-50'
-                  const td = `border-b border-mint-100 px-2.5 py-2.5 align-top ${bg}`
+                  const td = `border-b border-ink/10 px-2.5 py-2.5 align-top ${bg}`
                   return (
                     <tr key={m.id} className="group">
                       <th scope="row" className={`${td} sticky left-0 z-[1] max-w-[14rem] border-r text-left font-normal`}>

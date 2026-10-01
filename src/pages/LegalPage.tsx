@@ -79,9 +79,9 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
 
       <aside
         aria-label="Contact and related policies"
-        className="mt-14 space-y-8 border-t border-mint-200 pt-8"
+        className="mt-14 space-y-8 border-t border-ink/15 pt-8"
       >
-        <div className="border-l-2 border-hepatica-300 py-1 pl-4 sm:pl-5">
+        <div className="border-l-2 border-ink/25 py-1 pl-4 sm:pl-5">
           <p
             className="font-display text-[19px] font-semibold leading-snug text-ink"
             style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}

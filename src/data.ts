@@ -12,8 +12,8 @@
 export type EcoRisk = 'negligible' | 'low' | 'moderate' | 'high'
 
 export const ECO_RISK_COLORS: Record<EcoRisk, { bg: string; text: string; border: string; label: string }> = {
-  negligible: { bg: 'bg-sage-100', text: 'text-ink', border: 'border-sage-300', label: 'Negligible' },
-  low: { bg: 'bg-aqua-100', text: 'text-ink', border: 'border-aqua-300', label: 'Low' },
-  moderate: { bg: 'bg-amber-100', text: 'text-ink', border: 'border-amber-400', label: 'Moderate' },
-  high: { bg: 'bg-coral-100', text: 'text-ink', border: 'border-coral-400', label: 'High' },
+  negligible: { bg: '', text: 'text-ink', border: '', label: 'Negligible' },
+  low: { bg: 'bg-sky-50', text: 'text-ink', border: '', label: 'Low' },
+  moderate: { bg: 'bg-amber-100', text: 'text-ink', border: '', label: 'Moderate' },
+  high: { bg: 'bg-coral-100', text: 'text-ink', border: '', label: 'High' },
 }

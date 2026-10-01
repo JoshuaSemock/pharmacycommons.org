@@ -63,7 +63,7 @@ export function PageFrame({
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="pt-10 pb-10 sm:pt-14 lg:pb-12">{header}</header>
 
-      <div className="border-t border-sage-200 lg:grid lg:grid-cols-[minmax(0,42rem)_15rem] lg:justify-between lg:gap-x-12">
+      <div className="border-t border-ink/15 lg:grid lg:grid-cols-[minmax(0,42rem)_15rem] lg:justify-between lg:gap-x-12">
         {(showToc || aside) && (
           <aside
             className={[
@@ -172,7 +172,7 @@ export function Section({
   children: ReactNode
 }) {
   return (
-    <section className="border-t border-sage-200 py-9">
+    <section className="border-t border-ink/15 py-9">
       <h2
         id={id}
         className="mb-4 font-display text-[22px] font-semibold leading-snug text-ink"
@@ -189,7 +189,7 @@ export function Section({
 
 export function Pending({ children }: { children: ReactNode }) {
   return (
-    <span className="ml-2 rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 align-middle font-mono text-[10px] text-ink">
+    <span className="lp-raised ml-2 rounded px-1.5 py-0.5 align-middle font-mono text-[10px] text-ink">
       {children}
     </span>
   )

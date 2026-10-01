@@ -21,7 +21,7 @@ const LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-sage-200">
+    <footer className="mt-auto border-t border-ink/15">
       <div className="mx-auto max-w-page space-y-4 px-4 py-8 font-sans text-[13px] leading-relaxed sm:px-6">
         <p className="text-ink">
           For education only, not medical advice. Ask your pharmacist or prescriber before changing
@@ -52,7 +52,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <div className="flex flex-col gap-3 border-t border-sage-200 pt-4 text-[12px] text-ink sm:flex-row sm:items-baseline sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-ink/15 pt-4 text-[12px] text-ink sm:flex-row sm:items-baseline sm:justify-between">
           <p>
             © {YEAR} Pharmacy Commons · Code{' '}
             <a href={`${REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={link}>

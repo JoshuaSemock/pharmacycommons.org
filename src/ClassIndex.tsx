@@ -139,7 +139,7 @@ export default function ClassIndex() {
         <div
           role="tablist"
           aria-label="Classification system"
-          className="hidden flex-wrap gap-0.5 rounded-lg border border-sage-200 bg-sage-100 p-0.5 sm:inline-flex"
+          className="hidden flex-wrap gap-1.5 sm:inline-flex"
         >
           {TABS.map(t => (
             <button
@@ -150,11 +150,9 @@ export default function ClassIndex() {
               title={t.hint}
               onClick={() => patch({ type: t.key === DEFAULT_TAB ? null : t.key })}
               className={[
-                'rounded-md px-3 py-1.5 font-sans text-[13px] font-medium whitespace-nowrap transition-colors',
+                'lp-toggle rounded-md px-3 py-1.5 font-sans text-[13px] font-medium whitespace-nowrap text-ink',
                 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
-                tab === t.key
-                  ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-                  : 'text-ink',
+                '',
               ].join(' ')}
             >
               {t.label}
@@ -166,7 +164,7 @@ export default function ClassIndex() {
           <select
             value={tab}
             onChange={e => patch({ type: e.target.value === DEFAULT_TAB ? null : e.target.value })}
-            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-2 font-sans text-[14px] text-ink outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/20"
+            className="lp-field w-full rounded-md px-3 py-2 font-sans text-[14px] text-ink outline-none"
           >
             {TABS.map(t => (
               <option key={t.key} value={t.key}>
@@ -178,7 +176,7 @@ export default function ClassIndex() {
 
         {/* Search */}
         <div className="mt-5 max-w-lg">
-          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-2.5 shadow-sm shadow-sage-900/5 transition-all focus-within:border-ink/40 focus-within:ring-3 focus-within:ring-ink/20">
+          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-2.5">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -253,7 +251,7 @@ export default function ClassIndex() {
                 <span className="ml-2 font-mono text-[12px] text-ink">{sorted.length.toLocaleString()}</span>
               </p>
 
-              <ul className="divide-y divide-sage-100 border-y border-sage-200">
+              <ul className="divide-y divide-ink/10 border-y border-ink/15">
                 {visible.map(c => (
                   <ClassRow key={c.slug} cls={c} showType={tab === 'all'} indent={tab === 'atc' && !query} />
                 ))}
@@ -264,7 +262,7 @@ export default function ClassIndex() {
                   <button
                     type="button"
                     onClick={() => setLimit(l => l + PAGE)}
-                    className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
+                    className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13px] font-medium text-ink"
                   >
                     Show {Math.min(PAGE, sorted.length - visible.length).toLocaleString()} more
                   </button>

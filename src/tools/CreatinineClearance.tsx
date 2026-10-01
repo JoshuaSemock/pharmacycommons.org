@@ -76,7 +76,7 @@ export default function CreatinineClearance() {
       </header>
 
       {/* Calculator */}
-      <div className="border-t border-sage-200 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
+      <div className="border-t border-ink/15 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
         <section aria-labelledby="calculator-heading" className="min-w-0 pt-8" data-toc-skip>
           <h2 id="calculator-heading" className="sr-only">
             Calculator
@@ -121,7 +121,7 @@ export default function CreatinineClearance() {
       </div>
 
       {/* Method and sources */}
-      <div className="mt-16 border-t border-sage-200 lg:grid lg:grid-cols-[minmax(0,42rem)_15rem] lg:justify-between lg:gap-x-12">
+      <div className="mt-16 border-t border-ink/15 lg:grid lg:grid-cols-[minmax(0,42rem)_15rem] lg:justify-between lg:gap-x-12">
         <aside className="hidden lg:col-start-2 lg:row-start-1 lg:block lg:self-start lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pt-10 lg:pb-8">
           {headings.length >= 3 && <OnThisPage headings={headings} />}
         </aside>

@@ -33,7 +33,7 @@ export default function Resources() {
       lede="Guidelines, trial registries, drug lists and safety tools kept by other organizations. None of it feeds a Pharmacy Commons record. They are here because they are worth knowing."
       contentKey={`resources:${groups.length}`}
     >
-      <section className="border-t border-sage-200 py-8">
+      <section className="border-t border-ink/15 py-8">
         <p className="font-sans text-[14.5px] leading-relaxed text-ink">
           These sites are run by others and change without notice. Our own sources and how to cite them are on{' '}
           <Link to="/references" className={linkClass}>
@@ -44,19 +44,19 @@ export default function Resources() {
       </section>
 
       {failed && (
-        <p role="alert" className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-ink">
+        <p role="alert" className="border-t border-ink/15 py-8 font-sans text-[14.5px] text-ink">
           The resource list could not be loaded. Refresh the page to try again.
         </p>
       )}
 
       {!rows && !failed && (
-        <p className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-ink" aria-live="polite">
+        <p className="border-t border-ink/15 py-8 font-sans text-[14.5px] text-ink" aria-live="polite">
           Loading resources…
         </p>
       )}
 
       {groups.map(group => (
-        <section key={group.id} className="border-t border-sage-200 py-8">
+        <section key={group.id} className="border-t border-ink/15 py-8">
           <h2
             id={group.id}
             className="mb-2 font-display text-[21px] font-semibold text-ink"
@@ -75,7 +75,7 @@ export default function Resources() {
         </section>
       ))}
 
-      <section className="border-t border-sage-200 py-8">
+      <section className="border-t border-ink/15 py-8">
         <h2
           id="suggest-a-link"
           className="mb-3 font-display text-[21px] font-semibold text-ink"
@@ -101,7 +101,7 @@ export default function Resources() {
 function LinkItem({ link }: { link: ReferenceResource }) {
   const badges = [link.typeBadge, link.licenseBadge, ...link.badges].filter((b): b is string => Boolean(b))
   return (
-    <li className="min-w-0 border-l-2 border-sage-200 pl-4">
+    <li className="min-w-0 border-l-2 border-ink/15 pl-4">
       <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
         <a
           href={link.href}
@@ -114,7 +114,7 @@ function LinkItem({ link }: { link: ReferenceResource }) {
         {badges.map(badge => (
           <span
             key={badge}
-            className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-[10px] text-ink"
+            className="lp-raised rounded px-1.5 py-0.5 font-mono text-[10px] text-ink"
           >
             {badge}
           </span>

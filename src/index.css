@@ -304,6 +304,13 @@
 .lp-press {
   transition: box-shadow 150ms ease;
 }
+/* A field shows focus by pressing in, so no browser outline on it or on the
+   input inside it. */
+.lp-field,
+.lp-field:focus,
+.lp-field :focus {
+  outline: none;
+}
 @media (prefers-reduced-motion: reduce) {
   .lp-field,
   .lp-toggle,

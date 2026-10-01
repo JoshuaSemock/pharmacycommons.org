@@ -57,7 +57,7 @@ export default function Blog() {
             : 'No posts with that topic.'}
         </p>
       ) : (
-        <ul className="divide-y divide-sage-200">
+        <ul className="divide-y divide-ink/15">
           {visible.map(post => (
             <li key={post.slug} className="py-9 first:pt-10">
               <article>
@@ -65,7 +65,7 @@ export default function Blog() {
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   <span>{post.readingMinutes} minute read</span>
                   {post.draft && (
-                    <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+                    <span className="lp-raised rounded bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                       draft
                     </span>
                   )}
@@ -96,7 +96,7 @@ export default function Blog() {
                         <button
                           type="button"
                           onClick={() => selectTag(tag)}
-                          className="rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+                          className="lp-raised lp-press rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                         >
                           {tag}
                         </button>

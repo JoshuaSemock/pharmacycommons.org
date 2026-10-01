@@ -27,7 +27,7 @@ export default function Tools() {
         </p>
         <ul className="space-y-3">
           {THIRD_PARTY_TOOLS.map(tool => (
-            <li key={tool.url} className="min-w-0 border-l-2 border-sage-200 pl-4">
+            <li key={tool.url} className="min-w-0 border-l-2 border-ink/15 pl-4">
               <a
                 href={tool.url}
                 target="_blank"
@@ -42,7 +42,7 @@ export default function Tools() {
         </ul>
       </section>
 
-      <section className="border-t border-sage-200 py-8">
+      <section className="border-t border-ink/15 py-8">
         <p className="font-sans text-[14px] text-ink leading-relaxed">
           Missing a calculator you reach for daily?{' '}
           <a href="mailto:contact@pharmacycommons.org?subject=Tool%20request" className={`text-ink ${LINK}`}>
@@ -59,7 +59,7 @@ function GroupHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="scroll-mt-28 border-t-2 border-sage-300 pt-8 font-display text-[26px] font-semibold text-ink"
+      className="scroll-mt-28 border-t-2 border-ink/25 pt-8 font-display text-[26px] font-semibold text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -70,7 +70,7 @@ function GroupHeading({ id, children }: { id: string; children: ReactNode }) {
 function ToolList({ id, heading, tools }: { id: string; heading: string; tools: Tool[] }) {
   if (tools.length === 0) return null
   return (
-    <section id={id} className="scroll-mt-28 border-t border-sage-200 py-8 first-of-type:border-t-0">
+    <section id={id} className="scroll-mt-28 border-t border-ink/15 py-8 first-of-type:border-t-0">
       <h3
         className="mb-5 font-display text-[21px] font-semibold text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
@@ -79,7 +79,7 @@ function ToolList({ id, heading, tools }: { id: string; heading: string; tools: 
       </h3>
       <ul className="space-y-5">
         {tools.map(tool => (
-          <li key={tool.id} className="min-w-0 border-l-2 border-sage-200 pl-4">
+          <li key={tool.id} className="min-w-0 border-l-2 border-ink/15 pl-4">
             <div className="flex flex-wrap items-center gap-2.5">
               <h4 className="font-sans text-[14.5px] font-medium text-ink">
                 <ToolName tool={tool} />
@@ -114,9 +114,9 @@ function ToolName({ tool }: { tool: Tool }) {
 
 function StatusTag({ status }: { status: ToolStatus }) {
   const styles: Record<ToolStatus, string> = {
-    live: 'border-aqua-300 bg-aqua-100 text-ink',
-    building: 'border-violet-200 bg-violet-100 text-ink',
-    planned: 'border-sage-200 bg-sage-100 text-ink',
+    live: 'lp-raised',
+    building: 'lp-sunken',
+    planned: 'border border-dashed border-ink/30',
   }
   const labels: Record<ToolStatus, string> = {
     live: 'live',
@@ -124,6 +124,6 @@ function StatusTag({ status }: { status: ToolStatus }) {
     planned: 'planned',
   }
   return (
-    <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] ${styles[status]}`}>{labels[status]}</span>
+    <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] text-ink ${styles[status]}`}>{labels[status]}</span>
   )
 }
