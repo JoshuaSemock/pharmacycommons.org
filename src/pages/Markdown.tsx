@@ -155,7 +155,7 @@ const components: Components = {
     <li className="pl-1 [&>ol]:mt-2 [&>ol]:mb-1 [&>ul]:mt-2 [&>ul]:mb-1">{children}</li>
   ),
 
-  // Set in Fraunces so a pulled line reads as a different voice from the body.
+  // Italic, larger and set off by a rule, so a pulled line reads as a different voice from the body.
   blockquote: ({ children }) => (
     <InsideQuote.Provider value={true}>
       <blockquote
