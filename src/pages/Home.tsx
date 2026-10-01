@@ -3,7 +3,8 @@ import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
 import { formatDate } from '../blog'
-import { ctaFor, whatsNew, type UpdateKind } from '../updates'
+import { ctaFor, whatsNew } from '../updates'
+import Stamp from '../components/Stamp'
 
 /** Old links put browse state on `/`; those parameters now belong to /browse. */
 const BROWSE_PARAMS = ['q', 'letter', 'mode', 'per']
@@ -89,7 +90,7 @@ function Hero() {
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
-          <div className="flex items-center gap-2 rounded-xl border border-mint-200 bg-white px-4 py-3 shadow-sm shadow-mint-900/5 focus-within:border-hepatica-400 focus-within:ring-3 focus-within:ring-hepatica-200">
+          <div className="pc-letterpress pc-letterpress-sunken flex items-center gap-2 rounded-md bg-transparent px-4 py-3 shadow-deboss focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-hepatica-700">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -171,12 +172,6 @@ function Hero() {
 // What's new — shipped features (src/updates.ts) and blog posts, newest first
 // ─────────────────────────────────────────────────────────────────────────────
 
-const KIND_TAG: Record<UpdateKind, string> = {
-  Tool: 'border-mint-300 bg-mint-50 text-ink',
-  Feature: 'border-hepatica-200 bg-hepatica-50 text-ink',
-  'Blog post': 'border-salmon-200 bg-salmon-50 text-ink',
-}
-
 function WhatsNew() {
   const items = useMemo(() => whatsNew(RECENT_UPDATES), [])
   if (items.length === 0) return null
@@ -213,9 +208,7 @@ function WhatsNew() {
             <article>
               <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-ink">
                 <time dateTime={item.date}>{formatDate(item.date)}</time>
-                <span className={`rounded border px-1.5 py-0.5 font-sans text-[11.5px] font-medium ${KIND_TAG[item.kind]}`}>
-                  {item.kind}
-                </span>
+                <Stamp>{item.kind}</Stamp>
               </p>
               <h3
                 className="font-display text-[21px] font-semibold leading-snug text-balance text-ink"

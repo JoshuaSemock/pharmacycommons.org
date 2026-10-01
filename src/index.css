@@ -150,25 +150,31 @@
   --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
-     Letterpress relief (2026-10-01, plan 4.2). Buttons and cards are
-     stamped out of the paper itself: no fill of their own (transparent,
-     so the sheet and its grain show through), no border, no texture layer. A die makes a hard crease, so the
-     edge is a 1-2px micro-shadow, with only a faint wide shadow for
-     ambient depth. Light comes from the top left.
+     Letterpress relief (2026-10-01, plan 4.3 "hard crease"). Buttons,
+     cards, search fields and tags are stamped out of the paper itself:
+     no fill of their own (transparent, so the sheet and its grain run
+     straight through), no border, no texture layer, and the same
+     pigment raised or pressed. A metal die crushes the fibres into a
+     near-vertical wall, so every edge is a 0-1px micro-shadow. The only
+     soft layer is a 2-3px falloff on the shaded wall, the sloped shading
+     a blind deboss shows in real paper (reference: "podo" deboss).
+     Light comes from the top left.
      Each layer's color is a --lp-* var (on :root below), because
      Tailwind inlines @theme shadow values into the utility, so
      redefining --shadow-* for dark mode would do nothing.
-     Text gets a 1px impression (.pc-letterpress, below).
-     Components: src/components/Button.tsx, src/components/Card.tsx.
+     Text gets a 1px ink impression (.pc-letterpress, below).
+     Components: src/components/Button.tsx, Card.tsx, Stamp.tsx.
      --------------------------------------------------------------- */
-  /* Raised: crisp top-left rim, hard drop edge, soft ambient drop. */
+  /* Raised: hard top-left rim, tight drop edge, faint ambient drop, plus
+     a 1px bevel on the plateau (lit top-left, shaded bottom-right). */
   --shadow-emboss:
-    -1px -1px 1px var(--lp-rim), 1px 1px 2px var(--lp-edge), 3px 3px 6px var(--lp-ambient);
-  /* Sunken: hard inner top-left wall, soft inner occlusion, crisp
-     bottom-right floor reflection. */
+    -1px -1px 0 var(--lp-rim), 1px 1px 2px var(--lp-edge), 2px 2px 4px var(--lp-ambient),
+    inset 1px 1px 0 var(--lp-bevel-light), inset -1px -1px 0 var(--lp-bevel-dark);
+  /* Sunken: hard top-left inner wall, its short sloped falloff, a 1px
+     crease all round, and the crisp lit bottom-right wall. */
   --shadow-deboss:
-    inset 1px 1px 2px var(--lp-wall), inset 2px 2px 5px var(--lp-occlusion),
-    inset -1px -1px 1px var(--lp-floor);
+    inset 1px 1px 1px var(--lp-wall), inset 2px 2px 3px var(--lp-slope),
+    inset 0 0 0 1px var(--lp-crease), inset -1px -1px 0 var(--lp-floor);
 
   /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
@@ -230,8 +236,11 @@
   --lp-rim: rgb(255 255 255 / 0.9);
   --lp-edge: rgb(0 0 0 / 0.15);
   --lp-ambient: rgb(0 0 0 / 0.04);
-  --lp-wall: rgb(0 0 0 / 0.25);
-  --lp-occlusion: rgb(0 0 0 / 0.05);
+  --lp-bevel-light: rgb(255 255 255 / 0.7);
+  --lp-bevel-dark: rgb(0 0 0 / 0.06);
+  --lp-wall: rgb(0 0 0 / 0.15);
+  --lp-slope: rgb(0 0 0 / 0.07);
+  --lp-crease: rgb(0 0 0 / 0.06);
   --lp-floor: rgb(255 255 255 / 0.9);
   --lp-text-raised: 0 1px 0 rgb(255 255 255 / 0.6);
   --lp-text-sunken: 0 -1px 0 rgb(255 255 255 / 0.4);
@@ -241,8 +250,11 @@
   --lp-rim: rgb(255 255 255 / 0.12);
   --lp-edge: rgb(0 0 0 / 0.6);
   --lp-ambient: rgb(0 0 0 / 0.3);
-  --lp-wall: rgb(0 0 0 / 0.7);
-  --lp-occlusion: rgb(0 0 0 / 0.4);
+  --lp-bevel-light: rgb(255 255 255 / 0.08);
+  --lp-bevel-dark: rgb(0 0 0 / 0.3);
+  --lp-wall: rgb(0 0 0 / 0.6);
+  --lp-slope: rgb(0 0 0 / 0.3);
+  --lp-crease: rgb(0 0 0 / 0.25);
   --lp-floor: rgb(255 255 255 / 0.12);
   --lp-text-raised: 0 1px 0 rgb(0 0 0 / 0.8);
   --lp-text-sunken: 0 -1px 0 rgb(0 0 0 / 0.8);

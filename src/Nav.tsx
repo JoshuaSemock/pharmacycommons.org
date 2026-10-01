@@ -124,9 +124,7 @@ function HeaderSearch() {
     <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
       <form onSubmit={handleSubmit} role="search">
         <div
-          className={`flex h-10 items-center gap-2 rounded-lg border bg-white/80 px-3 transition-colors md:h-9 ${
-            focused ? 'border-hepatica-400 bg-white ring-2 ring-hepatica-200' : 'border-mint-200 hover:border-mint-300'
-          }`}
+          className="pc-letterpress pc-letterpress-sunken flex h-10 items-center gap-2 rounded-md bg-transparent px-3 shadow-deboss focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-hepatica-700 md:h-9"
         >
           <SearchIcon />
           <input
