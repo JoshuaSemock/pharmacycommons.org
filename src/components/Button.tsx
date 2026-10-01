@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react'
 
 /**
- * A letterpress button (plan 4.2): stamped out of the paper itself. It has
+ * A letterpress button (plan 4.3): stamped out of the paper itself. It has
  * no fill of its own (bg-transparent, so the sheet and its grain show
  * through) and no border, and it is raised at rest and
  * pressed in when selected. Only the 1-2px micro-shadows and the ink's 1px
@@ -15,7 +15,8 @@ import type { ButtonHTMLAttributes } from 'react'
  * `aria-pressed:` variant), so the look can't drift from what assistive tech
  * hears.
  *
- * Text is ink (the site rule), dimmed to 80% when pressed. `variant` now only
+ * Text is ink (the site rule) at full strength in both states: a stamp moves
+ * the paper, not the pigment. `variant` now only
  * picks the focus-ring accent, since the fill is the paper in every variant. Layout classes
  * passed in `className` are appended; don't pass ones that fight the built-in
  * padding, radius, background or shadow (Tailwind resolves conflicts by
@@ -51,9 +52,9 @@ export default function Button({
       type={type}
       aria-pressed={selected}
       className={[
-        'pc-letterpress inline-flex items-center justify-center gap-1.5 rounded-lg border-0 bg-transparent font-sans font-medium text-ink',
+        'pc-letterpress inline-flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent font-sans font-medium text-ink',
         'shadow-emboss transition-all duration-150 motion-reduce:transition-none',
-        'aria-pressed:shadow-deboss aria-pressed:translate-y-px aria-pressed:text-ink/80',
+        'aria-pressed:shadow-deboss aria-pressed:translate-y-px',
         'focus-visible:outline-2 focus-visible:outline-offset-4',
         'disabled:cursor-default disabled:opacity-50',
         VARIANTS[variant],
