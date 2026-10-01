@@ -66,7 +66,7 @@ function Hero() {
   }
 
   return (
-    <section className="pt-8 pb-8 text-center sm:pt-16 sm:pb-14">
+    <section className="pt-8 pb-6 text-center sm:pt-16 sm:pb-14">
       {/* Kicker. Sizes are pixel values on purpose: this site's phi scale makes
           text-xs 9.9px, too small for a sentence. */}
       <p className="mx-auto mb-2.5 max-w-2xl font-sans text-[12.5px] font-medium leading-snug text-pretty text-mint-600 sm:text-[13px]">
@@ -83,7 +83,7 @@ function Hero() {
       </h1>
 
       {/* Scope and educational disclaimer */}
-      <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-relaxed text-pretty text-mint-600 sm:text-[13.5px] sm:leading-normal">
+      <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-normal text-pretty text-mint-600 sm:text-[13.5px]">
         Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
       </p>
 

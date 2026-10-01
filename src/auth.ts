@@ -18,7 +18,7 @@
 
 import { useEffect, useState } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from './supabaseClient'
+import { getSupabase } from './db'
 
 export function useSession(): { session: Session | null; user: User | null; loading: boolean } {
   const [session, setSession] = useState<Session | null>(null)
@@ -26,20 +26,30 @@ export function useSession(): { session: Session | null; user: User | null; load
 
   useEffect(() => {
     let cancelled = false
+    let unsubscribe: (() => void) | null = null
 
-    supabase.auth.getSession().then(({ data }) => {
+    // The Supabase client (~55 KB gzipped) is fetched on demand rather than as
+    // part of the first page load, so the header renders without waiting on
+    // it. Until it arrives, `loading` stays true (the account button shows
+    // its neutral state).
+    getSupabase().then(supabase => {
       if (cancelled) return
-      setSession(data.session)
-      setLoading(false)
-    })
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next)
+      supabase.auth.getSession().then(({ data }) => {
+        if (cancelled) return
+        setSession(data.session)
+        setLoading(false)
+      })
+
+      const { data: subscription } = supabase.auth.onAuthStateChange((_event, next) => {
+        setSession(next)
+      })
+      unsubscribe = () => subscription.subscription.unsubscribe()
     })
 
     return () => {
       cancelled = true
-      subscription.subscription.unsubscribe()
+      unsubscribe?.()
     }
   }, [])
 
@@ -109,6 +119,7 @@ export async function signUpWithPassword(
   password: string,
   consent: LegalAgreementMetadata,
 ) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -119,17 +130,20 @@ export async function signUpWithPassword(
 }
 
 export async function signInWithPassword(email: string, password: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
   return data
 }
 
 export async function signOut() {
+  const supabase = await getSupabase()
   const { error } = await supabase.auth.signOut()
   if (error) throw error
 }
 
 export async function sendPasswordReset(email: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: authRedirectUrl(),
   })
@@ -147,6 +161,7 @@ export async function sendPasswordReset(email: string) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function updateEmail(newEmail: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase.auth.updateUser(
     { email: newEmail },
     { emailRedirectTo: authRedirectUrl() },
@@ -155,6 +170,7 @@ export async function updateEmail(newEmail: string) {
 }
 
 export async function updatePassword(newPassword: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) throw error
 }
@@ -184,6 +200,7 @@ export type VerifyNpiResult =
 
 /** Reads the caller's own verification row, if any. Null means "not verified yet." */
 export async function getMyProviderVerification(): Promise<ProviderVerification | null> {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('provider_verifications')
     .select('npi, verified_name, enumeration_type, primary_taxonomy, status, verified_at')
@@ -200,6 +217,7 @@ export async function getMyProviderVerification(): Promise<ProviderVerification 
  * exceptions. Throws only on a genuine transport/auth failure.
  */
 export async function verifyNpi(npi: string, lastName: string): Promise<VerifyNpiResult> {
+  const supabase = await getSupabase()
   const { data, error } = await supabase.functions.invoke<VerifyNpiResult>('verify-npi', {
     body: { npi, last_name: lastName },
   })
@@ -228,6 +246,7 @@ export type SavedEntity = {
 
 /** Every page the signed-in user has saved, most recent first. */
 export async function getSavedEntities(): Promise<SavedEntity[]> {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('saved_entities')
     .select('pcid_code, slug, name, entity_type, saved_at')
@@ -239,6 +258,7 @@ export async function getSavedEntities(): Promise<SavedEntity[]> {
 
 /** True if the signed-in user has already saved this PCID. Null user → false, no call made. */
 export async function isEntitySaved(pcidCode: string): Promise<boolean> {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('saved_entities')
     .select('pcid_code')
@@ -255,6 +275,7 @@ export async function saveEntity(entity: {
   name: string
   entity_type: string | null
 }): Promise<void> {
+  const supabase = await getSupabase()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -274,6 +295,7 @@ export async function saveEntity(entity: {
 }
 
 export async function unsaveEntity(pcidCode: string): Promise<void> {
+  const supabase = await getSupabase()
   const { error } = await supabase.from('saved_entities').delete().eq('pcid_code', pcidCode)
   if (error) throw new Error(`Failed to remove saved page: ${error.message}`)
 }

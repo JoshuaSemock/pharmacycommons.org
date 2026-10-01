@@ -479,6 +479,21 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   background-size: cover;
 }
 
+/* Phones: the same photo, fetched only after the page has finished loading.
+   On a phone the lichen shows only in the thin strips beside the sheet, yet at
+   745 KB it was most of the bytes on the first visit and slowed every other
+   download (mobile LCP 8 s on slow 4G). Until it arrives, the strips show
+   the photo's average color. index.html adds .pc-bg-ready on window load. */
+@media (width <= 780px) {
+  .page-background::before {
+    background-color: #878a6e;
+    background-image: none;
+  }
+  .pc-bg-ready .page-background::before {
+    background-image: url("/textures/lichen_bg.webp");
+  }
+}
+
 .page-content {
   --sheet-gutter: clamp(4px, 1.6vw, 32px);
   --edge-w: clamp(17px, 3.4vw, 46px);
@@ -556,6 +571,15 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 .paper-sheet::before {
   background: url("/textures/paper-grain.webp") 0 0 / var(--grain-size) repeat;
   opacity: var(--grain-strength);
+}
+
+/* Phones: a lighter tile (900px instead of 1200px; scripts/paper-textures.py).
+   This image is the Largest Contentful Paint on mobile, so its size counts
+   directly. index.html preloads whichever one the screen will use. */
+@media (width <= 780px) {
+  .paper-sheet::before {
+    background-image: url("/textures/paper-grain-sm.webp");
+  }
 }
 
 .paper-sheet::after {

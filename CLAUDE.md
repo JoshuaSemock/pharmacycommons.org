@@ -148,7 +148,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,
   the reverse) over the lichen photo at full strength (`public/textures/lichen_bg.webp`,
   one image for every screen size, still — no parallax since 2026-10-01 — preloaded in
-  `index.html`; made at the source's full resolution by `scripts/lichen-images.py` from
+  `index.html` on screens wider than 780px; on phones it is fetched only after load and first
+  paint (`.pc-bg-ready`), and phones get the 900px `paper-grain-sm.webp` (the mobile LCP image); made at the source's full resolution by `scripts/lichen-images.py` from
   `assets/textures/lichen_bg.jpg`). Torn edges, rim relief,
   shadow and paper grain are cut from the photos `assets/textures/paper.png` and
   `paper-texture.png` by `scripts/paper-textures.py` → `public/textures/paper-*.webp`
@@ -165,7 +166,9 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   Joshua before changing fonts either way.
 - **Backend:** Supabase Postgres, project `nenwovhyrdcdkhxzjiiv` ("Pharmaceutical
   Commons Database"). RLS on every table. `src/supabaseClient.ts` is the single
-  `createClient()` (publishable `sb_publishable_…` key).
+  `createClient()` (publishable `sb_publishable_…` key). Code that runs on every page (header,
+  account button, home) gets it via `getSupabase()` in `src/db.ts` so the SDK isn't in the
+  first-load bundle; don't add static `supabaseClient` imports to Nav/SiteMenu/Home/catalog/auth.
 - **Package manager:** pnpm, pinned via `packageManager` (pnpm@10.34.3), Node ≥22.
   **Never add `version:` to `pnpm/action-setup`** — declaring it twice is a hard error.
 - **Tests:** vitest. `tests/api.test.ts` mocks `@/supabaseClient` with an in-memory

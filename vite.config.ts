@@ -15,7 +15,11 @@ export default defineConfig({
     // The source is public (GPL-3.0), so publish source maps: readable stack
     // traces in the browser, and it clears Lighthouse's "missing source maps".
     sourcemap: true,
-    modulePreload: false,
+    // Emit <link rel="modulepreload"> for the entry's vendor chunks, so React
+    // downloads alongside index.js instead of after it (one round trip less on
+    // slow phones). No polyfill: every browser with ES modules except very old
+    // Safari supports modulepreload, and the fallback is just the old timing.
+    modulePreload: { polyfill: false },
     rolldownOptions: {
       output: {
         // Third-party code changes far less often than ours. Keeping it in its
