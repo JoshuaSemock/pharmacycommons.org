@@ -94,7 +94,7 @@ export default function SiteMenu() {
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg max-[359px]:w-9 text-ink transition-colors hover:bg-mint-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500"
+        className="lp-toggle flex h-10 w-10 shrink-0 items-center justify-center rounded-md max-[359px]:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
       >
         {isOpen ? <CloseIcon /> : <HamburgerIcon />}
       </button>
@@ -162,17 +162,19 @@ export default function SiteMenu() {
 /**
  * "Log in / Register" when signed out, "Signed In" once signed in; both go to
  * /account. The email address is deliberately not shown in the bar.
+ * Letterpress: "Log in / Register" is raised (a button to press); "Signed In"
+ * stays pressed in, a stamp that says the session is on.
  */
 export function AccountButton({ block = false }: { block?: boolean }) {
   const { user, loading } = useSession()
   const base = [
-    'items-center justify-center rounded-lg border px-3 font-sans text-[13px] font-medium whitespace-nowrap transition-colors',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500',
+    'items-center justify-center rounded-md px-3 font-sans text-[13px] font-medium whitespace-nowrap text-ink',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700',
     block ? 'flex h-11 w-full' : 'inline-flex h-9',
   ].join(' ')
 
   if (loading) {
-    return <span className={`${base} border-transparent bg-mint-100 ${block ? '' : 'w-[8.5rem]'}`} aria-hidden="true" />
+    return <span className={`${base} lp-raised ${block ? '' : 'w-[8.5rem]'}`} aria-hidden="true" />
   }
 
   if (user) {
@@ -180,7 +182,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
       <Link
         to="/account"
         title={user.email ?? undefined}
-        className={`${base} gap-1.5 border-mint-300 bg-mint-50 text-ink hover:border-mint-500`}
+        className={`${base} lp-sunken gap-1.5`}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-mint-600" aria-hidden="true" />
         Signed In
@@ -189,7 +191,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
   }
 
   return (
-    <Link to="/account" className={`${base} border-mint-300 bg-white text-ink hover:border-mint-500`}>
+    <Link to="/account" className={`${base} lp-raised lp-press`}>
       Log in / Register
     </Link>
   )

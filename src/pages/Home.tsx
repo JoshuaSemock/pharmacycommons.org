@@ -90,7 +90,7 @@ function Hero() {
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
-          <div className="pc-letterpress pc-letterpress-sunken flex items-center gap-2 rounded-md bg-transparent px-4 py-3 shadow-deboss focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-hepatica-700">
+          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-3 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -122,14 +122,14 @@ function Hero() {
         </form>
 
         {focused && suggestions.length > 0 && (
-          <div className="absolute top-full z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-mint-200 bg-white shadow-lg shadow-mint-900/5">
+          <div className="absolute top-full z-20 mt-1.5 w-full overflow-hidden rounded-md bg-paper shadow-lg shadow-black/15">
             {suggestions.map(entry => {
               const schedule = toDrug(entry).schedule
               return (
                 <button
                   key={entry.n}
                   onMouseDown={() => navigate(`/drugs/${entry.slug}`)}
-                  className="flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-mint-50"
+                  className="flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-neutral-100"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-sans text-[14px] font-medium text-ink">{entry.name}</span>
@@ -148,7 +148,7 @@ function Hero() {
             })}
             <Link
               to={`/browse?q=${encodeURIComponent(query.trim())}`}
-              className="flex min-h-[48px] items-center border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-ink hover:bg-mint-50"
+              className="lp-rule-t flex min-h-[48px] items-center px-4 py-2.5 font-sans text-[13px] text-ink hover:bg-neutral-100"
             >
               See every match for “{query.trim()}”
             </Link>
@@ -179,7 +179,7 @@ function WhatsNew() {
   return (
     <section
       aria-labelledby="whats-new-heading"
-      className="border-t border-mint-200 pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
+      className="lp-rule-t pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
     >
       <div className="mb-6 lg:mb-0">
         <h2
@@ -202,7 +202,7 @@ function WhatsNew() {
         </p>
       </div>
 
-      <ul className="max-w-[46rem] divide-y divide-mint-200">
+      <ul className="lp-divide-y max-w-[46rem]">
         {items.map(item => (
           <li key={item.id} className="py-6 first:pt-0">
             <article>
@@ -216,7 +216,7 @@ function WhatsNew() {
               >
                 <Link
                   to={item.to}
-                  className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                  className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
                 >
                   {item.title}
                 </Link>
@@ -249,7 +249,7 @@ function WhatsNew() {
 
 function SourcesFooter() {
   return (
-    <footer className="mt-16 border-t border-mint-200 pt-8">
+    <footer className="lp-rule-t mt-16 pt-8">
       <div className="grid gap-6 sm:grid-cols-3">
         <DataSource
           label="Founded by Dr. Joshua Semock, PharmD"

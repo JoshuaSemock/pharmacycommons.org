@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { searchClasses } from './api'
 import Button from './components/Button'
@@ -192,7 +193,7 @@ export default function SearchView() {
         </p>
 
         <div className="mt-6 max-w-lg">
-          <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-2.5 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200 transition-all">
+          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-2.5 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -265,15 +266,11 @@ export default function SearchView() {
 
               <label className="flex items-center gap-2 font-sans text-[12.5px] text-ink">
                 Show
-                <select
-                  value={per}
-                  onChange={e => patch({ per: e.target.value })}
-                  className="rounded-lg border border-sage-200 bg-white px-2 py-1 font-mono text-[12px] text-ink outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
-                >
+                <PageSizeSelect value={per} onChange={v => patch({ per: v })}>
                   {PAGE_SIZES.map(n => (
                     <option key={n} value={n}>{pageLabel(n)}</option>
                   ))}
-                </select>
+                </PageSizeSelect>
                 {per !== 0 && <span className="text-ink">at a time</span>}
               </label>
             </div>
@@ -323,7 +320,7 @@ export default function SearchView() {
                     {(g.def.kind === 'greek' || g.def.kind === 'symbol') && (
                       <span className="font-sans text-[12px] text-ink">{g.def.name}</span>
                     )}
-                    <span className="h-px flex-1 self-center bg-sage-200" />
+                    <span className="lp-score flex-1 self-center" />
                     <span className="font-mono text-[11px] text-ink">
                       {counts ? (counts[g.key] ?? 0).toLocaleString() : ''}
                     </span>
@@ -341,7 +338,7 @@ export default function SearchView() {
               <div className="mt-8 flex flex-col items-center gap-2">
                 <button
                   onClick={() => setLimit(l => l + pageSize)}
-                  className="rounded-lg bg-aqua-100 px-6 py-2.5 font-sans text-[13px] font-medium text-ink hover:bg-aqua-200 transition-colors"
+                  className="lp-raised lp-press rounded-md px-6 py-2.5 font-sans text-[13px] font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
                 >
                   Load {Math.min(per || remaining, remaining).toLocaleString()} more
                 </button>
@@ -356,7 +353,7 @@ export default function SearchView() {
 
       {/* Data provenance footer */}
       {!searching && (
-        <footer className="mt-16 border-t border-sage-200 pt-8">
+        <footer className="lp-rule-t mt-16 pt-8">
           <div className="grid gap-6 sm:grid-cols-3">
             <DataSource icon="🏛️" label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
             <DataSource icon="🧪" label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
@@ -391,14 +388,14 @@ function CharacterIndex({
   return (
     <nav
       aria-label="Browse by first character"
-      className="sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 border-y border-sage-200 bg-paper/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
+      className="lp-rule-y sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 bg-paper/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
     >
       <div className="flex items-center gap-1 overflow-x-auto sm:flex-wrap sm:overflow-visible">
         <button
           onClick={() => onSelect(null)}
           aria-pressed={!active}
-          className={`shrink-0 rounded px-2 py-1 font-sans text-[12px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600 ${
-            !active ? 'text-ink font-medium' : 'text-ink'
+          className={`lp-flat shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+            !active ? 'font-medium' : ''
           }`}
         >
           All
@@ -411,7 +408,7 @@ function CharacterIndex({
           return (
             <span key={b.key} className="flex shrink-0 items-center">
               <span
-                className={`mx-1 h-4 w-px bg-sage-200 ${i === 0 || startsRun ? '' : 'hidden'}`}
+                className={`lp-score-v mx-1 h-4 ${i === 0 || startsRun ? '' : 'hidden'}`}
                 aria-hidden="true"
               />
               <button
@@ -420,12 +417,8 @@ function CharacterIndex({
                 aria-pressed={isActive}
                 aria-label={b.kind === 'latin' || b.kind === 'numeric' ? undefined : b.name}
                 title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
-                className={`rounded px-[7px] py-1 font-mono text-[13px] leading-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600 ${
-                  !n
-                    ? 'cursor-default text-ink'
-                    : isActive
-                      ? 'bg-aqua-200 font-medium text-ink'
-                      : 'text-ink hover:bg-sage-100'
+                className={`lp-flat rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+                  !n ? 'cursor-default' : isActive ? 'font-medium' : ''
                 }`}
               >
                 {b.label}
@@ -466,10 +459,10 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
   return (
     <button
       onClick={onSelect}
-      className="group rounded-xl border border-sage-200 bg-white p-4 text-left transition-all hover:border-sage-300 hover:shadow-md hover:shadow-sage-900/5 hover:-translate-y-0.5"
+      className="lp-raised lp-press group rounded-md p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
     >
       <div className="mb-3 flex items-start gap-2">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sage-100 font-mono text-[11px] font-medium text-ink">
+        <span className="lp-sunken flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-mono text-[11px] font-medium text-ink">
           {monogram}
         </span>
         <div className="min-w-0">
@@ -482,11 +475,11 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 border-t border-sage-100 pt-2.5">
+      <div className="lp-rule-t flex items-center justify-between gap-2 pt-2.5">
         <span className="font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
         <span className="flex items-center gap-1.5">
           {entry.stub === 1 && (
-            <span className="rounded-md border border-sage-200 bg-sage-50 px-2 py-0.5 font-sans text-[10px] text-ink">
+            <span className="lp-raised rounded px-2 py-0.5 font-sans text-[10px] text-ink">
               Needs an editor
             </span>
           )}
@@ -562,5 +555,37 @@ function DataSource({ icon, label, desc }: { icon: string; label: string; desc: 
         <p className="font-sans text-[12px] text-ink leading-relaxed">{desc}</p>
       </div>
     </div>
+  )
+}
+
+/**
+ * The page-size dropdown. Letterpress: raised at rest, pressed in while its
+ * list is open, raised again once a size is picked or it closes. A native
+ * select has no open/close events, so the state is tracked from the pointer
+ * and keys that open it, and cleared on change, Escape and blur.
+ */
+function PageSizeSelect({
+  value, onChange, children,
+}: {
+  value: number; onChange: (v: string) => void; children: ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <select
+      value={value}
+      onPointerDown={() => setOpen(o => !o)}
+      onKeyDown={e => {
+        if (e.key === 'Escape' || e.key === 'Tab') setOpen(false)
+        else if (e.key === 'Enter' || e.key === ' ' || (e.altKey && e.key === 'ArrowDown')) setOpen(true)
+      }}
+      onChange={e => {
+        setOpen(false)
+        onChange(e.target.value)
+      }}
+      onBlur={() => setOpen(false)}
+      className={`lp-toggle ${open ? 'lp-on' : ''} cursor-pointer rounded-md border-0 bg-transparent py-1 pr-1 pl-2 font-mono text-[12px] text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700`}
+    >
+      {children}
+    </select>
   )
 }
