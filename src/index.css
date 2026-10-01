@@ -458,7 +458,17 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 .page-background::before {
   content: "";
   position: fixed;
-  inset: 0;
+  /* Sized to the *large* viewport (browser toolbars hidden), not inset: 0.
+     On phones the address bar slides away as you start scrolling; with
+     inset: 0 the layer grew with it and `cover` re-scaled the photo, which
+     read as a zoom/shift. 100lvh never changes, so the photo stays put; while
+     the toolbar is showing, the bottom sliver just sits under it.
+     100vh first for browsers without lvh (it means the same on mobile). */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
   z-index: 0;
   /* WebP in public/textures (stable URL, so index.html can preload it). Made
