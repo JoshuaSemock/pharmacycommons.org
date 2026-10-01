@@ -150,26 +150,25 @@
   --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
-     Paper relief (2026-10-01, plan 4.1). Buttons and cards are pressed
-     into the sheet: raised (embossed) at rest, stamped in (debossed) when
-     selected. Light comes from the top left. The depth comes entirely from
-     box-shadow: a crisp white highlight and a clean transparent-black
-     shadow. The fill stays the same color in both states, with no texture
-     or blend layer on top.
-     Shadow colors come from --relief-* vars (on :root below) because
-     Tailwind inlines @theme shadow values into the utility, so dark mode
-     can only change them through vars.
+     Letterpress relief (2026-10-01, plan 4.2). Buttons and cards are
+     stamped out of the paper itself: no fill of their own (transparent,
+     so the sheet and its grain show through), no border, no texture layer. A die makes a hard crease, so the
+     edge is a 1-2px micro-shadow, with only a faint wide shadow for
+     ambient depth. Light comes from the top left.
+     Each layer's color is a --lp-* var (on :root below), because
+     Tailwind inlines @theme shadow values into the utility, so
+     redefining --shadow-* for dark mode would do nothing.
+     Text gets a 1px impression (.pc-letterpress, below).
      Components: src/components/Button.tsx, src/components/Card.tsx.
      --------------------------------------------------------------- */
-  --color-hepatica-base: oklch(92% 0.035 295);
-  --color-mint-base: oklch(93% 0.040 170);
-
-  /* Raised: white top-left highlight, dark bottom-right shadow, rim light. */
+  /* Raised: crisp top-left rim, hard drop edge, soft ambient drop. */
   --shadow-emboss:
-    -3px -3px 6px var(--relief-light), 3px 3px 6px var(--relief-dark),
-    inset 1px 1px 1px var(--relief-rim);
-  /* Sunken: inner top-left shadow, inner bottom-right highlight. */
-  --shadow-deboss: inset 3px 3px 6px var(--relief-cavity), inset -3px -3px 6px var(--relief-light);
+    -1px -1px 1px var(--lp-rim), 1px 1px 2px var(--lp-edge), 3px 3px 6px var(--lp-ambient);
+  /* Sunken: hard inner top-left wall, soft inner occlusion, crisp
+     bottom-right floor reflection. */
+  --shadow-deboss:
+    inset 1px 1px 2px var(--lp-wall), inset 2px 2px 5px var(--lp-occlusion),
+    inset -1px -1px 1px var(--lp-floor);
 
   /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
@@ -227,24 +226,37 @@
 :root {
   color-scheme: light;
 
-  /* Paper relief light and shade (see --shadow-emboss in @theme). */
-  --relief-light: rgb(255 255 255 / 0.9);
-  --relief-dark: rgb(0 0 0 / 0.12);
-  --relief-rim: rgb(255 255 255 / 0.5);
-  --relief-cavity: rgb(0 0 0 / 0.18);
+  /* Letterpress light and shade (see --shadow-emboss in @theme). */
+  --lp-rim: rgb(255 255 255 / 0.9);
+  --lp-edge: rgb(0 0 0 / 0.15);
+  --lp-ambient: rgb(0 0 0 / 0.04);
+  --lp-wall: rgb(0 0 0 / 0.25);
+  --lp-occlusion: rgb(0 0 0 / 0.05);
+  --lp-floor: rgb(255 255 255 / 0.9);
+  --lp-text-raised: 0 1px 0 rgb(255 255 255 / 0.6);
+  --lp-text-sunken: 0 -1px 0 rgb(255 255 255 / 0.4);
 }
 
-/* Dark paper (#3a3a3a): a 90% white highlight would glow, so the light is a
-   faint sheen and the shade carries the depth. The base fills drop to a dark
-   tint, still the same in both states. */
 :root[data-theme="dark"] {
-  --relief-light: rgb(255 255 255 / 0.07);
-  --relief-dark: rgb(0 0 0 / 0.45);
-  --relief-rim: rgb(255 255 255 / 0.1);
-  --relief-cavity: rgb(0 0 0 / 0.5);
+  --lp-rim: rgb(255 255 255 / 0.12);
+  --lp-edge: rgb(0 0 0 / 0.6);
+  --lp-ambient: rgb(0 0 0 / 0.3);
+  --lp-wall: rgb(0 0 0 / 0.7);
+  --lp-occlusion: rgb(0 0 0 / 0.4);
+  --lp-floor: rgb(255 255 255 / 0.12);
+  --lp-text-raised: 0 1px 0 rgb(0 0 0 / 0.8);
+  --lp-text-sunken: 0 -1px 0 rgb(0 0 0 / 0.8);
+}
 
-  --color-hepatica-base: oklch(40% 0.045 295);
-  --color-mint-base: oklch(40% 0.045 170);
+/* Letterpress ink impression: the 1px text-shadow that makes the ink sit
+   in (or on) the stamped paper. Raised by default; sunken when the element
+   is pressed (aria-pressed="true") or is a sunken card. */
+.pc-letterpress {
+  text-shadow: var(--lp-text-raised);
+}
+.pc-letterpress[aria-pressed="true"],
+.pc-letterpress-sunken {
+  text-shadow: var(--lp-text-sunken);
 }
 
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
