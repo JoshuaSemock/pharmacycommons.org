@@ -282,8 +282,8 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-sage-200 bg-white">
-      <div className="border-b border-sage-100 px-4 py-3">
+    <div className="border-t border-sage-200">
+      <div className="py-3">
         <h2
           className="font-semibold uppercase tracking-[0.1em] text-sage-600"
           style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
@@ -291,7 +291,7 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
           {title}
         </h2>
       </div>
-      <div className="p-4">{children}</div>
+      <div className="pb-4">{children}</div>
     </div>
   )
 }

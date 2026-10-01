@@ -43,7 +43,7 @@ export default function SchemaFields({ apiBase }: { apiBase: string }) {
         aria-label="Filter schema fields"
         className="w-full max-w-md rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-mint-950 placeholder:text-neutral-500 focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200"
       />
-      <div role="region" aria-label="Schema fields" tabIndex={0} className="relative max-h-[30rem] min-w-0 overflow-auto rounded-xl border border-mint-200 bg-white">
+      <div role="region" aria-label="Schema fields" tabIndex={0} className="relative max-h-[30rem] min-w-0 overflow-auto border-y border-mint-200">
         <table className="w-full min-w-[40rem] border-separate border-spacing-0 font-sans text-[13px]">
           <thead className="sticky top-0 z-10 bg-mint-50">
             <tr>

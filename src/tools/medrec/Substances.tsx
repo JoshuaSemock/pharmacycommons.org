@@ -37,7 +37,7 @@ type ItemKey = 'caffeine' | 'nicotine' | 'recreational'
 
 function Card({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <article className="grid min-w-0 content-start gap-3 rounded-xl border border-mint-200 bg-white/80 p-4">
+    <article className="grid min-w-0 content-start gap-3 border-t border-mint-200 pt-4">
       <div>
         <h3 className="font-display font-semibold text-mint-950" style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}>
           {title}

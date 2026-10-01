@@ -8,8 +8,10 @@
    they beat the widget's own `.crcl` (0,1,0) regardless of stylesheet order —
    this file ships in a lazy chunk, so order is not guaranteed.
 
-   The page pins data-crcl-theme="light" because the site itself has no dark
-   theme yet. When it gets one, add a dark block here and drop the pin.
+   The page pins data-crcl-theme="light" so the widget's own
+   prefers-color-scheme block never fires: every token below points at a site
+   palette variable, and the site flips those itself in dark mode
+   (src/index.css, [data-theme="dark"]), so the calculator follows the site.
 
    `@reference` pulls in the @theme tokens without emitting any CSS. It also
    matters for a second reason: Tailwind v4 prunes theme variables nothing uses.
@@ -28,7 +30,7 @@
   --crcl-ink:        var(--color-mint-950);
   --crcl-ink-soft:   var(--color-mint-800);
   --crcl-ink-faint:  var(--color-mint-700);
-  --crcl-bg:         oklch(100% 0 0);
+  --crcl-bg:         var(--color-white);
   --crcl-bg-sunken:  var(--color-mint-50);
   --crcl-line:       var(--color-mint-200);
   --crcl-line-soft:  var(--color-mint-100);

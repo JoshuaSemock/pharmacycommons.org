@@ -215,7 +215,7 @@ function OverviewPanel({
 }) {
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
+      <div className="border-t border-sage-200 pt-3.5">
         <p className="font-sans text-sm text-sage-600">Signed in as</p>
         <p className="font-sans text-md font-medium text-sage-900">{email}</p>
       </div>
@@ -241,7 +241,7 @@ function OverviewPanel({
 
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint: string }) {
   return (
-    <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
+    <div className="border-t border-sage-200 pt-3.5">
       <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</p>
       <p className="mt-0.5 font-mono text-lg font-semibold text-sage-900">{value}</p>
       <p className="mt-0.5 font-sans text-2xs text-sage-600">{hint}</p>
@@ -275,7 +275,7 @@ function NpiStatCard() {
   const verified = verification?.status === 'active'
 
   return (
-    <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
+    <div className="border-t border-sage-200 pt-3.5">
       <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
         Contribution status
       </p>
@@ -349,7 +349,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-sage-300 bg-white/50 px-4 py-6 text-center">
+      <div className="border-t border-sage-200 px-1 py-6 text-center">
         <p className="font-sans text-sm text-sage-600">
           Nothing saved yet. Look for the <span className="font-medium text-sage-800">Save</span>{' '}
           button on any drug page to bookmark it here.
@@ -359,11 +359,11 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   }
 
   return (
-    <div className="space-y-2">
+    <div className="border-t border-sage-200">
       {rows.map(row => (
         <div
           key={row.pcid_code}
-          className="flex items-center justify-between gap-3 rounded-lg border border-sage-200 bg-white/70 px-4 py-3"
+          className="flex items-center justify-between gap-3 border-b border-sage-200 py-3"
         >
           <div className="min-w-0">
             <Link
@@ -633,7 +633,7 @@ function NpiVerification() {
 
   if (checking) {
     return (
-      <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
+      <div className="border-t border-sage-200 pt-3.5">
         <p className="font-sans text-sm text-sage-600">Checking NPI verification status…</p>
       </div>
     )
@@ -660,7 +660,7 @@ function NpiVerification() {
   }
 
   return (
-    <div className="rounded-lg border border-sage-200 bg-white/70 px-4 py-3.5">
+    <div className="border-t border-sage-200 pt-3.5">
       <p className="mb-3 font-sans text-sm font-medium text-sage-900">Verify your NPI</p>
       <p className="mb-4 font-sans text-sm leading-relaxed text-sage-600">
         Required before you can submit an edit. Checked against the CMS NPI Registry — your last

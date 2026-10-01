@@ -150,7 +150,7 @@ export default function ClassIndex() {
           {filtered.length === 0 ? (
             <p className="font-sans text-sm text-sage-600">No classes match “{query}”.</p>
           ) : (
-            <ul className="divide-y divide-sage-100 overflow-hidden rounded-xl border border-sage-200 bg-white">
+            <ul className="divide-y divide-sage-100 border-y border-sage-200">
               {filtered.slice(0, limit).map(r => (
                 <li key={r.slug}>
                   <Link

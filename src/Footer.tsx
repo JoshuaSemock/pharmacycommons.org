@@ -21,7 +21,7 @@ const LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-sage-200 bg-white/40">
+    <footer className="mt-auto border-t border-sage-200">
       <div className="mx-auto max-w-page space-y-4 px-4 py-8 font-sans text-[13px] leading-relaxed sm:px-6">
         <p className="text-sage-700">
           For education only, not medical advice. Ask your pharmacist or prescriber before changing

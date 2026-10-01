@@ -134,7 +134,7 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
   const appl = formatApplication(label.application_number)
 
   return (
-    <div className="rounded-xl border border-sage-200 bg-white px-5 py-4">
+    <div className="border-b border-sage-200 px-1 pb-4">
       <p className="mb-1 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
         FDA prescribing information
       </p>
@@ -237,7 +237,7 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
         </button>
       </nav>
 
-      <div className="space-y-2.5">
+      <div>
         {core.map(s => (
           <SectionAccordion key={s.key} section={s} open={open.has(s.key)} onToggle={() => toggle(s.key)} />
         ))}
@@ -247,8 +247,8 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
         const list = group === 'populations' ? populations : reference
         if (list.length === 0) return null
         return (
-          <div key={group} className="space-y-2.5">
-            <h3 className="px-1 pt-2 font-semibold uppercase tracking-[0.1em] text-sage-600" style={SMALL_CAPS_HEADING}>
+          <div key={group}>
+            <h3 className="px-1 pt-2 pb-2.5 font-semibold uppercase tracking-[0.1em] text-sage-600" style={SMALL_CAPS_HEADING}>
               {GROUP_LABELS[group]}
             </h3>
             {list.map(s => (
@@ -300,13 +300,13 @@ function SectionAccordion({
   const panelId = `label-panel-${section.key}`
 
   return (
-    <section id={`label-${section.key}`} className="scroll-mt-20 overflow-hidden rounded-xl border border-sage-200 bg-white">
+    <section id={`label-${section.key}`} className="scroll-mt-20 border-b border-sage-200 first-of-type:border-t">
       <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
         <button
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left transition-colors hover:bg-sage-50"
+          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left transition-colors hover:bg-sage-50"
         >
           <span className="font-display text-lg text-sage-900" style={{ fontFamily: 'var(--font-display)' }}>
             {section.title}
@@ -318,7 +318,7 @@ function SectionAccordion({
         </button>
       </h3>
       {open && (
-        <div id={panelId} className="space-y-4 border-t border-sage-100 px-5 py-4">
+        <div id={panelId} className="space-y-4 border-t border-sage-100 px-1 pt-4 pb-6">
           {section.blocks.map((b, i) => (
             <Block key={i} block={b} tables={section.tables_html} />
           ))}
@@ -459,7 +459,7 @@ function TrailingTables({ tables }: { tables: LabelTable[] | null }) {
 }
 
 const TABLE_CLASSES =
-  'overflow-x-auto rounded-lg border border-sage-200 bg-white font-sans text-sm leading-snug text-sage-800 ' +
+  'overflow-x-auto border-y border-sage-200 font-sans text-sm leading-snug text-sage-800 ' +
   '[&_caption]:px-3 [&_caption]:py-2 [&_caption]:text-left [&_caption]:font-semibold ' +
   '[&_table]:w-full [&_table]:border-collapse ' +
   '[&_td]:border-t [&_td]:border-sage-100 [&_td]:px-3 [&_td]:py-1.5 [&_td]:align-top ' +
@@ -490,7 +490,7 @@ function LabelSkeleton() {
 
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-sage-200 bg-white px-5 py-4 font-sans text-md leading-relaxed text-sage-700">
+    <div className="border-l-2 border-sage-300 py-1 pl-4 font-sans text-md leading-relaxed text-sage-700">
       {children}
     </div>
   )

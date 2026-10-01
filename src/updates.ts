@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'paper-and-dark-mode',
+    date: '2026-10-01',
+    kind: 'Feature',
+    title: 'A new page, and a dark mode',
+    summary:
+      'Pages now sit on a single sheet of floral-white paper with torn edges over the lichen, with fewer boxes in the way of the reading. Dark mode follows your device, or pick Light or Dark under Appearance in the site menu.',
+    to: '/',
+    cta: 'Take a look',
+  },
+  {
     id: 'days-supply',
     date: '2026-09-30',
     kind: 'Tool',
