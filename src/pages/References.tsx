@@ -75,7 +75,7 @@ export default function References() {
 
       <section className="border-t border-sage-200 py-9">
         <SectionHeading id="source-datasets">Sources and references</SectionHeading>
-        <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
+        <div className="space-y-3 font-sans text-md leading-relaxed text-ink">
           <p>
             For anything load-bearing — a dose, a contraindication, an approval date — cite
             the primary record, not this site. Entries marked{' '}
@@ -95,13 +95,13 @@ export default function References() {
         </div>
 
         {failed && (
-          <p role="alert" className="mt-5 font-sans text-md text-rose-700">
+          <p role="alert" className="mt-5 font-sans text-md text-ink">
             The reference list could not be loaded. Refresh the page to try again.
           </p>
         )}
 
         {!rows && !failed && (
-          <p className="mt-5 font-sans text-md text-sage-600" aria-live="polite">
+          <p className="mt-5 font-sans text-md text-ink" aria-live="polite">
             Loading references…
           </p>
         )}
@@ -123,7 +123,7 @@ export default function References() {
           <div key={group.id} className="mt-10">
             <h3
               id={group.id}
-              className="mb-5 font-display text-lg font-semibold leading-snug text-sage-900"
+              className="mb-5 font-display text-lg font-semibold leading-snug text-ink"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {group.heading}
@@ -155,7 +155,7 @@ function Reuse() {
   return (
     <section className="border-t border-sage-200 py-9">
       <SectionHeading id="reuse">Reuse</SectionHeading>
-      <div className="space-y-3 font-sans text-md leading-relaxed text-sage-700">
+      <div className="space-y-3 font-sans text-md leading-relaxed text-ink">
         <p>
           The application code is GPL-3.0. Data original to Pharmacy Commons is dedicated to
           the public domain under{' '}
@@ -236,7 +236,7 @@ function PageCitation({
 
       <div className="mt-7">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="font-sans text-sm font-medium text-sage-900">Formatted citation</span>
+          <span className="font-sans text-sm font-medium text-ink">Formatted citation</span>
           <CopyButton copied={copied} disabled={!citation} onClick={() => onCopy('page', citation)} />
         </div>
         <CitationText muted={!citation}>
@@ -267,7 +267,7 @@ function ReferenceItem({
           href={source.href}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 break-words font-sans text-md font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="min-w-0 break-words font-sans text-md font-medium text-ink underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
         >
           {source.name}
         </a>
@@ -281,19 +281,19 @@ function ReferenceItem({
         ))}
       </div>
       {source.organization && (
-        <p className="mt-0.5 break-words font-sans text-sm text-sage-600">{source.organization}</p>
+        <p className="mt-0.5 break-words font-sans text-sm text-ink">{source.organization}</p>
       )}
       {source.description && (
-        <p className="mt-1 break-words font-sans text-md leading-relaxed text-sage-600">{source.description}</p>
+        <p className="mt-1 break-words font-sans text-md leading-relaxed text-ink">{source.description}</p>
       )}
       {source.commonsUse && source.commonsUse !== source.description && (
-        <p className="mt-1 break-words font-sans text-md leading-relaxed text-sage-700">
-          <span className="font-medium text-sage-900">Used here for: </span>
+        <p className="mt-1 break-words font-sans text-md leading-relaxed text-ink">
+          <span className="font-medium text-ink">Used here for: </span>
           {source.commonsUse}
         </p>
       )}
       {journal && (
-        <p className="mt-1 break-words font-sans text-sm text-sage-600">Published in {journal}</p>
+        <p className="mt-1 break-words font-sans text-sm text-ink">Published in {journal}</p>
       )}
 
       {citation && (
@@ -350,8 +350,8 @@ function CitationSettings({
                   'rounded-md border px-2.5 py-1 font-sans text-sm transition-colors',
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500',
                   selected
-                    ? 'border-aqua-400 bg-aqua-100 text-aqua-700'
-                    : 'border-sage-200 bg-white/60 text-sage-600 hover:border-sage-300 hover:text-sage-900',
+                    ? 'border-aqua-400 bg-aqua-100 text-ink'
+                    : 'border-sage-200 bg-white/60 text-ink hover:border-sage-300',
                 ].join(' ')}
               >
                 {s.label}
@@ -362,7 +362,7 @@ function CitationSettings({
       </div>
 
       <div className="max-w-xs">
-        <label htmlFor="citation-accessed" className="mb-3 block font-sans text-sm font-medium text-sage-900">
+        <label htmlFor="citation-accessed" className="mb-3 block font-sans text-sm font-medium text-ink">
           Accessed
         </label>
         <input
@@ -372,7 +372,7 @@ function CitationSettings({
           onChange={e => onAccessed(e.target.value)}
           className={inputClass}
         />
-        <span className="mt-1.5 block font-sans text-2xs leading-snug text-sage-600">
+        <span className="mt-1.5 block font-sans text-2xs leading-snug text-ink">
           Applies to web citations. Journal articles are cited by DOI and don't take one.
         </span>
       </div>
@@ -386,7 +386,7 @@ function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="mb-5 font-display text-lg font-semibold leading-snug text-sage-900"
+      className="mb-5 font-display text-lg font-semibold leading-snug text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -399,7 +399,7 @@ function CitationText({ children, muted = false }: { children: ReactNode; muted?
     <div className="rounded-lg border border-sage-200 bg-white/70 px-3.5 py-3">
       <p
         className={`whitespace-pre-wrap break-words font-mono text-sm leading-relaxed ${
-          muted ? 'text-sage-600' : 'text-sage-800'
+          muted ? 'text-ink' : 'text-ink'
         }`}
       >
         {children}
@@ -435,9 +435,9 @@ function CopyButton({
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block font-sans text-sm font-medium text-sage-700">{label}</span>
+      <span className="mb-1.5 block font-sans text-sm font-medium text-ink">{label}</span>
       {children}
-      {hint && <span className="mt-1 block font-sans text-2xs text-sage-600">{hint}</span>}
+      {hint && <span className="mt-1 block font-sans text-2xs text-ink">{hint}</span>}
     </label>
   )
 }
@@ -465,16 +465,16 @@ function useCopy() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
 
 const sourceBadgeClass =
-  'rounded border border-mint-300 bg-mint-100 px-1.5 py-0.5 font-mono text-xs text-mint-800'
+  'rounded border border-mint-300 bg-mint-100 px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const badgeClass =
-  'rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-sage-600'
+  'rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const linkClass =
-  'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
+  'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'

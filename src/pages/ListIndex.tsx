@@ -59,12 +59,12 @@ export default function ListIndex() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="border-b border-mint-200 pb-10 pt-10 sm:pt-14">
         <h1
-          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-mint-950 sm:text-[2.618rem]"
+          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-ink sm:text-[2.618rem]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Lists
         </h1>
-        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-mint-700">
+        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-ink">
           Collections of drugs gathered for a purpose: an exam, a practice setting, a question about use. Classes
           say what a drug is; lists say why it is worth knowing. Every entry links to its drug page, and every list
           can be sorted, filtered and downloaded.
@@ -72,7 +72,7 @@ export default function ListIndex() {
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
             to="/lists/compare"
-            className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-hepatica-700 transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
+            className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-ink transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
           >
             Compare lists
           </Link>
@@ -80,7 +80,7 @@ export default function ListIndex() {
       </header>
 
       {failed ? (
-        <p className="py-10 font-sans text-[15px] text-mint-700">Lists couldn’t be loaded right now.</p>
+        <p className="py-10 font-sans text-[15px] text-ink">Lists couldn’t be loaded right now.</p>
       ) : !lists ? (
         <div className="grid gap-4 py-9 sm:grid-cols-2" aria-busy="true">
           {[0, 1, 2, 3].map(i => (
@@ -91,7 +91,7 @@ export default function ListIndex() {
         <>
           <section className="py-9">
             <SectionHeading>Pharmacy Commons lists</SectionHeading>
-            <p className="mb-5 max-w-[42rem] font-sans text-[14px] leading-relaxed text-mint-700">
+            <p className="mb-5 max-w-[42rem] font-sans text-[14px] leading-relaxed text-ink">
               Curated by Pharmacy Commons. Each has a PCID, a stated source and a CC0 license.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -110,7 +110,7 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-mint-700">
+              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
                 Lists published by agencies and professional bodies, such as the NIOSH hazardous drugs list, will
                 appear here with their own license terms.
               </p>
@@ -126,7 +126,7 @@ export default function ListIndex() {
                 ))}
               </div>
             ) : (
-              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-mint-700">
+              <p className="max-w-[42rem] border-l-2 border-mint-300 py-1 pl-4 font-sans text-[14px] leading-relaxed text-ink">
                 Lists made by people with a Pharmacy Commons account are coming. They will be public, and anyone
                 will be able to copy one to start their own.
               </p>
@@ -149,14 +149,14 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
         <Badge tone="mint">{`PCID-${list.pcid}`}</Badge>
       </div>
       <h3
-        className="font-display text-[22px] font-semibold leading-snug text-mint-950"
+        className="font-display text-[22px] font-semibold leading-snug text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
       >
-        <Link to={`/lists/${list.slug}`} className="hover:text-hepatica-700">
+        <Link to={`/lists/${list.slug}`}>
           {list.title}
         </Link>
       </h3>
-      {list.description && <p className="font-sans text-[14px] leading-relaxed text-mint-800">{list.description}</p>}
+      {list.description && <p className="font-sans text-[14px] leading-relaxed text-ink">{list.description}</p>}
 
       {sublists.length > 0 && (
         <ul className="flex flex-wrap gap-1.5" aria-label={`Categories in ${list.title}`}>
@@ -164,10 +164,10 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
             <li key={s.slug} className="min-w-0 max-w-full">
               <Link
                 to={`/lists/${s.slug}`}
-                className="inline-flex max-w-full items-baseline gap-1.5 rounded-md border border-mint-200 bg-white px-2 py-0.5 font-sans text-[13px] text-mint-900 transition-colors hover:border-hepatica-300 hover:text-hepatica-700"
+                className="inline-flex max-w-full items-baseline gap-1.5 rounded-md border border-mint-200 bg-white px-2 py-0.5 font-sans text-[13px] text-ink transition-colors hover:border-hepatica-300"
               >
                 <span className="min-w-0 break-words">{s.title.replace(/^.*?:\s*/, '')}</span>
-                <span className="shrink-0 font-mono text-[11px] text-mint-700">{s.item_count}</span>
+                <span className="shrink-0 font-mono text-[11px] text-ink">{s.item_count}</span>
               </Link>
             </li>
           ))}
@@ -175,8 +175,8 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
       )}
 
       <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-mint-100 pt-3">
-        <span className="font-mono text-[11.5px] text-mint-700">{list.item_count.toLocaleString()} drugs</span>
-        <Link to={`/lists/${list.slug}`} className="font-sans text-[13px] font-medium text-hepatica-700 hover:underline">
+        <span className="font-mono text-[11.5px] text-ink">{list.item_count.toLocaleString()} drugs</span>
+        <Link to={`/lists/${list.slug}`} className="font-sans text-[13px] font-medium text-ink hover:underline">
           Open list →
         </Link>
       </div>
@@ -186,14 +186,14 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
 
 function Badge({ tone, children }: { tone: 'mint' | 'sky'; children: string }) {
   const cls =
-    tone === 'sky' ? 'border-sky-200 bg-sky-50 text-sky-700' : 'border-mint-200 bg-mint-50 text-mint-800'
+    tone === 'sky' ? 'border-sky-200 bg-sky-50 text-ink' : 'border-mint-200 bg-mint-50 text-ink'
   return <span className={`rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium ${cls}`}>{children}</span>
 }
 
 function SectionHeading({ children }: { children: string }) {
   return (
     <h2
-      className="mb-2 font-display text-[22px] font-semibold leading-snug text-mint-950"
+      className="mb-2 font-display text-[22px] font-semibold leading-snug text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}

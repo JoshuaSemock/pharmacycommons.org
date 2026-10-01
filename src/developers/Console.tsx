@@ -42,7 +42,7 @@ export const EXAMPLES: ConsoleExample[] = [
 ]
 
 const STATUS_TONE = (s: number) =>
-  s >= 200 && s < 300 ? 'bg-mint-400 text-mint-950' : s === 304 ? 'bg-sky-300 text-sky-950' : s >= 400 && s < 500 ? 'bg-marigold-400 text-marigold-950' : 'bg-rose-400 text-rose-950'
+  s >= 200 && s < 300 ? 'bg-white/10 ring-1 ring-inset ring-mint-400 text-ink' : s === 304 ? 'bg-white/10 ring-1 ring-inset ring-sky-300 text-ink' : s >= 400 && s < 500 ? 'bg-white/10 ring-1 ring-inset ring-marigold-400 text-ink' : 'bg-white/10 ring-1 ring-inset ring-rose-400 text-ink'
 
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -137,11 +137,11 @@ export default function Console({ apiBase }: { apiBase: string }) {
       {/* Endpoint list */}
       <nav aria-label="Endpoints" className="min-w-0">
         <label className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-1 lg:hidden">
-          <span className="font-sans text-[12.5px] font-medium text-mint-900">Endpoint</span>
+          <span className="font-sans text-[12.5px] font-medium text-ink">Endpoint</span>
           <select
             value={ep.id}
             onChange={e => isEndpointId(e.target.value) && update({ ep: e.target.value })}
-            className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-mint-950"
+            className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink"
           >
             {ENDPOINTS.map(e => (
               <option key={e.id} value={e.id}>
@@ -159,10 +159,10 @@ export default function Console({ apiBase }: { apiBase: string }) {
                   type="button"
                   onClick={() => update({ ep: e.id })}
                   aria-current={on ? 'true' : undefined}
-                  className={`grid w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors ${on ? 'bg-hepatica-100 text-hepatica-900' : 'text-mint-900 hover:bg-mint-50'}`}
+                  className={`grid w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors ${on ? 'bg-hepatica-100 text-ink' : 'text-ink hover:bg-mint-50'}`}
                 >
                   <span className="font-sans text-[14px] font-medium">{e.label}</span>
-                  <span className={`truncate font-mono text-[11px] ${on ? 'text-hepatica-700' : 'text-neutral-600'}`}>{e.path}</span>
+                  <span className={`truncate font-mono text-[11px] ${on ? 'text-ink' : 'text-ink'}`}>{e.path}</span>
                 </button>
               </li>
             )
@@ -174,8 +174,8 @@ export default function Console({ apiBase }: { apiBase: string }) {
         {/* Request */}
         <div className="grid min-w-0 gap-3 border-t border-mint-200 pt-4">
           <div>
-            <p className="font-sans text-[15px] font-semibold text-mint-950">{ep.summary}</p>
-            <p className="mt-0.5 max-w-[60rem] font-sans text-[13.5px] leading-relaxed text-neutral-700">{ep.description}</p>
+            <p className="font-sans text-[15px] font-semibold text-ink">{ep.summary}</p>
+            <p className="mt-0.5 max-w-[60rem] font-sans text-[13.5px] leading-relaxed text-ink">{ep.description}</p>
           </div>
 
           {(ep.params.length > 0 || ep.jsonld) && (
@@ -185,9 +185,9 @@ export default function Console({ apiBase }: { apiBase: string }) {
                 const set = (v: string) => update({ values: { ...values, [p.name]: v } })
                 return (
                   <div key={p.name} className="grid min-w-0 content-start gap-1">
-                    <label htmlFor={fid} className="flex flex-wrap items-baseline gap-x-2 font-sans text-[12.5px] font-medium text-mint-900">
+                    <label htmlFor={fid} className="flex flex-wrap items-baseline gap-x-2 font-sans text-[12.5px] font-medium text-ink">
                       <span className="font-mono">{p.name}</span>
-                      <span className="font-normal text-neutral-500">
+                      <span className="font-normal text-ink">
                         {p.in === 'path' ? 'in the path' : 'query'}
                         {p.required ? ' · required' : p.default ? ` · default ${p.default}` : ''}
                       </span>
@@ -222,7 +222,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                         className={fieldClass}
                       />
                     )}
-                    <span className="font-sans text-[12px] leading-snug text-neutral-600">
+                    <span className="font-sans text-[12px] leading-snug text-ink">
                       {p.description}
                       {p.options && <> Options: {p.options.join(', ')}.</>}
                     </span>
@@ -231,18 +231,18 @@ export default function Console({ apiBase }: { apiBase: string }) {
               })}
               {ep.jsonld && (
                 <div className="grid content-start gap-1">
-                  <span className="font-sans text-[12.5px] font-medium text-mint-900">Format</span>
+                  <span className="font-sans text-[12.5px] font-medium text-ink">Format</span>
                   <div role="radiogroup" aria-label="Format" className="flex gap-1.5">
                     {(['json', 'jsonld'] as const).map(f => (
                       <label key={f} className="relative cursor-pointer">
                         <input type="radio" name="console-fmt" checked={format === f} onChange={() => update({ fmt: f })} className="peer sr-only" />
-                        <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-mono text-[12.5px] text-mint-900 peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-checked:text-hepatica-800 peer-focus-visible:ring-2 peer-focus-visible:ring-hepatica-300">
+                        <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-mono text-[12.5px] text-ink peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-focus-visible:ring-2 peer-focus-visible:ring-hepatica-300">
                           {f === 'json' ? '.json' : '.jsonld'}
                         </span>
                       </label>
                     ))}
                   </div>
-                  <span className="font-sans text-[12px] text-neutral-600">JSON-LD adds linked-data types for semantic-web tools.</span>
+                  <span className="font-sans text-[12px] text-ink">JSON-LD adds linked-data types for semantic-web tools.</span>
                 </div>
               )}
             </div>
@@ -251,8 +251,8 @@ export default function Console({ apiBase }: { apiBase: string }) {
           {/* URL bar */}
           <div className="flex min-w-0 flex-wrap items-stretch gap-2">
             <div className={`${CODE_SURFACE} flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2`}>
-              <span className="shrink-0 rounded bg-mint-400 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-mint-950">GET</span>
-              <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12.5px] text-neutral-100" aria-label="Request URL">
+              <span className="shrink-0 rounded bg-white/10 ring-1 ring-inset ring-mint-400 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
+              <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12.5px] text-ink" aria-label="Request URL">
                 {url}
               </code>
               <button type="button" onClick={() => copy(url, 'URL')} className={darkButton}>
@@ -263,14 +263,14 @@ export default function Console({ apiBase }: { apiBase: string }) {
               type="button"
               disabled={busy || missing.length > 0}
               onClick={() => void run()}
-              className="inline-flex items-center gap-2 rounded-lg border border-mint-700 bg-mint-700 px-4 font-sans text-[14px] font-semibold text-white transition-colors hover:bg-mint-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-mint-700 bg-mint-100 px-4 font-sans text-[14px] font-semibold text-ink transition-colors hover:bg-mint-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy ? 'Running…' : 'Run'}
               <kbd className="hidden rounded border border-white/30 px-1 font-mono text-[10.5px] font-normal sm:inline">Ctrl ↵</kbd>
             </button>
           </div>
           {missing.length > 0 && (
-            <p className="font-sans text-[13px] text-marigold-800">Fill in {missing.map(p => p.name).join(' and ')} to run this request.</p>
+            <p className="font-sans text-[13px] text-ink">Fill in {missing.map(p => p.name).join(' and ')} to run this request.</p>
           )}
         </div>
 
@@ -279,21 +279,21 @@ export default function Console({ apiBase }: { apiBase: string }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2.5">
             {result ? (
               result.networkError ? (
-                <span className="rounded bg-rose-400 px-2 py-0.5 font-mono text-[12px] font-semibold text-rose-950">No response</span>
+                <span className="rounded bg-white/10 ring-1 ring-inset ring-rose-400 px-2 py-0.5 font-mono text-[12px] font-semibold text-ink">No response</span>
               ) : (
                 <>
                   <span className={`rounded px-2 py-0.5 font-mono text-[12px] font-semibold ${STATUS_TONE(result.status)}`}>{result.status}</span>
-                  <span className="font-mono text-[12px] text-neutral-300">{result.ms} ms</span>
-                  <span className="font-mono text-[12px] text-neutral-300">{formatBytes(result.bytes)}</span>
+                  <span className="font-mono text-[12px] text-ink">{result.ms} ms</span>
+                  <span className="font-mono text-[12px] text-ink">{formatBytes(result.bytes)}</span>
                 </>
               )
             ) : (
-              <span className="font-sans text-[13px] text-neutral-400">Run a request to see the live response here.</span>
+              <span className="font-sans text-[13px] text-ink">Run a request to see the live response here.</span>
             )}
             {result && !result.networkError && (
               <div role="tablist" aria-label="Response view" className="ml-auto flex gap-1">
                 {(['body', 'headers'] as const).map(t => (
-                  <button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className={`${darkButton} ${tab === t ? 'bg-white/20 text-white' : ''}`}>
+                  <button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className={`${darkButton} ${tab === t ? 'bg-white/20 text-ink' : ''}`}>
                     {t === 'body' ? 'Body' : `Headers (${result.headers.length})`}
                   </button>
                 ))}
@@ -308,7 +308,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 
           <div className="max-h-[36rem] min-h-[10rem] overflow-auto px-4 py-3">
             {!result && (
-              <div className="grid gap-2 font-sans text-[13.5px] text-neutral-300">
+              <div className="grid gap-2 font-sans text-[13.5px] text-ink">
                 <p>Or start from an example:</p>
                 <ul className="flex flex-wrap gap-2">
                   {EXAMPLES.map(x => (
@@ -321,7 +321,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                           update({ ep: x.ep, values: vals, fmt: x.fmt ?? 'json' })
                           void run({ target: buildUrl(e, vals, apiBase, x.fmt ?? 'json') })
                         }}
-                        className="rounded-full border border-white/20 px-3 py-1 text-neutral-100 hover:border-mint-300 hover:text-mint-200"
+                        className="rounded-full border border-white/20 px-3 py-1 text-ink hover:border-mint-300"
                       >
                         {x.label}
                       </button>
@@ -331,7 +331,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
               </div>
             )}
             {result?.networkError && (
-              <p className="font-sans text-[13.5px] text-rose-200">
+              <p className="font-sans text-[13.5px] text-ink">
                 The request did not get an answer ({result.networkError}). Check your connection, or try again in a moment.
               </p>
             )}
@@ -339,8 +339,8 @@ export default function Console({ apiBase }: { apiBase: string }) {
               <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 font-mono text-[12.5px]">
                 {result.headers.map(([k, v]) => (
                   <div key={k} className="contents">
-                    <dt className="text-hepatica-300">{k}</dt>
-                    <dd className="break-all text-neutral-100">{v}</dd>
+                    <dt className="text-ink">{k}</dt>
+                    <dd className="break-all text-ink">{v}</dd>
                   </div>
                 ))}
               </dl>
@@ -348,22 +348,22 @@ export default function Console({ apiBase }: { apiBase: string }) {
             {result && !result.networkError && tab === 'body' && (
               <>
                 {result.status === 304 && (
-                  <p className="mb-2 font-sans text-[13.5px] text-sky-200">
+                  <p className="mb-2 font-sans text-[13.5px] text-ink">
                     304 Not Modified: the record has not changed since that ETag, so the server sent no body. This is how a client keeps a copy up to date cheaply.
                   </p>
                 )}
                 {result.json != null ? (
                   <JsonView value={result.json} openDepth={result.bytes < 16000 ? 4 : 2} onPcid={loadPcid} onCopyPath={p => copy(p, `path ${p}`)} />
                 ) : (
-                  result.text && <pre className="whitespace-pre-wrap font-mono text-[12.5px] text-neutral-100">{result.text}</pre>
+                  result.text && <pre className="whitespace-pre-wrap font-mono text-[12.5px] text-ink">{result.text}</pre>
                 )}
               </>
             )}
           </div>
 
           {result && !result.networkError && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/10 px-4 py-2 font-sans text-[12.5px] text-neutral-400">
-              {copied?.startsWith('path ') ? <span className="text-mint-200">Copied {copied.slice(5)}</span> : <span>Click a field name to copy its path. Click a PCID to open that record.</span>}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/10 px-4 py-2 font-sans text-[12.5px] text-ink">
+              {copied?.startsWith('path ') ? <span className="text-ink">Copied {copied.slice(5)}</span> : <span>Click a field name to copy its path. Click a PCID to open that record.</span>}
               {etag && result.status === 200 && (
                 <button type="button" onClick={() => void run({ etag, target: result.url })} className={`${darkButton} ml-auto`}>
                   Ask again with If-None-Match
@@ -376,7 +376,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
         {/* Code */}
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] overflow-hidden rounded-xl border border-mint-200 bg-white">
           <div role="tablist" aria-label="Code language" className="flex flex-wrap items-center gap-1 border-b border-mint-100 px-3 py-2">
-            <span className="mr-2 font-sans text-[12.5px] font-medium text-mint-900">The same request in</span>
+            <span className="mr-2 font-sans text-[12.5px] font-medium text-ink">The same request in</span>
             {SNIPPET_LANGS.map(([id, label]) => (
               <button
                 key={id}
@@ -384,16 +384,16 @@ export default function Console({ apiBase }: { apiBase: string }) {
                 aria-selected={lang === id}
                 type="button"
                 onClick={() => setLang(id)}
-                className={`rounded-md px-2.5 py-1 font-sans text-[13px] ${lang === id ? 'bg-hepatica-100 font-medium text-hepatica-900' : 'text-mint-800 hover:bg-mint-50'}`}
+                className={`rounded-md px-2.5 py-1 font-sans text-[13px] ${lang === id ? 'bg-hepatica-100 font-medium text-ink' : 'text-ink hover:bg-mint-50'}`}
               >
                 {label}
               </button>
             ))}
-            <button type="button" onClick={() => copy(snippet(lang, url, ep), 'code')} className="ml-auto rounded-md border border-mint-300 px-2.5 py-1 font-sans text-[12.5px] font-medium text-mint-900 hover:border-mint-400">
+            <button type="button" onClick={() => copy(snippet(lang, url, ep), 'code')} className="ml-auto rounded-md border border-mint-300 px-2.5 py-1 font-sans text-[12.5px] font-medium text-ink hover:border-mint-400">
               {copied === 'code' ? 'Copied' : 'Copy code'}
             </button>
           </div>
-          <pre className={`${CODE_SURFACE} m-0 overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-relaxed text-neutral-100`}>
+          <pre className={`${CODE_SURFACE} m-0 overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-relaxed text-ink`}>
             <code>{snippet(lang, url, ep)}</code>
           </pre>
         </div>
@@ -403,7 +403,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 }
 
 /** The dark "code" surface: black olive from the palette, not pure black. */
-export const CODE_SURFACE = 'pc-code bg-neutral-900 text-neutral-100'
-const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-neutral-300 hover:bg-white/10 hover:text-white'
+export const CODE_SURFACE = 'pc-code bg-neutral-900 text-ink'
+const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10'
 const fieldClass =
-  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-mint-950 placeholder:text-neutral-400 focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200'
+  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200'

@@ -133,24 +133,24 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
               }}
               onMouseEnter={() => setActive(i)}
               className={`flex cursor-pointer items-baseline justify-between gap-3 px-3 py-1.5 font-sans text-[13.5px] ${
-                i === active ? 'bg-hepatica-100 text-hepatica-900' : 'text-mint-950'
+                i === active ? 'bg-hepatica-100 text-ink' : 'text-ink'
               }`}
             >
               <span className="min-w-0 truncate">{o.label}</span>
-              <span className="shrink-0 font-mono text-[10.5px] text-neutral-500">{o.pcid ? `PCID-${o.pcid}` : (o.detail ?? '')}</span>
+              <span className="shrink-0 font-mono text-[10.5px] text-ink">{o.pcid ? `PCID-${o.pcid}` : (o.detail ?? '')}</span>
             </li>
           ))}
         </ul>
       )}
       {pcid != null && (
-        <p className="mt-1 font-sans text-[12px] text-neutral-600">
+        <p className="mt-1 font-sans text-[12px] text-ink">
           Linked to{' '}
           <a
             href={`/id/PCID-${pcid}`}
             target="_blank"
             rel="noopener"
             title="Opens the Pharmacy Commons record in a new tab"
-            className="font-mono text-hepatica-700 underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600"
+            className="font-mono text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600"
           >
             PCID-{pcid}
           </a>

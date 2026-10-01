@@ -77,16 +77,16 @@ export default function ListDetail() {
   }, [list])
 
   if (state === 'loading') {
-    return <main className="flex justify-center py-32 font-sans text-mint-700">Loading…</main>
+    return <main className="flex justify-center py-32 font-sans text-ink">Loading…</main>
   }
 
   if (state !== 'ready' || !list) {
     return (
       <main className="flex flex-col items-center justify-center px-4 py-32 text-center">
-        <p className="mb-2 font-display text-xl text-mint-800" style={{ fontFamily: 'var(--font-display)' }}>
+        <p className="mb-2 font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
           {state === 'missing' ? `No list called “${slug}”.` : 'The list couldn’t be loaded right now.'}
         </p>
-        <Link to="/lists" className="font-sans text-sm text-hepatica-700 hover:underline">
+        <Link to="/lists" className="font-sans text-sm text-ink hover:underline">
           All lists
         </Link>
       </main>
@@ -95,20 +95,20 @@ export default function ListDetail() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-4 font-sans text-[13px] text-mint-700">
-        <Link to="/lists" className="transition-colors hover:text-mint-950">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-4 font-sans text-[13px] text-ink">
+        <Link to="/lists" className="transition-colors">
           Lists
         </Link>
         {list.parent && (
           <span className="flex min-w-0 items-center gap-1.5">
             <span aria-hidden="true">/</span>
-            <Link to={`/lists/${list.parent.slug}`} className="break-words transition-colors hover:text-mint-950">
+            <Link to={`/lists/${list.parent.slug}`} className="break-words transition-colors">
               {list.parent.title}
             </Link>
           </span>
         )}
         <span aria-hidden="true">/</span>
-        <span aria-current="page" className="min-w-0 break-words font-medium text-mint-950">
+        <span aria-current="page" className="min-w-0 break-words font-medium text-ink">
           {list.title}
         </span>
       </nav>
@@ -130,10 +130,10 @@ export default function ListDetail() {
                       to={`/lists/${c.slug}`}
                       className="flex items-baseline justify-between gap-2 rounded-lg border border-mint-200 bg-white px-3 py-2 transition-colors hover:border-hepatica-300 hover:bg-mint-50"
                     >
-                      <span className="min-w-0 break-words font-sans text-[13px] leading-snug text-mint-900">
+                      <span className="min-w-0 break-words font-sans text-[13px] leading-snug text-ink">
                         {c.title.replace(/^.*?:\s*/, '')}
                       </span>
-                      <span className="shrink-0 font-mono text-[11px] text-mint-700">{c.item_count}</span>
+                      <span className="shrink-0 font-mono text-[11px] text-ink">{c.item_count}</span>
                     </Link>
                   </li>
                 ))}
@@ -154,29 +154,29 @@ function ListHeader({ list }: { list: ListRecord }) {
     <header className="border-b border-mint-200 pb-8">
       <div className="flex flex-wrap gap-1.5">
         {place && (
-          <span className="rounded-md border border-sky-200 bg-sky-50 px-2 py-0.5 font-mono text-[11px] font-medium text-sky-700">
+          <span className="rounded-md border border-sky-200 bg-sky-50 px-2 py-0.5 font-mono text-[11px] font-medium text-ink">
             {place}
           </span>
         )}
-        <span className="rounded-md border border-mint-200 bg-mint-50 px-2 py-0.5 font-mono text-[11px] text-mint-800">
+        <span className="rounded-md border border-mint-200 bg-mint-50 px-2 py-0.5 font-mono text-[11px] text-ink">
           {list.pcid_code}
         </span>
       </div>
       <h1
-        className="mt-3 font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-mint-950 sm:text-[2.618rem]"
+        className="mt-3 font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-ink sm:text-[2.618rem]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {list.title}
       </h1>
       {list.description && (
-        <p className="mt-4 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-mint-700">
+        <p className="mt-4 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-ink">
           {list.description}
         </p>
       )}
       <div className="mt-6 flex flex-wrap gap-2.5">
         <Link
           to={`/lists/compare?l=${encodeURIComponent(list.slug)}`}
-          className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-hepatica-700 transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
+          className="rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13.5px] font-medium text-ink transition-colors hover:border-hepatica-500 hover:bg-hepatica-400/20"
         >
           Compare with another list
         </Link>
@@ -259,11 +259,11 @@ function Items({ list }: { list: ListRecord }) {
     <div>
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <h2
-          className="font-display text-[22px] font-semibold leading-snug text-mint-950"
+          className="font-display text-[22px] font-semibold leading-snug text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Drugs on this list{' '}
-          <span className="ml-1 font-mono text-[13px] font-normal text-mint-700">
+          <span className="ml-1 font-mono text-[13px] font-normal text-ink">
             {rows.length === list.items.length
               ? list.items.length.toLocaleString()
               : `${rows.length.toLocaleString()} of ${list.items.length.toLocaleString()}`}
@@ -272,7 +272,7 @@ function Items({ list }: { list: ListRecord }) {
         <button
           type="button"
           onClick={download}
-          className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-mint-900 transition-colors hover:border-mint-400"
+          className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink transition-colors hover:border-mint-400"
         >
           Download CSV
         </button>
@@ -286,15 +286,15 @@ function Items({ list }: { list: ListRecord }) {
           onChange={e => setQuery(e.target.value)}
           placeholder={`Filter ${list.items.length.toLocaleString()} drugs`}
           aria-label="Filter drugs on this list"
-          className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-mint-950 placeholder:text-mint-700 focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200 sm:w-64"
+          className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200 sm:w-64"
         />
         {tops.length > 0 && (
-          <label className="flex items-center gap-2 font-sans text-[13px] text-mint-800">
+          <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
             Show
             <select
               value={top ?? ''}
               onChange={e => update({ top: e.target.value || null })}
-              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-mint-950"
+              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All ranks</option>
               {tops.map(n => (
@@ -306,12 +306,12 @@ function Items({ list }: { list: ListRecord }) {
           </label>
         )}
         {showStatus && (
-          <label className="flex items-center gap-2 font-sans text-[13px] text-mint-800">
+          <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
             Status
             <select
               value={status ?? ''}
               onChange={e => update({ status: e.target.value || null })}
-              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-mint-950"
+              className="rounded-lg border border-mint-200 bg-white px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All</option>
               {statuses.map(s => (
@@ -325,7 +325,7 @@ function Items({ list }: { list: ListRecord }) {
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <span id="list-sort-label" className="font-sans text-[12.5px] font-medium text-mint-950">
+        <span id="list-sort-label" className="font-sans text-[12.5px] font-medium text-ink">
           Sort by
         </span>
         <div
@@ -344,8 +344,8 @@ function Items({ list }: { list: ListRecord }) {
                 onClick={() => update({ sort: o.key, dir: null })}
                 className={`rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap transition-colors ${
                   active
-                    ? 'bg-white font-medium text-mint-950 shadow-[0_1px_3px_rgb(0_0_0/0.14)] ring-1 ring-mint-200'
-                    : 'text-mint-700 hover:text-mint-950'
+                    ? 'bg-white font-medium text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14)] ring-1 ring-mint-200'
+                    : 'text-ink'
                 }`}
               >
                 {o.label}
@@ -357,7 +357,7 @@ function Items({ list }: { list: ListRecord }) {
           type="button"
           onClick={() => update({ dir: reverse ? null : 'rev' })}
           aria-label={`Reverse order (now ${directionText})`}
-          className="flex items-center gap-1.5 rounded-lg border border-mint-200 bg-white px-2.5 py-1 font-sans text-[12.5px] text-mint-800 hover:border-mint-300"
+          className="flex items-center gap-1.5 rounded-lg border border-mint-200 bg-white px-2.5 py-1 font-sans text-[12.5px] text-ink hover:border-mint-300"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path
@@ -373,11 +373,11 @@ function Items({ list }: { list: ListRecord }) {
       </div>
 
       {rows.length === 0 ? (
-        <p className="py-6 font-sans text-[14px] text-mint-700">No drugs match these filters.</p>
+        <p className="py-6 font-sans text-[14px] text-ink">No drugs match these filters.</p>
       ) : (
         <div className="overflow-hidden border-y border-mint-200">
           <div
-            className="hidden gap-x-4 border-b border-mint-200 bg-mint-50 px-4 py-2 font-sans text-[12px] text-mint-700 sm:grid"
+            className="hidden gap-x-4 border-b border-mint-200 bg-mint-50 px-4 py-2 font-sans text-[12px] text-ink sm:grid"
             style={{ gridTemplateColumns: gridCols }}
             aria-hidden="true"
           >
@@ -408,7 +408,7 @@ function Items({ list }: { list: ListRecord }) {
         <button
           type="button"
           onClick={() => setLimit(l => l + BATCH * 2)}
-          className="mt-4 rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13px] font-medium text-hepatica-700 hover:bg-hepatica-400/20"
+          className="mt-4 rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink hover:bg-hepatica-400/20"
         >
           Show more ({(rows.length - limit).toLocaleString()} left)
         </button>
@@ -444,26 +444,26 @@ function Row({
       style={{ ['--cols' as string]: gridCols }}
     >
       {showRank ? (
-        <span className="font-mono text-[12.5px] text-mint-800">{item.rank ?? '—'}</span>
+        <span className="font-mono text-[12.5px] text-ink">{item.rank ?? '—'}</span>
       ) : (
         <span className="sm:hidden" aria-hidden="true" />
       )}
       <span className="min-w-0">
-        <Link to={`/drugs/${item.slug}`} className="break-words font-sans text-[14.5px] font-medium text-mint-950 hover:text-hepatica-700">
+        <Link to={`/drugs/${item.slug}`} className="break-words font-sans text-[14.5px] font-medium text-ink">
           {name}
         </Link>
         {item.entity_type === 'combination' && (
-          <span className="ml-2 font-sans text-[11.5px] text-mint-700">combination</span>
+          <span className="ml-2 font-sans text-[11.5px] text-ink">combination</span>
         )}
         {sourceDiffers && (
-          <span className="block break-words font-sans text-[11.5px] text-mint-700">listed as “{item.source_name}”</span>
+          <span className="block break-words font-sans text-[11.5px] text-ink">listed as “{item.source_name}”</span>
         )}
       </span>
       {showValue && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {valueText !== null && (
             <>
-              <span className="font-mono text-[12px] text-mint-800">
+              <span className="font-mono text-[12px] text-ink">
                 <span className="sm:hidden">{valueLabel}: </span>
                 {valueText}
               </span>
@@ -479,7 +479,7 @@ function Row({
       {showStatus && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {item.legal_status && (
-            <span className="inline-block max-w-full break-words rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-rose-700">
+            <span className="inline-block max-w-full break-words rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
               {item.legal_status}
             </span>
           )}
@@ -498,7 +498,7 @@ function AboutCard({ list }: { list: ListRecord }) {
       <dl className="space-y-3 font-sans text-[13px]">
         <Fact label="Source">
           {list.source_url ? (
-            <a href={list.source_url} target="_blank" rel="noopener noreferrer" className="text-hepatica-700 underline decoration-hepatica-300 underline-offset-2">
+            <a href={list.source_url} target="_blank" rel="noopener noreferrer" className="text-ink underline decoration-hepatica-300 underline-offset-2">
               {list.source_citation}
             </a>
           ) : (
@@ -511,7 +511,7 @@ function AboutCard({ list }: { list: ListRecord }) {
         <Fact label="Drugs">{list.item_count.toLocaleString()}</Fact>
         <Fact label="License">{list.license === 'CC0-1.0' ? 'CC0 1.0 (public domain)' : list.license}</Fact>
         <Fact label="Permanent address">
-          <Link to={`/id/${list.pcid_code}`} className="font-mono text-[12px] text-hepatica-700 hover:underline">
+          <Link to={`/id/${list.pcid_code}`} className="font-mono text-[12px] text-ink hover:underline">
             /id/{list.pcid_code}
           </Link>
         </Fact>
@@ -524,8 +524,8 @@ function AboutCard({ list }: { list: ListRecord }) {
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <dt className="text-[12px] text-mint-700">{label}</dt>
-      <dd className="break-words text-mint-950">{children}</dd>
+      <dt className="text-[12px] text-ink">{label}</dt>
+      <dd className="break-words text-ink">{children}</dd>
     </div>
   )
 }
@@ -535,7 +535,7 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
     <div className="border-t border-mint-200">
       <div className="py-3">
         {/* Inline size and family: index.css styles bare h2 with the display face at --text-3xl. */}
-        <h2 className="font-medium text-mint-950" style={{ fontSize: '12.5px', lineHeight: 1.4, fontFamily: 'var(--font-sans)' }}>
+        <h2 className="font-medium text-ink" style={{ fontSize: '12.5px', lineHeight: 1.4, fontFamily: 'var(--font-sans)' }}>
           {title}
         </h2>
       </div>

@@ -45,7 +45,7 @@ export default function Nav() {
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-mint-100 max-[359px]:h-7 max-[359px]:w-7">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
-          <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-hepatica-600 sm:text-[15px]">
+          <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">
             Pharmacy Commons
           </span>
         </Link>
@@ -79,7 +79,7 @@ function barLinkClass({ isActive }: { isActive: boolean }): string {
     'relative flex h-10 items-center px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] transition-colors min-[400px]:px-2.5 sm:text-[14px]',
     'after:absolute after:inset-x-1.5 after:bottom-1 after:h-0.5 after:rounded-full after:transition-colors min-[400px]:after:inset-x-2.5',
     'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
-    isActive ? 'font-medium text-mint-950 after:bg-hepatica-500' : 'text-mint-800 hover:text-mint-950 after:bg-transparent',
+    isActive ? 'font-medium text-ink after:bg-hepatica-500' : 'text-ink after:bg-transparent',
   ].join(' ')
 }
 
@@ -138,13 +138,13 @@ function HeaderSearch() {
             placeholder="Search drugs, brands, classes"
             aria-label="Search the commons"
             enterKeyHint="search"
-            className="min-w-0 flex-1 bg-transparent font-sans text-[13.5px] text-mint-950 placeholder-mint-600 outline-none [&::-webkit-search-cancel-button]:hidden"
+            className="min-w-0 flex-1 bg-transparent font-sans text-[13.5px] text-ink placeholder:text-ink outline-none [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center text-mint-600 hover:text-mint-900"
+              className="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center text-ink"
               aria-label="Clear search"
             >
               <XIcon />
@@ -164,17 +164,17 @@ function HeaderSearch() {
                 className="flex min-h-[48px] w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-mint-50"
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-sans text-[13.5px] font-medium text-mint-950">{entry.name}</span>
-                  <span className="block truncate font-sans text-[12px] text-mint-700">
+                  <span className="block truncate font-sans text-[13.5px] font-medium text-ink">{entry.name}</span>
+                  <span className="block truncate font-sans text-[12px] text-ink">
                     {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
                   </span>
                 </span>
                 {schedule && (
-                  <span className="rounded-md border border-rose-200 bg-rose-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-rose-700">
+                  <span className="rounded-md border border-rose-200 bg-rose-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                     {schedule}
                   </span>
                 )}
-                <span className="shrink-0 font-mono text-[10.5px] text-mint-700">{pcidOf(entry)}</span>
+                <span className="shrink-0 font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
               </button>
             )
           })}
@@ -186,7 +186,7 @@ function HeaderSearch() {
 
 function SearchIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-mint-600">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
       <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
       <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>

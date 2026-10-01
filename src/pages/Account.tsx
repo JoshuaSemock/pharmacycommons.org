@@ -66,7 +66,7 @@ export default function Account() {
       {linkError && (
         <p
           role="alert"
-          className="mt-8 rounded-lg border border-marigold-300 bg-marigold-50 px-3.5 py-3 font-sans text-md leading-relaxed text-marigold-900"
+          className="mt-8 rounded-lg border border-marigold-300 bg-marigold-50 px-3.5 py-3 font-sans text-md leading-relaxed text-ink"
         >
           {linkError}
         </p>
@@ -105,13 +105,13 @@ export default function Account() {
               If you spot something wrong or missing, write to{' '}
               <a
                 href="mailto:contact@pharmacycommons.org"
-                className="font-medium text-aqua-700 underline-offset-2 hover:underline"
+                className="font-medium text-ink underline-offset-2 hover:underline"
               >
                 contact@pharmacycommons.org
               </a>{' '}
               with the drug, what should change, and your source. Corrections are described in
               the{' '}
-              <Link to="/blog" className="font-medium text-aqua-700 underline-offset-2 hover:underline">
+              <Link to="/blog" className="font-medium text-ink underline-offset-2 hover:underline">
                 build log
               </Link>{' '}
               rather than applied quietly.
@@ -175,13 +175,13 @@ function SignedIn({ email }: { email: string }) {
               'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
               'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
               tab === t.key
-                ? 'bg-white text-sage-900 shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-                : 'text-sage-600 hover:text-sage-900',
+                ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
+                : 'text-ink',
             ].join(' ')}
           >
             {t.label}
             {t.key === 'saved' && savedCount !== null && savedCount > 0 && (
-              <span className="ml-1.5 rounded-full bg-sage-200 px-1.5 py-0.5 font-mono text-xs text-sage-700">
+              <span className="ml-1.5 rounded-full bg-sage-200 px-1.5 py-0.5 font-mono text-xs text-ink">
                 {savedCount}
               </span>
             )}
@@ -216,8 +216,8 @@ function OverviewPanel({
   return (
     <div className="space-y-5">
       <div className="border-t border-sage-200 pt-3.5">
-        <p className="font-sans text-sm text-sage-600">Signed in as</p>
-        <p className="font-sans text-md font-medium text-sage-900">{email}</p>
+        <p className="font-sans text-sm text-ink">Signed in as</p>
+        <p className="font-sans text-md font-medium text-ink">{email}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -231,7 +231,7 @@ function OverviewPanel({
 
       <NpiVerification />
 
-      <p className="text-sage-600">
+      <p className="text-ink">
         There's nothing to propose yet — the contribution form is still being built. This page
         will grow a "your submissions" list once it exists.
       </p>
@@ -242,9 +242,9 @@ function OverviewPanel({
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint: string }) {
   return (
     <div className="border-t border-sage-200 pt-3.5">
-      <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</p>
-      <p className="mt-0.5 font-mono text-lg font-semibold text-sage-900">{value}</p>
-      <p className="mt-0.5 font-sans text-2xs text-sage-600">{hint}</p>
+      <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</p>
+      <p className="mt-0.5 font-mono text-lg font-semibold text-ink">{value}</p>
+      <p className="mt-0.5 font-sans text-2xs text-ink">{hint}</p>
     </div>
   )
 }
@@ -276,17 +276,17 @@ function NpiStatCard() {
 
   return (
     <div className="border-t border-sage-200 pt-3.5">
-      <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+      <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
         Contribution status
       </p>
       <p
         className={`mt-0.5 font-sans text-md font-semibold ${
-          checking ? 'text-sage-400' : verified ? 'text-aqua-700' : 'text-sage-700'
+          checking ? 'text-ink' : verified ? 'text-ink' : 'text-ink'
         }`}
       >
         {checking ? 'Checking…' : verified ? 'NPI verified' : 'Not verified'}
       </p>
-      <p className="mt-0.5 font-sans text-2xs text-sage-600">
+      <p className="mt-0.5 font-sans text-2xs text-ink">
         {verified ? verification?.verified_name : 'Verify below to unlock edits'}
       </p>
     </div>
@@ -340,7 +340,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   }
 
   if (loading) {
-    return <p className="font-sans text-sm text-sage-600">Loading saved pages…</p>
+    return <p className="font-sans text-sm text-ink">Loading saved pages…</p>
   }
 
   if (error) {
@@ -350,8 +350,8 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
   if (rows.length === 0) {
     return (
       <div className="border-t border-sage-200 px-1 py-6 text-center">
-        <p className="font-sans text-sm text-sage-600">
-          Nothing saved yet. Look for the <span className="font-medium text-sage-800">Save</span>{' '}
+        <p className="font-sans text-sm text-ink">
+          Nothing saved yet. Look for the <span className="font-medium text-ink">Save</span>{' '}
           button on any drug page to bookmark it here.
         </p>
       </div>
@@ -368,13 +368,13 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
           <div className="min-w-0">
             <Link
               to={`/drugs/${row.slug}`}
-              className="block truncate font-sans text-md font-medium text-sage-900 hover:text-aqua-700 hover:underline"
+              className="block truncate font-sans text-md font-medium text-ink hover:underline"
             >
               {row.name}
             </Link>
-            <p className="mt-0.5 font-mono text-2xs text-sage-500">
+            <p className="mt-0.5 font-mono text-2xs text-ink">
               {row.pcid_code}
-              {row.entity_type && <span className="ml-2 font-sans text-sage-400">· {row.entity_type}</span>}
+              {row.entity_type && <span className="ml-2 font-sans text-ink">· {row.entity_type}</span>}
             </p>
           </div>
           <button
@@ -432,13 +432,13 @@ function ChangeEmailForm({ currentEmail }: { currentEmail: string }) {
 
   return (
     <div>
-      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Change email</h3>
-      <p className="mb-3 font-sans text-sm leading-relaxed text-sage-600">
-        Currently <span className="font-medium text-sage-800">{currentEmail}</span>. Changing it
+      <h3 className="mb-1 font-sans text-sm font-semibold text-ink">Change email</h3>
+      <p className="mb-3 font-sans text-sm leading-relaxed text-ink">
+        Currently <span className="font-medium text-ink">{currentEmail}</span>. Changing it
         sends a confirmation link to the new address before it takes effect.
       </p>
       {status === 'sent' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm leading-relaxed text-aqua-700">
+        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm leading-relaxed text-ink">
           Check {newEmail.trim()} for a confirmation link to finish the change.
         </p>
       ) : (
@@ -496,12 +496,12 @@ function ChangePasswordForm() {
 
   return (
     <div>
-      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Change password</h3>
-      <p className="mb-3 font-sans text-sm leading-relaxed text-sage-600">
+      <h3 className="mb-1 font-sans text-sm font-semibold text-ink">Change password</h3>
+      <p className="mb-3 font-sans text-sm leading-relaxed text-ink">
         Takes effect immediately — you'll stay signed in on this device.
       </p>
       {status === 'done' ? (
-        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm text-aqua-700">
+        <p className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-sm text-ink">
           Password updated.
         </p>
       ) : (
@@ -554,8 +554,8 @@ function SignOutRow() {
 
   return (
     <div className="border-t border-sage-200 pt-5">
-      <h3 className="mb-1 font-sans text-sm font-semibold text-sage-900">Sign out</h3>
-      <p className="mb-3 font-sans text-sm text-sage-600">Ends your session on this device.</p>
+      <h3 className="mb-1 font-sans text-sm font-semibold text-ink">Sign out</h3>
+      <p className="mb-3 font-sans text-sm text-ink">Ends your session on this device.</p>
       {error && <p className={`mb-2 ${errorClass}`}>{error}</p>}
       <button type="button" onClick={handleSignOut} disabled={signingOut} className={buttonClass}>
         {signingOut ? 'Signing out…' : 'Sign out'}
@@ -634,7 +634,7 @@ function NpiVerification() {
   if (checking) {
     return (
       <div className="border-t border-sage-200 pt-3.5">
-        <p className="font-sans text-sm text-sage-600">Checking NPI verification status…</p>
+        <p className="font-sans text-sm text-ink">Checking NPI verification status…</p>
       </div>
     )
   }
@@ -646,13 +646,13 @@ function NpiVerification() {
   if (verification && verification.status === 'active') {
     return (
       <div className="rounded-lg border border-aqua-200 bg-aqua-100/60 px-4 py-3.5">
-        <p className="font-sans text-sm font-medium text-aqua-700">
+        <p className="font-sans text-sm font-medium text-ink">
           NPI verified — {verification.verified_name ?? verification.npi}
         </p>
         {verification.primary_taxonomy && (
-          <p className="mt-0.5 font-sans text-sm text-aqua-700/80">{verification.primary_taxonomy}</p>
+          <p className="mt-0.5 font-sans text-sm text-ink">{verification.primary_taxonomy}</p>
         )}
-        <p className="mt-1.5 font-sans text-sm text-aqua-700/80">
+        <p className="mt-1.5 font-sans text-sm text-ink">
           NPI {verification.npi} · you can submit edits once the contribution form ships.
         </p>
       </div>
@@ -661,8 +661,8 @@ function NpiVerification() {
 
   return (
     <div className="border-t border-sage-200 pt-3.5">
-      <p className="mb-3 font-sans text-sm font-medium text-sage-900">Verify your NPI</p>
-      <p className="mb-4 font-sans text-sm leading-relaxed text-sage-600">
+      <p className="mb-3 font-sans text-sm font-medium text-ink">Verify your NPI</p>
+      <p className="mb-4 font-sans text-sm leading-relaxed text-ink">
         Required before you can submit an edit. Checked against the CMS NPI Registry — your last
         name must match the name on file for that NPI.
       </p>
@@ -744,8 +744,8 @@ function TabButton({
         'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
         active
-          ? 'bg-white text-sage-900 shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-          : 'text-sage-600 hover:text-sage-900',
+          ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
+          : 'text-ink',
       ].join(' ')}
     >
       {children}
@@ -791,7 +791,7 @@ function SignInForm() {
 
   if (status === 'reset-sent') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-aqua-700">
+      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
         If an account exists for {email}, a password reset link is on its way.
       </p>
     )
@@ -830,7 +830,7 @@ function SignInForm() {
           type="button"
           onClick={handleForgotPassword}
           disabled={status === 'loading'}
-          className="font-sans text-sm text-sage-600 underline-offset-2 hover:text-sage-900 hover:underline disabled:opacity-50"
+          className="font-sans text-sm text-ink underline-offset-2 hover:underline disabled:opacity-50"
         >
           Forgot password?
         </button>
@@ -887,7 +887,7 @@ function RegisterForm() {
 
   if (status === 'check-email') {
     return (
-      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-aqua-700">
+      <p className="mt-5 rounded-lg border border-aqua-200 bg-aqua-100/60 px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
         Check {email} for a confirmation link to finish setting up your account.
       </p>
     )
@@ -929,19 +929,19 @@ function RegisterForm() {
 
       {error && <p className={errorClass}>{error}</p>}
 
-      <p className="font-sans text-2xs leading-snug text-sage-600">
+      <p className="font-sans text-2xs leading-snug text-ink">
         Anything you submit for review is licensed under the project's terms, same as the rest of
         the dataset.
       </p>
 
       {/* Clickwrap: registration stays disabled until this is ticked. Links open in a new tab so the form keeps its input. */}
-      <div className="mt-4 mb-4 rounded border border-mint-200 bg-white/70 p-3.5 text-xs text-mint-700">
+      <div className="mt-4 mb-4 rounded border border-mint-200 bg-white/70 p-3.5 text-xs text-ink">
         <label className="flex cursor-pointer items-start gap-2.5">
           <input
             type="checkbox"
             checked={agreedToTerms}
             onChange={e => setAgreedToTerms(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-mint-600 focus:ring-mint-500"
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-ink focus:ring-mint-500"
           />
           <span className="font-sans leading-relaxed">
             I agree to the Pharmacy Commons{' '}
@@ -981,27 +981,27 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block font-sans text-sm font-medium text-sage-700">{label}</span>
+      <span className="mb-1.5 block font-sans text-sm font-medium text-ink">{label}</span>
       {children}
-      {hint && <span className="mt-1 block font-sans text-2xs text-sage-600">{hint}</span>}
+      {hint && <span className="mt-1 block font-sans text-2xs text-ink">{hint}</span>}
     </label>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-sage-900 placeholder-sage-400 outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
 
 const primaryButtonClass =
-  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
+  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
 
 // primaryButtonClass already sets disabled:opacity-50; swap it rather than stack
 // two opacity utilities whose winner depends on stylesheet order.
 const registerButtonClass = `${primaryButtonClass.replace('disabled:opacity-50', 'disabled:opacity-40')} disabled:cursor-not-allowed`
 
-const consentLinkClass = 'font-medium underline hover:text-mint-950'
+const consentLinkClass = 'font-medium underline'
 
 const errorClass =
-  'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-coral-600'
+  'rounded-lg border border-coral-200 bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-ink'

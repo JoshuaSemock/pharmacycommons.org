@@ -39,10 +39,10 @@ function Card({ title, note, children }: { title: string; note?: string; childre
   return (
     <article className="grid min-w-0 content-start gap-3 border-t border-mint-200 pt-4">
       <div>
-        <h3 className="font-display font-semibold text-mint-950" style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}>
+        <h3 className="font-display font-semibold text-ink" style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}>
           {title}
         </h3>
-        {note && <p className="mt-0.5 font-sans text-[12.5px] text-neutral-600">{note}</p>}
+        {note && <p className="mt-0.5 font-sans text-[12.5px] text-ink">{note}</p>}
       </div>
       {children}
     </article>
@@ -54,7 +54,7 @@ function Result({ items }: { items: [string, string][] }) {
     <p className="flex flex-wrap gap-x-5 gap-y-1 rounded-lg bg-neutral-100 px-3 py-2 font-mono text-[12.5px]">
       {items.map(([k, v]) => (
         <span key={k}>
-          <span className="text-neutral-600">{k}</span> <b className="font-medium text-mint-950">{v}</b>
+          <span className="text-ink">{k}</span> <b className="font-medium text-ink">{v}</b>
         </span>
       ))}
     </p>
@@ -63,7 +63,7 @@ function Result({ items }: { items: [string, string][] }) {
 
 function Remove({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} aria-label="Remove row" className="self-end rounded p-1.5 text-neutral-500 hover:bg-rose-50 hover:text-rose-700">
+    <button type="button" onClick={onClick} aria-label="Remove row" className="self-end rounded p-1.5 text-ink hover:bg-rose-50">
       <RemoveIcon />
     </button>
   )
@@ -185,7 +185,7 @@ export default function Substances({ subs, onChange }: Props) {
                 </button>
               </div>
               <Result items={[['Estimated caffeine', `${fmt(Math.round(caffeineMgPerDay(subs)))} mg per day`]]} />
-              <p className="font-sans text-[12.5px] leading-snug text-neutral-600">
+              <p className="font-sans text-[12.5px] leading-snug text-ink">
                 Amounts are typical values; edit “mg each” to match a product label. The FDA cites 400 mg a day as an amount not generally linked to harmful
                 effects in healthy adults.
               </p>
@@ -254,7 +254,7 @@ export default function Substances({ subs, onChange }: Props) {
               </div>
               {quit('nicotine')}
               <Result items={[['Pack-years', py ? fmt(Math.round(py * 10) / 10) : 'none calculated']]} />
-              <p className="font-sans text-[12.5px] leading-snug text-neutral-600">Pack-years = cigarettes per day ÷ 20 × years smoked, for cigarettes only.</p>
+              <p className="font-sans text-[12.5px] leading-snug text-ink">Pack-years = cigarettes per day ÷ 20 × years smoked, for cigarettes only.</p>
             </>
           )}
         </Card>
@@ -286,7 +286,7 @@ export default function Substances({ subs, onChange }: Props) {
                 ]}
               />
               <details open={al.audit.some(x => x !== '')} className="rounded-lg border border-mint-100 p-3">
-                <summary className="cursor-pointer font-sans text-[13.5px] font-medium text-mint-950">AUDIT-C screening questions</summary>
+                <summary className="cursor-pointer font-sans text-[13.5px] font-medium text-ink">AUDIT-C screening questions</summary>
                 <div className="mt-3 grid gap-3">
                   {AUDIT_C.map(([q, answers], qi) => (
                     <Field key={q} label={q}>
@@ -308,7 +308,7 @@ export default function Substances({ subs, onChange }: Props) {
                       </select>
                     </Field>
                   ))}
-                  <p className="font-sans text-[12.5px] leading-snug text-neutral-600">
+                  <p className="font-sans text-[12.5px] leading-snug text-ink">
                     Scores run from 0 to 12. A score of 4 or more in men, or 3 or more in women, is generally treated as a positive screen for unhealthy alcohol
                     use.
                   </p>
@@ -325,7 +325,7 @@ export default function Substances({ subs, onChange }: Props) {
               {subs.recreational.items.map(i => (
                 <div key={i.id} className={`${rowClass} sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]`}>
                   <div className="col-span-2 grid min-w-0 content-start gap-1 sm:col-span-1">
-                    <label htmlFor={`rec-${i.id}`} className="font-sans text-[12.5px] font-medium text-mint-900">
+                    <label htmlFor={`rec-${i.id}`} className="font-sans text-[12.5px] font-medium text-ink">
                       Substance
                     </label>
                     <NameSearch

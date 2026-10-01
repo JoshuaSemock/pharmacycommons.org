@@ -71,8 +71,8 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
 
   const versionSelect = (label: string, value: number | null, set: (n: number) => void) => (
     <label className="grid min-w-0 gap-1">
-      <span className="font-sans text-[12.5px] font-medium text-mint-900">{label}</span>
-      <select value={value ?? ''} onChange={e => set(Number(e.target.value))} className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-mint-950">
+      <span className="font-sans text-[12.5px] font-medium text-ink">{label}</span>
+      <select value={value ?? ''} onChange={e => set(Number(e.target.value))} className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink">
         {versions?.map(v => (
           <option key={v.number} value={v.number}>
             Version {v.number} · {v.reason} · {fmtDate(v.created_at)}
@@ -86,12 +86,12 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border-t border-mint-200 pt-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
         <div className="grid min-w-0 gap-1">
-          <label htmlFor="diff-ref" className="font-sans text-[12.5px] font-medium text-mint-900">
+          <label htmlFor="diff-ref" className="font-sans text-[12.5px] font-medium text-ink">
             Record
           </label>
           <RefPicker id="diff-ref" value={ref} onChange={setRef} apiBase={apiBase} placeholder="Type a name, or a PCID" onEnter={() => void loadVersions()} />
         </div>
-        <button type="button" onClick={() => void loadVersions()} className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[13px] font-medium text-mint-900 hover:border-mint-400">
+        <button type="button" onClick={() => void loadVersions()} className="rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[13px] font-medium text-ink hover:border-mint-400">
           Load history
         </button>
         {versions && versions.length > 0 ? (
@@ -102,22 +102,22 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
               type="button"
               disabled={busy || from == null || to == null || from === to}
               onClick={() => void compare()}
-              className="rounded-lg border border-mint-700 bg-mint-700 px-4 py-1.5 font-sans text-[13.5px] font-semibold text-white hover:bg-mint-800 disabled:opacity-50"
+              className="rounded-lg border border-mint-700 bg-mint-100 px-4 py-1.5 font-sans text-[13.5px] font-semibold text-ink hover:bg-mint-200 disabled:opacity-50"
             >
               {busy ? 'Comparing…' : 'Compare'}
             </button>
           </>
         ) : (
-          <p className="font-sans text-[13px] text-neutral-600 md:col-span-3">{busy ? 'Loading history…' : versions ? 'This record has one version so far.' : ''}</p>
+          <p className="font-sans text-[13px] text-ink md:col-span-3">{busy ? 'Loading history…' : versions ? 'This record has one version so far.' : ''}</p>
         )}
       </div>
 
-      {versions && versions.length === 1 && <p className="font-sans text-[13.5px] text-neutral-700">Only one version exists, so there is nothing to compare yet.</p>}
-      {error && <p className="font-sans text-[13.5px] text-rose-700">{error}</p>}
+      {versions && versions.length === 1 && <p className="font-sans text-[13.5px] text-ink">Only one version exists, so there is nothing to compare yet.</p>}
+      {error && <p className="font-sans text-[13.5px] text-ink">{error}</p>}
 
       {rows && counts && (
         <div className="grid min-w-0 gap-2">
-          <p className="font-sans text-[13.5px] text-mint-950">
+          <p className="font-sans text-[13.5px] text-ink">
             {rows.length === 0 ? (
               'No field differs between these versions.'
             ) : (
@@ -131,16 +131,16 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
               {rows.map(r => (
                 <li key={r.path} className={`grid min-w-0 gap-1 border-l-4 px-3 py-2 ${KIND_STYLE[r.kind]}`}>
                   <span className="flex flex-wrap items-baseline gap-2">
-                    <span className="font-sans text-[11.5px] font-medium text-neutral-700">{r.kind}</span>
-                    <code className="break-all font-mono text-[12.5px] text-hepatica-800">{r.path}</code>
+                    <span className="font-sans text-[11.5px] font-medium text-ink">{r.kind}</span>
+                    <code className="break-all font-mono text-[12.5px] text-ink">{r.path}</code>
                   </span>
                   {r.kind !== 'added' && (
-                    <span className="break-words font-mono text-[12px] text-rose-800">
+                    <span className="break-words font-mono text-[12px] text-ink">
                       <span className="sr-only">Before: </span>− {show(r.before)}
                     </span>
                   )}
                   {r.kind !== 'removed' && (
-                    <span className="break-words font-mono text-[12px] text-mint-800">
+                    <span className="break-words font-mono text-[12px] text-ink">
                       <span className="sr-only">After: </span>+ {show(r.after)}
                     </span>
                   )}

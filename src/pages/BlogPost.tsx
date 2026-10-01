@@ -18,7 +18,7 @@ export default function BlogPost() {
         <p className="pt-8">
           <Link
             to="/blog"
-            className="font-sans text-[15px] text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
+            className="font-sans text-[15px] text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
           >
             Back to all posts
           </Link>
@@ -36,15 +36,15 @@ export default function BlogPost() {
     <>
       <Link
         to="/blog"
-        className="inline-block font-sans text-[13.5px] text-sage-600 transition-colors hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+        className="inline-block font-sans text-[13.5px] text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
       >
         ← All posts
       </Link>
       <div className="mt-7">
         <PageTitle title={post.title} lede={post.summary}>
-          <div className="mt-7 flex flex-wrap items-baseline gap-x-8 gap-y-2 font-sans text-[14px] text-sage-600">
+          <div className="mt-7 flex flex-wrap items-baseline gap-x-8 gap-y-2 font-sans text-[14px] text-ink">
             <p>
-              By <span className="font-medium text-sage-800">{post.author}</span>
+              By <span className="font-medium text-ink">{post.author}</span>
             </p>
             <p>
               <time dateTime={post.date}>{formatDate(post.date)}</time>
@@ -52,7 +52,7 @@ export default function BlogPost() {
               {post.readingMinutes} minute read
             </p>
             {post.draft && (
-              <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-coral-600">
+              <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                 draft
               </span>
             )}
@@ -71,7 +71,7 @@ export default function BlogPost() {
             <li key={tag}>
               <Link
                 to={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="block rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                className="block rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
               >
                 {tag}
               </Link>
@@ -103,9 +103,9 @@ export default function BlogPost() {
         >
           {newer ? (
             <Link to={`/blog/${newer.slug}`} className="group block">
-              <span className="block font-sans text-[12.5px] text-sage-600">Newer post</span>
+              <span className="block font-sans text-[12.5px] text-ink">Newer post</span>
               <span
-                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-sage-800 transition-colors group-hover:text-aqua-700"
+                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-ink transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {newer.title}
@@ -116,9 +116,9 @@ export default function BlogPost() {
           )}
           {older && (
             <Link to={`/blog/${older.slug}`} className="group block sm:text-right">
-              <span className="block font-sans text-[12.5px] text-sage-600">Older post</span>
+              <span className="block font-sans text-[12.5px] text-ink">Older post</span>
               <span
-                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-sage-800 transition-colors group-hover:text-aqua-700"
+                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-ink transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {older.title}

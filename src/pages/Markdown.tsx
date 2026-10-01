@@ -33,7 +33,7 @@ import rehypeSlug from 'rehype-slug'
  * ratio there updates this page too.
  */
 
-const BODY = 'font-sans text-base leading-[1.7] text-sage-700'
+const BODY = 'font-sans text-base leading-[1.7] text-ink'
 
 /** Lets the `code` mapping tell fenced blocks apart from inline spans. */
 const InsidePre = createContext(false)
@@ -49,7 +49,7 @@ function Paragraph({ children }: { children?: ReactNode }) {
 function CodeBlockWrapper({ children }: { children?: ReactNode }) {
   return (
     <InsidePre.Provider value={true}>
-      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-sm leading-relaxed text-sage-800">
+      <pre className="overflow-x-auto rounded-lg border border-sage-200 bg-white/70 p-4 font-mono text-sm leading-relaxed text-ink">
         {children}
       </pre>
     </InsidePre.Provider>
@@ -60,7 +60,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
   const insidePre = useContext(InsidePre)
   if (insidePre) return <code>{children}</code>
   return (
-    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.88em] text-sage-800">
+    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.88em] text-ink">
       {children}
     </code>
   )
@@ -68,7 +68,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
 
 function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
   const className =
-    'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
+    'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
 
   // Internal route — keep it a client-side navigation.
   if (href && href.startsWith('/')) {
@@ -101,7 +101,7 @@ const components: Components = {
   h1: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="scroll-mt-32 pt-6 font-display text-2xl font-semibold leading-tight text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-2xl font-semibold leading-tight text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -110,7 +110,7 @@ const components: Components = {
   h2: ({ node: _node, children, ...props }) => (
     <h2
       {...props}
-      className="scroll-mt-32 pt-6 font-display text-xl font-semibold leading-snug text-sage-900"
+      className="scroll-mt-32 pt-6 font-display text-xl font-semibold leading-snug text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -119,7 +119,7 @@ const components: Components = {
   h3: ({ node: _node, children, ...props }) => (
     <h3
       {...props}
-      className="scroll-mt-32 pt-3 font-display text-lg font-semibold leading-snug text-sage-900"
+      className="scroll-mt-32 pt-3 font-display text-lg font-semibold leading-snug text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -128,7 +128,7 @@ const components: Components = {
   h4: ({ node: _node, children, ...props }) => (
     <h4
       {...props}
-      className="scroll-mt-32 pt-2 font-sans text-base font-medium text-sage-900"
+      className="scroll-mt-32 pt-2 font-sans text-base font-medium text-ink"
     >
       {children}
     </h4>
@@ -138,17 +138,17 @@ const components: Components = {
 
   a: ({ href, children }) => <Anchor href={href}>{children}</Anchor>,
 
-  strong: ({ children }) => <strong className="font-medium text-sage-900">{children}</strong>,
+  strong: ({ children }) => <strong className="font-medium text-ink">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => (
-    <del className="text-sage-600 line-through decoration-sage-400">{children}</del>
+    <del className="text-ink line-through decoration-sage-400">{children}</del>
   ),
 
   ul: ({ children }) => (
-    <ul className={`list-disc space-y-3 pl-5 marker:text-sage-400 ${BODY}`}>{children}</ul>
+    <ul className={`list-disc space-y-3 pl-5 marker:text-ink ${BODY}`}>{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className={`list-decimal space-y-3 pl-5 marker:text-sage-400 ${BODY}`}>{children}</ol>
+    <ol className={`list-decimal space-y-3 pl-5 marker:text-ink ${BODY}`}>{children}</ol>
   ),
   // Nested lists need their own margin; the outer space-y does not reach them.
   li: ({ children }) => (
@@ -159,7 +159,7 @@ const components: Components = {
   blockquote: ({ children }) => (
     <InsideQuote.Provider value={true}>
       <blockquote
-        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-lg leading-[1.5] text-sage-800 italic"
+        className="my-8 space-y-3 border-l-2 border-aqua-400 py-1 pl-5 font-display text-lg leading-[1.5] text-ink italic"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {children}
@@ -182,14 +182,14 @@ const components: Components = {
   th: ({ node: _node, children, ...props }) => (
     <th
       {...props}
-      className="px-3 py-2 text-left font-medium text-sage-900"
+      className="px-3 py-2 text-left font-medium text-ink"
       style={{ textAlign: (props.style?.textAlign as 'left' | 'center' | 'right') ?? 'left' }}
     >
       {children}
     </th>
   ),
   td: ({ node: _node, children, ...props }) => (
-    <td {...props} className="px-3 py-2 align-top text-sage-700">
+    <td {...props} className="px-3 py-2 align-top text-ink">
       {children}
     </td>
   ),
@@ -202,7 +202,7 @@ const components: Components = {
         loading="lazy"
         className="w-full rounded-lg border border-sage-200"
       />
-      {alt && <figcaption className="font-sans text-sm text-sage-600">{alt}</figcaption>}
+      {alt && <figcaption className="font-sans text-sm text-ink">{alt}</figcaption>}
     </figure>
   ),
 
@@ -225,7 +225,7 @@ const components: Components = {
     return isFootnotes ? (
       <section
         data-toc-skip=""
-        className="mt-12 border-t border-sage-200 pt-6 font-sans text-md text-sage-600 [&_h2]:pt-0 [&_h2]:text-base [&_ol]:text-md [&_p]:text-md"
+        className="mt-12 border-t border-sage-200 pt-6 font-sans text-md text-ink [&_h2]:pt-0 [&_h2]:text-base [&_ol]:text-md [&_p]:text-md"
       >
         {children}
       </section>

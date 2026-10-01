@@ -142,7 +142,10 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 - **Design system:** OKLCH palette — mint (primary), hepatica (secondary), salmon
   (accent), rose (warning), marigold (caution, also eco-risk "moderate"), sky (info),
   neutral (floral white `#faf9f5` → black olive `#3a3a3a`). Steps 50–950, base 400;
-  50–600 fills only, 700+ text (≥5:1 on floral white). Legacy sage/aqua/violet/coral/
+  ramps are for fills, borders, rings and underlines only. **All text is `text-ink`**
+  (2026-10-01): neutral-800 `#3a3a3a` in light mode, neutral-50 `#faf9f5` in dark mode,
+  headings and body alike; code panels (`.pc-code`) use neutral-50 in both. Never give text
+  a palette color (mint, hepatica, neutral, white …). Legacy sage/aqua/violet/coral/
   amber names are aliases pending migration. Fonts **as shipped**: Newsreader
   (display) + IBM Plex Sans Condensed / IBM Plex Mono. Page = a torn-edged
   paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,

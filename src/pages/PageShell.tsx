@@ -106,13 +106,13 @@ export function PageTitle({
   return (
     <div className="max-w-4xl">
       <h1
-        className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-sage-900 sm:text-[2.618rem]"
+        className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-ink sm:text-[2.618rem]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {title}
       </h1>
       {lede && (
-        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-sage-600">
+        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-ink">
           {lede}
         </p>
       )}
@@ -123,7 +123,7 @@ export function PageTitle({
 
 /** Rail block heading — sentence case, matches the TOC label. */
 export function RailHeading({ children }: { children: ReactNode }) {
-  return <p className="mb-3 font-sans text-[12.5px] font-medium text-sage-900">{children}</p>
+  return <p className="mb-3 font-sans text-[12.5px] font-medium text-ink">{children}</p>
 }
 
 type PageShellProps = {
@@ -175,12 +175,12 @@ export function Section({
     <section className="border-t border-sage-200 py-9">
       <h2
         id={id}
-        className="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900"
+        className="mb-4 font-display text-[22px] font-semibold leading-snug text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {heading}
       </h2>
-      <div className="space-y-4 font-sans text-[15.5px] leading-[1.7] text-sage-700">
+      <div className="space-y-4 font-sans text-[15.5px] leading-[1.7] text-ink">
         {children}
       </div>
     </section>
@@ -189,7 +189,7 @@ export function Section({
 
 export function Pending({ children }: { children: ReactNode }) {
   return (
-    <span className="ml-2 rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 align-middle font-mono text-[10px] text-sage-600">
+    <span className="ml-2 rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 align-middle font-mono text-[10px] text-ink">
       {children}
     </span>
   )

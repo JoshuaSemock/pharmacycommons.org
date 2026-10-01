@@ -44,20 +44,20 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
           <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3 font-sans text-[13px] leading-snug">
             {doc.effectiveDate && (
               <div>
-                <dt className="text-mint-700">Effective</dt>
-                <dd className="mt-0.5 font-mono text-[12.5px] text-mint-950">
+                <dt className="text-ink">Effective</dt>
+                <dd className="mt-0.5 font-mono text-[12.5px] text-ink">
                   <time dateTime={doc.effectiveIso ?? undefined}>{doc.effectiveDate}</time>
                 </dd>
               </div>
             )}
             {doc.meta.map(m => (
               <div key={m.label}>
-                <dt className="text-mint-700">{m.label}</dt>
-                <dd className="mt-0.5 font-medium text-mint-950">{m.value}</dd>
+                <dt className="text-ink">{m.label}</dt>
+                <dd className="mt-0.5 font-medium text-ink">{m.value}</dd>
               </div>
             ))}
             <div>
-              <dt className="text-mint-700">Source</dt>
+              <dt className="text-ink">Source</dt>
               <dd className="mt-0.5">
                 <a
                   href={`https://github.com/JoshuaSemock/pharmacycommons.org/blob/main/${page?.file ?? ''}`}
@@ -83,12 +83,12 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
       >
         <div className="border-l-2 border-hepatica-300 py-1 pl-4 sm:pl-5">
           <p
-            className="font-display text-[19px] font-semibold leading-snug text-mint-950"
+            className="font-display text-[19px] font-semibold leading-snug text-ink"
             style={{ fontFamily: 'var(--font-display)', fontSize: '19px' }}
           >
             Questions about this policy?
           </p>
-          <p className="mt-1.5 font-sans text-[14.5px] leading-relaxed text-mint-700">
+          <p className="mt-1.5 font-sans text-[14.5px] leading-relaxed text-ink">
             Write to the maintainers, including for account deletion or a content removal
             request:{' '}
             <a href={`mailto:${LEGAL_CONTACT_EMAIL}`} className={`break-all font-mono text-[13.5px] ${linkClass}`}>
@@ -98,7 +98,7 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
         </div>
 
         <nav aria-label="Related policies">
-          <p className="mb-3 font-sans text-[12.5px] font-medium text-mint-900">Related policies</p>
+          <p className="mb-3 font-sans text-[12.5px] font-medium text-ink">Related policies</p>
           <ul className="flex flex-col gap-2 font-sans text-[14.5px] sm:flex-row sm:flex-wrap sm:gap-x-6">
             {related.map(p => (
               <li key={p.to}>
@@ -115,4 +115,4 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
 }
 
 const linkClass =
-  'text-mint-700 underline decoration-mint-300 underline-offset-2 transition-colors hover:text-mint-950 hover:decoration-mint-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-500'
+  'text-ink underline decoration-mint-300 underline-offset-2 transition-colors hover:decoration-mint-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-500'

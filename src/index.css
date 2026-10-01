@@ -138,12 +138,16 @@
   --color-neutral-900: oklch(27.0% 0 0);      /* #262626 */
   --color-neutral-950: oklch(21.0% 0 0);      /* #181818 */
 
-  /* Page surface and default text (2026-10-01). The sheet of paper the
-     site sits on, and the ink on it. They swap in dark mode (see the
-     [data-theme="dark"] block below), so `bg-paper` / `text-ink` are the
-     theme-safe way to say "same as the page". */
-  --color-paper: #faf9f5;   /* floral white */
-  --color-ink: #3a3a3a;     /* black olive */
+  /* Page surface and text (2026-10-01). The sheet of paper the site sits
+     on, and the ink on it. They swap in dark mode (see the
+     [data-theme="dark"] block below).
+     ALL TEXT IS INK — headings, body, links, labels, placeholders. Light
+     mode: neutral-800 (#3a3a3a). Dark mode: neutral-50 (#faf9f5). Use
+     `text-ink` (or inherit); never a palette color (mint, hepatica, neutral,
+     white …) as a text utility. The palette ramps are for fills, borders, rings and
+     underlines only. */
+  --color-paper: #faf9f5;             /* floral white */
+  --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
@@ -204,17 +208,16 @@
 
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
    stays), so the existing classes keep their meaning without a dark: copy:
-   text-mint-950 (darkest ink) becomes mint-50 (lightest), bg-mint-50 (palest
-   wash) becomes mint-950 (deepest), border-mint-200 stays a quiet rule. The
-   text steps keep their contrast too: 700 on floral white is >= 5:1, and
-   its partner 300 on black olive is ~7:1. Values are literal copies of the
+   bg-mint-50 (palest wash) becomes mint-950 (deepest), border-mint-200
+   stays a quiet rule. Text doesn't use the ramps (it is all --color-ink,
+   which swaps above). Values are literal copies of the
    partner step (generated from the @theme block — regenerate if a ramp
    changes). `white` becomes a raised surface, a step lighter than the page,
    so white cards, inputs and menus still sit "above" the paper. */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-paper: #3a3a3a;   /* black olive */
-  --color-ink: #faf9f5;     /* floral white */
+  --color-ink: oklch(98.2% 0.005 95);  /* = neutral-50, #faf9f5 */
   --color-white: oklch(39.5% 0.002 95);  /* #464645 — raised surface */
 
   --color-mint-50: oklch(25.0% 0.033 170);          /* = mint-950 */
@@ -338,7 +341,12 @@
 /* Code panels (CODE_SURFACE in src/developers/Console.tsx) stay dark in both
    themes: inside them the neutral ramp and white keep their light-theme
    values, so bg-neutral-900 / text-neutral-100 / white/10 hovers read the
-   same as on the light page — a dark well on the black-olive paper. */
+   same as on the light page — a dark well on the black-olive paper. Ink
+   inside them is neutral-50 in both themes (the one exception to
+   "neutral-800 in light mode": dark text on the dark well is unreadable). */
+.pc-code {
+  --color-ink: oklch(98.2% 0.005 95);  /* = neutral-50, #faf9f5 */
+}
 :root[data-theme="dark"] .pc-code {
   --color-neutral-50: oklch(98.2% 0.005 95);
   --color-neutral-100: oklch(95.4% 0.006 95);
@@ -368,6 +376,12 @@ body {
   background-color: #faf9f5;
   color: var(--color-ink);                  /* black olive / floral white */
   -webkit-font-smoothing: antialiased;
+}
+
+/* Placeholders are ink too (Tailwind's preflight fades them to 50%). */
+::placeholder {
+  color: var(--color-ink);
+  opacity: 1;
 }
 
 :root[data-theme="dark"] body {

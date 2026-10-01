@@ -108,7 +108,7 @@ export default function LabelSections({ slug }: { slug: string }) {
     <div className={`space-y-5 transition-opacity ${loading ? 'opacity-50' : ''}`} aria-busy={loading}>
       <SourceStrip data={data} onPick={setSetid} />
       <LabelBody sections={data.sections} key={data.label.setid} />
-      <p className="px-1 font-sans text-2xs leading-relaxed text-sage-600">
+      <p className="px-1 font-sans text-2xs leading-relaxed text-ink">
         Text is reproduced from the FDA-approved prescribing information and split into sections for
         reading; it is not a substitute for the full label or for clinical judgment. Always check the
         current label on DailyMed before making prescribing decisions.
@@ -135,16 +135,16 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
 
   return (
     <div className="border-b border-sage-200 px-1 pb-4">
-      <p className="mb-1 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
+      <p className="mb-1 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
         FDA prescribing information
       </p>
       <p
-        className="font-display text-lg leading-snug text-sage-900"
+        className="font-display text-lg leading-snug text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {toTitleCase(label.title ?? label.brand_name ?? 'Prescription drug label')}
       </p>
-      <dl className="mt-2 flex flex-wrap gap-x-5 gap-y-1 font-sans text-sm text-sage-700">
+      <dl className="mt-2 flex flex-wrap gap-x-5 gap-y-1 font-sans text-sm text-ink">
         {label.labeler && <Meta term="Labeler">{label.labeler.replace(/\s+/g, ' ')}</Meta>}
         {revised && <Meta term="Revised">{revised}</Meta>}
         {appl && <Meta term="Application">{appl}</Meta>}
@@ -152,12 +152,12 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <ExternalLink href={label.dailymed_url}>Full label on DailyMed</ExternalLink>
         {data.other_labels.length > 0 && (
-          <label className="flex min-w-0 max-w-full flex-wrap items-center gap-2 font-sans text-sm text-sage-600 sm:flex-nowrap">
+          <label className="flex min-w-0 max-w-full flex-wrap items-center gap-2 font-sans text-sm text-ink sm:flex-nowrap">
             <span>
               {data.n_labels > 1 ? `${data.n_labels.toLocaleString()} labels on file ·` : ''} View another
             </span>
             <select
-              className="min-w-0 max-w-[16rem] rounded-md border border-sage-200 bg-sage-50 px-2 py-1 font-sans text-sm text-sage-800"
+              className="min-w-0 max-w-[16rem] rounded-md border border-sage-200 bg-sage-50 px-2 py-1 font-sans text-sm text-ink"
               value=""
               onChange={e => e.target.value && onPick(e.target.value)}
             >
@@ -179,8 +179,8 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
 function Meta({ term, children }: { term: string; children: ReactNode }) {
   return (
     <div className="flex gap-1.5">
-      <dt className="text-sage-600">{term}</dt>
-      <dd className="font-medium text-sage-800">{children}</dd>
+      <dt className="text-ink">{term}</dt>
+      <dd className="font-medium text-ink">{children}</dd>
     </div>
   )
 }
@@ -224,14 +224,14 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
           <button
             key={s.key}
             onClick={() => jumpTo(s.key)}
-            className="rounded-full border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-sage-700 transition-colors hover:border-aqua-300 hover:text-sage-900"
+            className="rounded-full border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-aqua-300"
           >
             {s.title}
           </button>
         ))}
         <button
           onClick={() => setOpen(allOpen ? new Set() : new Set(jumpable.map(s => s.key)))}
-          className="ml-auto px-1 font-sans text-sm font-medium text-aqua-700 hover:underline"
+          className="ml-auto px-1 font-sans text-sm font-medium text-ink hover:underline"
         >
           {allOpen ? 'Collapse all' : 'Expand all'}
         </button>
@@ -248,7 +248,7 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
         if (list.length === 0) return null
         return (
           <div key={group}>
-            <h3 className="px-1 pt-2 pb-2.5 font-semibold uppercase tracking-[0.1em] text-sage-600" style={SMALL_CAPS_HEADING}>
+            <h3 className="px-1 pt-2 pb-2.5 font-semibold uppercase tracking-[0.1em] text-ink" style={SMALL_CAPS_HEADING}>
               {GROUP_LABELS[group]}
             </h3>
             {list.map(s => (
@@ -269,7 +269,7 @@ function BoxedWarning({ section }: { section: LabelSection }) {
     >
       <div className="flex items-center gap-2 bg-coral-100 px-5 py-2.5">
         <WarningIcon />
-        <h3 className="font-semibold uppercase tracking-[0.08em] text-coral-600" style={BOXED_HEADING}>
+        <h3 className="font-semibold uppercase tracking-[0.08em] text-ink" style={BOXED_HEADING}>
           Boxed warning
         </h3>
       </div>
@@ -277,7 +277,7 @@ function BoxedWarning({ section }: { section: LabelSection }) {
         {section.blocks.map((b, i) => (
           <div key={i}>
             {b.heading && (
-              <p className="mb-1.5 font-sans text-md font-semibold text-sage-900">{sentenceCase(b.heading)}</p>
+              <p className="mb-1.5 font-sans text-md font-semibold text-ink">{sentenceCase(b.heading)}</p>
             )}
             <BlockText text={b.text} />
           </div>
@@ -308,10 +308,10 @@ function SectionAccordion({
           aria-controls={panelId}
           className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left transition-colors hover:bg-sage-50"
         >
-          <span className="font-display text-lg text-sage-900" style={{ fontFamily: 'var(--font-display)' }}>
+          <span className="font-display text-lg text-ink" style={{ fontFamily: 'var(--font-display)' }}>
             {section.title}
           </span>
-          <span className="flex shrink-0 items-center gap-2 font-sans text-sm text-sage-600">
+          <span className="flex shrink-0 items-center gap-2 font-sans text-sm text-ink">
             {subheads > 1 && <span>{subheads} topics</span>}
             <Chevron open={open} />
           </span>
@@ -333,7 +333,7 @@ function Block({ block, tables }: { block: LabelBlock; tables: LabelTable[] | nu
   if (block.heading === 'Summary') {
     return (
       <div className="rounded-lg bg-sage-50 px-4 py-3">
-        <p className="mb-1.5 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
+        <p className="mb-1.5 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
           At a glance
         </p>
         <BlockText text={block.text} tables={tables} />
@@ -343,7 +343,7 @@ function Block({ block, tables }: { block: LabelBlock; tables: LabelTable[] | nu
   return (
     <div>
       {block.heading && (
-        <h4 className="mb-1.5 font-semibold text-sage-900" style={SUBHEADING}>
+        <h4 className="mb-1.5 font-semibold text-ink" style={SUBHEADING}>
           {block.heading}
         </h4>
       )}
@@ -366,11 +366,11 @@ function BlockText({ text, tables = null }: { text: string; tables?: LabelTable[
   const visible = long && !expanded ? clampParts(parts, 900) : parts
 
   return (
-    <div className="space-y-2 font-sans text-md leading-relaxed text-sage-700">
+    <div className="space-y-2 font-sans text-md leading-relaxed text-ink">
       {visible.map((p, i) => {
         if (p.kind === 'list') {
           return (
-            <ul key={i} className="list-disc space-y-1 pl-5 marker:text-sage-400">
+            <ul key={i} className="list-disc space-y-1 pl-5 marker:text-ink">
               {p.items.map((item, j) => (
                 <li key={j}>{item}</li>
               ))}
@@ -386,7 +386,7 @@ function BlockText({ text, tables = null }: { text: string; tables?: LabelTable[
       {long && (
         <button
           onClick={() => setExpanded(e => !e)}
-          className="font-sans text-sm font-medium text-aqua-700 hover:underline"
+          className="font-sans text-sm font-medium text-ink hover:underline"
         >
           {expanded ? 'Show less' : 'Show more'}
         </button>
@@ -459,7 +459,7 @@ function TrailingTables({ tables }: { tables: LabelTable[] | null }) {
 }
 
 const TABLE_CLASSES =
-  'overflow-x-auto border-y border-sage-200 font-sans text-sm leading-snug text-sage-800 ' +
+  'overflow-x-auto border-y border-sage-200 font-sans text-sm leading-snug text-ink ' +
   '[&_caption]:px-3 [&_caption]:py-2 [&_caption]:text-left [&_caption]:font-semibold ' +
   '[&_table]:w-full [&_table]:border-collapse ' +
   '[&_td]:border-t [&_td]:border-sage-100 [&_td]:px-3 [&_td]:py-1.5 [&_td]:align-top ' +
@@ -481,7 +481,7 @@ function LabelSkeleton() {
       {[0, 1, 2, 3].map(i => (
         <div key={i} className="h-12 animate-pulse rounded-xl bg-sage-100" />
       ))}
-      <p className="px-1 font-sans text-sm text-sage-600">
+      <p className="px-1 font-sans text-sm text-ink">
         Loading prescribing information… the first view of a label takes a few seconds.
       </p>
     </div>
@@ -490,7 +490,7 @@ function LabelSkeleton() {
 
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <div className="border-l-2 border-sage-300 py-1 pl-4 font-sans text-md leading-relaxed text-sage-700">
+    <div className="border-l-2 border-sage-300 py-1 pl-4 font-sans text-md leading-relaxed text-ink">
       {children}
     </div>
   )
@@ -502,7 +502,7 @@ function ExternalLink({ href, children }: { href: string; children: ReactNode })
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-sans text-sm font-medium text-aqua-700 underline-offset-2 hover:underline"
+      className="font-sans text-sm font-medium text-ink underline-offset-2 hover:underline"
     >
       {children} ↗
     </a>
@@ -525,7 +525,7 @@ function Chevron({ open }: { open: boolean }) {
 
 function WarningIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" className="text-coral-600">
+    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" className="text-ink">
       <path d="M8 1.75L15 14H1L8 1.75Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
       <path d="M8 6.25V9.5M8 11.5V11.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>

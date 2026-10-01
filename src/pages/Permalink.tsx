@@ -64,7 +64,7 @@ export default function Permalink() {
   }, [])
 
   if (state.kind === 'loading') {
-    return <main className="flex justify-center py-32 font-sans text-sage-600">Finding record…</main>
+    return <main className="flex justify-center py-32 font-sans text-ink">Finding record…</main>
   }
 
   const message =
@@ -78,15 +78,15 @@ export default function Permalink() {
 
   return (
     <main className="flex flex-col items-center justify-center px-4 py-32 text-center">
-      <p className="mb-3 max-w-lg font-display text-xl text-sage-700" style={{ fontFamily: 'var(--font-display)' }}>
+      <p className="mb-3 max-w-lg font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
         {message}
       </p>
-      <p className="font-sans text-sm text-sage-600">
-        <Link to="/browse" className="text-aqua-700 hover:underline">
+      <p className="font-sans text-sm text-ink">
+        <Link to="/browse" className="text-ink hover:underline">
           Browse all records
         </Link>
         {' · '}
-        <a href={`${API_BASE}/v1`} className="text-aqua-700 hover:underline">
+        <a href={`${API_BASE}/v1`} className="text-ink hover:underline">
           API
         </a>
       </p>

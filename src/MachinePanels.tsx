@@ -77,7 +77,7 @@ function SourcesCard({ doc, failed }: { doc: EntityDocument | null; failed: bool
       {!doc ? (
         <Skeleton />
       ) : sources.length === 0 ? (
-        <p className="font-sans text-sm text-sage-600">No sources recorded for this entry.</p>
+        <p className="font-sans text-sm text-ink">No sources recorded for this entry.</p>
       ) : (
         <>
           <ul className="space-y-3">
@@ -86,7 +86,7 @@ function SourcesCard({ doc, failed }: { doc: EntityDocument | null; failed: bool
             ))}
           </ul>
           {(prov?.record_created || prov?.record_updated) && (
-            <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-relaxed text-sage-600">
+            <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-relaxed text-ink">
               {prov.record_created && <>Record created {formatDate(prov.record_created)}</>}
               {prov.record_created && prov.record_updated && ' · '}
               {prov.record_updated && <>updated {formatDate(prov.record_updated)}</>}
@@ -108,30 +108,30 @@ function SourceRow({ source: s }: { source: ProvenanceSource }) {
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-sans text-sm font-medium leading-snug text-aqua-700 underline-offset-2 hover:underline"
+            className="font-sans text-sm font-medium leading-snug text-ink underline-offset-2 hover:underline"
           >
             {s.name}
           </a>
         ) : (
-          <span className="font-sans text-sm font-medium leading-snug text-sage-800">{s.name}</span>
+          <span className="font-sans text-sm font-medium leading-snug text-ink">{s.name}</span>
         )}
         {s.kind === 'machine_assisted' && (
           <span
-            className="shrink-0 rounded border border-amber-400 bg-amber-100 px-1.5 py-px font-sans text-2xs text-sage-800"
+            className="shrink-0 rounded border border-amber-400 bg-amber-100 px-1.5 py-px font-sans text-2xs text-ink"
             title="Assigned by a rule or an AI-assisted review rather than taken from a published source"
           >
             machine-assisted
           </span>
         )}
       </div>
-      <p className="mt-0.5 font-sans text-2xs leading-relaxed text-sage-600">
+      <p className="mt-0.5 font-sans text-2xs leading-relaxed text-ink">
         {parts}
         {s.license ? (
           <> · {s.license}</>
         ) : s.terms_url ? (
           <>
             {' · '}
-            <a href={s.terms_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-sage-900">
+            <a href={s.terms_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
               terms
             </a>
           </>
@@ -174,18 +174,18 @@ function MachineCard({
 
       <div className="mt-4 border-t border-sage-100 pt-3">
         {failed ? (
-          <p className="font-sans text-sm leading-relaxed text-sage-600">
+          <p className="font-sans text-sm leading-relaxed text-ink">
             The structured record couldn’t be loaded right now. The addresses above still work.
           </p>
         ) : !doc ? (
           <Skeleton />
         ) : (
           <>
-            <p className="font-sans text-sm text-sage-800">
+            <p className="font-sans text-sm text-ink">
               Version {doc.version.number}
-              <span className="text-sage-600"> · {reasonLabel(doc.version.reason)} · {formatDate(doc.version.created_at)}</span>
+              <span className="text-ink"> · {reasonLabel(doc.version.reason)} · {formatDate(doc.version.created_at)}</span>
             </p>
-            <p className="mt-0.5 font-mono text-2xs text-sage-600" title={doc.version.hash}>
+            <p className="mt-0.5 font-mono text-2xs text-ink" title={doc.version.hash}>
               {doc.version.hash.slice(0, 19)}…
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -196,16 +196,16 @@ function MachineCard({
         )}
       </div>
 
-      <p className="mt-4 font-sans text-2xs leading-relaxed text-sage-600">
-        <a href={urls.schema} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-sage-900">
+      <p className="mt-4 font-sans text-2xs leading-relaxed text-ink">
+        <a href={urls.schema} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
           JSON Schema
         </a>
         {' · '}
-        <a href={urls.jsonld} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-sage-900">
+        <a href={urls.jsonld} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
           JSON-LD
         </a>
         {' · '}
-        <a href={urls.index} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-sage-900">
+        <a href={urls.index} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
           API index
         </a>
       </p>
@@ -213,7 +213,7 @@ function MachineCard({
       <dialog
         ref={dialog}
         aria-label={`${pcidCode} as structured data`}
-        className="m-auto w-[min(56rem,calc(100%-2rem))] max-h-[85vh] overflow-hidden rounded-xl border border-sage-200 bg-white p-0 text-sage-900 backdrop:bg-sage-900/40"
+        className="m-auto w-[min(56rem,calc(100%-2rem))] max-h-[85vh] overflow-hidden rounded-xl border border-sage-200 bg-white p-0 text-ink backdrop:bg-sage-900/40"
         onClick={e => {
           if (e.target === dialog.current) dialog.current?.close() // click on backdrop
         }}
@@ -248,7 +248,7 @@ function RecordDialog({
         </div>
         <button
           onClick={onClose}
-          className="rounded-md px-2 py-1 font-sans text-sm text-sage-600 hover:bg-sage-100 hover:text-sage-900"
+          className="rounded-md px-2 py-1 font-sans text-sm text-ink hover:bg-sage-100"
         >
           Close
         </button>
@@ -291,12 +291,12 @@ function JsonView({ doc }: { doc: EntityDocument }) {
           href={doc.links.self}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-sans text-sm text-aqua-700 underline-offset-2 hover:underline"
+          className="font-sans text-sm text-ink underline-offset-2 hover:underline"
         >
           Open in API ↗
         </a>
       </div>
-      <pre className="overflow-x-auto rounded-lg bg-sage-50 p-4 font-mono text-2xs leading-relaxed text-sage-800">
+      <pre className="overflow-x-auto rounded-lg bg-sage-50 p-4 font-mono text-2xs leading-relaxed text-ink">
         {text}
       </pre>
     </div>
@@ -323,13 +323,13 @@ function HistoryView({ doc }: { doc: EntityDocument }) {
     return () => ctrl.abort()
   }, [doc.pcid])
 
-  if (failed) return <p className="font-sans text-sm text-sage-600">History couldn’t be loaded right now.</p>
+  if (failed) return <p className="font-sans text-sm text-ink">History couldn’t be loaded right now.</p>
   if (!versions || !changes) return <Skeleton />
 
   return (
     <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <section>
-        <h3 className="mb-3 font-sans text-sm font-semibold text-sage-800">Versions</h3>
+        <h3 className="mb-3 font-sans text-sm font-semibold text-ink">Versions</h3>
         <ol className="space-y-2.5">
           {versions.map(v => (
             <li key={v.number} className="border-b border-sage-100 pb-2.5 last:border-b-0">
@@ -338,47 +338,47 @@ function HistoryView({ doc }: { doc: EntityDocument }) {
                   href={v.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-sans text-sm font-medium text-aqua-700 underline-offset-2 hover:underline"
+                  className="font-sans text-sm font-medium text-ink underline-offset-2 hover:underline"
                 >
                   Version {v.number}
                 </a>
-                <span className="font-sans text-2xs text-sage-600">{formatDate(v.created_at)}</span>
+                <span className="font-sans text-2xs text-ink">{formatDate(v.created_at)}</span>
               </div>
-              <p className="mt-0.5 font-sans text-2xs text-sage-600">
+              <p className="mt-0.5 font-sans text-2xs text-ink">
                 {reasonLabel(v.reason)}
                 {typeof v.changes === 'number' && v.changes > 0 && ` · ${v.changes} ${v.changes === 1 ? 'edit' : 'edits'}`}
               </p>
             </li>
           ))}
         </ol>
-        <p className="mt-3 font-sans text-2xs leading-relaxed text-sage-600">
+        <p className="mt-3 font-sans text-2xs leading-relaxed text-ink">
           A new version is recorded whenever the record’s content changes — an edit to this entry, or a
           refresh of data derived from its sources. Every version stays readable at its own address.
         </p>
       </section>
 
       <section>
-        <h3 className="mb-3 font-sans text-sm font-semibold text-sage-800">Changes</h3>
+        <h3 className="mb-3 font-sans text-sm font-semibold text-ink">Changes</h3>
         {changes.changes.length === 0 ? (
-          <p className="font-sans text-sm leading-relaxed text-sage-600">
+          <p className="font-sans text-sm leading-relaxed text-ink">
             {changes.note ?? 'No edits recorded yet.'}
           </p>
         ) : (
           <ol className="space-y-3">
             {changes.changes.map(c => (
               <li key={c.change_id} className="border-l-2 border-sage-200 pl-3">
-                <p className="font-sans text-2xs text-sage-600">
+                <p className="font-sans text-2xs text-ink">
                   {formatDate(c.changed_at)} · {sourceLabel(c)} · {c.table.replace(/_/g, ' ')}
                   {c.row_key && ` #${c.row_key}`}
                 </p>
                 <dl className="mt-1 space-y-1">
                   {c.fields.map(f => (
                     <div key={f} className="font-mono text-2xs leading-relaxed">
-                      <dt className="inline text-sage-600">{f}: </dt>
-                      <dd className="inline text-sage-800">
-                        {c.op !== 'INSERT' && <del className="text-coral-600">{show(c.diff[f]?.old)}</del>}
+                      <dt className="inline text-ink">{f}: </dt>
+                      <dd className="inline text-ink">
+                        {c.op !== 'INSERT' && <del className="text-ink">{show(c.diff[f]?.old)}</del>}
                         {c.op === 'UPDATE' && ' → '}
-                        {c.op !== 'DELETE' && <ins className="text-aqua-700 no-underline">{show(c.diff[f]?.new)}</ins>}
+                        {c.op !== 'DELETE' && <ins className="text-ink no-underline">{show(c.diff[f]?.new)}</ins>}
                       </dd>
                     </div>
                   ))}
@@ -399,7 +399,7 @@ function UrlRow({ label, display, copy, href }: { label: string; display: string
   return (
     <div>
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
-        <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</p>
+        <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</p>
         <button
           onClick={() =>
             navigator.clipboard.writeText(copy).then(() => {
@@ -407,7 +407,7 @@ function UrlRow({ label, display, copy, href }: { label: string; display: string
               setTimeout(() => setCopied(false), 1500)
             })
           }
-          className="shrink-0 font-sans text-2xs text-sage-600 hover:text-sage-900"
+          className="shrink-0 font-sans text-2xs text-ink"
           aria-label={`Copy ${label}`}
         >
           {copied ? 'Copied' : 'Copy'}
@@ -419,12 +419,12 @@ function UrlRow({ label, display, copy, href }: { label: string; display: string
           target="_blank"
           rel="noopener noreferrer"
           title={copy}
-          className="block break-all font-mono text-2xs leading-relaxed text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
+          className="block break-all font-mono text-2xs leading-relaxed text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
         >
           {display}
         </a>
       ) : (
-        <p title={copy} className="break-all font-mono text-2xs leading-relaxed text-sage-800">
+        <p title={copy} className="break-all font-mono text-2xs leading-relaxed text-ink">
           {display}
         </p>
       )}
@@ -437,7 +437,7 @@ function SmallButton({ onClick, children }: { onClick: () => void; children: Rea
     <button
       type="button"
       onClick={onClick}
-      className="rounded-lg border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-sage-700 transition-colors hover:border-aqua-300 hover:text-aqua-700"
+      className="rounded-lg border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-aqua-300"
     >
       {children}
     </button>
@@ -451,7 +451,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       aria-selected={active}
       onClick={onClick}
       className={`rounded-md px-3 py-1.5 font-sans text-sm transition-colors ${
-        active ? 'bg-sage-100 font-medium text-sage-900' : 'text-sage-600 hover:text-sage-900'
+        active ? 'bg-sage-100 font-medium text-ink' : 'text-ink'
       }`}
     >
       {children}
@@ -465,7 +465,7 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
     <div className="border-t border-sage-200">
       <div className="py-3">
         <h2
-          className="font-semibold uppercase tracking-[0.1em] text-sage-600"
+          className="font-semibold uppercase tracking-[0.1em] text-ink"
           style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
         >
           {title}

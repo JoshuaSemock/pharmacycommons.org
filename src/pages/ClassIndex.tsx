@@ -91,12 +91,12 @@ export default function ClassIndex() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="mb-6 border-b border-sage-200 pb-6 pt-8">
         <h1
-          className="font-display text-3xl font-semibold leading-tight text-sage-900 sm:text-4xl"
+          className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Drug classes
         </h1>
-        <p className="mt-2 max-w-2xl font-sans text-md leading-relaxed text-sage-700">
+        <p className="mt-2 max-w-2xl font-sans text-md leading-relaxed text-ink">
           Every classification system in Pharmacy Commons, each class linked to the drugs in it.
         </p>
       </header>
@@ -113,8 +113,8 @@ export default function ClassIndex() {
             }}
             className={`rounded-lg border px-3 py-1.5 font-sans text-sm transition-colors ${
               t.key === type
-                ? 'border-aqua-300 bg-aqua-100 font-medium text-sage-900'
-                : 'border-sage-200 bg-white text-sage-700 hover:border-sage-300 hover:text-sage-900'
+                ? 'border-aqua-300 bg-aqua-100 font-medium text-ink'
+                : 'border-sage-200 bg-white text-ink hover:border-sage-300'
             }`}
           >
             {t.label}
@@ -123,7 +123,7 @@ export default function ClassIndex() {
       </div>
 
       {failed ? (
-        <p className="font-sans text-md text-sage-600">Classes couldn’t be loaded right now.</p>
+        <p className="font-sans text-md text-ink">Classes couldn’t be loaded right now.</p>
       ) : !rows ? (
         <div className="space-y-2" aria-busy="true">
           {[0, 1, 2, 3, 4].map(i => (
@@ -133,7 +133,7 @@ export default function ClassIndex() {
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="font-sans text-sm text-sage-600">
+            <p className="font-sans text-sm text-ink">
               {rows[0]?.class_type_label ?? ''} · {filtered.length.toLocaleString()}{' '}
               {filtered.length === 1 ? 'class' : 'classes'}
             </p>
@@ -143,12 +143,12 @@ export default function ClassIndex() {
               onChange={e => setQuery(e.target.value)}
               placeholder={showCodes ? 'Filter by name or code' : 'Filter by name'}
               aria-label="Filter classes"
-              className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-sage-900 placeholder:text-sage-600 focus:border-aqua-400 focus:outline-none sm:w-64"
+              className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-aqua-400 focus:outline-none sm:w-64"
             />
           </div>
 
           {filtered.length === 0 ? (
-            <p className="font-sans text-sm text-sage-600">No classes match “{query}”.</p>
+            <p className="font-sans text-sm text-ink">No classes match “{query}”.</p>
           ) : (
             <ul className="divide-y divide-sage-100 border-y border-sage-200">
               {filtered.slice(0, limit).map(r => (
@@ -162,13 +162,13 @@ export default function ClassIndex() {
                         : undefined
                     }
                   >
-                    <span className="min-w-0 break-words font-sans text-md leading-snug text-sage-800">
+                    <span className="min-w-0 break-words font-sans text-md leading-snug text-ink">
                       {showCodes && r.source_code && (
-                        <span className="mr-2 font-mono text-sm text-sage-600">{r.source_code}</span>
+                        <span className="mr-2 font-mono text-sm text-ink">{r.source_code}</span>
                       )}
                       {r.name}
                     </span>
-                    <span className="shrink-0 font-sans text-sm text-sage-600">
+                    <span className="shrink-0 font-sans text-sm text-ink">
                       {r.member_count.toLocaleString()}
                     </span>
                   </Link>
@@ -180,7 +180,7 @@ export default function ClassIndex() {
           {filtered.length > limit && (
             <button
               onClick={() => setLimit(l => l + BATCH)}
-              className="mt-4 font-sans text-sm font-medium text-aqua-700 hover:underline"
+              className="mt-4 font-sans text-sm font-medium text-ink hover:underline"
             >
               Show more ({(filtered.length - limit).toLocaleString()} left)
             </button>

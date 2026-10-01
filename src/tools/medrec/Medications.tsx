@@ -52,7 +52,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
   const filterOptions: [Filter, ReactNode][] = [['all', 'All'] as [Filter, string], ...CATEGORIES].map(([v, l]) => [
     v,
     <>
-      {l} <span className="ml-0.5 font-mono text-[11px] text-neutral-500">{counts.get(v) ?? 0}</span>
+      {l} <span className="ml-0.5 font-mono text-[11px] text-ink">{counts.get(v) ?? 0}</span>
     </>,
   ])
 
@@ -84,7 +84,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
       )}
 
       {list.length === 0 ? (
-        <p className="font-sans text-[14px] italic text-neutral-600">{meds.length ? 'Nothing listed in this category.' : 'No medications listed yet.'}</p>
+        <p className="font-sans text-[14px] italic text-ink">{meds.length ? 'Nothing listed in this category.' : 'No medications listed yet.'}</p>
       ) : (
         <>
           <div
@@ -93,14 +93,14 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
             tabIndex={0}
             className="relative min-w-0 overflow-x-auto border-y border-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300"
           >
-            <table className="w-full border-separate border-spacing-0 font-sans text-[13.5px] text-mint-950">
+            <table className="w-full border-separate border-spacing-0 font-sans text-[13.5px] text-ink">
               <thead>
                 <tr>
                   {MED_COLUMNS.map(([key, label]) => (
                     <th
                       key={key}
                       scope="col"
-                      className={`border-b border-mint-200 bg-mint-50 px-2.5 py-2 text-left align-bottom font-sans text-[12.5px] font-medium text-mint-800 ${
+                      className={`border-b border-mint-200 bg-mint-50 px-2.5 py-2 text-left align-bottom font-sans text-[12.5px] font-medium text-ink ${
                         key === 'name' ? 'sticky left-0 z-10 min-w-[11rem] border-r' : MIN_WIDTH[key]
                       }`}
                     >
@@ -125,7 +125,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                           <button
                             type="button"
                             onClick={() => onOpen(m.id)}
-                            className="text-left font-sans text-[14.5px] font-semibold text-mint-950 underline-offset-2 [overflow-wrap:anywhere] hover:text-hepatica-700 hover:underline"
+                            className="text-left font-sans text-[14.5px] font-semibold text-ink underline-offset-2 [overflow-wrap:anywhere] hover:underline"
                           >
                             {c.name || 'Unnamed medication'}
                           </button>
@@ -159,7 +159,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                           type="button"
                           onClick={() => onRemove(m.id)}
                           aria-label={`Remove ${c.name || 'medication'}`}
-                          className="rounded p-1.5 align-middle text-neutral-500 hover:bg-rose-50 hover:text-rose-700"
+                          className="rounded p-1.5 align-middle text-ink hover:bg-rose-50"
                         >
                           <RemoveIcon />
                         </button>
@@ -170,7 +170,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
               </tbody>
             </table>
           </div>
-          <p className="font-sans text-[12.5px] text-neutral-600">Scroll the table sideways to see every column. Select a name or Edit to change a row.</p>
+          <p className="font-sans text-[12.5px] text-ink">Scroll the table sideways to see every column. Select a name or Edit to change a row.</p>
         </>
       )}
     </section>

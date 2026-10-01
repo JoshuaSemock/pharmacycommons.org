@@ -65,7 +65,7 @@ export default function CreatinineClearance() {
       <header className="pt-10 pb-10 sm:pt-14 lg:pb-12">
         <Link
           to="/tools"
-          className="mb-4 inline-block font-sans text-[13px] text-sage-600 transition-colors hover:text-sage-900"
+          className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors"
         >
           All tools
         </Link>
@@ -86,7 +86,7 @@ export default function CreatinineClearance() {
         </section>
 
         <aside className="pt-8 lg:pt-10">
-          <div className="space-y-7 font-sans text-[13.5px] leading-relaxed text-sage-600">
+          <div className="space-y-7 font-sans text-[13.5px] leading-relaxed text-ink">
             <div>
               <RailHeading>Scope</RailHeading>
               <p>
@@ -109,7 +109,7 @@ export default function CreatinineClearance() {
                   onClick={e => {
                     if (scrollToId('method-and-sources', 'smooth')) e.preventDefault()
                   }}
-                  className="text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
+                  className="text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
                 >
                   Equations, thresholds, and sources
                 </a>
@@ -129,7 +129,7 @@ export default function CreatinineClearance() {
         <div ref={sourcesRef} className="min-w-0 pt-9 lg:col-start-1 lg:row-start-1">
           <h2
             id="method-and-sources"
-            className="scroll-mt-32 font-display text-[30px] font-semibold leading-tight text-sage-900"
+            className="scroll-mt-32 font-display text-[30px] font-semibold leading-tight text-ink"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Method and sources

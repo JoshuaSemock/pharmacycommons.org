@@ -34,7 +34,7 @@ export default function Blog() {
             />
           ))}
         </div>
-        <p className="mt-4 font-sans text-[12.5px] text-sage-600" aria-live="polite">
+        <p className="mt-4 font-sans text-[12.5px] text-ink" aria-live="polite">
           {active
             ? `${visible.length} of ${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`
             : `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`}
@@ -50,7 +50,7 @@ export default function Blog() {
       toc={false}
     >
       {visible.length === 0 ? (
-        <p className="py-10 font-sans text-[15.5px] text-sage-600">
+        <p className="py-10 font-sans text-[15.5px] text-ink">
           {posts.length === 0
             ? 'No posts yet. Add a markdown file to src/content/posts/ and it will appear here.'
             : 'No posts with that topic.'}
@@ -60,30 +60,30 @@ export default function Blog() {
           {visible.map(post => (
             <li key={post.slug} className="py-9 first:pt-10">
               <article>
-                <p className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13.5px] text-sage-600">
+                <p className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13.5px] text-ink">
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   <span>{post.readingMinutes} minute read</span>
                   {post.draft && (
-                    <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-coral-600">
+                    <span className="rounded border border-coral-200 bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                       draft
                     </span>
                   )}
                 </p>
 
                 <h2
-                  className="font-display text-[26px] font-semibold leading-snug text-balance text-sage-900"
+                  className="font-display text-[26px] font-semibold leading-snug text-balance text-ink"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="transition-colors hover:text-aqua-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                    className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
                   >
                     {post.title}
                   </Link>
                 </h2>
 
                 {post.summary && (
-                  <p className="mt-3 font-sans text-[16px] leading-[1.65] text-pretty text-sage-600">
+                  <p className="mt-3 font-sans text-[16px] leading-[1.65] text-pretty text-ink">
                     {post.summary}
                   </p>
                 )}
@@ -95,7 +95,7 @@ export default function Blog() {
                         <button
                           type="button"
                           onClick={() => selectTag(tag)}
-                          className="rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-sage-600 transition-colors hover:border-sage-300 hover:text-sage-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                          className="rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
                         >
                           {tag}
                         </button>
@@ -128,8 +128,8 @@ function TagButton({
       aria-pressed={active}
       className={`rounded-md border px-2.5 py-1 font-sans text-[12.5px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 ${
         active
-          ? 'border-aqua-400 bg-aqua-100 text-aqua-700'
-          : 'border-sage-200 bg-white/60 text-sage-600 hover:border-sage-300 hover:text-sage-900'
+          ? 'border-aqua-400 bg-aqua-100 text-ink'
+          : 'border-sage-200 bg-white/60 text-ink hover:border-sage-300'
       }`}
     >
       {label}
