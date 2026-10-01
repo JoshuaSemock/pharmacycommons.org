@@ -26,6 +26,7 @@ const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 const MedicationReconciliation = lazy(() => import('./tools/MedicationReconciliation'))
+const DaysSupply = lazy(() => import('./tools/DaysSupply'))
 const Developers = lazy(() => import('./pages/Developers'))
 // Legal & governance pages; text comes from docs/*.md (see src/legal.ts).
 const Terms = lazy(() => import('./pages/Terms'))
@@ -69,6 +70,7 @@ export default function App() {
             path="/tools/medication-reconciliation"
             element={<MedicationReconciliation />}
           />
+          <Route path="/tools/days-supply" element={<DaysSupply />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/references" element={<References />} />

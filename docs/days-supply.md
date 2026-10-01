@@ -1,7 +1,7 @@
 # Days supply and quantity calculator
 
 Route: `/tools/days-supply` · Code: `src/tools/DaysSupply.tsx`, `src/tools/dayssupply/`
-Decided with Joshua 2026-09-28. Reference example: scriptcalc.com. Status: planned.
+Decided with Joshua 2026-09-28. Reference example: scriptcalc.com. Status: live (version 1, 2026-09-28).
 
 ## What it is
 
@@ -130,6 +130,21 @@ Worked examples from the planning discussion become unit tests
 - Drops per mL and in-use limits stored per product in Supabase, with the source
   on each row (manufacturer, a named payer, general default), so disagreements are
   stored and shown.
+
+## What version 1 does differently from the plan above
+
+- **Directions builder:** the page uses med rec's vocabularies (`medrec/model.ts`)
+  and sentence engine (`medrec/sig.ts`) directly, with its own form fields. The
+  med rec editor itself was not extracted into a shared component, so the live
+  med rec tool is untouched. Extracting it is a later clean-up.
+- **Manufacturer vs. payer:** side-by-side results for drops per mL only. Doses
+  per pen are entered once.
+- **Dose escalation** (GLP-1 starting dose, then step up) is not in version 1. It
+  moves to the second phase with tapers. Each step can be calculated on its own
+  meanwhile, since each step is usually a separate product and fill.
+- **Refill threshold** defaults to 75% of the days supply and is editable.
+- The engine is `src/tools/dayssupply/calc.ts`, tested in `dayssupply.test.ts`;
+  the page is `src/tools/DaysSupply.tsx` with `src/tools/dayssupply/Results.tsx`.
 
 ## Open
 

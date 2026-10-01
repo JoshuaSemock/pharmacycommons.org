@@ -166,7 +166,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
-`/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`) · `/developers` (API console
+`/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
+`/tools/days-supply` (browser-only; see `docs/days-supply.md`) · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read

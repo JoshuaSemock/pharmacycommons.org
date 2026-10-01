@@ -86,6 +86,11 @@ const STATIC_ROUTES = [
     description: 'Build a complete medication list with allergies and substance use. Directions are written out in full with no abbreviations. The list stays in your browser and saves as CSV or PDF.',
   },
   {
+    path: '/tools/days-supply',
+    title: 'Days supply and quantity calculator',
+    description: 'Work out the quantity to dispense for a number of days, or the days supply of a quantity, for tablets, liquids, eye and ear drops, inhalers, insulin and GLP-1 pens. Priming, drops per mL and in-use limits are counted in, and every step is shown.',
+  },
+  {
     path: '/developers',
     title: 'Developers',
     heading: 'Pharmacy Commons API for developers',
