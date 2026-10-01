@@ -35,11 +35,11 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav ref={navRef} className="lp-rule-b sticky top-0 z-50 bg-paper/80 backdrop-blur-md">
+    <nav ref={navRef} className="pc-grain lp-rule-b sticky top-0 z-50 bg-paper">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
         <Link
           to="/"
-          className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 md:h-auto"
+          className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 md:h-auto"
           aria-label="Pharmacy Commons home"
         >
           <span className="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
@@ -79,7 +79,7 @@ export default function Nav() {
 function barLinkClass({ isActive }: { isActive: boolean }): string {
   return [
     'lp-flat flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] text-ink min-[360px]:text-[13.5px] min-[400px]:px-2.5 sm:text-[14px]',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
     isActive ? 'font-medium' : '',
   ].join(' ')
 }
@@ -125,7 +125,7 @@ function HeaderSearch() {
     <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
       <form onSubmit={handleSubmit} role="search">
         <div
-          className="lp-field flex h-10 items-center gap-2 rounded-md px-3 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50 md:h-9"
+          className="lp-field flex h-10 items-center gap-2 rounded-md px-3 md:h-9"
         >
           <SearchIcon />
           <input

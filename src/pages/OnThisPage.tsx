@@ -198,7 +198,7 @@ export default function OnThisPage({ headings }: { headings: TocHeading[] }) {
                 aria-current={isActive ? 'location' : undefined}
                 className={[
                   '-ml-px block border-l-2 py-1 pr-2 font-sans text-[13px] leading-snug transition-colors',
-                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
                   h.level === 3 ? 'pl-6' : 'pl-3',
                   isActive
                     ? 'border-aqua-500 text-ink'

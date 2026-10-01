@@ -104,7 +104,7 @@ export default function RefPicker({ id, value, onChange, apiBase, types, placeho
             } else if (!e.metaKey && !e.ctrlKey) onEnter?.()
           } else if (e.key === 'Escape') setOpen(false)
         }}
-        className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:font-sans placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200"
+        className="w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:font-sans placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20"
       />
       {show && (
         <ul id={listId} role="listbox" className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-lg border border-mint-200 bg-white py-1 shadow-lg">

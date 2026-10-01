@@ -263,7 +263,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <div className="flex min-w-[14rem] max-w-sm flex-1 items-center gap-2 rounded-lg border border-sage-200 bg-white px-3 py-1.5 transition-all focus-within:border-aqua-400 focus-within:ring-2 focus-within:ring-aqua-200">
+            <div className="flex min-w-[14rem] max-w-sm flex-1 items-center gap-2 rounded-lg border border-sage-200 bg-white px-3 py-1.5 transition-all focus-within:border-ink/40 focus-within:ring-2 focus-within:ring-ink/20">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
                 <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

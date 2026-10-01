@@ -91,7 +91,7 @@ export default function Footer() {
 }
 
 const focus =
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 
 const link = `whitespace-nowrap text-ink underline decoration-sage-300 underline-offset-2 transition-colors hover:decoration-aqua-600 ${focus}`
 

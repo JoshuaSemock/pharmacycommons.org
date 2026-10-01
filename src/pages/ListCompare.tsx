@@ -208,7 +208,7 @@ export default function ListCompare() {
               onChange={e => setQuery(e.target.value)}
               placeholder="Filter drugs"
               aria-label="Filter drugs"
-              className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none sm:w-64"
+              className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none sm:w-64"
             />
           </div>
 

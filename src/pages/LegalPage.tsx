@@ -115,4 +115,4 @@ export default function LegalPage({ source, current, lede }: LegalPageProps) {
 }
 
 const linkClass =
-  'text-ink underline decoration-mint-300 underline-offset-2 transition-colors hover:decoration-mint-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-500'
+  'text-ink underline decoration-mint-300 underline-offset-2 transition-colors hover:decoration-mint-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'

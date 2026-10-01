@@ -77,7 +77,7 @@ export default function Blog() {
                 >
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                    className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                   >
                     {post.title}
                   </Link>
@@ -96,7 +96,7 @@ export default function Blog() {
                         <button
                           type="button"
                           onClick={() => selectTag(tag)}
-                          className="rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                          className="rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                         >
                           {tag}
                         </button>
