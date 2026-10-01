@@ -416,9 +416,9 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    textures 2026-10-01b).
 
    Back to front:
-     1. .page-background::before — the lichen photograph, fixed to the
-        viewport, at full strength, so it shows in its true color wherever
-        the paper doesn't cover it.
+     1. .page-background::before — the lichen photograph, fixed and still
+        behind the viewport, at full strength, so it shows in its true color
+        wherever the paper doesn't cover it.
      2. .page-content — the page column, i.e. the sheet: centered, a little
         narrower than the viewport, so lichen shows down both sides.
      3. .page-content::before — the shadow the sheet casts on the lichen.
@@ -444,8 +444,6 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
      --relief-strength opacity of the rim relief
    --------------------------------------------------------------------------- */
 .page-background {
-  --bg-drift: 247px;
-  --bg-drift-range: 4000px;
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -453,44 +451,22 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   overflow-x: clip;
 }
 
+/* The lichen holds still behind the sheet (the scroll parallax was removed
+   2026-10-01: the paper moving over it is motion enough). One image for every
+   screen size: the full-resolution photo, which stays sharp even where a tall
+   phone screen makes `cover` enlarge it. */
 .page-background::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* WebP in public/textures (stable URL, so index.html can preload it). The
-     original JPEGs stay in assets/textures as source files. */
+  /* WebP in public/textures (stable URL, so index.html can preload it). Made
+     from assets/textures/lichen_bg.jpg by scripts/lichen-images.py. */
   background-image: url("/textures/lichen_bg.webp");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-}
-
-@media (max-width: 780px) {
-  .page-background::before {
-    background-image: url("/textures/lichen_bg_mobile.webp");
-  }
-}
-
-/* Parallax drift: as the page scrolls the photo slides the same way, far
-   slower, then holds. Pure CSS scroll-driven animation (no JS). Browsers
-   without animation-timeline, and reduced-motion users, get a still photo. */
-@keyframes pc-bg-drift {
-  from { transform: translate3d(0, calc(var(--bg-drift) / 2), 0); }
-  to   { transform: translate3d(0, calc(var(--bg-drift) / -2), 0); }
-}
-
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .page-background::before {
-      inset: calc(var(--bg-drift) / -2) 0;
-      will-change: transform;
-      animation: pc-bg-drift linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0px var(--bg-drift-range);
-    }
-  }
 }
 
 .page-content {
