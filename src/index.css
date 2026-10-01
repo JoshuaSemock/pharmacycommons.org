@@ -271,6 +271,71 @@
   text-shadow: var(--lp-text-sunken);
 }
 
+/* Letterpress states, one class per behaviour (2026-10-01). Each sets the
+   shadow and the ink impression together, so markup needs one class.
+     .lp-raised   embossed, always (labels, cards, plain buttons)
+     .lp-sunken   debossed, always (signed-in badge, wells)
+     .lp-field    a text field: embossed at rest, debossed while focused
+                  (being typed into). Put it on the wrapper round the input.
+     .lp-toggle   embossed, debossed while pressed/open/selected:
+                  aria-pressed="true", aria-expanded="true",
+                  aria-selected="true", aria-current="page" or .lp-on.
+     .lp-flat     no relief at rest, debossed when aria-current="page",
+                  aria-pressed="true" or aria-selected="true" (bar links,
+                  the A-Z letters, tabs).
+     .lp-press    add to a raised link or card: it presses in while
+                  clicked. There is no hover lift; paper doesn't float.
+   Rules are scored into the paper (a shaded line with a lit line below)
+   instead of colored borders:
+     .lp-rule-t / .lp-rule-b / .lp-rule-y   on a container's top/bottom/both
+     .lp-score    a 1px horizontal line element (h-px spans)
+     .lp-score-v  a 1px vertical line element
+     .lp-divide-y between the children of a list */
+.lp-raised,
+.lp-field,
+.lp-toggle {
+  box-shadow: var(--shadow-emboss);
+  text-shadow: var(--lp-text-raised);
+}
+.lp-sunken,
+.lp-field:focus-within,
+.lp-toggle[aria-pressed="true"],
+.lp-toggle[aria-expanded="true"],
+.lp-toggle[aria-selected="true"],
+.lp-toggle[aria-current="page"],
+.lp-toggle.lp-on,
+.lp-flat[aria-current="page"],
+.lp-flat[aria-pressed="true"],
+.lp-flat[aria-selected="true"],
+.lp-press:active {
+  box-shadow: var(--shadow-deboss);
+  text-shadow: var(--lp-text-sunken);
+}
+.lp-field,
+.lp-toggle,
+.lp-flat,
+.lp-press {
+  transition: box-shadow 150ms ease, text-shadow 150ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-field,
+  .lp-toggle,
+  .lp-flat,
+  .lp-press {
+    transition: none;
+  }
+}
+
+.lp-rule-t { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+.lp-rule-b { box-shadow: inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim); }
+.lp-rule-y {
+  box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim),
+    inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim);
+}
+.lp-score { height: 1px; background: var(--lp-edge); box-shadow: 0 1px 0 var(--lp-rim); }
+.lp-score-v { width: 1px; background: var(--lp-edge); box-shadow: 1px 0 0 var(--lp-rim); }
+.lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
    stays), so the existing classes keep their meaning without a dark: copy:
    bg-mint-50 (palest wash) becomes mint-950 (deepest), border-mint-200

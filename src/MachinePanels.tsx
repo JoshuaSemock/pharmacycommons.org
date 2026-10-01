@@ -117,7 +117,7 @@ function SourceRow({ source: s }: { source: ProvenanceSource }) {
         )}
         {s.kind === 'machine_assisted' && (
           <span
-            className="shrink-0 rounded border border-amber-400 bg-amber-100 px-1.5 py-px font-sans text-2xs text-ink"
+            className="lp-raised shrink-0 rounded px-1.5 py-px font-sans text-2xs text-ink"
             title="Assigned by a rule or an AI-assisted review rather than taken from a published source"
           >
             machine-assisted
@@ -437,7 +437,7 @@ function SmallButton({ onClick, children }: { onClick: () => void; children: Rea
     <button
       type="button"
       onClick={onClick}
-      className="rounded-lg border border-sage-200 bg-white px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-aqua-300"
+      className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
     >
       {children}
     </button>
@@ -450,9 +450,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`rounded-md px-3 py-1.5 font-sans text-sm transition-colors ${
-        active ? 'bg-sage-100 font-medium text-ink' : 'text-ink'
-      }`}
+      className={`lp-flat rounded-md px-3 py-1.5 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${active ? 'font-medium' : ''}`}
     >
       {children}
     </button>

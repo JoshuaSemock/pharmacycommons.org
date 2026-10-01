@@ -201,7 +201,7 @@ export default function DrugDetail() {
               >
                 {formatDrugName(drug.name)}
               </h1>
-              <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-2xs text-ink">
+              <span className="lp-raised mt-1 rounded px-2 py-0.5 font-mono text-2xs text-ink">
                 INN
               </span>
             </div>
@@ -317,11 +317,7 @@ function SaveButton({
         disabled={pending}
         aria-pressed={saved}
         title={saved ? 'Remove from saved pages' : 'Save this page to your account'}
-        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-sm font-medium transition-colors disabled:opacity-50 ${
-          saved
-            ? 'border-amber-300 bg-amber-100 text-ink hover:border-amber-400'
-            : 'border-sage-200 bg-white/70 text-ink hover:border-sage-300'
-        }`}
+        className="lp-toggle flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-sm font-medium text-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
       >
         <BookmarkIcon filled={saved} />
         {saved ? 'Saved' : 'Save'}
@@ -527,10 +523,8 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
             <Link
               to={`/classes/${c.slug}`}
               title={[c.source_code, c.name, c.is_direct ? null : '(via a sub-class)'].filter(Boolean).join(' · ')}
-              className={`inline-flex max-w-full items-baseline gap-1.5 rounded-md border px-2 py-0.5 font-sans text-sm leading-snug transition-colors hover:border-aqua-300 ${
-                c.is_direct
-                  ? 'border-sage-200 bg-white text-ink'
-                  : 'border-dashed border-sage-300 text-ink'
+              className={`inline-flex max-w-full items-baseline gap-1.5 rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+                c.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
               }`}
             >
               {c.source_code && group.type === 'atc' && (
@@ -605,8 +599,8 @@ function BrandRow({ label, brands, muted = false }: { label: string; brands: Bra
       {brands.map(b => {
         const href = brandHref(b)
         const text = formatBrandName(b.name)
-        const cls = `rounded-md border px-2 py-0.5 font-sans text-sm ${
-          muted ? 'border-dashed border-sage-300 text-ink' : 'border-sage-200 bg-white text-ink'
+        const cls = `rounded px-2 py-0.5 font-sans text-sm text-ink ${
+          muted ? 'border border-dashed border-ink/30' : 'lp-raised'
         }`
         return href ? (
           <a
@@ -615,7 +609,7 @@ function BrandRow({ label, brands, muted = false }: { label: string; brands: Bra
             target="_blank"
             rel="noopener noreferrer"
             title={`${text} on Drugs@FDA${muted ? ' (discontinued)' : ''}`}
-            className={`${cls} transition-colors hover:border-aqua-300`}
+            className={`${cls} ${muted ? '' : 'lp-press'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700`}
           >
             {text}
           </a>
@@ -697,7 +691,7 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
           <li key={m.pcid_code}>
             <button
               onClick={() => navigate(`/drugs/${m.slug}`)}
-              className="block w-full min-w-0 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-sage-50"
+              className="lp-raised lp-press block w-full min-w-0 rounded-md px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
             >
               <span className="block break-words font-sans text-sm font-medium leading-snug text-ink">
                 {formatDrugName(m.name)}
@@ -890,7 +884,7 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
             <li key={l.slug}>
               <Link
                 to={`/lists/${l.slug}`}
-                className="flex items-baseline justify-between gap-3 rounded-lg border border-sage-200 bg-white px-3 py-2 transition-colors hover:border-aqua-300 hover:bg-sage-50"
+                className="lp-raised lp-press flex items-baseline justify-between gap-3 rounded-md px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
               >
                 <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">
                   {l.title}

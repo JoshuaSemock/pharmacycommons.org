@@ -215,27 +215,27 @@
           <div class="paper-sheet" aria-hidden="true"></div>
           <!-- Mirrors src/Nav.tsx. The search is a plain GET form, so it works before
                (and without) JavaScript; the menu button is a placeholder until React mounts. -->
-          <header class="sticky top-0 z-50 border-b border-mint-200 bg-paper/80">
+          <header class="lp-rule-b sticky top-0 z-50 bg-paper/80">
             <div class="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
               <a href="/" class="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 md:h-auto" aria-label="Pharmacy Commons home">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-mint-100 max-[359px]:h-7 max-[359px]:w-7">
+                <span class="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
                   <img src="/logo-40.png" alt="" width="20" height="20" class="h-5 w-5 object-contain" />
                 </span>
                 <span class="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">Pharmacy Commons</span>
               </a>
               <form action="/browse" method="get" role="search" class="col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
-                <div class="pc-letterpress pc-letterpress-sunken flex h-10 items-center gap-2 rounded-md bg-transparent px-3 shadow-deboss md:h-9">
+                <div class="lp-field flex h-10 items-center gap-2 rounded-md px-3 md:h-9">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" class="shrink-0 text-ink"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5" /><path d="M10 10L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
                   <input type="search" name="q" placeholder="Search drugs, brands, classes" aria-label="Search the commons" class="min-w-0 flex-1 bg-transparent font-sans text-[13.5px] text-ink placeholder:text-ink outline-none" />
                 </div>
               </form>
               <ul class="flex shrink-0 items-center md:ml-auto">
-                <li><a href="/browse" class="flex h-10 items-center px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Browse</a></li>
-                <li><a href="/lists" class="flex h-10 items-center px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Lists</a></li>
-                <li><a href="/tools" class="flex h-10 items-center px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Tools</a></li>
+                <li><a href="/browse" class="flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Browse</a></li>
+                <li><a href="/lists" class="flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Lists</a></li>
+                <li><a href="/tools" class="flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Tools</a></li>
               </ul>
-              <span class="hidden h-9 w-[8.5rem] shrink-0 rounded-lg bg-mint-100 md:block" aria-hidden="true"></span>
-              <span class="-mr-1 flex h-10 w-10 shrink-0 max-[359px]:w-9 items-center justify-center text-ink" aria-hidden="true">
+              <span class="lp-raised hidden h-9 w-[8.5rem] shrink-0 rounded-md md:block" aria-hidden="true"></span>
+              <span class="lp-raised flex h-10 w-10 shrink-0 max-[359px]:w-9 items-center justify-center rounded-md text-ink" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
               </span>
             </div>
@@ -261,7 +261,7 @@
             </section>
 
             <div class="mx-auto max-w-4xl text-left font-sans text-[16px] leading-relaxed text-ink">
-              <section class="border-t border-sage-200 py-9">
+              <section class="lp-rule-t py-9">
                 <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-ink">About Pharmacy Commons</h2>
                 <p>
                   Pharmacy Commons is an open interface to structured pharmaceutical records. Information is sourced from public and
@@ -270,7 +270,7 @@
                 </p>
               </section>
 
-              <section class="border-t border-sage-200 py-9">
+              <section class="lp-rule-t py-9">
                 <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-ink">Our mission</h2>
                 <p>
                   To unenclose pharmaceutical knowledge as a durable public trust. Since the public finances the discovery and
@@ -279,7 +279,7 @@
                 </p>
               </section>
 
-              <section class="border-t border-sage-200 py-9">
+              <section class="lp-rule-t py-9">
                 <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-ink">What you can do here</h2>
                 <ul class="list-disc space-y-2 pl-5">
                   <li>Look up a medicine by its colloquial name. Each one has a stable identifier (a PCID) and a permanent address.</li>
@@ -289,7 +289,7 @@
                 </ul>
               </section>
 
-              <section class="border-t border-sage-200 py-9">
+              <section class="lp-rule-t py-9">
                 <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-ink">Every fact traces to its source</h2>
                 <p>
                   Each record links to where it came from, for example an FDA document identifier or a clinical study citation.
@@ -299,7 +299,7 @@
                 </p>
               </section>
 
-              <section class="border-t border-sage-200 py-9">
+              <section class="lp-rule-t py-9">
                 <h2 class="mb-4 font-display text-[22px] font-semibold leading-snug text-ink">Founder and contact</h2>
                 <p>
                   Pharmacy Commons is founded and maintained by Dr. Joshua Semock, PharmD. Corrections and questions are welcome at

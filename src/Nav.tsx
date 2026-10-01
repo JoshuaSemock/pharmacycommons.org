@@ -35,14 +35,14 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav ref={navRef} className="sticky top-0 z-50 border-b border-mint-200 bg-paper/80 backdrop-blur-md">
+    <nav ref={navRef} className="lp-rule-b sticky top-0 z-50 bg-paper/80 backdrop-blur-md">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
         <Link
           to="/"
-          className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500 md:h-auto"
+          className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 md:h-auto"
           aria-label="Pharmacy Commons home"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-mint-100 max-[359px]:h-7 max-[359px]:w-7">
+          <span className="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
           <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">
@@ -66,7 +66,7 @@ export default function Nav() {
           <AccountButton />
         </div>
 
-        <div className="-mr-1 shrink-0">
+        <div className="shrink-0">
           <SiteMenu />
         </div>
       </div>
@@ -74,12 +74,13 @@ export default function Nav() {
   )
 }
 
+/** Bar links sit flat on the paper; the current page's link is pressed in.
+    NavLink sets aria-current="page", which .lp-flat keys off. */
 function barLinkClass({ isActive }: { isActive: boolean }): string {
   return [
-    'relative flex h-10 items-center px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] transition-colors min-[400px]:px-2.5 sm:text-[14px]',
-    'after:absolute after:inset-x-1.5 after:bottom-1 after:h-0.5 after:rounded-full after:transition-colors min-[400px]:after:inset-x-2.5',
-    'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
-    isActive ? 'font-medium text-ink after:bg-hepatica-500' : 'text-ink after:bg-transparent',
+    'lp-flat flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] text-ink min-[360px]:text-[13.5px] min-[400px]:px-2.5 sm:text-[14px]',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700',
+    isActive ? 'font-medium' : '',
   ].join(' ')
 }
 
@@ -124,7 +125,7 @@ function HeaderSearch() {
     <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
       <form onSubmit={handleSubmit} role="search">
         <div
-          className="pc-letterpress pc-letterpress-sunken flex h-10 items-center gap-2 rounded-md bg-transparent px-3 shadow-deboss focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-hepatica-700 md:h-9"
+          className="lp-field flex h-10 items-center gap-2 rounded-md px-3 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50 md:h-9"
         >
           <SearchIcon />
           <input
@@ -152,14 +153,14 @@ function HeaderSearch() {
       </form>
 
       {focused && suggestions.length > 0 && (
-        <div className="absolute top-full z-10 mt-1.5 w-full overflow-hidden rounded-lg border border-mint-200 bg-white shadow-lg shadow-mint-900/5">
+        <div className="absolute top-full z-10 mt-1.5 w-full overflow-hidden rounded-md bg-paper shadow-lg shadow-black/15">
           {suggestions.map(entry => {
             const schedule = toDrug(entry).schedule
             return (
               <button
                 key={entry.n}
                 onMouseDown={() => handleSuggestion(entry.slug)}
-                className="flex min-h-[48px] w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-mint-50"
+                className="flex min-h-[48px] w-full items-center gap-3 px-3 py-2 text-left hover:bg-neutral-100"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-sans text-[13.5px] font-medium text-ink">{entry.name}</span>
