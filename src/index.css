@@ -532,9 +532,15 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 /* Home hero title (src/pages/Home.tsx and the static shell in index.html).
    A class, because the bare h1 rule above outranks text-* utilities.
    ~31px on a 375px phone so "Pharmacy Commons" holds one line and the
-   search box stays above the fold; the full phi^3 size from md up. */
+   search box stays above the fold; the full phi^3 size from md up.
+   Family, weight and tracking match the Nav wordmark ("Pharmacy Commons",
+   src/Nav.tsx: font-sans, font-medium, tracking-[-0.01em]) so the title
+   reads as the same mark, only larger. */
 .pc-hero-title {
+  font-family: var(--font-sans);
   font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1.1;
 }
 @media (min-width: 40rem) {
