@@ -147,8 +147,10 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   (display) + IBM Plex Sans Condensed / IBM Plex Mono. Page = a torn-edged
   paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,
   the reverse) over the lichen photo at full strength (`public/textures/lichen_bg.webp`,
-  `lichen_bg_mobile.webp` below 780px, preloaded in `index.html`). Edge masks come from
-  `scripts/torn-edge.py`. **Dark mode** (2026-10-01): `<html data-theme>` set before paint
+  `lichen_bg_mobile.webp` below 780px, preloaded in `index.html`). Torn edges, rim relief,
+  shadow and paper grain are cut from the photos `assets/textures/paper.png` and
+  `paper-texture.png` by `scripts/paper-textures.py` → `public/textures/paper-*.webp`
+  (sources aren't served; rerun the script after replacing either). **Dark mode** (2026-10-01): `<html data-theme>` set before paint
   by the script in `index.html` (saved choice → system), switch in Site menu → Appearance
   (`src/theme.ts`). Dark flips every ramp end for end in `src/index.css`, so existing
   classes need no `dark:` copy; `dark:` exists for exceptions; `.pc-code` keeps code
