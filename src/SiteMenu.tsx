@@ -94,7 +94,7 @@ export default function SiteMenu() {
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg max-[359px]:w-9 text-mint-800 transition-colors hover:bg-mint-100 hover:text-mint-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg max-[359px]:w-9 text-ink transition-colors hover:bg-mint-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-500"
       >
         {isOpen ? <CloseIcon /> : <HamburgerIcon />}
       </button>
@@ -135,7 +135,7 @@ export default function SiteMenu() {
             <div className="sm:grid sm:grid-cols-2 sm:gap-x-6">
               {ACTIVE_TOOL_SECTIONS.map(section => (
                 <section key={section.id} aria-label={section.label} className="pb-2">
-                  <p className="px-3 pt-2 pb-0.5 font-sans text-[12.5px] text-mint-700">{section.label}</p>
+                  <p className="px-3 pt-2 pb-0.5 font-sans text-[12.5px] text-ink">{section.label}</p>
                   <ul>
                     {section.tools.map(tool => (
                       <li key={tool.id}>
@@ -180,7 +180,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
       <Link
         to="/account"
         title={user.email ?? undefined}
-        className={`${base} gap-1.5 border-mint-300 bg-mint-50 text-mint-800 hover:border-mint-500 hover:text-mint-950`}
+        className={`${base} gap-1.5 border-mint-300 bg-mint-50 text-ink hover:border-mint-500`}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-mint-600" aria-hidden="true" />
         Signed In
@@ -189,7 +189,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
   }
 
   return (
-    <Link to="/account" className={`${base} border-mint-300 bg-white text-mint-800 hover:border-mint-500 hover:text-mint-950`}>
+    <Link to="/account" className={`${base} border-mint-300 bg-white text-ink hover:border-mint-500`}>
       Log in / Register
     </Link>
   )
@@ -200,7 +200,7 @@ type MenuLink = { to: string; label: string }
 /* Not headings: the unlayered h1–h6 sizes in index.css would override text-*. */
 function GroupLabel({ children }: { children: string }) {
   return (
-    <p aria-hidden="true" className="px-3 pt-4 pb-1 font-display text-[17px] font-semibold text-mint-900 md:pt-0">
+    <p aria-hidden="true" className="px-3 pt-4 pb-1 font-display text-[17px] font-semibold text-ink md:pt-0">
       {children}
     </p>
   )
@@ -222,8 +222,8 @@ function MenuGroup({ label, links, small = false }: { label: string; links: Menu
                   'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
                   small ? 'text-[13px]' : 'text-[14.5px]',
                   isActive
-                    ? 'border-hepatica-500 bg-white text-mint-950'
-                    : `border-transparent hover:bg-mint-100 ${small ? 'text-mint-700 hover:text-mint-950' : 'text-mint-900'}`,
+                    ? 'border-hepatica-500 bg-white text-ink'
+                    : `border-transparent hover:bg-mint-100 ${small ? 'text-ink' : 'text-ink'}`,
                 ].join(' ')
               }
             >
@@ -240,7 +240,7 @@ function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
   const className = [
     'flex min-h-11 items-center rounded-r-lg border-l-2 px-3 font-sans text-[14.5px] transition-colors md:min-h-9',
     'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
-    current ? 'border-hepatica-500 bg-white text-mint-950' : 'border-transparent text-mint-900 hover:bg-mint-100',
+    current ? 'border-hepatica-500 bg-white text-ink' : 'border-transparent text-ink hover:bg-mint-100',
   ].join(' ')
   if (tool.to) {
     return (
@@ -252,7 +252,7 @@ function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
   return (
     <a href={tool.href} target="_blank" rel="noreferrer" className={className}>
       {tool.name}
-      <span className="ml-1 text-mint-600" aria-hidden="true">
+      <span className="ml-1 text-ink" aria-hidden="true">
         ↗
       </span>
       <span className="sr-only"> (opens in a new tab)</span>
@@ -285,7 +285,7 @@ function AppearanceControl() {
               className={[
                 'min-h-9 rounded-md px-3 font-sans text-[13px] transition-colors',
                 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-hepatica-500',
-                selected ? 'bg-hepatica-100 font-medium text-hepatica-900' : 'text-mint-800 hover:bg-mint-100 hover:text-mint-950',
+                selected ? 'bg-hepatica-100 font-medium text-ink' : 'text-ink hover:bg-mint-100',
               ].join(' ')}
             >
               {option.label}

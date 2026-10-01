@@ -97,8 +97,8 @@ function startMed(): Medication {
 function Group({ title, children, hint }: { title: string; children: ReactNode; hint?: ReactNode }) {
   return (
     <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-mint-200 pt-4">
-      <legend className="float-left mb-1 w-full font-sans text-[12.5px] font-medium text-mint-800">{title}</legend>
-      {hint && <p className="font-sans text-[13px] leading-snug text-neutral-700">{hint}</p>}
+      <legend className="float-left mb-1 w-full font-sans text-[12.5px] font-medium text-ink">{title}</legend>
+      {hint && <p className="font-sans text-[13px] leading-snug text-ink">{hint}</p>}
       {children}
     </fieldset>
   )
@@ -106,7 +106,7 @@ function Group({ title, children, hint }: { title: string; children: ReactNode; 
 
 function Check({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: ReactNode }) {
   return (
-    <label className="flex cursor-pointer items-start gap-2 font-sans text-[13.5px] text-mint-950">
+    <label className="flex cursor-pointer items-start gap-2 font-sans text-[13.5px] text-ink">
       <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="mt-1 accent-mint-700" />
       <span>{children}</span>
     </label>
@@ -232,7 +232,7 @@ export default function DaysSupply() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="grid gap-5 pt-10 pb-8 sm:pt-14">
         <div>
-          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-sage-600 transition-colors hover:text-sage-900">
+          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors">
             All tools
           </Link>
           <PageTitle
@@ -241,7 +241,7 @@ export default function DaysSupply() {
           />
         </div>
         <div className="grid gap-2">
-          <p className="font-sans text-[13px] font-medium text-mint-800">Try an example</p>
+          <p className="font-sans text-[13px] font-medium text-ink">Try an example</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLES.map(e => (
               <button key={e.id} type="button" className={secondaryButton} onClick={() => loadExample(e)}>
@@ -249,7 +249,7 @@ export default function DaysSupply() {
               </button>
             ))}
           </div>
-          <p className="font-sans text-[12.5px] text-neutral-600">Example package values are typical, not a specific product’s. Check the package you are dispensing.</p>
+          <p className="font-sans text-[12.5px] text-ink">Example package values are typical, not a specific product’s. Check the package you are dispensing.</p>
         </div>
       </header>
 
@@ -259,8 +259,8 @@ export default function DaysSupply() {
           <SectionHeading id="directions" title="Directions" lede="Built the same way as in medication reconciliation: the form decides which actions, units and routes are offered." />
 
           <div aria-live="polite" className="grid gap-1.5 rounded-lg border border-mint-200 bg-mint-50 px-4 py-3">
-            <span className="font-sans text-[12.5px] font-medium text-mint-800">Directions as written</span>
-            <p className="[overflow-wrap:anywhere] font-display text-[19px] leading-snug text-mint-950" style={{ fontFamily: 'var(--font-display)' }}>
+            <span className="font-sans text-[12.5px] font-medium text-ink">Directions as written</span>
+            <p className="[overflow-wrap:anywhere] font-display text-[19px] leading-snug text-ink" style={{ fontFamily: 'var(--font-display)' }}>
               <SigText segments={sigSegments(m)} />
             </p>
             <div>
@@ -273,7 +273,7 @@ export default function DaysSupply() {
           <Group title="What it is">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid min-w-0 content-start gap-1">
-                <label htmlFor="ds-drug" className="font-sans text-[12.5px] font-medium text-mint-900">
+                <label htmlFor="ds-drug" className="font-sans text-[12.5px] font-medium text-ink">
                   Name (optional)
                 </label>
                 <NameSearch id="ds-drug" value={m.drug} pcid={m.pcid} placeholder="Search by generic or brand name" onChange={(drug, pcid) => patch({ drug, pcid })} />
@@ -329,12 +329,12 @@ export default function DaysSupply() {
                 </select>
               </Field>
               <div className="grid min-w-0 content-start gap-1">
-                <span className="font-sans text-[12.5px] font-medium text-mint-900">How many</span>
+                <span className="font-sans text-[12.5px] font-medium text-ink">How many</span>
                 <div className="flex min-w-0 items-center gap-2">
                   <NumberInput label="Quantity per dose" value={m.qty} step={step} onChange={qty => patch({ qty })} />
                   {m.range && (
                     <>
-                      <span className="shrink-0 font-sans text-[13px] text-neutral-600">to</span>
+                      <span className="shrink-0 font-sans text-[13px] text-ink">to</span>
                       <NumberInput label="Upper quantity per dose" value={m.qtyMax} step={step} onChange={qtyMax => patch({ qtyMax })} />
                     </>
                   )}
@@ -377,7 +377,7 @@ export default function DaysSupply() {
                 </select>
               </Field>
               <div className="grid min-w-0 content-start gap-1">
-                <span className="font-sans text-[12.5px] font-medium text-mint-900">Scheduled or as needed</span>
+                <span className="font-sans text-[12.5px] font-medium text-ink">Scheduled or as needed</span>
                 <ChipRadio
                   name="ds-prn"
                   label="Scheduled or as needed"
@@ -420,7 +420,7 @@ export default function DaysSupply() {
             />
             {mode === 'quantity' ? (
               <div className="grid gap-2">
-                <span className="font-sans text-[12.5px] font-medium text-mint-900">Number of days</span>
+                <span className="font-sans text-[12.5px] font-medium text-ink">Number of days</span>
                 <ChipRadio name="ds-days" label="Number of days" value={(PRESETS as readonly string[]).includes(target) ? target : ''} options={PRESETS.map(p => [p, p] as const)} onChange={setTarget} />
                 <div className="max-w-[10rem]">
                   <NumberInput label="Number of days" value={target} step="1" onChange={setTarget} />
@@ -451,21 +451,21 @@ export default function DaysSupply() {
             {columns.length ? (
               <Results columns={columns} fill={fill} threshold={thresholdN} onCopy={copy} />
             ) : (
-              <p className="rounded-lg border border-marigold-300 bg-marigold-100 px-3.5 py-2.5 font-sans text-[14px] text-marigold-900">
+              <p className="rounded-lg border border-marigold-300 bg-marigold-100 px-3.5 py-2.5 font-sans text-[14px] text-ink">
                 Still needed: {missing.join(', ')}.
               </p>
             )}
-            {notice && <p className="font-sans text-[13px] text-mint-800">{notice}</p>}
+            {notice && <p className="font-sans text-[13px] text-ink">{notice}</p>}
           </section>
         </div>
       </div>
 
-      <p className="mt-12 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-neutral-600">
+      <p className="mt-12 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-ink">
         Nothing entered here is saved or sent anywhere. This tool does arithmetic on what you enter; it does not know a specific product’s package, a payer’s rules,
         or a state’s limits. Check the package and the plan before you dispense. Design notes are in the project’s{' '}
         <a
           href="https://github.com/JoshuaSemock/pharmacycommons.org/blob/main/docs/days-supply.md"
-          className="text-mint-800 underline decoration-mint-300 underline-offset-2 hover:decoration-mint-600"
+          className="text-ink underline decoration-mint-300 underline-offset-2 hover:decoration-mint-600"
         >
           days supply document
         </a>
@@ -564,7 +564,7 @@ function PackageFields({
       return (
         <div className="grid gap-3">
           {penOrVial}
-          <p className="font-sans text-[12.5px] text-neutral-600">Starting values are typical for U-100 insulin. Change them to match the product.</p>
+          <p className="font-sans text-[12.5px] text-ink">Starting values are typical for U-100 insulin. Change them to match the product.</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label={`Units per ${p.container}`}>
               <NumberInput value={p.unitsPer} step="1" onChange={unitsPer => patchPack({ unitsPer })} />
@@ -593,6 +593,6 @@ function PackageFields({
         </div>
       )
     default:
-      return <p className="font-sans text-[14px] text-neutral-700">Choose a form above.</p>
+      return <p className="font-sans text-[14px] text-ink">Choose a form above.</p>
   }
 }

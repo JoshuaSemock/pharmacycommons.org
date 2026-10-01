@@ -34,7 +34,7 @@ export default function Resources() {
       contentKey={`resources:${groups.length}`}
     >
       <section className="border-t border-sage-200 py-8">
-        <p className="font-sans text-[14.5px] leading-relaxed text-sage-700">
+        <p className="font-sans text-[14.5px] leading-relaxed text-ink">
           These sites are run by others and change without notice. Our own sources and how to cite them are on{' '}
           <Link to="/references" className={linkClass}>
             References
@@ -44,13 +44,13 @@ export default function Resources() {
       </section>
 
       {failed && (
-        <p role="alert" className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-rose-700">
+        <p role="alert" className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-ink">
           The resource list could not be loaded. Refresh the page to try again.
         </p>
       )}
 
       {!rows && !failed && (
-        <p className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-sage-600" aria-live="polite">
+        <p className="border-t border-sage-200 py-8 font-sans text-[14.5px] text-ink" aria-live="polite">
           Loading resources…
         </p>
       )}
@@ -59,13 +59,13 @@ export default function Resources() {
         <section key={group.id} className="border-t border-sage-200 py-8">
           <h2
             id={group.id}
-            className="mb-2 font-display text-[21px] font-semibold text-sage-900"
+            className="mb-2 font-display text-[21px] font-semibold text-ink"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {group.heading}
           </h2>
           {INTROS[group.heading] && (
-            <p className="mb-5 font-sans text-[14.5px] leading-relaxed text-sage-600">{INTROS[group.heading]}</p>
+            <p className="mb-5 font-sans text-[14.5px] leading-relaxed text-ink">{INTROS[group.heading]}</p>
           )}
           <ul className="space-y-5">
             {group.items.map(link => (
@@ -78,12 +78,12 @@ export default function Resources() {
       <section className="border-t border-sage-200 py-8">
         <h2
           id="suggest-a-link"
-          className="mb-3 font-display text-[21px] font-semibold text-sage-900"
+          className="mb-3 font-display text-[21px] font-semibold text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Suggest a link
         </h2>
-        <p className="font-sans text-[14.5px] leading-relaxed text-sage-700">
+        <p className="font-sans text-[14.5px] leading-relaxed text-ink">
           Know a free, well-maintained resource that belongs here, or a link that has moved? Write to{' '}
           <a
             href="mailto:contact@pharmacycommons.org?subject=Resources%20suggestion"
@@ -107,28 +107,28 @@ function LinkItem({ link }: { link: ReferenceResource }) {
           href={link.href}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-sage-900 underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-ink underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
         >
           {link.name}
         </a>
         {badges.map(badge => (
           <span
             key={badge}
-            className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-[10px] text-sage-600"
+            className="rounded border border-sage-200 bg-sage-100 px-1.5 py-0.5 font-mono text-[10px] text-ink"
           >
             {badge}
           </span>
         ))}
       </div>
       {link.organization && (
-        <p className="mt-0.5 break-words font-sans text-[12.5px] text-sage-600">{link.organization}</p>
+        <p className="mt-0.5 break-words font-sans text-[12.5px] text-ink">{link.organization}</p>
       )}
       {link.description && (
-        <p className="mt-1 break-words font-sans text-[14px] leading-relaxed text-sage-600">{link.description}</p>
+        <p className="mt-1 break-words font-sans text-[14px] leading-relaxed text-ink">{link.description}</p>
       )}
     </li>
   )
 }
 
 const linkClass =
-  'text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
+  'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'

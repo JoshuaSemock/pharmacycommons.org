@@ -69,19 +69,19 @@ export default function ClassPage() {
   }, [cls])
 
   if (loading) {
-    return <div className="flex justify-center py-32 font-sans text-sage-600">Loading…</div>
+    return <div className="flex justify-center py-32 font-sans text-ink">Loading…</div>
   }
 
   if (error || !cls) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
         <p
-          className="mb-2 font-display text-xl text-sage-700"
+          className="mb-2 font-display text-xl text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {error || 'Class not found'}
         </p>
-        <Link to="/classes" className="font-sans text-sm text-aqua-700 hover:underline">
+        <Link to="/classes" className="font-sans text-sm text-ink hover:underline">
           Browse all drug classes
         </Link>
       </div>
@@ -115,15 +115,15 @@ function ClassHeader({ cls }: { cls: ClassDetail }) {
     <div className="max-w-4xl">
       <nav
         aria-label="Class hierarchy"
-        className="mb-5 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-sans text-[13px] text-sage-600"
+        className="mb-5 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-sans text-[13px] text-ink"
       >
-        <Link to={`/classes?type=${cls.class_type}`} className="transition-colors hover:text-sage-900">
+        <Link to={`/classes?type=${cls.class_type}`} className="transition-colors">
           Classes
         </Link>
         {cls.ancestors.map(a => (
           <span key={a.slug} className="flex items-center gap-1.5">
             <span aria-hidden="true">/</span>
-            <Link to={`/classes/${a.slug}`} className="transition-colors hover:text-sage-900" title={a.name}>
+            <Link to={`/classes/${a.slug}`} className="transition-colors" title={a.name}>
               {a.source_code ? (
                 <>
                   <span className="font-mono text-[12px]">{a.source_code}</span>
@@ -136,24 +136,24 @@ function ClassHeader({ cls }: { cls: ClassDetail }) {
           </span>
         ))}
         <span aria-hidden="true">/</span>
-        <span className="font-medium text-sage-900" aria-current="page">
+        <span className="font-medium text-ink" aria-current="page">
           {cls.source_code ?? cls.name}
         </span>
       </nav>
 
-      <span className="inline-block rounded-md border border-aqua-200 bg-aqua-100 px-2 py-0.5 font-mono text-[11.5px] font-medium text-aqua-700">
+      <span className="inline-block rounded-md border border-aqua-200 bg-aqua-100 px-2 py-0.5 font-mono text-[11.5px] font-medium text-ink">
         {classBadgeText(cls.class_type_label, cls.source_code)}
       </span>
 
       <h1
-        className="mt-3 font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-sage-900 sm:text-[2.618rem]"
+        className="mt-3 font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-ink sm:text-[2.618rem]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {cls.name}
       </h1>
 
       {cls.description && (
-        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-sage-600">
+        <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-ink">
           {cls.description}
         </p>
       )}
@@ -180,7 +180,7 @@ function ClassFacts({ cls, directCount }: { cls: ClassDetail; directCount: numbe
         <Fact label="Drugs">
           {cls.member_count.toLocaleString()}
           {inherited > 0 && (
-            <span className="block text-[12px] text-sage-600">
+            <span className="block text-[12px] text-ink">
               {directCount.toLocaleString()} direct, {inherited.toLocaleString()} via sub-classes
             </span>
           )}
@@ -194,8 +194,8 @@ function ClassFacts({ cls, directCount }: { cls: ClassDetail; directCount: numbe
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <dt className="text-[12px] text-sage-600">{label}</dt>
-      <dd className="text-sage-900">{children}</dd>
+      <dt className="text-[12px] text-ink">{label}</dt>
+      <dd className="text-ink">{children}</dd>
     </div>
   )
 }
@@ -214,10 +214,10 @@ function SubClasses({ cls }: { cls: ClassDetail }) {
               className="flex items-baseline gap-3 px-4 py-2.5 transition-colors hover:bg-sage-50"
             >
               {c.source_code && (
-                <span className="w-20 shrink-0 font-mono text-[12px] text-sage-600">{c.source_code}</span>
+                <span className="w-20 shrink-0 font-mono text-[12px] text-ink">{c.source_code}</span>
               )}
-              <span className="min-w-0 flex-1 font-sans text-[14px] text-sage-900">{c.name}</span>
-              <span className="shrink-0 font-mono text-[11.5px] text-sage-600" title={`${c.member_count} drugs`}>
+              <span className="min-w-0 flex-1 font-sans text-[14px] text-ink">{c.name}</span>
+              <span className="shrink-0 font-mono text-[11.5px] text-ink" title={`${c.member_count} drugs`}>
                 {c.member_count.toLocaleString()}
               </span>
             </Link>
@@ -253,18 +253,18 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
     <section className="border-t border-sage-200 py-9">
       <SectionHeading>
         Drugs in this class
-        <span className="ml-2 font-mono text-[13px] font-normal text-sage-600">
+        <span className="ml-2 font-mono text-[13px] font-normal text-ink">
           {cls.members.length.toLocaleString()}
         </span>
       </SectionHeading>
 
       {cls.members.length === 0 ? (
-        <p className="font-sans text-[15px] text-sage-600">No drugs are linked to this class yet.</p>
+        <p className="font-sans text-[15px] text-ink">No drugs are linked to this class yet.</p>
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-3">
             <div className="flex min-w-[14rem] max-w-sm flex-1 items-center gap-2 rounded-lg border border-sage-200 bg-white px-3 py-1.5 transition-all focus-within:border-aqua-400 focus-within:ring-2 focus-within:ring-aqua-200">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
                 <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
@@ -274,13 +274,13 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
                 onChange={e => setFilter(e.target.value)}
                 placeholder="Filter drugs in this class"
                 aria-label="Filter drugs in this class"
-                className="flex-1 bg-transparent font-sans text-[13.5px] text-sage-900 placeholder-sage-400 outline-none"
+                className="flex-1 bg-transparent font-sans text-[13.5px] text-ink placeholder:text-ink outline-none"
               />
               {filter && (
                 <button
                   type="button"
                   onClick={() => setFilter('')}
-                  className="text-sage-400 hover:text-sage-600"
+                  className="text-ink"
                   aria-label="Clear filter"
                 >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -291,7 +291,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
             </div>
 
             {mixed && (
-              <label className="flex items-center gap-2 font-sans text-[13px] text-sage-700">
+              <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
                 <input
                   type="checkbox"
                   checked={directOnly}
@@ -304,7 +304,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
           </div>
 
           {hasInherited && (
-            <p className="mb-4 font-sans text-[13px] leading-relaxed text-sage-600">
+            <p className="mb-4 font-sans text-[13px] leading-relaxed text-ink">
               {directCount === 0
                 ? 'Every drug here is filed under one of the sub-classes above.'
                 : 'Drugs with a dashed outline are filed under a sub-class, not this class directly.'}
@@ -312,8 +312,8 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
           )}
 
           {filtered.length === 0 ? (
-            <p className="py-6 font-sans text-[14px] text-sage-600">
-              No drugs in this class match <span className="font-medium text-sage-900">{filter}</span>.
+            <p className="py-6 font-sans text-[14px] text-ink">
+              No drugs in this class match <span className="font-medium text-ink">{filter}</span>.
             </p>
           ) : (
             <ul className="grid gap-2 sm:grid-cols-2">
@@ -328,11 +328,11 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
               <button
                 type="button"
                 onClick={() => setLimit(l => l + MEMBER_PAGE)}
-                className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
+                className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
               >
                 Show {Math.min(MEMBER_PAGE, filtered.length - visible.length).toLocaleString()} more
               </button>
-              <span className="font-mono text-[11.5px] text-sage-600">
+              <span className="font-mono text-[11.5px] text-ink">
                 {(filtered.length - visible.length).toLocaleString()} left
               </span>
             </div>
@@ -355,13 +355,13 @@ function MemberLink({ member }: { member: ClassMember }) {
       >
         <span
           className={`min-w-0 break-words font-sans text-[14px] font-medium leading-snug ${
-            member.is_direct ? 'text-sage-900' : 'text-sage-700'
+            member.is_direct ? 'text-ink' : 'text-ink'
           }`}
         >
           {formatDrugName(member.name)}
         </span>
         {!member.is_direct && (
-          <span className="shrink-0 font-sans text-[11px] text-sage-600">via sub-class</span>
+          <span className="shrink-0 font-sans text-[11px] text-ink">via sub-class</span>
         )}
       </Link>
     </li>
@@ -371,7 +371,7 @@ function MemberLink({ member }: { member: ClassMember }) {
 function SectionHeading({ children }: { children: ReactNode }) {
   return (
     <h2
-      className="mb-4 font-display text-[22px] font-semibold leading-snug text-sage-900"
+      className="mb-4 font-display text-[22px] font-semibold leading-snug text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}

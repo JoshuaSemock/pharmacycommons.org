@@ -178,7 +178,7 @@ export default function MedicationReconciliation() {
     <main data-print-page className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="grid gap-5 pt-10 pb-8 sm:pt-14 print:hidden">
         <div>
-          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-sage-600 transition-colors hover:text-sage-900">
+          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors">
             All tools
           </Link>
           <PageTitle
@@ -187,7 +187,7 @@ export default function MedicationReconciliation() {
           />
         </div>
 
-        <p className="flex max-w-[48rem] gap-2.5 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] leading-relaxed text-sky-900">
+        <p className="flex max-w-[48rem] gap-2.5 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] leading-relaxed text-ink">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="mt-0.5 shrink-0">
             <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
           </svg>
@@ -220,7 +220,7 @@ export default function MedicationReconciliation() {
             Print or save as PDF
           </button>
           {confirmClear ? (
-            <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-rose-900">
+            <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-ink">
               Clear the whole list?
               <button type="button" className={dangerQuietButton} onClick={clearAll}>
                 Yes, clear it
@@ -243,7 +243,7 @@ export default function MedicationReconciliation() {
 
         <div aria-live="polite" className="grid gap-2 empty:hidden">
           {state.example && (
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] text-sky-900">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-2.5 font-sans text-[14px] text-ink">
               <span>
                 <b className="font-semibold">Example list.</b> These entries show how the tool works. They are not a real person's medications.
               </span>
@@ -255,7 +255,7 @@ export default function MedicationReconciliation() {
           {notice && (
             <p
               className={`rounded-lg border px-3.5 py-2.5 font-sans text-[14px] ${
-                notice.tone === 'ok' ? 'border-mint-200 bg-mint-50 text-mint-900' : 'border-marigold-300 bg-marigold-100 text-marigold-900'
+                notice.tone === 'ok' ? 'border-mint-200 bg-mint-50 text-ink' : 'border-marigold-300 bg-marigold-100 text-ink'
               }`}
             >
               {notice.text}
@@ -270,9 +270,9 @@ export default function MedicationReconciliation() {
             ['substances', 'Substance use', null],
             ['printable', 'Printable list', null],
           ].map(([id, label, n]) => (
-            <a key={String(id)} href={`#${id}`} className="text-mint-800 hover:text-hepatica-700 hover:underline">
+            <a key={String(id)} href={`#${id}`} className="text-ink hover:underline">
               {label}
-              {n != null && <span className="ml-1 font-mono text-[11.5px] text-neutral-500">{n}</span>}
+              {n != null && <span className="ml-1 font-mono text-[11.5px] text-ink">{n}</span>}
             </a>
           ))}
         </nav>
@@ -296,10 +296,10 @@ export default function MedicationReconciliation() {
           </div>
           {flags.length ? (
             <div className="grid gap-2 rounded-xl border border-mint-200 bg-white/80 p-4">
-              <p className="font-sans font-medium text-[12.5px] text-mint-800">Check before you finish · {flags.length}</p>
+              <p className="font-sans font-medium text-[12.5px] text-ink">Check before you finish · {flags.length}</p>
               <ul className="grid gap-1.5">
                 {flags.map((f, i) => (
-                  <li key={i} className="flex items-baseline gap-2.5 font-sans text-[14px] text-mint-950">
+                  <li key={i} className="flex items-baseline gap-2.5 font-sans text-[14px] text-ink">
                     <span aria-hidden="true" className={`size-2 shrink-0 translate-y-[-1px] rounded-full ${dot[f.tone]}`} />
                     <span>
                       <span className="sr-only">{f.tone === 'warn' ? 'Warning: ' : f.tone === 'caution' ? 'Check: ' : 'Note: '}</span>
@@ -310,7 +310,7 @@ export default function MedicationReconciliation() {
               </ul>
             </div>
           ) : (
-            <p className="rounded-lg border border-mint-200 bg-mint-50 px-3.5 py-2.5 font-sans text-[14px] text-mint-900">
+            <p className="rounded-lg border border-mint-200 bg-mint-50 px-3.5 py-2.5 font-sans text-[14px] text-ink">
               Nothing to review. Every entry has a strength and a reason for use, and allergies are recorded.
             </p>
           )}
@@ -362,7 +362,7 @@ export default function MedicationReconciliation() {
         <PrintableList state={state} prepared={today()} />
       </section>
 
-      <p className="mt-10 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-neutral-600 print:hidden">
+      <p className="mt-10 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-ink print:hidden">
         This tool helps organize information. It is not a medical record and does not replace review by a pharmacist or prescriber. Linked names go to the
         matching Pharmacy Commons record; names typed without a match are kept exactly as entered.
       </p>

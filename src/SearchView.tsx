@@ -181,18 +181,18 @@ export default function SearchView() {
       {/* Page header and filter */}
       <section className="pt-10 pb-8 sm:pt-14">
         <h1
-          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-sage-900 sm:text-[2.618rem]"
+          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-ink sm:text-[2.618rem]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Browse the catalog
         </h1>
-        <p className="mt-4 max-w-[42rem] font-sans text-[16px] leading-relaxed text-pretty text-sage-600">
+        <p className="mt-4 max-w-[42rem] font-sans text-[16px] leading-relaxed text-pretty text-ink">
           Every drug in the Commons, from A onward. Search by name, brand, combination or drug class, or jump to a letter.
         </p>
 
         <div className="mt-6 max-w-lg">
           <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-2.5 shadow-sm shadow-sage-900/5 focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200 transition-all">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
@@ -202,11 +202,11 @@ export default function SearchView() {
               onChange={e => setQuery(e.target.value)}
               placeholder="e.g. metformin, Glucophage, metformin/sitagliptin, SSRI"
               aria-label="Filter the catalog"
-              className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
+              className="flex-1 bg-transparent font-sans text-[14px] text-ink placeholder:text-ink outline-none"
               autoFocus={!!query && FINE_POINTER}
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-sage-400 hover:text-sage-600" aria-label="Clear search">
+              <button onClick={() => setQuery('')} className="text-ink" aria-label="Clear search">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
@@ -228,16 +228,16 @@ export default function SearchView() {
       {/* Results */}
       <section className="pt-6">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
-          <h2 className="font-sans text-[13px] text-sage-600">
+          <h2 className="font-sans text-[13px] text-ink">
             {searching
-              ? <>Matches for <span className="font-medium text-sage-900">{query}</span></>
+              ? <>Matches for <span className="font-medium text-ink">{query}</span></>
               : confined && bucket
-                ? <>Drugs filed under <span className="font-medium text-sage-900">{bucketLabel(bucket)}</span></>
+                ? <>Drugs filed under <span className="font-medium text-ink">{bucketLabel(bucket)}</span></>
                 : bucket
-                  ? <>The catalog from <span className="font-medium text-sage-900">{bucketLabel(bucket)}</span> onward</>
+                  ? <>The catalog from <span className="font-medium text-ink">{bucketLabel(bucket)}</span> onward</>
                   : 'The full catalog, A onward'}
             {ready && total > 0 && (
-              <span className="ml-2 font-mono text-[12px] text-sage-400">
+              <span className="ml-2 font-mono text-[12px] text-ink">
                 {(start + 1).toLocaleString()}–{(start + entries.length).toLocaleString()} of {total.toLocaleString()}
               </span>
             )}
@@ -262,18 +262,18 @@ export default function SearchView() {
                 </div>
               )}
 
-              <label className="flex items-center gap-2 font-sans text-[12.5px] text-sage-600">
+              <label className="flex items-center gap-2 font-sans text-[12.5px] text-ink">
                 Show
                 <select
                   value={per}
                   onChange={e => patch({ per: e.target.value })}
-                  className="rounded-lg border border-sage-200 bg-white px-2 py-1 font-mono text-[12px] text-sage-900 outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
+                  className="rounded-lg border border-sage-200 bg-white px-2 py-1 font-mono text-[12px] text-ink outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
                 >
                   {PAGE_SIZES.map(n => (
                     <option key={n} value={n}>{pageLabel(n)}</option>
                   ))}
                 </select>
-                {per !== 0 && <span className="text-sage-400">at a time</span>}
+                {per !== 0 && <span className="text-ink">at a time</span>}
               </label>
             </div>
           )}
@@ -281,21 +281,21 @@ export default function SearchView() {
 
         {failed ? (
           <div className="py-16 text-center">
-            <p className="font-sans text-sage-700">The catalog didn’t load.</p>
-            <button onClick={() => window.location.reload()} className="mt-2 font-sans text-[13px] text-aqua-700 hover:underline">
+            <p className="font-sans text-ink">The catalog didn’t load.</p>
+            <button onClick={() => window.location.reload()} className="mt-2 font-sans text-[13px] text-ink hover:underline">
               Reload the page
             </button>
           </div>
         ) : !ready ? (
           <div className="py-16 text-center">
-            <p className="font-sans text-sage-600">Loading the catalog…</p>
+            <p className="font-sans text-ink">Loading the catalog…</p>
           </div>
         ) : total === 0 && classMatches.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="font-sans text-sage-600">
-              Nothing in the catalog matches <span className="font-medium text-sage-900">{query}</span>.
+            <p className="font-sans text-ink">
+              Nothing in the catalog matches <span className="font-medium text-ink">{query}</span>.
             </p>
-            <button onClick={() => setQuery('')} className="mt-2 font-sans text-[13px] text-aqua-700 hover:underline">
+            <button onClick={() => setQuery('')} className="mt-2 font-sans text-[13px] text-ink hover:underline">
               Browse every drug instead
             </button>
           </div>
@@ -306,7 +306,7 @@ export default function SearchView() {
             ))}
 
             {total > 0 && classMatches.length > 0 && (
-              <h3 className="mb-3 font-sans text-[13px] text-sage-600">Drugs matching by name or brand</h3>
+              <h3 className="mb-3 font-sans text-[13px] text-ink">Drugs matching by name or brand</h3>
             )}
 
             {total > 0 && groups.map(g => (
@@ -314,16 +314,16 @@ export default function SearchView() {
                 {g.def && (
                   <div id={`bucket-${bucketToParam(g.key)}`} className="mb-3 flex items-baseline gap-3 scroll-mt-[calc(var(--nav-h,5.75rem)_+_3rem)]">
                     <span
-                      className="font-display text-[26px] font-semibold leading-none text-sage-300"
+                      className="font-display text-[26px] font-semibold leading-none text-ink"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       {g.def.label}
                     </span>
                     {(g.def.kind === 'greek' || g.def.kind === 'symbol') && (
-                      <span className="font-sans text-[12px] text-sage-400">{g.def.name}</span>
+                      <span className="font-sans text-[12px] text-ink">{g.def.name}</span>
                     )}
                     <span className="h-px flex-1 self-center bg-sage-200" />
-                    <span className="font-mono text-[11px] text-sage-400">
+                    <span className="font-mono text-[11px] text-ink">
                       {counts ? (counts[g.key] ?? 0).toLocaleString() : ''}
                     </span>
                   </div>
@@ -340,11 +340,11 @@ export default function SearchView() {
               <div className="mt-8 flex flex-col items-center gap-2">
                 <button
                   onClick={() => setLimit(l => l + pageSize)}
-                  className="rounded-lg bg-aqua-600 px-6 py-2.5 font-sans text-[13px] font-medium text-white hover:bg-aqua-700 transition-colors"
+                  className="rounded-lg bg-aqua-100 px-6 py-2.5 font-sans text-[13px] font-medium text-ink hover:bg-aqua-200 transition-colors"
                 >
                   Load {Math.min(per || remaining, remaining).toLocaleString()} more
                 </button>
-                <span className="font-mono text-[11px] text-sage-400">
+                <span className="font-mono text-[11px] text-ink">
                   {remaining.toLocaleString()} left
                 </span>
               </div>
@@ -397,7 +397,7 @@ function CharacterIndex({
           onClick={() => onSelect(null)}
           aria-pressed={!active}
           className={`shrink-0 rounded px-2 py-1 font-sans text-[12px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600 ${
-            !active ? 'text-sage-900 font-medium' : 'text-sage-600 hover:text-sage-900'
+            !active ? 'text-ink font-medium' : 'text-ink'
           }`}
         >
           All
@@ -421,10 +421,10 @@ function CharacterIndex({
                 title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
                 className={`rounded px-[7px] py-1 font-mono text-[13px] leading-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600 ${
                   !n
-                    ? 'cursor-default text-sage-300'
+                    ? 'cursor-default text-ink'
                     : isActive
-                      ? 'bg-aqua-600 font-medium text-white'
-                      : 'text-sage-700 hover:bg-sage-100 hover:text-sage-900'
+                      ? 'bg-aqua-200 font-medium text-ink'
+                      : 'text-ink hover:bg-sage-100'
                 }`}
               >
                 {b.label}
@@ -448,7 +448,7 @@ function ScopeButton({
       title={title}
       aria-pressed={active}
       className={`rounded-[6px] px-2.5 py-1 font-sans text-[12px] transition-colors ${
-        active ? 'bg-sage-100 font-medium text-sage-900' : 'text-sage-600 hover:text-sage-900'
+        active ? 'bg-sage-100 font-medium text-ink' : 'text-ink'
       }`}
     >
       {label}
@@ -475,29 +475,29 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
       className="group rounded-xl border border-sage-200 bg-white p-4 text-left transition-all hover:border-sage-300 hover:shadow-md hover:shadow-sage-900/5 hover:-translate-y-0.5"
     >
       <div className="mb-3 flex items-start gap-2">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sage-100 font-mono text-[11px] font-medium text-sage-600">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sage-100 font-mono text-[11px] font-medium text-ink">
           {monogram}
         </span>
         <div className="min-w-0">
-          <h3 className="font-display font-semibold text-sage-900 group-hover:text-aqua-700 transition-colors" style={{ fontFamily: 'var(--font-display)', fontSize: '16px', lineHeight: 1.25 }}>
+          <h3 className="font-display font-semibold text-ink transition-colors" style={{ fontFamily: 'var(--font-display)', fontSize: '16px', lineHeight: 1.25 }}>
             {title}
           </h3>
-          <p className="truncate font-sans text-[11px] text-sage-600" title={otherBrands.join(', ') || undefined}>
+          <p className="truncate font-sans text-[11px] text-ink" title={otherBrands.join(', ') || undefined}>
             {subtitle}
           </p>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-sage-100 pt-2.5">
-        <span className="font-mono text-[10.5px] text-sage-400">{pcidOf(entry)}</span>
+        <span className="font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
         <span className="flex items-center gap-1.5">
           {entry.stub === 1 && (
-            <span className="rounded-md border border-sage-200 bg-sage-50 px-2 py-0.5 font-sans text-[10px] text-sage-600">
+            <span className="rounded-md border border-sage-200 bg-sage-50 px-2 py-0.5 font-sans text-[10px] text-ink">
               Needs an editor
             </span>
           )}
           {drug.schedule && (
-            <span className="rounded-md border border-coral-200 bg-coral-100 px-2 py-0.5 font-mono text-[10px] font-medium text-coral-600">
+            <span className="rounded-md border border-coral-200 bg-coral-100 px-2 py-0.5 font-mono text-[10px] font-medium text-ink">
               {drug.schedule}
             </span>
           )}
@@ -525,20 +525,20 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
   return (
     <section className="mb-10 min-w-0" aria-label={`Drug class: ${hit.name}`}>
       <div className="mb-3 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="font-sans text-[12px] text-sage-600">Drug class</span>
+        <span className="font-sans text-[12px] text-ink">Drug class</span>
         <h3
-          className="min-w-0 break-words font-display text-[20px] font-semibold leading-tight text-sage-900"
+          className="min-w-0 break-words font-display text-[20px] font-semibold leading-tight text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {hit.name}
         </h3>
-        <span className="font-sans text-[12px] text-sage-600">
+        <span className="font-sans text-[12px] text-ink">
           {hit.class_type_label}
-          {hit.source_code && <span className="font-mono text-[11px] text-sage-400"> · {hit.source_code}</span>}
+          {hit.source_code && <span className="font-mono text-[11px] text-ink"> · {hit.source_code}</span>}
           {' · '}
           {members.length} {members.length === 1 ? 'drug' : 'drugs'}
         </span>
-        <Link to={`/classes/${hit.slug}`} className="font-sans text-[12.5px] text-aqua-700 hover:underline">
+        <Link to={`/classes/${hit.slug}`} className="font-sans text-[12.5px] text-ink hover:underline">
           Open class page
         </Link>
       </div>
@@ -550,7 +550,7 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
       {members.length > CLASS_PREVIEW && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="mt-3 font-sans text-[13px] font-medium text-aqua-700 hover:underline"
+          className="mt-3 font-sans text-[13px] font-medium text-ink hover:underline"
         >
           {showAll ? 'Show fewer' : `Show all ${members.length} drugs in this class`}
         </button>
@@ -564,8 +564,8 @@ function DataSource({ icon, label, desc }: { icon: string; label: string; desc: 
     <div className="flex gap-3">
       <span className="text-xl leading-none mt-0.5">{icon}</span>
       <div className="min-w-0">
-        <p className="font-sans text-[13px] font-medium text-sage-800">{label}</p>
-        <p className="font-sans text-[12px] text-sage-600 leading-relaxed">{desc}</p>
+        <p className="font-sans text-[13px] font-medium text-ink">{label}</p>
+        <p className="font-sans text-[12px] text-ink leading-relaxed">{desc}</p>
       </div>
     </div>
   )

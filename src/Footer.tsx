@@ -23,12 +23,12 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t border-sage-200">
       <div className="mx-auto max-w-page space-y-4 px-4 py-8 font-sans text-[13px] leading-relaxed sm:px-6">
-        <p className="text-sage-700">
+        <p className="text-ink">
           For education only, not medical advice. Ask your pharmacist or prescriber before changing
           any medication.
         </p>
 
-        <ul aria-label="Crisis lines (US)" className="flex flex-wrap gap-x-6 gap-y-1 text-sage-900">
+        <ul aria-label="Crisis lines (US)" className="flex flex-wrap gap-x-6 gap-y-1 text-ink">
           <li>
             Emergency: <a href="tel:911" className={strongLink}>911</a>
           </li>
@@ -52,7 +52,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <div className="flex flex-col gap-3 border-t border-sage-200 pt-4 text-[12px] text-sage-600 sm:flex-row sm:items-baseline sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-sage-200 pt-4 text-[12px] text-ink sm:flex-row sm:items-baseline sm:justify-between">
           <p>
             © {YEAR} Pharmacy Commons · Code{' '}
             <a href={`${REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={link}>
@@ -93,6 +93,6 @@ export default function Footer() {
 const focus =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
 
-const link = `whitespace-nowrap text-sage-700 underline decoration-sage-300 underline-offset-2 transition-colors hover:text-sage-900 hover:decoration-aqua-600 ${focus}`
+const link = `whitespace-nowrap text-ink underline decoration-sage-300 underline-offset-2 transition-colors hover:decoration-aqua-600 ${focus}`
 
-const strongLink = `whitespace-nowrap font-medium text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 ${focus}`
+const strongLink = `whitespace-nowrap font-medium text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 ${focus}`

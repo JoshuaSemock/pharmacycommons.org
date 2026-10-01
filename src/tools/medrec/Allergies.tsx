@@ -35,14 +35,14 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
         }
       />
 
-      <label className="flex cursor-pointer items-start gap-2 font-sans text-[14px] text-mint-950">
+      <label className="flex cursor-pointer items-start gap-2 font-sans text-[14px] text-ink">
         <input type="checkbox" checked={nkda} onChange={e => onNkda(e.target.checked)} className="mt-1 accent-mint-700" />
         <span>
           <b className="font-semibold">No known drug allergies.</b> Checking this records that the question was asked.
         </span>
       </label>
 
-      {allergies.length === 0 && !nkda && <p className="font-sans text-[14px] italic text-neutral-600">No allergies listed.</p>}
+      {allergies.length === 0 && !nkda && <p className="font-sans text-[14px] italic text-ink">No allergies listed.</p>}
 
       {allergies.map(a => {
         const level = allergyLevel(a)
@@ -56,7 +56,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <h3
-                  className="font-display font-semibold text-mint-950"
+                  className="font-display font-semibold text-ink"
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: '18px',
@@ -71,7 +71,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
                 type="button"
                 onClick={() => onRemove(a.id)}
                 aria-label={`Remove ${a.substance || 'allergy'}`}
-                className="rounded p-1.5 text-neutral-500 hover:bg-rose-50 hover:text-rose-700"
+                className="rounded p-1.5 text-ink hover:bg-rose-50"
               >
                 <RemoveIcon />
               </button>
@@ -79,7 +79,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,0.8fr)]">
               <div className="grid min-w-0 content-start gap-1">
-                <label htmlFor={`${p}-substance`} className="font-sans text-[12.5px] font-medium text-mint-900">
+                <label htmlFor={`${p}-substance`} className="font-sans text-[12.5px] font-medium text-ink">
                   Allergy to what?
                 </label>
                 <NameSearch

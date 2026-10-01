@@ -6,7 +6,8 @@
  * - A "PCID-…" string loads that record in the console; a URL opens in a new tab.
  * - Long arrays show their first 50 items, with a button for the rest.
  *
- * Colors are the site palette on a dark code surface (see CODE_SURFACE).
+ * All text is ink (neutral-50 on the dark code surface, see CODE_SURFACE and
+ * .pc-code in src/index.css); JSON is no longer color-coded.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -51,19 +52,19 @@ function Key({ name, path, onCopyPath }: { name: string | number; path: (string 
         type="button"
         title={`Copy path ${jsonPath(path)}`}
         onClick={() => onCopyPath?.(jsonPath(path))}
-        className="rounded-sm text-hepatica-300 hover:bg-white/10 hover:text-hepatica-200 focus-visible:outline-1 focus-visible:outline-hepatica-300"
+        className="rounded-sm text-ink hover:bg-white/10 focus-visible:outline-1 focus-visible:outline-hepatica-300"
       >
         "{name}"
       </button>
-      <span className="text-neutral-400">: </span>
+      <span className="text-ink">: </span>
     </>
   )
 }
 
 function Scalar({ value, onPcid }: { value: unknown; onPcid?: (p: string) => void }) {
-  if (value === null) return <span className="text-sky-300">null</span>
-  if (typeof value === 'boolean') return <span className="text-sky-300">{String(value)}</span>
-  if (typeof value === 'number') return <span className="text-salmon-300">{String(value)}</span>
+  if (value === null) return <span className="text-ink">null</span>
+  if (typeof value === 'boolean') return <span className="text-ink">{String(value)}</span>
+  if (typeof value === 'number') return <span className="text-ink">{String(value)}</span>
   const s = String(value)
   if (PCID_RE.test(s) && onPcid) {
     return (
@@ -71,7 +72,7 @@ function Scalar({ value, onPcid }: { value: unknown; onPcid?: (p: string) => voi
         type="button"
         onClick={() => onPcid(s)}
         title={`Load ${s} in the console`}
-        className="rounded-sm text-mint-300 underline decoration-mint-300/40 underline-offset-2 hover:bg-white/10 hover:decoration-mint-300"
+        className="rounded-sm text-ink underline decoration-mint-300/40 underline-offset-2 hover:bg-white/10 hover:decoration-mint-300"
       >
         "{s}"
       </button>
@@ -79,12 +80,12 @@ function Scalar({ value, onPcid }: { value: unknown; onPcid?: (p: string) => voi
   }
   if (/^https?:\/\/\S+$/.test(s)) {
     return (
-      <a href={s} target="_blank" rel="noreferrer" className="break-all text-mint-300 underline decoration-mint-300/40 underline-offset-2 hover:decoration-mint-300">
+      <a href={s} target="_blank" rel="noreferrer" className="break-all text-ink underline decoration-mint-300/40 underline-offset-2 hover:decoration-mint-300">
         "{s}"
       </a>
     )
   }
-  return <span className="break-words text-mint-200">{JSON.stringify(s)}</span>
+  return <span className="break-words text-ink">{JSON.stringify(s)}</span>
 }
 
 function Node({ name, value, path, depth, openDepth, last, onPcid, onCopyPath }: NodeProps) {
@@ -92,7 +93,7 @@ function Node({ name, value, path, depth, openDepth, last, onPcid, onCopyPath }:
   const isObject = value !== null && typeof value === 'object'
   const [open, setOpen] = useState(depth < openDepth)
   const [showAll, setShowAll] = useState(false)
-  const comma = last ? '' : <span className="text-neutral-500">,</span>
+  const comma = last ? '' : <span className="text-ink">,</span>
   const indent = { paddingLeft: depth === 0 ? 0 : '1.1rem' }
 
   if (!isObject) {
@@ -116,7 +117,7 @@ function Node({ name, value, path, depth, openDepth, last, onPcid, onCopyPath }:
     return (
       <div style={indent} role="treeitem" aria-selected={false}>
         {name !== undefined && <Key name={name} path={path} onCopyPath={onCopyPath} />}
-        <span className="text-neutral-400">{openBr + closeBr}</span>
+        <span className="text-ink">{openBr + closeBr}</span>
         {comma}
       </div>
     )
@@ -128,18 +129,18 @@ function Node({ name, value, path, depth, openDepth, last, onPcid, onCopyPath }:
         type="button"
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Collapse' : 'Expand'}
-        className="-ml-4 mr-0.5 inline-block w-3.5 text-center text-neutral-500 hover:text-neutral-200"
+        className="-ml-4 mr-0.5 inline-block w-3.5 text-center text-ink"
       >
         {open ? '▾' : '▸'}
       </button>
       {name !== undefined && <Key name={name} path={path} onCopyPath={onCopyPath} />}
-      <span className="text-neutral-400">{openBr}</span>
+      <span className="text-ink">{openBr}</span>
       {!open && (
         <>
-          <button type="button" onClick={() => setOpen(true)} className="mx-1 rounded bg-white/10 px-1.5 text-[11px] text-neutral-300 hover:bg-white/20">
+          <button type="button" onClick={() => setOpen(true)} className="mx-1 rounded bg-white/10 px-1.5 text-[11px] text-ink hover:bg-white/20">
             {isArray ? `${count} item${count === 1 ? '' : 's'}` : `${count} field${count === 1 ? '' : 's'}`}
           </button>
-          <span className="text-neutral-400">{closeBr}</span>
+          <span className="text-ink">{closeBr}</span>
           {comma}
         </>
       )}
@@ -161,13 +162,13 @@ function Node({ name, value, path, depth, openDepth, last, onPcid, onCopyPath }:
             ))}
             {isArray && !showAll && count > ARRAY_PAGE && (
               <div style={{ paddingLeft: '1.1rem' }}>
-                <button type="button" onClick={() => setShowAll(true)} className="rounded bg-white/10 px-2 py-0.5 text-[11px] text-neutral-200 hover:bg-white/20">
+                <button type="button" onClick={() => setShowAll(true)} className="rounded bg-white/10 px-2 py-0.5 text-[11px] text-ink hover:bg-white/20">
                   Show {count - ARRAY_PAGE} more
                 </button>
               </div>
             )}
           </div>
-          <span className="text-neutral-400">{closeBr}</span>
+          <span className="text-ink">{closeBr}</span>
           {comma}
         </>
       )}

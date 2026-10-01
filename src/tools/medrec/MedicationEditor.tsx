@@ -47,7 +47,7 @@ type Props = {
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-mint-200 pt-4">
-      <legend className="float-left mb-1 w-full font-sans font-medium text-[12.5px] text-mint-800">{title}</legend>
+      <legend className="float-left mb-1 w-full font-sans font-medium text-[12.5px] text-ink">{title}</legend>
       {children}
     </fieldset>
   )
@@ -75,9 +75,9 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="font-sans font-medium text-[12.5px] text-hepatica-700">Editing</span>
+          <span className="font-sans font-medium text-[12.5px] text-ink">Editing</span>
           <Tag>{CATEGORY_LABEL[m.category]}</Tag>
-          <span className="font-display text-[19px] font-semibold text-mint-950 [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-display)' }}>
+          <span className="font-display text-[19px] font-semibold text-ink [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-display)' }}>
             {medTitle(m)}
           </span>
         </div>
@@ -85,18 +85,18 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
       </div>
 
       <div aria-live="polite" className="grid gap-1.5 rounded-lg border border-mint-200 bg-mint-50 px-4 py-3">
-        <span className="font-sans font-medium text-[12.5px] text-mint-800">Directions</span>
-        <p className="font-display text-[20px] leading-snug text-mint-950 [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-display)' }}>
+        <span className="font-sans font-medium text-[12.5px] text-ink">Directions</span>
+        <p className="font-display text-[20px] leading-snug text-ink [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-display)' }}>
           <SigText segments={sigSegments(m)} />
         </p>
-        <p className="font-sans text-[12.5px] text-neutral-700">Highlighted amounts are calculated from the strength and quantity, so they always agree.</p>
+        <p className="font-sans text-[12.5px] text-ink">Highlighted amounts are calculated from the strength and quantity, so they always agree.</p>
       </div>
 
       <Group title="What it is">
         <ChipRadio name={`${p}-category`} label="Category" value={m.category} options={CATEGORIES} onChange={category => onPatch({ category })} />
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="grid min-w-0 content-start gap-1">
-            <label htmlFor={`${p}-drug`} className="font-sans text-[12.5px] font-medium text-mint-900">
+            <label htmlFor={`${p}-drug`} className="font-sans text-[12.5px] font-medium text-ink">
               Name
             </label>
             <NameSearch
@@ -160,12 +160,12 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
 
           {f.thin ? (
             <div className="grid content-start gap-1">
-              <span className="font-sans text-[12.5px] font-medium text-mint-900">Amount</span>
-              <p className="py-1.5 font-sans text-[13.5px] text-neutral-700">Written as “{f.thin}”, with no count.</p>
+              <span className="font-sans text-[12.5px] font-medium text-ink">Amount</span>
+              <p className="py-1.5 font-sans text-[13.5px] text-ink">Written as “{f.thin}”, with no count.</p>
             </div>
           ) : (
             <div className="grid min-w-0 content-start gap-1">
-              <span className="font-sans text-[12.5px] font-medium text-mint-900">How many</span>
+              <span className="font-sans text-[12.5px] font-medium text-ink">How many</span>
               <div className="flex min-w-0 items-center gap-2">
                 <input
                   aria-label="Quantity"
@@ -179,7 +179,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                 />
                 {m.range && (
                   <>
-                    <span className="shrink-0 font-sans text-[13px] text-neutral-600">to</span>
+                    <span className="shrink-0 font-sans text-[13px] text-ink">to</span>
                     <input
                       aria-label="Upper quantity"
                       type="number"
@@ -193,7 +193,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                   </>
                 )}
               </div>
-              <label className="flex items-center gap-1.5 font-sans text-[12px] text-neutral-700">
+              <label className="flex items-center gap-1.5 font-sans text-[12px] text-ink">
                 <input type="checkbox" checked={m.range} onChange={e => onPatch({ range: e.target.checked })} className="accent-mint-700" />A range, such as one
                 to two
               </label>
@@ -251,7 +251,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)]">
           <div className="grid content-start gap-1">
-            <span className="font-sans text-[12.5px] font-medium text-mint-900">Scheduled or as needed</span>
+            <span className="font-sans text-[12.5px] font-medium text-ink">Scheduled or as needed</span>
             <ChipRadio
               name={`${p}-prn`}
               label="Scheduled or as needed"
@@ -272,7 +272,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
             />
           </Field>
           <div className="grid min-w-0 content-start gap-1">
-            <span className="font-sans text-[12.5px] font-medium text-mint-900">How long</span>
+            <span className="font-sans text-[12.5px] font-medium text-ink">How long</span>
             <div className="flex min-w-0 gap-2">
               <select
                 aria-label="How long"
@@ -306,7 +306,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
       <Group title="Extra instructions">
         <div className="grid gap-x-5 gap-y-1.5 sm:grid-cols-2">
           {INSTRUCTIONS.map(([k, t]) => (
-            <label key={k} className="flex cursor-pointer items-start gap-2 font-sans text-[13.5px] text-mint-950">
+            <label key={k} className="flex cursor-pointer items-start gap-2 font-sans text-[13.5px] text-ink">
               <input
                 type="checkbox"
                 checked={m.instr.includes(k)}
@@ -326,13 +326,13 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
         </Field>
         {unit && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <label className="flex cursor-pointer items-center gap-2 font-sans text-[13.5px] text-mint-950">
+            <label className="flex cursor-pointer items-center gap-2 font-sans text-[13.5px] text-ink">
               <input type="checkbox" checked={showsMax(m)} onChange={e => onPatch({ showMax: e.target.checked })} className="accent-mint-700" />
               Include a maximum per 24 hours
             </label>
             {showsMax(m) && (
               <>
-                <label className="flex items-center gap-2 font-sans text-[13px] text-neutral-700">
+                <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
                   Maximum
                   <input
                     type="number"
@@ -346,7 +346,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                   />
                   {unit.pl}
                 </label>
-                <span className="font-sans text-[12.5px] text-neutral-600">
+                <span className="font-sans text-[12.5px] text-ink">
                   {!mx
                     ? 'Enter a quantity and frequency to calculate it.'
                     : mx.auto

@@ -69,28 +69,28 @@ function Hero() {
     <section className="pt-8 pb-6 text-center sm:pt-16 sm:pb-14">
       {/* Kicker. Sizes are pixel values on purpose: this site's phi scale makes
           text-xs 9.9px, too small for a sentence. */}
-      <p className="mx-auto mb-2.5 max-w-2xl font-sans text-[12.5px] font-medium leading-snug text-pretty text-mint-600 sm:text-[13px]">
+      <p className="mx-auto mb-2.5 max-w-2xl font-sans text-[12.5px] font-medium leading-snug text-pretty text-ink sm:text-[13px]">
         Together we can cultivate our commons to create an open compendium of drug information and clinical evidence accessible to all.
       </p>
 
       {/* Title. Size comes from .pc-hero-title in src/index.css: the bare h1 rule
           there is unlayered, so text-* utilities on an h1 are ignored. */}
       <h1
-        className="pc-hero-title mx-auto mb-3 max-w-4xl font-display text-balance text-hepatica-600"
+        className="pc-hero-title mx-auto mb-3 max-w-4xl font-display text-balance text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Pharmacy Commons
       </h1>
 
       {/* Scope and educational disclaimer */}
-      <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-normal text-pretty text-mint-600 sm:text-[13.5px]">
+      <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-normal text-pretty text-ink sm:text-[13.5px]">
         Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
       </p>
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
           <div className="flex items-center gap-2 rounded-xl border border-mint-200 bg-white px-4 py-3 shadow-sm shadow-mint-900/5 focus-within:border-hepatica-400 focus-within:ring-3 focus-within:ring-hepatica-200">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-mint-500">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
@@ -102,14 +102,14 @@ function Hero() {
               onBlur={() => setTimeout(() => setFocused(false), 150)}
               placeholder="drug, brand name, combination product, class..."
               aria-label="Search the commons"
-              className="min-w-0 flex-1 bg-transparent font-sans text-[14px] text-mint-900 placeholder-mint-400 outline-none"
+              className="min-w-0 flex-1 bg-transparent font-sans text-[14px] text-ink placeholder:text-ink outline-none"
               autoFocus={FINE_POINTER}
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="-my-2 -mr-2 inline-flex min-h-[32px] min-w-[32px] items-center justify-center text-mint-400 hover:text-mint-700"
+                className="-my-2 -mr-2 inline-flex min-h-[32px] min-w-[32px] items-center justify-center text-ink"
                 aria-label="Clear search"
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -131,23 +131,23 @@ function Hero() {
                   className="flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-mint-50"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-sans text-[14px] font-medium text-mint-900">{entry.name}</span>
-                    <span className="block truncate font-sans text-[12px] text-mint-700">
+                    <span className="block truncate font-sans text-[14px] font-medium text-ink">{entry.name}</span>
+                    <span className="block truncate font-sans text-[12px] text-ink">
                       {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
                     </span>
                   </span>
                   {schedule && (
-                    <span className="rounded-md border border-rose-200 bg-salmon-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-salmon-700">
+                    <span className="rounded-md border border-rose-200 bg-salmon-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                       {schedule}
                     </span>
                   )}
-                  <span className="shrink-0 font-mono text-[11px] text-mint-700">{pcidOf(entry)}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink">{pcidOf(entry)}</span>
                 </button>
               )
             })}
             <Link
               to={`/browse?q=${encodeURIComponent(query.trim())}`}
-              className="flex min-h-[48px] items-center border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-hepatica-700 hover:bg-mint-50"
+              className="flex min-h-[48px] items-center border-t border-mint-100 px-4 py-2.5 font-sans text-[13px] text-ink hover:bg-mint-50"
             >
               See every match for “{query.trim()}”
             </Link>
@@ -155,9 +155,9 @@ function Hero() {
         )}
       </div>
 
-      <p className="mt-5 font-sans text-[13px] text-mint-700 sm:text-[13.5px]">
+      <p className="mt-5 font-sans text-[13px] text-ink sm:text-[13.5px]">
         Or{' '}
-        <Link to="/browse" className="font-medium text-hepatica-700 underline-offset-2 hover:underline">
+        <Link to="/browse" className="font-medium text-ink underline-offset-2 hover:underline">
           {catalogSize !== null
             ? `browse all ${catalogSize.toLocaleString()} entries, A to Z`
             : 'browse the full catalog, A to Z'}
@@ -172,9 +172,9 @@ function Hero() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const KIND_TAG: Record<UpdateKind, string> = {
-  Tool: 'border-mint-300 bg-mint-50 text-mint-800',
-  Feature: 'border-hepatica-200 bg-hepatica-50 text-hepatica-800',
-  'Blog post': 'border-salmon-200 bg-salmon-50 text-salmon-800',
+  Tool: 'border-mint-300 bg-mint-50 text-ink',
+  Feature: 'border-hepatica-200 bg-hepatica-50 text-ink',
+  'Blog post': 'border-salmon-200 bg-salmon-50 text-ink',
 }
 
 function WhatsNew() {
@@ -189,19 +189,19 @@ function WhatsNew() {
       <div className="mb-6 lg:mb-0">
         <h2
           id="whats-new-heading"
-          className="font-display text-[26px] font-semibold leading-snug text-mint-900"
+          className="font-display text-[26px] font-semibold leading-snug text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           What's new in the Commons
         </h2>
-        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-mint-700">
+        <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-ink">
           New tools, features, and writing from the Community Commons Blog, as they ship.
         </p>
         <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-sans text-[13.5px] font-medium">
-          <Link to="/tools" className="text-hepatica-700 underline-offset-2 hover:underline">
+          <Link to="/tools" className="text-ink underline-offset-2 hover:underline">
             All tools
           </Link>
-          <Link to="/blog" className="text-hepatica-700 underline-offset-2 hover:underline">
+          <Link to="/blog" className="text-ink underline-offset-2 hover:underline">
             All posts
           </Link>
         </p>
@@ -211,34 +211,34 @@ function WhatsNew() {
         {items.map(item => (
           <li key={item.id} className="py-6 first:pt-0">
             <article>
-              <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-mint-700">
+              <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-ink">
                 <time dateTime={item.date}>{formatDate(item.date)}</time>
                 <span className={`rounded border px-1.5 py-0.5 font-sans text-[11.5px] font-medium ${KIND_TAG[item.kind]}`}>
                   {item.kind}
                 </span>
               </p>
               <h3
-                className="font-display text-[21px] font-semibold leading-snug text-balance text-mint-900"
+                className="font-display text-[21px] font-semibold leading-snug text-balance text-ink"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 <Link
                   to={item.to}
-                  className="transition-colors hover:text-aqua-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                  className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
                 >
                   {item.title}
                 </Link>
               </h3>
               {item.summary ? (
-                <p className="mt-2 line-clamp-3 font-sans text-[15px] leading-[1.6] text-pretty text-mint-700">
+                <p className="mt-2 line-clamp-3 font-sans text-[15px] leading-[1.6] text-pretty text-ink">
                   {item.summary}
                 </p>
               ) : (
-                item.detail && <p className="mt-1.5 font-sans text-[13px] text-mint-700">{item.detail}</p>
+                item.detail && <p className="mt-1.5 font-sans text-[13px] text-ink">{item.detail}</p>
               )}
               <Link
                 to={item.to}
                 aria-label={`${ctaFor(item)}: ${item.title}`}
-                className="mt-2 inline-block font-sans text-[13.5px] font-medium text-hepatica-700 underline-offset-2 hover:underline"
+                className="mt-2 inline-block font-sans text-[13.5px] font-medium text-ink underline-offset-2 hover:underline"
               >
                 {ctaFor(item)}
               </Link>
@@ -273,8 +273,8 @@ function DataSource({ label, desc }: { label: string; desc: string }) {
       <span className="mt-0.5 text-xl leading-none" aria-hidden="true">
       </span>
       <div>
-        <p className="font-sans text-[13px] font-medium text-mint-800">{label}</p>
-        <p className="font-sans text-[12px] leading-relaxed text-mint-700">{desc}</p>
+        <p className="font-sans text-[13px] font-medium text-ink">{label}</p>
+        <p className="font-sans text-[12px] leading-relaxed text-ink">{desc}</p>
       </div>
     </div>
   )

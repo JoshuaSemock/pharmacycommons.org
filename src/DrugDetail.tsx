@@ -151,21 +151,21 @@ export default function DrugDetail() {
   }, [drug])
 
   if (loading) {
-    return <div className="flex justify-center py-32 font-sans text-sage-600">Loading…</div>
+    return <div className="flex justify-center py-32 font-sans text-ink">Loading…</div>
   }
 
   if (error || !drug) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
         <p
-          className="mb-2 font-display text-xl text-sage-700"
+          className="mb-2 font-display text-xl text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {error || 'Drug not found'}
         </p>
         <button
           onClick={() => navigate('/')}
-          className="font-sans text-sm text-aqua-700 hover:underline"
+          className="font-sans text-sm text-ink hover:underline"
         >
           Return to search
         </button>
@@ -176,18 +176,18 @@ export default function DrugDetail() {
   return (
     <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 py-4 font-sans text-sm text-sage-600">
-        <button onClick={() => navigate('/')} className="transition-colors hover:text-sage-900">
+      <nav className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
+        <button onClick={() => navigate('/')} className="transition-colors">
           Browse
         </button>
         <span aria-hidden="true">/</span>
-        <span className="font-medium text-sage-900">{formatDrugName(drug.name)}</span>
+        <span className="font-medium text-ink">{formatDrugName(drug.name)}</span>
       </nav>
 
       {/* Drug header */}
       <header className="mb-8 border-b border-sage-200 pb-6">
         <div className="mb-2 flex flex-wrap items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-aqua-200 font-mono text-sm font-medium text-aqua-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-aqua-200 font-mono text-sm font-medium text-ink">
             {drug.name.slice(0, 2).toUpperCase()}
           </div>
           {/* min-w-0 on this column and the h1: flex items default to min-width:auto,
@@ -196,16 +196,16 @@ export default function DrugDetail() {
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <h1
-                className="min-w-0 font-display text-3xl font-semibold leading-tight text-sage-900 sm:text-4xl"
+                className="min-w-0 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {formatDrugName(drug.name)}
               </h1>
-              <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-2xs text-sage-600">
+              <span className="mt-1 rounded border border-sage-200 bg-sage-100 px-2 py-0.5 font-mono text-2xs text-ink">
                 INN
               </span>
             </div>
-            <p className="font-sans text-md text-sage-600">{drug.entity_type}</p>
+            <p className="font-sans text-md text-ink">{drug.entity_type}</p>
             <BrandLine brands={drug.brands ?? []} />
           </div>
           <SaveButton
@@ -216,7 +216,7 @@ export default function DrugDetail() {
           />
         </div>
 
-        <p className="mt-3 max-w-2xl font-sans text-md leading-relaxed text-sage-700">
+        <p className="mt-3 max-w-2xl font-sans text-md leading-relaxed text-ink">
           {drug.description || 'Active pharmaceutical ingredient'}
         </p>
       </header>
@@ -319,14 +319,14 @@ function SaveButton({
         title={saved ? 'Remove from saved pages' : 'Save this page to your account'}
         className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-sm font-medium transition-colors disabled:opacity-50 ${
           saved
-            ? 'border-amber-300 bg-amber-100 text-amber-700 hover:border-amber-400'
-            : 'border-sage-200 bg-white/70 text-sage-600 hover:border-sage-300 hover:text-sage-900'
+            ? 'border-amber-300 bg-amber-100 text-ink hover:border-amber-400'
+            : 'border-sage-200 bg-white/70 text-ink hover:border-sage-300'
         }`}
       >
         <BookmarkIcon filled={saved} />
         {saved ? 'Saved' : 'Save'}
       </button>
-      {error && <p className="max-w-[14rem] text-right font-sans text-2xs text-coral-600">{error}</p>}
+      {error && <p className="max-w-[14rem] text-right font-sans text-2xs text-ink">{error}</p>}
     </div>
   )
 }
@@ -400,14 +400,14 @@ function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
   return (
     <SideCard title="Guidelines">
       {failed ? (
-        <p className="font-sans text-sm text-sage-600">Guidelines couldn’t be loaded right now.</p>
+        <p className="font-sans text-sm text-ink">Guidelines couldn’t be loaded right now.</p>
       ) : guidelines === null ? (
         <div className="space-y-2" aria-busy="true">
           <div className="h-4 w-4/5 animate-pulse rounded bg-sage-100" />
           <div className="h-4 w-3/5 animate-pulse rounded bg-sage-100" />
         </div>
       ) : guidelines.length === 0 ? (
-        <p className="font-sans text-sm leading-relaxed text-sage-600">
+        <p className="font-sans text-sm leading-relaxed text-ink">
           No guidelines linked to this drug yet.
         </p>
       ) : (
@@ -419,18 +419,18 @@ function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={g.title}
-                className="group font-sans text-md font-medium leading-snug text-aqua-700 underline-offset-2 hover:underline"
+                className="group font-sans text-md font-medium leading-snug text-ink underline-offset-2 hover:underline"
               >
                 {g.short_title}
-                <span aria-hidden="true" className="ml-0.5 text-sage-400 group-hover:text-aqua-700">
+                <span aria-hidden="true" className="ml-0.5 text-ink">
                   ↗
                 </span>
               </a>
-              <p className="mt-0.5 font-sans text-sm text-sage-600">
+              <p className="mt-0.5 font-sans text-sm text-ink">
                 {g.organization} · {g.pub_year}
               </p>
               {g.context && (
-                <p className="mt-1 font-sans text-sm leading-relaxed text-sage-700">{g.context}</p>
+                <p className="mt-1 font-sans text-sm leading-relaxed text-ink">{g.context}</p>
               )}
             </li>
           ))}
@@ -505,7 +505,7 @@ function ClassesCard({ pcidCode }: { pcidCode: string }) {
         ))}
       </div>
       {hasInherited && (
-        <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-snug text-sage-600">
+        <p className="mt-4 border-t border-sage-100 pt-3 font-sans text-2xs leading-snug text-ink">
           Dashed: a broader class this drug belongs to through one of its sub-classes.
         </p>
       )}
@@ -520,21 +520,21 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
 
   return (
     <div>
-      <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{group.label}</p>
+      <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-ink">{group.label}</p>
       <ul className="flex flex-wrap gap-1.5">
         {visible.map(c => (
           <li key={c.slug} className="min-w-0 max-w-full">
             <Link
               to={`/classes/${c.slug}`}
               title={[c.source_code, c.name, c.is_direct ? null : '(via a sub-class)'].filter(Boolean).join(' · ')}
-              className={`inline-flex max-w-full items-baseline gap-1.5 rounded-md border px-2 py-0.5 font-sans text-sm leading-snug transition-colors hover:border-aqua-300 hover:text-aqua-700 ${
+              className={`inline-flex max-w-full items-baseline gap-1.5 rounded-md border px-2 py-0.5 font-sans text-sm leading-snug transition-colors hover:border-aqua-300 ${
                 c.is_direct
-                  ? 'border-sage-200 bg-white text-sage-800'
-                  : 'border-dashed border-sage-300 text-sage-600'
+                  ? 'border-sage-200 bg-white text-ink'
+                  : 'border-dashed border-sage-300 text-ink'
               }`}
             >
               {c.source_code && group.type === 'atc' && (
-                <span className="shrink-0 font-mono text-2xs text-sage-600">{c.source_code}</span>
+                <span className="shrink-0 font-mono text-2xs text-ink">{c.source_code}</span>
               )}
               <span className="break-words">{c.name}</span>
             </Link>
@@ -544,7 +544,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
       {group.classes.length > preview && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="mt-1.5 font-sans text-sm font-medium text-aqua-700 hover:underline"
+          className="mt-1.5 font-sans text-sm font-medium text-ink hover:underline"
         >
           {showAll ? 'Show fewer' : `Show all ${group.classes.length}`}
         </button>
@@ -589,7 +589,7 @@ function BrandLine({ brands }: { brands: BrandName[] }) {
       {(hidden > 0 || showAll) && brands.length > BRAND_PREVIEW && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="font-sans text-sm font-medium text-aqua-700 hover:underline"
+          className="font-sans text-sm font-medium text-ink hover:underline"
         >
           {showAll ? 'Show fewer' : `Show all ${brands.length} brand names`}
         </button>
@@ -601,12 +601,12 @@ function BrandLine({ brands }: { brands: BrandName[] }) {
 function BrandRow({ label, brands, muted = false }: { label: string; brands: BrandName[]; muted?: boolean }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
-      <span className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</span>
+      <span className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</span>
       {brands.map(b => {
         const href = brandHref(b)
         const text = formatBrandName(b.name)
         const cls = `rounded-md border px-2 py-0.5 font-sans text-sm ${
-          muted ? 'border-dashed border-sage-300 text-sage-600' : 'border-sage-200 bg-white text-sage-800'
+          muted ? 'border-dashed border-sage-300 text-ink' : 'border-sage-200 bg-white text-ink'
         }`
         return href ? (
           <a
@@ -615,7 +615,7 @@ function BrandRow({ label, brands, muted = false }: { label: string; brands: Bra
             target="_blank"
             rel="noopener noreferrer"
             title={`${text} on Drugs@FDA${muted ? ' (discontinued)' : ''}`}
-            className={`${cls} transition-colors hover:border-aqua-300 hover:text-aqua-700`}
+            className={`${cls} transition-colors hover:border-aqua-300`}
           >
             {text}
           </a>
@@ -668,7 +668,7 @@ function HierarchyCard({
 function HierarchySection({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+      <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-ink">
         {label}
       </p>
       {children}
@@ -699,16 +699,16 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
               onClick={() => navigate(`/drugs/${m.slug}`)}
               className="block w-full min-w-0 rounded-lg border border-sage-200 bg-white px-3 py-2 text-left transition-colors hover:border-aqua-300 hover:bg-sage-50"
             >
-              <span className="block break-words font-sans text-sm font-medium leading-snug text-sage-800">
+              <span className="block break-words font-sans text-sm font-medium leading-snug text-ink">
                 {formatDrugName(m.name)}
               </span>
               {m.brands && m.brands.length > 0 && (
-                <span className="mt-0.5 block font-sans text-sm leading-snug text-sage-700">
+                <span className="mt-0.5 block font-sans text-sm leading-snug text-ink">
                   {m.brands.map(formatBrandName).join(', ')}
                 </span>
               )}
               {m.term_type && (
-                <span className="mt-0.5 block font-sans text-2xs text-sage-600">{m.term_type}</span>
+                <span className="mt-0.5 block font-sans text-2xs text-ink">{m.term_type}</span>
               )}
             </button>
           </li>
@@ -717,7 +717,7 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
       {sorted.length > HIERARCHY_PREVIEW && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="mt-2 font-sans text-sm font-medium text-aqua-700 hover:underline"
+          className="mt-2 font-sans text-sm font-medium text-ink hover:underline"
         >
           {showAll ? 'Show fewer' : `Show all ${sorted.length}`}
         </button>
@@ -737,7 +737,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
   const riskKey = toRiskKey(metrics.rq_category)
   const riskMeta = riskKey
     ? ECO_RISK_COLORS[riskKey]
-    : { bg: 'bg-sage-100', text: 'text-sage-600', border: 'border-sage-200', label: 'Unknown' }
+    : { bg: 'bg-sage-100', text: 'text-ink', border: 'border-sage-200', label: 'Unknown' }
 
   // Log scale so an RQ of 0.01 and an RQ of 50 are visually distinguishable.
   const riskBarWidth =
@@ -758,10 +758,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
   const rqTextColor =
     riskKey === 'high'
-      ? 'text-coral-600'
+      ? 'text-ink'
       : riskKey === 'moderate'
-        ? 'text-sage-700'
-        : 'text-aqua-700'
+        ? 'text-ink'
+        : 'text-ink'
 
   const barColor =
     riskKey === 'high'
@@ -776,7 +776,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
     <div className="overflow-hidden rounded-xl border" style={{ borderColor }}>
       <div className={`px-4 py-3 ${headerBg}`}>
         <div className="mb-0.5 flex items-center justify-between gap-2">
-          <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-sage-600">
+          <h2 className="font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
             Environmental risk
           </h2>
           <span
@@ -790,7 +790,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
       <div className="space-y-4 bg-white p-4">
         <div>
           <div className="mb-1.5 flex items-end justify-between gap-2">
-            <span className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+            <span className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
               Risk quotient (RQ)
             </span>
             <span className={`font-mono text-lg font-semibold ${rqTextColor}`}>
@@ -804,7 +804,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
             />
           </div>
           {rqValue === null && (
-            <p className="mt-1.5 font-sans text-2xs text-sage-600">
+            <p className="mt-1.5 font-sans text-2xs text-ink">
               No risk quotient calculated for this entry.
             </p>
           )}
@@ -813,10 +813,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
         {typeof metrics.dpd_category === 'string' && metrics.dpd_category && (
           <div className="flex items-center justify-between rounded-lg bg-sage-50 px-3 py-2.5">
             <div>
-              <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+              <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
                 Drug persistence
               </p>
-              <p className="mt-0.5 font-sans text-sm font-medium text-sage-700">
+              <p className="mt-0.5 font-sans text-sm font-medium text-ink">
                 {titleCase(metrics.dpd_category)}
                 {typeof metrics.dpd_days === 'number' && ` · ${metrics.dpd_days} days`}
               </p>
@@ -826,10 +826,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
         {typeof metrics.excretion_route === 'string' && metrics.excretion_route && (
           <div>
-            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-ink">
               Excretion route
             </p>
-            <p className="font-sans text-sm text-sage-700">
+            <p className="font-sans text-sm text-ink">
               {titleCase(metrics.excretion_route)}
             </p>
           </div>
@@ -837,10 +837,10 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
         {typeof metrics.primary_concern === 'string' && metrics.primary_concern && (
           <div>
-            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-sage-600">
+            <p className="mb-1 font-sans text-xs uppercase tracking-[0.08em] text-ink">
               Primary concern
             </p>
-            <p className="font-sans text-sm leading-relaxed text-sage-700">
+            <p className="font-sans text-sm leading-relaxed text-ink">
               {metrics.primary_concern}
             </p>
           </div>
@@ -892,13 +892,13 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
                 to={`/lists/${l.slug}`}
                 className="flex items-baseline justify-between gap-3 rounded-lg border border-sage-200 bg-white px-3 py-2 transition-colors hover:border-aqua-300 hover:bg-sage-50"
               >
-                <span className="min-w-0 break-words font-sans text-sm leading-snug text-sage-800">
+                <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">
                   {l.title}
                   {l.via_name && (
-                    <span className="block text-2xs text-sage-600">as {formatDrugName(l.via_name)}</span>
+                    <span className="block text-2xs text-ink">as {formatDrugName(l.via_name)}</span>
                   )}
                 </span>
-                {detail && <span className="shrink-0 font-mono text-2xs text-sage-700">{detail}</span>}
+                {detail && <span className="shrink-0 font-mono text-2xs text-ink">{detail}</span>}
               </Link>
             </li>
           )
@@ -916,7 +916,7 @@ function SideCard({ title, children }: { title: string; children: ReactNode }) {
     <div className="border-t border-sage-200">
       <div className="py-3">
         <h2
-          className="font-semibold uppercase tracking-[0.1em] text-sage-600"
+          className="font-semibold uppercase tracking-[0.1em] text-ink"
           style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
         >
           {title}
@@ -938,10 +938,10 @@ function IdRow({ label, value, name }: { label: string; value: string | string[]
   return (
     <div>
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
-        <p className="font-sans text-xs uppercase tracking-[0.08em] text-sage-600">{label}</p>
-        {source && <p className="shrink-0 font-sans text-2xs text-sage-600">{source}</p>}
+        <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</p>
+        {source && <p className="shrink-0 font-sans text-2xs text-ink">{source}</p>}
       </div>
-      <p className="break-words font-mono text-2xs leading-relaxed text-sage-800">
+      <p className="break-words font-mono text-2xs leading-relaxed text-ink">
         {segments.map((seg, i) =>
           seg.href ? (
             <a
@@ -950,7 +950,7 @@ function IdRow({ label, value, name }: { label: string; value: string | string[]
               target="_blank"
               rel="noopener noreferrer"
               title={source ? `Open in ${source}` : undefined}
-              className="text-aqua-700 underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
+              className="text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
             >
               {seg.text}
             </a>

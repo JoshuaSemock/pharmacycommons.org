@@ -5,7 +5,7 @@ import { THIRD_PARTY_TOOLS, TOOL_SECTIONS, toolsIn } from '../tools'
 import type { Tool, ToolStatus } from '../tools'
 
 const LINK =
-  'underline decoration-aqua-300 underline-offset-2 transition-colors hover:text-aqua-700 hover:decoration-aqua-600'
+  'underline decoration-aqua-300 underline-offset-2 transition-colors hover:decoration-aqua-600'
 
 export default function Tools() {
   return (
@@ -21,7 +21,7 @@ export default function Tools() {
 
       <GroupHeading id="third-party">Third party</GroupHeading>
       <section className="py-8">
-        <p className="mb-5 font-sans text-[14px] text-sage-600 leading-relaxed">
+        <p className="mb-5 font-sans text-[14px] text-ink leading-relaxed">
           Calculators on other sites that we reach for too. They open in a new tab; Pharmacy Commons does not check or
           maintain them.
         </p>
@@ -32,20 +32,20 @@ export default function Tools() {
                 href={tool.url}
                 target="_blank"
                 rel="noreferrer"
-                className={`font-sans text-[14.5px] font-medium text-sage-900 [overflow-wrap:anywhere] ${LINK}`}
+                className={`font-sans text-[14.5px] font-medium text-ink [overflow-wrap:anywhere] ${LINK}`}
               >
                 {tool.name}
               </a>
-              <span className="ml-2 font-sans text-[13px] text-sage-600">{tool.publisher}</span>
+              <span className="ml-2 font-sans text-[13px] text-ink">{tool.publisher}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="border-t border-sage-200 py-8">
-        <p className="font-sans text-[14px] text-sage-600 leading-relaxed">
+        <p className="font-sans text-[14px] text-ink leading-relaxed">
           Missing a calculator you reach for daily?{' '}
-          <a href="mailto:contact@pharmacycommons.org?subject=Tool%20request" className={`text-aqua-700 ${LINK}`}>
+          <a href="mailto:contact@pharmacycommons.org?subject=Tool%20request" className={`text-ink ${LINK}`}>
             Ask for it
           </a>
           .
@@ -59,7 +59,7 @@ function GroupHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="scroll-mt-28 border-t-2 border-sage-300 pt-8 font-display text-[26px] font-semibold text-sage-900"
+      className="scroll-mt-28 border-t-2 border-sage-300 pt-8 font-display text-[26px] font-semibold text-ink"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -72,7 +72,7 @@ function ToolList({ id, heading, tools }: { id: string; heading: string; tools: 
   return (
     <section id={id} className="scroll-mt-28 border-t border-sage-200 py-8 first-of-type:border-t-0">
       <h3
-        className="mb-5 font-display text-[21px] font-semibold text-sage-900"
+        className="mb-5 font-display text-[21px] font-semibold text-ink"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {heading}
@@ -81,12 +81,12 @@ function ToolList({ id, heading, tools }: { id: string; heading: string; tools: 
         {tools.map(tool => (
           <li key={tool.id} className="min-w-0 border-l-2 border-sage-200 pl-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h4 className="font-sans text-[14.5px] font-medium text-sage-900">
+              <h4 className="font-sans text-[14.5px] font-medium text-ink">
                 <ToolName tool={tool} />
               </h4>
               <StatusTag status={tool.status} />
             </div>
-            <p className="mt-1 font-sans text-[14px] text-sage-600 leading-relaxed">{tool.blurb}</p>
+            <p className="mt-1 font-sans text-[14px] text-ink leading-relaxed">{tool.blurb}</p>
           </li>
         ))}
       </ul>
@@ -114,9 +114,9 @@ function ToolName({ tool }: { tool: Tool }) {
 
 function StatusTag({ status }: { status: ToolStatus }) {
   const styles: Record<ToolStatus, string> = {
-    live: 'border-aqua-300 bg-aqua-100 text-aqua-700',
-    building: 'border-violet-200 bg-violet-100 text-violet-600',
-    planned: 'border-sage-200 bg-sage-100 text-sage-600',
+    live: 'border-aqua-300 bg-aqua-100 text-ink',
+    building: 'border-violet-200 bg-violet-100 text-ink',
+    planned: 'border-sage-200 bg-sage-100 text-ink',
   }
   const labels: Record<ToolStatus, string> = {
     live: 'live',

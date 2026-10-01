@@ -106,41 +106,41 @@ export default function ListCompare() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 py-4 font-sans text-[13px] text-mint-700">
-        <Link to="/lists" className="transition-colors hover:text-mint-950">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 py-4 font-sans text-[13px] text-ink">
+        <Link to="/lists" className="transition-colors">
           Lists
         </Link>
         <span aria-hidden="true">/</span>
-        <span aria-current="page" className="font-medium text-mint-950">
+        <span aria-current="page" className="font-medium text-ink">
           Compare
         </span>
       </nav>
 
       <header className="border-b border-mint-200 pb-8">
         <h1
-          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-mint-950 sm:text-[2.618rem]"
+          className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-ink sm:text-[2.618rem]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Compare lists
         </h1>
-        <p className="mt-4 max-w-[42rem] font-sans text-[17px] leading-relaxed text-mint-700">
+        <p className="mt-4 max-w-[42rem] font-sans text-[17px] leading-relaxed text-ink">
           Pick up to three lists. Each row is a drug; each column shows what that list says about it.
         </p>
       </header>
 
       <div className="flex flex-wrap items-center gap-2.5 pt-7">
-        <span className="mr-1 font-sans text-[12.5px] font-medium text-mint-950">Comparing</span>
+        <span className="mr-1 font-sans text-[12.5px] font-medium text-ink">Comparing</span>
         {slugs.map((slug, i) => (
           <span
             key={slug}
-            className="flex max-w-full items-center gap-2 rounded-lg border border-hepatica-300 bg-hepatica-100 py-1.5 pl-3 pr-1.5 font-sans text-[13px] font-medium text-hepatica-800"
+            className="flex max-w-full items-center gap-2 rounded-lg border border-hepatica-300 bg-hepatica-100 py-1.5 pl-3 pr-1.5 font-sans text-[13px] font-medium text-ink"
           >
             <span className="min-w-0 break-words">{lists[i]?.title ?? slug}</span>
             <button
               type="button"
               onClick={() => setSlugs(slugs.filter(s => s !== slug))}
               aria-label={`Remove ${lists[i]?.title ?? slug}`}
-              className="flex rounded p-1 text-hepatica-700 hover:bg-hepatica-200"
+              className="flex rounded p-1 text-ink hover:bg-hepatica-200"
             >
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                 <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -154,7 +154,7 @@ export default function ListCompare() {
             <select
               value=""
               onChange={e => e.target.value && setSlugs([...slugs, e.target.value])}
-              className="w-full max-w-72 rounded-lg border border-dashed border-mint-500 bg-white px-2.5 py-1.5 font-sans text-[13px] text-mint-900"
+              className="w-full max-w-72 rounded-lg border border-dashed border-mint-500 bg-white px-2.5 py-1.5 font-sans text-[13px] text-ink"
             >
               <option value="">+ Add a list</option>
               {available.map(l => (
@@ -168,11 +168,11 @@ export default function ListCompare() {
       </div>
 
       {slugs.length < 2 ? (
-        <p className="py-10 font-sans text-[15px] text-mint-700">
+        <p className="py-10 font-sans text-[15px] text-ink">
           {slugs.length === 0 ? 'Add two or three lists to compare them.' : 'Add one more list to compare.'}
         </p>
       ) : !ready ? (
-        <p className="py-10 font-sans text-[15px] text-mint-700" aria-busy="true">
+        <p className="py-10 font-sans text-[15px] text-ink" aria-busy="true">
           Loading lists…
         </p>
       ) : (
@@ -194,11 +194,11 @@ export default function ListCompare() {
                   onClick={() => setShow(key)}
                   className={`rounded-md px-2.5 py-1 font-sans text-[12.5px] whitespace-nowrap ${
                     show === key
-                      ? 'bg-white font-medium text-mint-950 shadow-[0_1px_3px_rgb(0_0_0/0.14)] ring-1 ring-mint-200'
-                      : 'text-mint-700 hover:text-mint-950'
+                      ? 'bg-white font-medium text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14)] ring-1 ring-mint-200'
+                      : 'text-ink'
                   }`}
                 >
-                  {label} <span className="font-mono text-[11px] text-mint-700">{counts[key].toLocaleString()}</span>
+                  {label} <span className="font-mono text-[11px] text-ink">{counts[key].toLocaleString()}</span>
                 </button>
               ))}
             </div>
@@ -208,7 +208,7 @@ export default function ListCompare() {
               onChange={e => setQuery(e.target.value)}
               placeholder="Filter drugs"
               aria-label="Filter drugs"
-              className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-mint-950 placeholder:text-mint-700 focus:border-hepatica-400 focus:outline-none sm:w-64"
+              className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none sm:w-64"
             />
           </div>
 
@@ -216,13 +216,13 @@ export default function ListCompare() {
           <div className="overflow-x-auto border-y border-mint-200">
             <table className="w-full min-w-[36rem] border-collapse font-sans text-[13.5px]">
               <thead>
-                <tr className="border-b border-mint-200 bg-mint-50 text-left text-[12px] text-mint-700">
+                <tr className="border-b border-mint-200 bg-mint-50 text-left text-[12px] text-ink">
                   <th scope="col" className="px-4 py-2 font-normal">
                     Drug
                   </th>
                   {shown.map(l => (
-                    <th key={l.slug} scope="col" className="px-4 py-2 font-medium text-mint-950">
-                      <Link to={`/lists/${l.slug}`} className="hover:text-hepatica-700">
+                    <th key={l.slug} scope="col" className="px-4 py-2 font-medium text-ink">
+                      <Link to={`/lists/${l.slug}`}>
                         {l.title}
                       </Link>
                     </th>
@@ -233,7 +233,7 @@ export default function ListCompare() {
                 {filtered.slice(0, limit).map(r => (
                   <tr key={r.pcid} className="border-b border-mint-100 last:border-b-0">
                     <th scope="row" className="px-4 py-2 text-left font-medium">
-                      <Link to={`/drugs/${r.slug}`} className="text-mint-950 hover:text-hepatica-700">
+                      <Link to={`/drugs/${r.slug}`} className="text-ink">
                         {r.name}
                       </Link>
                     </th>
@@ -252,12 +252,12 @@ export default function ListCompare() {
             <button
               type="button"
               onClick={() => setLimit(l => l + BATCH)}
-              className="mt-4 rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13px] font-medium text-hepatica-700 hover:bg-hepatica-400/20"
+              className="mt-4 rounded-lg border border-hepatica-400 bg-hepatica-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink hover:bg-hepatica-400/20"
             >
               Show more ({(filtered.length - limit).toLocaleString()} left)
             </button>
           )}
-          <p className="mt-3 font-sans text-[12.5px] text-mint-700">— means the drug is not on that list.</p>
+          <p className="mt-3 font-sans text-[12.5px] text-ink">— means the drug is not on that list.</p>
         </>
       )}
     </main>
@@ -267,21 +267,21 @@ export default function ListCompare() {
 function Cell({ item }: { item: ListItem | null }) {
   if (!item) {
     return (
-      <span className="text-neutral-500" aria-label="Not on this list">
+      <span className="text-ink" aria-label="Not on this list">
         —
       </span>
     )
   }
   return (
     <span className="flex flex-wrap items-center gap-2">
-      {item.rank !== null && <span className="font-mono text-[12.5px] text-mint-950">#{item.rank}</span>}
+      {item.rank !== null && <span className="font-mono text-[12.5px] text-ink">#{item.rank}</span>}
       {item.legal_status && (
-        <span className="rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-rose-700">
+        <span className="rounded-md border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
           {item.legal_status}
         </span>
       )}
       {item.rank === null && !item.legal_status && (
-        <span className="text-mint-700" aria-label="On this list">
+        <span className="text-ink" aria-label="On this list">
           ✓
         </span>
       )}

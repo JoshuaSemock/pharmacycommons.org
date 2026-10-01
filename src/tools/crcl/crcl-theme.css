@@ -27,16 +27,17 @@
 @reference "../../index.css";
 
 .crcl.pc-crcl {
-  --crcl-ink:        var(--color-mint-950);
-  --crcl-ink-soft:   var(--color-mint-800);
-  --crcl-ink-faint:  var(--color-mint-700);
+  /* All text is site ink (neutral-800 light / neutral-50 dark, 2026-10-01). */
+  --crcl-ink:        var(--color-ink);
+  --crcl-ink-soft:   var(--color-ink);
+  --crcl-ink-faint:  var(--color-ink);
   --crcl-bg:         var(--color-white);
   --crcl-bg-sunken:  var(--color-mint-50);
   --crcl-line:       var(--color-mint-200);
   --crcl-line-soft:  var(--color-mint-100);
 
   --crcl-brand:      var(--color-mint-900);
-  --crcl-brand-ink:  var(--color-neutral-50);
+  --crcl-brand-ink:  var(--color-ink);
   --crcl-accent:     var(--color-hepatica-700);
 
   /* Dose OK: primary green, not the secondary purple — "fine" should
@@ -123,7 +124,7 @@
   font-weight: 400;
   border: 1px solid var(--color-hepatica-300);
   background: var(--color-hepatica-100);
-  color: var(--color-hepatica-700);
+  color: var(--color-ink);
   border-radius: 4px;
   padding: 0.1rem 0.35rem;
 }
@@ -193,10 +194,22 @@
   transition: background-color 150ms, border-color 150ms;
 }
 
-/* The widget brightens on hover, which washes out a dark brand. Deepen it. */
+/* Brand fills are a pale mint so ink text reads on them in both themes
+   (the widget's dark brand fill would need white text). */
+.crcl.pc-crcl .crcl-btn-primary,
+.crcl.pc-crcl .crcl-seg button.is-on {
+  background: var(--color-mint-100);
+  border-color: var(--color-mint-700);
+}
+
 .crcl.pc-crcl .crcl-btn-primary:hover {
   filter: none;
-  background: var(--color-mint-950);
+  background: var(--color-mint-200);
+}
+
+/* Disclosure summaries were accent-colored text. */
+.crcl.pc-crcl .crcl-details > summary {
+  color: var(--crcl-ink);
 }
 
 .crcl.pc-crcl .crcl-btn-ghost:hover {

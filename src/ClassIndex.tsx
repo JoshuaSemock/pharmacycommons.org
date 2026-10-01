@@ -153,8 +153,8 @@ export default function ClassIndex() {
                 'rounded-md px-3 py-1.5 font-sans text-[13px] font-medium whitespace-nowrap transition-colors',
                 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
                 tab === t.key
-                  ? 'bg-white text-sage-900 shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
-                  : 'text-sage-600 hover:text-sage-900',
+                  ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
+                  : 'text-ink',
               ].join(' ')}
             >
               {t.label}
@@ -162,11 +162,11 @@ export default function ClassIndex() {
           ))}
         </div>
         <label className="block sm:hidden">
-          <span className="mb-1.5 block font-sans text-[13px] font-medium text-sage-700">Classification system</span>
+          <span className="mb-1.5 block font-sans text-[13px] font-medium text-ink">Classification system</span>
           <select
             value={tab}
             onChange={e => patch({ type: e.target.value === DEFAULT_TAB ? null : e.target.value })}
-            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-2 font-sans text-[14px] text-sage-900 outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
+            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-2 font-sans text-[14px] text-ink outline-none focus:border-aqua-400 focus:ring-2 focus:ring-aqua-200"
           >
             {TABS.map(t => (
               <option key={t.key} value={t.key}>
@@ -179,7 +179,7 @@ export default function ClassIndex() {
         {/* Search */}
         <div className="mt-5 max-w-lg">
           <div className="flex items-center gap-2 rounded-xl border border-sage-200 bg-white px-4 py-2.5 shadow-sm shadow-sage-900/5 transition-all focus-within:border-aqua-400 focus-within:ring-3 focus-within:ring-aqua-200">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-sage-400">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
@@ -191,10 +191,10 @@ export default function ClassIndex() {
                 tab === 'all' ? 'Search every system, e.g. serotonin or N06AB' : `Search ${activeTab.label} classes`
               }
               aria-label="Search drug classes"
-              className="flex-1 bg-transparent font-sans text-[14px] text-sage-900 placeholder-sage-400 outline-none"
+              className="flex-1 bg-transparent font-sans text-[14px] text-ink placeholder:text-ink outline-none"
             />
             {input && (
-              <button type="button" onClick={() => setInput('')} className="text-sage-400 hover:text-sage-600" aria-label="Clear search">
+              <button type="button" onClick={() => setInput('')} className="text-ink" aria-label="Clear search">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
@@ -207,13 +207,13 @@ export default function ClassIndex() {
         <div className="mt-8">
           {failed ? (
             <div className="py-12 text-center">
-              <p className="font-sans text-sage-700">The classes didn’t load.</p>
-              <button onClick={() => window.location.reload()} className="mt-2 font-sans text-[13px] text-aqua-700 hover:underline">
+              <p className="font-sans text-ink">The classes didn’t load.</p>
+              <button onClick={() => window.location.reload()} className="mt-2 font-sans text-[13px] text-ink hover:underline">
                 Reload the page
               </button>
             </div>
           ) : needsQuery ? (
-            <p className="py-12 text-center font-sans text-sage-600">
+            <p className="py-12 text-center font-sans text-ink">
               Type a class name or code to search every classification system at once.
             </p>
           ) : rows === null ? (
@@ -224,33 +224,33 @@ export default function ClassIndex() {
             </div>
           ) : sorted.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="font-sans text-sage-600">
+              <p className="font-sans text-ink">
                 {query ? (
                   <>
                     No {tab === 'all' ? '' : `${activeTab.label} `}classes match{' '}
-                    <span className="font-medium text-sage-900">{query}</span>.
+                    <span className="font-medium text-ink">{query}</span>.
                   </>
                 ) : (
                   `No ${activeTab.label} classes have drugs linked to them yet.`
                 )}
               </p>
               {query && tab !== 'all' && (
-                <button onClick={() => patch({ type: 'all' })} className="mt-2 font-sans text-[13px] text-aqua-700 hover:underline">
+                <button onClick={() => patch({ type: 'all' })} className="mt-2 font-sans text-[13px] text-ink hover:underline">
                   Search every system instead
                 </button>
               )}
             </div>
           ) : (
             <>
-              <p className="mb-3 font-sans text-[13px] text-sage-600">
+              <p className="mb-3 font-sans text-[13px] text-ink">
                 {query ? (
                   <>
-                    Classes matching <span className="font-medium text-sage-900">{query}</span>
+                    Classes matching <span className="font-medium text-ink">{query}</span>
                   </>
                 ) : (
                   activeTab.hint
                 )}
-                <span className="ml-2 font-mono text-[12px] text-sage-400">{sorted.length.toLocaleString()}</span>
+                <span className="ml-2 font-mono text-[12px] text-ink">{sorted.length.toLocaleString()}</span>
               </p>
 
               <ul className="divide-y divide-sage-100 border-y border-sage-200">
@@ -264,11 +264,11 @@ export default function ClassIndex() {
                   <button
                     type="button"
                     onClick={() => setLimit(l => l + PAGE)}
-                    className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-aqua-700 transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
+                    className="rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-[13px] font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20"
                   >
                     Show {Math.min(PAGE, sorted.length - visible.length).toLocaleString()} more
                   </button>
-                  <span className="font-mono text-[11.5px] text-sage-600">
+                  <span className="font-mono text-[11.5px] text-ink">
                     {(sorted.length - visible.length).toLocaleString()} left
                   </span>
                 </div>
@@ -295,15 +295,15 @@ function ClassRow({ cls, showType, indent }: { cls: ClassSummary; showType: bool
         style={depth ? { paddingLeft: `calc(1rem + ${depth * 1.25}rem)` } : undefined}
       >
         {cls.source_code && (
-          <span className="w-24 shrink-0 font-mono text-[12px] text-sage-600">{cls.source_code}</span>
+          <span className="w-24 shrink-0 font-mono text-[12px] text-ink">{cls.source_code}</span>
         )}
         <span className="min-w-0 flex-1">
-          <span className={`block font-sans text-[14px] text-sage-900 ${depth === 0 && indent ? 'font-medium' : ''}`}>
+          <span className={`block font-sans text-[14px] text-ink ${depth === 0 && indent ? 'font-medium' : ''}`}>
             {cls.name}
           </span>
-          {showType && <span className="block font-sans text-[11.5px] text-sage-600">{cls.class_type_label}</span>}
+          {showType && <span className="block font-sans text-[11.5px] text-ink">{cls.class_type_label}</span>}
         </span>
-        <span className="shrink-0 font-mono text-[11.5px] text-sage-600" title={`${cls.member_count} drugs`}>
+        <span className="shrink-0 font-mono text-[11.5px] text-ink" title={`${cls.member_count} drugs`}>
           {cls.member_count.toLocaleString()}
         </span>
       </Link>

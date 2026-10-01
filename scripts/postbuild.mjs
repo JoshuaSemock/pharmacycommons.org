@@ -286,8 +286,8 @@ function shellBlock(route, homeShell) {
         <div class="page-content flex min-h-screen flex-col">
           ${header}
           <main class="mx-auto max-w-page px-4 pt-10 pb-24 sm:px-6">
-            <h1 class="max-w-4xl font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-sage-900 sm:text-[2.618rem]">${esc(route.heading ?? route.title)}</h1>
-            <p class="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-sage-600">${esc(route.description)}</p>
+            <h1 class="max-w-4xl font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-balance text-ink sm:text-[2.618rem]">${esc(route.heading ?? route.title)}</h1>
+            <p class="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-ink">${esc(route.description)}</p>
           </main>
         </div>
       </div>
