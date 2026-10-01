@@ -45,7 +45,7 @@ export default function Nav() {
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-mint-100 max-[359px]:h-7 max-[359px]:w-7">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
-          <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-mint-950 sm:text-[15px]">
+          <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-hepatica-600 sm:text-[15px]">
             Pharmacy Commons
           </span>
         </Link>
