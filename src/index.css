@@ -504,8 +504,8 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   --edge-r-reach: 0.746;
   --edge-r-w: calc(var(--edge-w) * var(--edge-r-ratio));
   --grain-size: 600px;          /* tile is 1200px: drawn at 2x for sharp fibres */
-  --grain-strength: 0.42;
-  --relief-strength: 1;
+  --grain-strength: 0.16;
+  --relief-strength: 0.61;
   --paper-shadow: rgb(0 0 0 / 0.65);
 
   position: relative;
