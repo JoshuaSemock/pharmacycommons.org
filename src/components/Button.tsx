@@ -23,8 +23,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<NonNullable<ButtonProps['variant']>, string> = {
-  mint: 'bg-mint-emboss aria-pressed:bg-mint-deboss',
-  hepatica: 'bg-hepatica-emboss aria-pressed:bg-hepatica-deboss',
+  mint: 'bg-mint-emboss border-mint-300 aria-pressed:bg-mint-deboss aria-pressed:border-mint-500 dark:aria-pressed:border-mint-200',
+  hepatica: 'bg-hepatica-emboss border-hepatica-300 aria-pressed:bg-hepatica-deboss aria-pressed:border-hepatica-500 dark:aria-pressed:border-hepatica-200',
 }
 
 const SIZES: Record<NonNullable<ButtonProps['size']>, string> = {
@@ -47,10 +47,10 @@ export default function Button({
       aria-pressed={selected}
       className={[
         'pc-relief inline-flex items-center justify-center gap-1.5 font-sans text-ink',
-        'border border-transparent aria-pressed:border-black/5',
+        'border',
         'shadow-emboss aria-pressed:shadow-deboss',
         'transition-[box-shadow,background-color,translate] duration-150 motion-reduce:transition-none',
-        'not-aria-pressed:enabled:hover:shadow-emboss-hover not-aria-pressed:enabled:hover:-translate-y-px',
+        'not-aria-pressed:enabled:hover:shadow-emboss-hover not-aria-pressed:enabled:hover:-translate-y-0.5',
         'aria-pressed:translate-y-px motion-reduce:translate-none',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-700',
         'disabled:cursor-default disabled:opacity-50',

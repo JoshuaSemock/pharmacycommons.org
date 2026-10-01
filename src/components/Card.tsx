@@ -25,8 +25,8 @@ export default function Card({
   return (
     <div
       className={[
-        'pc-relief rounded-xl border border-white/40 transition-shadow duration-200 motion-reduce:transition-none',
-        sunken ? 'pc-relief-sunken bg-neutral-100 shadow-deboss' : 'bg-paper shadow-emboss',
+        'pc-relief rounded-xl border transition-shadow duration-200 motion-reduce:transition-none',
+        sunken ? 'pc-relief-sunken border-neutral-300 bg-neutral-100 shadow-deboss' : 'border-neutral-200 bg-paper shadow-emboss',
         padded ? 'p-6' : '',
         className,
       ].join(' ')}

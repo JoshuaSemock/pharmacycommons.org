@@ -167,9 +167,19 @@
   --color-hepatica-emboss: oklch(93.0% 0.040 302);
   --color-hepatica-deboss: oklch(85.5% 0.060 302);
 
-  --shadow-emboss: -3px -3px 6px var(--relief-light), 3px 3px 6px var(--relief-dark);
-  --shadow-emboss-hover: -4px -4px 8px var(--relief-light-strong), 4px 4px 8px var(--relief-dark-strong);
-  --shadow-deboss: inset 3px 3px 6px var(--relief-cavity), inset -2px -2px 4px var(--relief-light);
+  /* Emboss: a 1px bevel on the face (lit top-left edge, shaded
+     bottom-right edge), a tight contact shadow, then the soft cast shadow.
+     Deboss: a crisp shaded rim along the top-left inner wall, a soft
+     cavity shade, and the lit bottom-right inner wall. */
+  --shadow-emboss:
+    inset 1px 1px 0 var(--relief-bevel-light), inset -1px -1px 0 var(--relief-bevel-dark),
+    -2px -2px 4px var(--relief-light), 1px 1px 1px var(--relief-contact), 3px 4px 9px var(--relief-dark);
+  --shadow-emboss-hover:
+    inset 1px 1px 0 var(--relief-bevel-light), inset -1px -1px 0 var(--relief-bevel-dark),
+    -3px -3px 6px var(--relief-light), 1px 2px 2px var(--relief-contact), 5px 7px 14px var(--relief-dark-strong);
+  --shadow-deboss:
+    inset 2px 2px 2px var(--relief-rim), inset 4px 5px 9px var(--relief-cavity),
+    inset -2px -2px 3px var(--relief-light);
 
   /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
@@ -227,23 +237,33 @@
 :root {
   color-scheme: light;
 
-  /* Paper relief light and shade (see --shadow-emboss in @theme). */
-  --relief-light: rgb(255 255 255 / 0.8);
-  --relief-light-strong: rgb(255 255 255 / 0.9);
-  --relief-dark: oklch(25% 0.02 145 / 0.12);
-  --relief-dark-strong: oklch(25% 0.02 145 / 0.16);
-  --relief-cavity: oklch(30% 0.08 170 / 0.22);
+  /* Paper relief light and shade (see --shadow-emboss in @theme).
+     --relief-depth scales every shade at once: 1 is the default, 0.5 is
+     half as deep, 1.5 deeper. The highlights don't scale (on floral-white
+     paper a white highlight is near invisible, so depth comes from shade). */
+  --relief-depth: 1;
+  --relief-light: rgb(255 255 255 / 0.95);
+  --relief-bevel-light: rgb(255 255 255 / 0.85);
+  --relief-bevel-dark: oklch(25% 0.02 145 / calc(0.16 * var(--relief-depth)));
+  --relief-contact: oklch(25% 0.02 145 / calc(0.22 * var(--relief-depth)));
+  --relief-dark: oklch(25% 0.02 145 / calc(0.26 * var(--relief-depth)));
+  --relief-dark-strong: oklch(25% 0.02 145 / calc(0.32 * var(--relief-depth)));
+  --relief-rim: oklch(25% 0.05 170 / calc(0.35 * var(--relief-depth)));
+  --relief-cavity: oklch(25% 0.06 170 / calc(0.38 * var(--relief-depth)));
 }
 
 /* Dark paper: white highlights glow on #3a3a3a, so the lit edge is only a
    faint sheen and the shade is near-black. The relief fills drop below the
    paper (deboss lowest) so the cavity still reads as the darker surface. */
 :root[data-theme="dark"] {
-  --relief-light: rgb(255 255 255 / 0.07);
-  --relief-light-strong: rgb(255 255 255 / 0.1);
-  --relief-dark: rgb(0 0 0 / 0.45);
-  --relief-dark-strong: rgb(0 0 0 / 0.55);
-  --relief-cavity: rgb(0 0 0 / 0.55);
+  --relief-light: rgb(255 255 255 / 0.08);
+  --relief-bevel-light: rgb(255 255 255 / 0.14);
+  --relief-bevel-dark: rgb(0 0 0 / calc(0.3 * var(--relief-depth)));
+  --relief-contact: rgb(0 0 0 / calc(0.4 * var(--relief-depth)));
+  --relief-dark: rgb(0 0 0 / calc(0.5 * var(--relief-depth)));
+  --relief-dark-strong: rgb(0 0 0 / calc(0.6 * var(--relief-depth)));
+  --relief-rim: rgb(0 0 0 / calc(0.55 * var(--relief-depth)));
+  --relief-cavity: rgb(0 0 0 / calc(0.6 * var(--relief-depth)));
 
   --color-mint-emboss: oklch(40.0% 0.050 170);
   --color-mint-deboss: oklch(31.0% 0.045 170);
@@ -667,7 +687,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    tile back over the element, hard-light like the sheet (the tile is
    neutral-gray = no change, so multiply would darken everything). A debossed
    element ([aria-pressed="true"] or .pc-relief-sunken) takes the grain at
-   1.6x: the darker cavity pulls more of the paper's texture into view.
+   2x: the darker cavity pulls more of the paper's texture into view.
    --grain-size and --grain-strength inherit from .page-content.
    --------------------------------------------------------------------------- */
 .pc-relief {
@@ -688,7 +708,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 
 .pc-relief[aria-pressed="true"]::after,
 .pc-relief-sunken::after {
-  opacity: calc(var(--grain-strength, 0.16) * 1.6);
+  opacity: calc(var(--grain-strength, 0.16) * 2);
 }
 
 @media (width <= 780px) {
