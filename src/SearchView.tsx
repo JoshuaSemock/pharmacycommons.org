@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { searchClasses } from './api'
+import Button from './components/Button'
 import type { ClassSearchHit } from './api.generated'
 import {
   loadCatalog,
@@ -246,7 +247,7 @@ export default function SearchView() {
           {ready && !failed && (
             <div className="flex flex-wrap items-center gap-4">
               {bucket && !searching && (
-                <div className="flex items-center rounded-lg border border-sage-200 bg-white p-0.5">
+                <div className="flex items-center gap-1.5">
                   <ScopeButton
                     label="Browse on"
                     title={`Start at ${bucketName(bucket)} and keep going`}
@@ -443,16 +444,9 @@ function ScopeButton({
   label: string; title: string; active: boolean; onClick: () => void
 }) {
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      aria-pressed={active}
-      className={`rounded-[6px] px-2.5 py-1 font-sans text-[12px] transition-colors ${
-        active ? 'bg-sage-100 font-medium text-ink' : 'text-ink'
-      }`}
-    >
+    <Button variant="mint" size="sm" selected={active} onClick={onClick} title={title}>
       {label}
-    </button>
+    </Button>
   )
 }
 

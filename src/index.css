@@ -150,6 +150,28 @@
   --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
+     Paper relief (2026-10-01). Buttons and cards are pressed into the
+     sheet: raised (embossed) at rest, stamped in (debossed) when
+     selected. Light comes from the top left at 45°.
+     Fills: *-emboss is the raised face; *-deboss is a step darker,
+     the shade at the bottom of the cavity. Same hues as the mint and
+     hepatica ramps above. Text on them is still ink (text-ink).
+     Shadows read their colors from --relief-light / --relief-dark
+     (set on :root below) so dark mode can swap them; Tailwind inlines
+     @theme shadow values into the utility, so overriding --shadow-*
+     itself in dark mode would do nothing.
+     Components: src/components/Button.tsx, src/components/Card.tsx.
+     --------------------------------------------------------------- */
+  --color-mint-emboss: oklch(93.5% 0.045 170);
+  --color-mint-deboss: oklch(86.5% 0.065 170);
+  --color-hepatica-emboss: oklch(93.0% 0.040 302);
+  --color-hepatica-deboss: oklch(85.5% 0.060 302);
+
+  --shadow-emboss: -3px -3px 6px var(--relief-light), 3px 3px 6px var(--relief-dark);
+  --shadow-emboss-hover: -4px -4px 8px var(--relief-light-strong), 4px 4px 8px var(--relief-dark-strong);
+  --shadow-deboss: inset 3px 3px 6px var(--relief-cavity), inset -2px -2px 4px var(--relief-light);
+
+  /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
      so existing components recolor without edits. Values are literal
      copies (not var() refs) so Tailwind's theme pruning can't drop the
@@ -204,6 +226,29 @@
 
 :root {
   color-scheme: light;
+
+  /* Paper relief light and shade (see --shadow-emboss in @theme). */
+  --relief-light: rgb(255 255 255 / 0.8);
+  --relief-light-strong: rgb(255 255 255 / 0.9);
+  --relief-dark: oklch(25% 0.02 145 / 0.12);
+  --relief-dark-strong: oklch(25% 0.02 145 / 0.16);
+  --relief-cavity: oklch(30% 0.08 170 / 0.22);
+}
+
+/* Dark paper: white highlights glow on #3a3a3a, so the lit edge is only a
+   faint sheen and the shade is near-black. The relief fills drop below the
+   paper (deboss lowest) so the cavity still reads as the darker surface. */
+:root[data-theme="dark"] {
+  --relief-light: rgb(255 255 255 / 0.07);
+  --relief-light-strong: rgb(255 255 255 / 0.1);
+  --relief-dark: rgb(0 0 0 / 0.45);
+  --relief-dark-strong: rgb(0 0 0 / 0.55);
+  --relief-cavity: rgb(0 0 0 / 0.55);
+
+  --color-mint-emboss: oklch(40.0% 0.050 170);
+  --color-mint-deboss: oklch(31.0% 0.045 170);
+  --color-hepatica-emboss: oklch(40.0% 0.050 302);
+  --color-hepatica-deboss: oklch(31.0% 0.050 302);
 }
 
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
@@ -613,6 +658,49 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   width: 100%;
   min-width: 0;
   overflow-wrap: break-word;
+}
+
+/* ---------------------------------------------------------------------------
+   Paper relief grain (src/components/Button.tsx, Card.tsx). The sheet's grain
+   (.paper-sheet::before) sits *under* the page content, so a filled button or
+   card would cover it and look like plastic. .pc-relief lays the same grain
+   tile back over the element, hard-light like the sheet (the tile is
+   neutral-gray = no change, so multiply would darken everything). A debossed
+   element ([aria-pressed="true"] or .pc-relief-sunken) takes the grain at
+   1.6x: the darker cavity pulls more of the paper's texture into view.
+   --grain-size and --grain-strength inherit from .page-content.
+   --------------------------------------------------------------------------- */
+.pc-relief {
+  position: relative;
+  isolation: isolate;
+}
+
+.pc-relief::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat;
+  mix-blend-mode: hard-light;
+  opacity: var(--grain-strength, 0.16);
+}
+
+.pc-relief[aria-pressed="true"]::after,
+.pc-relief-sunken::after {
+  opacity: calc(var(--grain-strength, 0.16) * 1.6);
+}
+
+@media (width <= 780px) {
+  .pc-relief::after {
+    background-image: url("/textures/paper-grain-sm.webp");
+  }
+}
+
+@media print {
+  .pc-relief::after {
+    display: none;
+  }
 }
 
 /* Phones: form controls at 16px minimum. iOS Safari zooms the page in

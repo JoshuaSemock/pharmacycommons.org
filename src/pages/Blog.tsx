@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import Button from '../components/Button'
 import PageShell, { RailHeading } from './PageShell'
 import { listPosts, allTags, formatDate } from '../blog'
 
@@ -122,17 +123,8 @@ function TagButton({
   onClick: () => void
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`rounded-md border px-2.5 py-1 font-sans text-[12.5px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 ${
-        active
-          ? 'border-aqua-400 bg-aqua-100 text-ink'
-          : 'border-sage-200 bg-white/60 text-ink hover:border-sage-300'
-      }`}
-    >
+    <Button variant="hepatica" size="sm" selected={active} onClick={onClick}>
       {label}
-    </button>
+    </Button>
   )
 }
