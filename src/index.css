@@ -5,7 +5,12 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-display: 'Newsreader', Georgia, serif;
+  /* One typeface for all reading text. --font-display is kept as a token
+     so existing font-display classes and var(--font-display) styles keep
+     working, but it now resolves to the same sans as body copy (the serif
+     was dropped 2026-09-30 for legibility). IBM Plex Mono is reserved for
+     the Tailwind font-mono utility: identifiers, codes, JSON. */
+  --font-display: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   --font-sans: 'IBM Plex Sans Condensed', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
@@ -192,7 +197,7 @@ body {
 }
 
 h1, h2, h3, .article-body h1 {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
 }
 
 /* Golden ratio heading defaults. Tailwind's text-* utilities

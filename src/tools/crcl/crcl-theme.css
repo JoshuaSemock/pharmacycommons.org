@@ -68,7 +68,7 @@
 /* ---------------------------------------------------------------- labels */
 
 /* Sentence case everywhere. The widget's uppercase + tracking reads as
-   template chrome and fights the display serif. */
+   template chrome and fights the heading type. */
 .crcl.pc-crcl .crcl-panel > legend,
 .crcl.pc-crcl .crcl-card-title,
 .crcl.pc-crcl .crcl-headline-label,
@@ -138,7 +138,7 @@
 /* -------------------------------------------------------------- headline */
 
 /* The one place the page spends its boldness: the number itself, in
-   the display serif, on the same hepatica wash as the Pharmacopoe Ai block. */
+   semibold display type, on the same hepatica wash as the Pharmacopoe Ai block. */
 .crcl.pc-crcl .crcl-headline {
   border-color: var(--color-hepatica-200);
   border-radius: 0.75rem;

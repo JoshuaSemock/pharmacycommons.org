@@ -44,7 +44,7 @@
         }
 
         body {
-            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
             background: var(--bg);
             color: var(--ink);
             margin: 0;
@@ -61,7 +61,7 @@
         }
 
         .article-body h1 {
-            font-family: 'Fraunces', serif;
+            font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
             font-size: var(--text-3xl);
             border-bottom: 2px solid var(--moss-300);
             padding-bottom: 0.5rem;
@@ -74,7 +74,7 @@
             padding: 0.5rem 1rem;
             border: none;
             border-radius: var(--radius);
-            font-family: 'IBM Plex Sans', sans-serif;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
@@ -95,7 +95,7 @@
 
         .infobox h3 {
             margin-top: 0;
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
             color: var(--moss-700);
             border-bottom: 1px solid var(--line);
             padding-bottom: 0.5rem;
@@ -140,7 +140,7 @@
             <button id="edit-btn" onclick="toggleEdit()" class="btn btn-secondary" style="display: none;">Edit Monograph</button>
             <button id="save-btn" onclick="saveArticle()" class="btn btn-primary" style="display: none;">Save Changes</button>
         </div>
-        <textarea id="drug-editor" style="display: none; width: 100%; height: 400px; font-family: 'IBM Plex Mono', monospace; padding: 1rem; border: 1px solid var(--line); background: var(--bg-raised); color: var(--ink); border-radius: var(--radius); margin-bottom: 1rem; box-sizing: border-box;"></textarea>
+        <textarea id="drug-editor" style="display: none; width: 100%; height: 400px; font-family: ui-monospace, 'Courier New', monospace; padding: 1rem; border: 1px solid var(--line); background: var(--bg-raised); color: var(--ink); border-radius: var(--radius); margin-bottom: 1rem; box-sizing: border-box;"></textarea>
 
         <div id="drug-content">
             <p style="color: var(--ink-soft);">Querying the compendium...</p>
