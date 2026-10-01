@@ -150,36 +150,26 @@
   --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
-     Paper relief (2026-10-01). Buttons and cards are pressed into the
-     sheet: raised (embossed) at rest, stamped in (debossed) when
-     selected. Light comes from the top left at 45°.
-     Fills: *-emboss is the raised face; *-deboss is a step darker,
-     the shade at the bottom of the cavity. Same hues as the mint and
-     hepatica ramps above. Text on them is still ink (text-ink).
-     Shadows read their colors from --relief-light / --relief-dark
-     (set on :root below) so dark mode can swap them; Tailwind inlines
-     @theme shadow values into the utility, so overriding --shadow-*
-     itself in dark mode would do nothing.
+     Paper relief (2026-10-01, plan 4.1). Buttons and cards are pressed
+     into the sheet: raised (embossed) at rest, stamped in (debossed) when
+     selected. Light comes from the top left. The depth comes entirely from
+     box-shadow: a crisp white highlight and a clean transparent-black
+     shadow. The fill stays the same color in both states, with no texture
+     or blend layer on top.
+     Shadow colors come from --relief-* vars (on :root below) because
+     Tailwind inlines @theme shadow values into the utility, so dark mode
+     can only change them through vars.
      Components: src/components/Button.tsx, src/components/Card.tsx.
      --------------------------------------------------------------- */
-  --color-mint-emboss: oklch(93.5% 0.045 170);
-  --color-mint-deboss: oklch(86.5% 0.065 170);
-  --color-hepatica-emboss: oklch(93.0% 0.040 302);
-  --color-hepatica-deboss: oklch(85.5% 0.060 302);
+  --color-hepatica-base: oklch(92% 0.035 295);
+  --color-mint-base: oklch(93% 0.040 170);
 
-  /* Emboss: a 1px bevel on the face (lit top-left edge, shaded
-     bottom-right edge), a tight contact shadow, then the soft cast shadow.
-     Deboss: a crisp shaded rim along the top-left inner wall, a soft
-     cavity shade, and the lit bottom-right inner wall. */
+  /* Raised: white top-left highlight, dark bottom-right shadow, rim light. */
   --shadow-emboss:
-    inset 1px 1px 0 var(--relief-bevel-light), inset -1px -1px 0 var(--relief-bevel-dark),
-    -2px -2px 4px var(--relief-light), 1px 1px 1px var(--relief-contact), 3px 4px 9px var(--relief-dark);
-  --shadow-emboss-hover:
-    inset 1px 1px 0 var(--relief-bevel-light), inset -1px -1px 0 var(--relief-bevel-dark),
-    -3px -3px 6px var(--relief-light), 1px 2px 2px var(--relief-contact), 5px 7px 14px var(--relief-dark-strong);
-  --shadow-deboss:
-    inset 2px 2px 2px var(--relief-rim), inset 4px 5px 9px var(--relief-cavity),
-    inset -2px -2px 3px var(--relief-light);
+    -3px -3px 6px var(--relief-light), 3px 3px 6px var(--relief-dark),
+    inset 1px 1px 1px var(--relief-rim);
+  /* Sunken: inner top-left shadow, inner bottom-right highlight. */
+  --shadow-deboss: inset 3px 3px 6px var(--relief-cavity), inset -3px -3px 6px var(--relief-light);
 
   /* ---------------------------------------------------------------
      LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
@@ -237,38 +227,24 @@
 :root {
   color-scheme: light;
 
-  /* Paper relief light and shade (see --shadow-emboss in @theme).
-     --relief-depth scales every shade at once: 1 is the default, 0.5 is
-     half as deep, 1.5 deeper. The highlights don't scale (on floral-white
-     paper a white highlight is near invisible, so depth comes from shade). */
-  --relief-depth: 1;
-  --relief-light: rgb(255 255 255 / 0.95);
-  --relief-bevel-light: rgb(255 255 255 / 0.85);
-  --relief-bevel-dark: oklch(25% 0.02 145 / calc(0.16 * var(--relief-depth)));
-  --relief-contact: oklch(25% 0.02 145 / calc(0.22 * var(--relief-depth)));
-  --relief-dark: oklch(25% 0.02 145 / calc(0.26 * var(--relief-depth)));
-  --relief-dark-strong: oklch(25% 0.02 145 / calc(0.32 * var(--relief-depth)));
-  --relief-rim: oklch(25% 0.05 170 / calc(0.35 * var(--relief-depth)));
-  --relief-cavity: oklch(25% 0.06 170 / calc(0.38 * var(--relief-depth)));
+  /* Paper relief light and shade (see --shadow-emboss in @theme). */
+  --relief-light: rgb(255 255 255 / 0.9);
+  --relief-dark: rgb(0 0 0 / 0.12);
+  --relief-rim: rgb(255 255 255 / 0.5);
+  --relief-cavity: rgb(0 0 0 / 0.18);
 }
 
-/* Dark paper: white highlights glow on #3a3a3a, so the lit edge is only a
-   faint sheen and the shade is near-black. The relief fills drop below the
-   paper (deboss lowest) so the cavity still reads as the darker surface. */
+/* Dark paper (#3a3a3a): a 90% white highlight would glow, so the light is a
+   faint sheen and the shade carries the depth. The base fills drop to a dark
+   tint, still the same in both states. */
 :root[data-theme="dark"] {
-  --relief-light: rgb(255 255 255 / 0.08);
-  --relief-bevel-light: rgb(255 255 255 / 0.14);
-  --relief-bevel-dark: rgb(0 0 0 / calc(0.3 * var(--relief-depth)));
-  --relief-contact: rgb(0 0 0 / calc(0.4 * var(--relief-depth)));
-  --relief-dark: rgb(0 0 0 / calc(0.5 * var(--relief-depth)));
-  --relief-dark-strong: rgb(0 0 0 / calc(0.6 * var(--relief-depth)));
-  --relief-rim: rgb(0 0 0 / calc(0.55 * var(--relief-depth)));
-  --relief-cavity: rgb(0 0 0 / calc(0.6 * var(--relief-depth)));
+  --relief-light: rgb(255 255 255 / 0.07);
+  --relief-dark: rgb(0 0 0 / 0.45);
+  --relief-rim: rgb(255 255 255 / 0.1);
+  --relief-cavity: rgb(0 0 0 / 0.5);
 
-  --color-mint-emboss: oklch(40.0% 0.050 170);
-  --color-mint-deboss: oklch(31.0% 0.045 170);
-  --color-hepatica-emboss: oklch(40.0% 0.050 302);
-  --color-hepatica-deboss: oklch(31.0% 0.050 302);
+  --color-hepatica-base: oklch(40% 0.045 295);
+  --color-mint-base: oklch(40% 0.045 170);
 }
 
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
@@ -678,49 +654,6 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   width: 100%;
   min-width: 0;
   overflow-wrap: break-word;
-}
-
-/* ---------------------------------------------------------------------------
-   Paper relief grain (src/components/Button.tsx, Card.tsx). The sheet's grain
-   (.paper-sheet::before) sits *under* the page content, so a filled button or
-   card would cover it and look like plastic. .pc-relief lays the same grain
-   tile back over the element, hard-light like the sheet (the tile is
-   neutral-gray = no change, so multiply would darken everything). A debossed
-   element ([aria-pressed="true"] or .pc-relief-sunken) takes the grain at
-   2x: the darker cavity pulls more of the paper's texture into view.
-   --grain-size and --grain-strength inherit from .page-content.
-   --------------------------------------------------------------------------- */
-.pc-relief {
-  position: relative;
-  isolation: isolate;
-}
-
-.pc-relief::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat;
-  mix-blend-mode: hard-light;
-  opacity: var(--grain-strength, 0.16);
-}
-
-.pc-relief[aria-pressed="true"]::after,
-.pc-relief-sunken::after {
-  opacity: calc(var(--grain-strength, 0.16) * 2);
-}
-
-@media (width <= 780px) {
-  .pc-relief::after {
-    background-image: url("/textures/paper-grain-sm.webp");
-  }
-}
-
-@media print {
-  .pc-relief::after {
-    display: none;
-  }
 }
 
 /* Phones: form controls at 16px minimum. iOS Safari zooms the page in
