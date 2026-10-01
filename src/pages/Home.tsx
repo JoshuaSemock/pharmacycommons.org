@@ -68,20 +68,16 @@ function Hero() {
 
   return (
     <section className="pt-8 pb-6 text-center sm:pt-16 sm:pb-14">
-      {/* Kicker. Sizes are pixel values on purpose: this site's phi scale makes
-          text-xs 9.9px, too small for a sentence. */}
-      {/* Title. Size comes from .pc-hero-title in src/index.css: the bare h1 rule
-          there is unlayered, so text-* utilities on an h1 are ignored. */}
-      <h1
-        className="pc-hero-title mx-auto mb-3 max-w-4xl font-display text-balance text-ink"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
+      {/* Title. Type specs (size, weight, tracking) come from .pc-hero-title in
+          src/index.css, matched to the Nav wordmark: the bare h1 rule there is
+          unlayered, so text-* utilities on an h1 are ignored. */}
+      <h1 className="pc-hero-title mx-auto mb-3 max-w-4xl text-balance text-ink">
         Pharmacy Commons
       </h1>
 
       {/* Scope and educational disclaimer */}
       <p className="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-normal text-pretty text-ink sm:text-[13.5px]">
-        Together we can cultivate our commons to create an open compendium of drug information and clinical evidence accessible to all. 
+        Together we can cultivate our commons to create an open compendium of drug information and clinical evidence accessible to all.
         Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
       </p>
 
