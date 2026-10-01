@@ -36,7 +36,7 @@ export default function BlogPost() {
     <>
       <Link
         to="/blog"
-        className="inline-block font-sans text-[13.5px] text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+        className="inline-block font-sans text-[13.5px] text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
       >
         ← All posts
       </Link>
@@ -71,7 +71,7 @@ export default function BlogPost() {
             <li key={tag}>
               <Link
                 to={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="block rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500"
+                className="block rounded-md border border-sage-200 bg-white/60 px-2 py-0.5 font-sans text-[12.5px] text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
               >
                 {tag}
               </Link>

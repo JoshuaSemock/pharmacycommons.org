@@ -94,9 +94,9 @@ export default function SiteMenu() {
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        className="lp-toggle flex h-10 w-10 shrink-0 items-center justify-center rounded-md max-[359px]:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+        className="lp-toggle flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[3.4px] rounded-md max-[359px]:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
       >
-        {isOpen ? <CloseIcon /> : <HamburgerIcon />}
+        <MenuBars open={isOpen} />
       </button>
 
       {/* Dimmed page under the bar; tapping it closes the menu. */}
@@ -115,7 +115,7 @@ export default function SiteMenu() {
         aria-label="Site menu"
         onBlur={onPanelBlur}
         className={[
-          'absolute inset-x-0 top-full border-b border-mint-200 bg-paper shadow-lg shadow-mint-900/10',
+          'pc-grain absolute inset-x-0 top-full bg-paper shadow-lg shadow-black/15',
           'max-h-[calc(100dvh-var(--nav-h,3.5rem))] overflow-y-auto overscroll-contain',
           'transition-[opacity,translate,visibility] duration-200 ease-out motion-reduce:transition-none',
           isOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0',
@@ -124,13 +124,13 @@ export default function SiteMenu() {
         <div className="mx-auto max-w-page px-4 pt-2 pb-6 sm:px-6 md:grid md:grid-cols-[1fr_1.6fr_1fr] md:gap-x-10 md:pt-5">
           <div>
             {/* The bar shows the account button from md up; below that it lives here. */}
-            <div className="border-b border-mint-200/70 py-3 md:hidden">
+            <div className="lp-rule-b py-3 md:hidden">
               <AccountButton block />
             </div>
             <MenuGroup label="Explore" links={EXPLORE_LINKS} />
           </div>
 
-          <div className="border-t border-mint-200/70 md:border-t-0">
+          <div className="lp-rule-t-until-md">
             <GroupLabel>Tools</GroupLabel>
             <div className="sm:grid sm:grid-cols-2 sm:gap-x-6">
               {ACTIVE_TOOL_SECTIONS.map(section => (
@@ -148,7 +148,7 @@ export default function SiteMenu() {
             </div>
           </div>
 
-          <div className="border-t border-mint-200/70 md:border-t-0">
+          <div className="lp-rule-t-until-md">
             <MenuGroup label="About the Commons" links={REFERENCE_LINKS} />
             <MenuGroup label="Legal" links={LEGAL_LINKS} small />
             <AppearanceControl />
@@ -169,7 +169,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
   const { user, loading } = useSession()
   const base = [
     'items-center justify-center rounded-md px-3 font-sans text-[13px] font-medium whitespace-nowrap text-ink',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
     block ? 'flex h-11 w-full' : 'inline-flex h-9',
   ].join(' ')
 
@@ -220,12 +220,10 @@ function MenuGroup({ label, links, small = false }: { label: string; links: Menu
               end
               className={({ isActive }) =>
                 [
-                  'flex min-h-11 items-center rounded-r-lg border-l-2 px-3 font-sans transition-colors md:min-h-9',
-                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
+                  'lp-flat flex min-h-11 items-center rounded-md px-3 font-sans text-ink md:min-h-9',
+                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40',
                   small ? 'text-[13px]' : 'text-[14.5px]',
-                  isActive
-                    ? 'border-hepatica-500 bg-white text-ink'
-                    : `border-transparent hover:bg-mint-100 ${small ? 'text-ink' : 'text-ink'}`,
+                  isActive ? 'font-medium' : '',
                 ].join(' ')
               }
             >
@@ -240,9 +238,9 @@ function MenuGroup({ label, links, small = false }: { label: string; links: Menu
 
 function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
   const className = [
-    'flex min-h-11 items-center rounded-r-lg border-l-2 px-3 font-sans text-[14.5px] transition-colors md:min-h-9',
-    'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hepatica-500',
-    current ? 'border-hepatica-500 bg-white text-ink' : 'border-transparent text-ink hover:bg-mint-100',
+    'lp-flat flex min-h-11 items-center rounded-md px-3 font-sans text-[14.5px] text-ink md:min-h-9',
+    'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40',
+    current ? 'font-medium' : '',
   ].join(' ')
   if (tool.to) {
     return (
@@ -274,7 +272,7 @@ function AppearanceControl() {
   return (
     <section aria-label="Appearance" className="pb-2">
       <GroupLabel>Appearance</GroupLabel>
-      <div role="radiogroup" aria-label="Color theme" className="mx-3 mt-1 inline-flex rounded-lg border border-mint-200 p-0.5">
+      <div role="radiogroup" aria-label="Color theme" className="mx-3 mt-1 inline-flex gap-1">
         {THEME_OPTIONS.map(option => {
           const selected = choice === option.value
           return (
@@ -285,9 +283,9 @@ function AppearanceControl() {
               aria-checked={selected}
               onClick={() => setChoice(option.value)}
               className={[
-                'min-h-9 rounded-md px-3 font-sans text-[13px] transition-colors',
-                'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-hepatica-500',
-                selected ? 'bg-hepatica-100 font-medium text-ink' : 'text-ink hover:bg-mint-100',
+                'lp-toggle min-h-9 rounded-md px-3 font-sans text-[13px] text-ink',
+                'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
+                selected ? 'font-medium' : '',
               ].join(' ')}
             >
               {option.label}
@@ -299,18 +297,19 @@ function AppearanceControl() {
   )
 }
 
-function HamburgerIcon() {
+/**
+ * Three bars that fold into an X when the menu opens: the top bar drops to the
+ * middle and turns 45°, the middle one fades, the bottom one rises and turns
+ * -45°. Bars are 1.6px with 3.4px gaps, so each outer bar sits 5px from the
+ * centre. The same transition runs both ways; reduced motion skips it.
+ */
+function MenuBars({ open }: { open: boolean }) {
+  const bar = 'block h-[1.6px] w-[18px] rounded-full bg-current transition-[translate,rotate,opacity] duration-300 ease-in-out motion-reduce:transition-none'
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
+    <>
+      <span aria-hidden="true" className={`${bar} ${open ? 'translate-y-[5px] rotate-45' : ''}`} />
+      <span aria-hidden="true" className={`${bar} ${open ? 'opacity-0' : 'opacity-100'}`} />
+      <span aria-hidden="true" className={`${bar} ${open ? '-translate-y-[5px] -rotate-45' : ''}`} />
+    </>
   )
 }

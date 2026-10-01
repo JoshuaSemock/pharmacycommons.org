@@ -162,7 +162,7 @@
      Each layer's color is a --lp-* var (on :root below), because
      Tailwind inlines @theme shadow values into the utility, so
      redefining --shadow-* for dark mode would do nothing.
-     Text gets a 1px ink impression (.pc-letterpress, below).
+     Text has no shadow or impression; the ink stays crisp (2026-10-01).
      Components: src/components/Button.tsx, Card.tsx, Stamp.tsx.
      --------------------------------------------------------------- */
   /* Raised: hard top-left rim, tight drop edge, faint ambient drop, plus
@@ -242,8 +242,6 @@
   --lp-slope: rgb(0 0 0 / 0.07);
   --lp-crease: rgb(0 0 0 / 0.06);
   --lp-floor: rgb(255 255 255 / 0.9);
-  --lp-text-raised: 0 1px 0 rgb(255 255 255 / 0.6);
-  --lp-text-sunken: 0 -1px 0 rgb(255 255 255 / 0.4);
 }
 
 :root[data-theme="dark"] {
@@ -256,30 +254,19 @@
   --lp-slope: rgb(0 0 0 / 0.3);
   --lp-crease: rgb(0 0 0 / 0.25);
   --lp-floor: rgb(255 255 255 / 0.12);
-  --lp-text-raised: 0 1px 0 rgb(0 0 0 / 0.8);
-  --lp-text-sunken: 0 -1px 0 rgb(0 0 0 / 0.8);
-}
-
-/* Letterpress ink impression: the 1px text-shadow that makes the ink sit
-   in (or on) the stamped paper. Raised by default; sunken when the element
-   is pressed (aria-pressed="true") or is a sunken card. */
-.pc-letterpress {
-  text-shadow: var(--lp-text-raised);
-}
-.pc-letterpress[aria-pressed="true"],
-.pc-letterpress-sunken {
-  text-shadow: var(--lp-text-sunken);
 }
 
 /* Letterpress states, one class per behaviour (2026-10-01). Each sets the
-   shadow and the ink impression together, so markup needs one class.
+   shadow, so markup needs one class. Text is never shadowed (see the
+   text-shadow rule below): the relief is in the paper, the ink stays crisp.
      .lp-raised   embossed, always (labels, cards, plain buttons)
      .lp-sunken   debossed, always (signed-in badge, wells)
      .lp-field    a text field: embossed at rest, debossed while focused
                   (being typed into). Put it on the wrapper round the input.
      .lp-toggle   embossed, debossed while pressed/open/selected:
                   aria-pressed="true", aria-expanded="true",
-                  aria-selected="true", aria-current="page" or .lp-on.
+                  aria-selected="true", aria-checked="true",
+                  aria-current="page" or .lp-on.
      .lp-flat     no relief at rest, debossed when aria-current="page",
                   aria-pressed="true" or aria-selected="true" (bar links,
                   the A-Z letters, tabs).
@@ -288,6 +275,7 @@
    Rules are scored into the paper (a shaded line with a lit line below)
    instead of colored borders:
      .lp-rule-t / .lp-rule-b / .lp-rule-y   on a container's top/bottom/both
+     .lp-rule-t-until-md                    top rule below md only (stacked columns)
      .lp-score    a 1px horizontal line element (h-px spans)
      .lp-score-v  a 1px vertical line element
      .lp-divide-y between the children of a list */
@@ -295,7 +283,6 @@
 .lp-field,
 .lp-toggle {
   box-shadow: var(--shadow-emboss);
-  text-shadow: var(--lp-text-raised);
 }
 .lp-sunken,
 .lp-field:focus-within,
@@ -303,19 +290,19 @@
 .lp-toggle[aria-expanded="true"],
 .lp-toggle[aria-selected="true"],
 .lp-toggle[aria-current="page"],
+.lp-toggle[aria-checked="true"],
 .lp-toggle.lp-on,
 .lp-flat[aria-current="page"],
 .lp-flat[aria-pressed="true"],
 .lp-flat[aria-selected="true"],
 .lp-press:active {
   box-shadow: var(--shadow-deboss);
-  text-shadow: var(--lp-text-sunken);
 }
 .lp-field,
 .lp-toggle,
 .lp-flat,
 .lp-press {
-  transition: box-shadow 150ms ease, text-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
   .lp-field,
@@ -328,6 +315,9 @@
 
 .lp-rule-t { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
 .lp-rule-b { box-shadow: inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim); }
+@media (width < 48rem) {
+  .lp-rule-t-until-md { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+}
 .lp-rule-y {
   box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim),
     inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim);
@@ -547,6 +537,14 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   .pc-hero-title { font-size: var(--text-5xl); }
 }
 
+/* No text shadows anywhere (2026-10-01): text renders as plain, crisp ink.
+   The letterpress relief lives in box-shadow only. */
+*,
+*::before,
+*::after {
+  text-shadow: none !important;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-mint-200) transparent;
@@ -743,6 +741,38 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   width: 100%;
   min-width: 0;
   overflow-wrap: break-word;
+}
+
+/* Paper grain on surfaces that sit above the sheet (the sticky nav bar and
+   the site menu panel), so they read as the same paper rather than a flat
+   band. Same tile and blend as .paper-sheet::before; --grain-size and
+   --grain-strength inherit from .page-content. The grain sits between the
+   element's own background and its content (isolation + z-index -1), so it
+   never covers links or controls. Doesn't set `position`: the element must
+   already be positioned (sticky / absolute). */
+.pc-grain {
+  isolation: isolate;
+}
+.pc-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat;
+  mix-blend-mode: hard-light;
+  opacity: var(--grain-strength, 0.16);
+}
+@media (width <= 780px) {
+  .pc-grain::before {
+    background-image: url("/textures/paper-grain-sm.webp");
+  }
+}
+@media print {
+  .pc-grain::before {
+    display: none;
+  }
 }
 
 /* Phones: form controls at 16px minimum. iOS Safari zooms the page in

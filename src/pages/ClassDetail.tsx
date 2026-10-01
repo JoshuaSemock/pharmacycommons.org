@@ -235,7 +235,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
             onChange={e => setQuery(e.target.value)}
             placeholder={`Filter ${members.length.toLocaleString()} drugs`}
             aria-label="Filter drugs in this class"
-            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-aqua-400 focus:outline-none sm:w-64"
+            className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none sm:w-64"
           />
         )}
       </div>

@@ -348,7 +348,7 @@ function CitationSettings({
                 onClick={() => onStyle(s.id)}
                 className={[
                   'rounded-md border px-2.5 py-1 font-sans text-sm transition-colors',
-                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
                   selected
                     ? 'border-aqua-400 bg-aqua-100 text-ink'
                     : 'border-sage-200 bg-white/60 text-ink hover:border-sage-300',
@@ -465,10 +465,10 @@ function useCopy() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-ink/40 focus:bg-white focus:ring-2 focus:ring-ink/20'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
 
 const sourceBadgeClass =
   'rounded border border-mint-300 bg-mint-100 px-1.5 py-0.5 font-mono text-xs text-ink'

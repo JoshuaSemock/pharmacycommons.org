@@ -193,7 +193,7 @@ export default function SearchView() {
         </p>
 
         <div className="mt-6 max-w-lg">
-          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-2.5 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50">
+          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-2.5">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -338,7 +338,7 @@ export default function SearchView() {
               <div className="mt-8 flex flex-col items-center gap-2">
                 <button
                   onClick={() => setLimit(l => l + pageSize)}
-                  className="lp-raised lp-press rounded-md px-6 py-2.5 font-sans text-[13px] font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+                  className="lp-raised lp-press rounded-md px-6 py-2.5 font-sans text-[13px] font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                 >
                   Load {Math.min(per || remaining, remaining).toLocaleString()} more
                 </button>
@@ -394,7 +394,7 @@ function CharacterIndex({
         <button
           onClick={() => onSelect(null)}
           aria-pressed={!active}
-          className={`lp-flat shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+          className={`lp-flat shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
             !active ? 'font-medium' : ''
           }`}
         >
@@ -417,7 +417,7 @@ function CharacterIndex({
                 aria-pressed={isActive}
                 aria-label={b.kind === 'latin' || b.kind === 'numeric' ? undefined : b.name}
                 title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
-                className={`lp-flat rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+                className={`lp-flat rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
                   !n ? 'cursor-default' : isActive ? 'font-medium' : ''
                 }`}
               >
@@ -459,7 +459,7 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
   return (
     <button
       onClick={onSelect}
-      className="lp-raised lp-press group rounded-md p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+      className="lp-raised lp-press group rounded-md p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
     >
       <div className="mb-3 flex items-start gap-2">
         <span className="lp-sunken flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-mono text-[11px] font-medium text-ink">
@@ -583,7 +583,7 @@ function PageSizeSelect({
         onChange(e.target.value)
       }}
       onBlur={() => setOpen(false)}
-      className={`lp-toggle ${open ? 'lp-on' : ''} cursor-pointer rounded-md border-0 bg-transparent py-1 pr-1 pl-2 font-mono text-[12px] text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700`}
+      className={`lp-toggle ${open ? 'lp-on' : ''} cursor-pointer rounded-md border-0 bg-transparent py-1 pr-1 pl-2 font-mono text-[12px] text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40`}
     >
       {children}
     </select>

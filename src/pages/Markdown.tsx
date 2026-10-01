@@ -68,7 +68,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
 
 function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
   const className =
-    'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500'
+    'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 
   // Internal route — keep it a client-side navigation.
   if (href && href.startsWith('/')) {

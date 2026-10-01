@@ -90,7 +90,7 @@ function Hero() {
 
       <div className="relative mx-auto max-w-lg text-left">
         <form onSubmit={handleSubmit} role="search">
-          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-3 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-hepatica-700/50">
+          <div className="lp-field flex items-center gap-2 rounded-md px-4 py-3">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
               <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
               <path d="M10 10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -216,7 +216,7 @@ function WhatsNew() {
               >
                 <Link
                   to={item.to}
-                  className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+                  className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                 >
                   {item.title}
                 </Link>

@@ -236,7 +236,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                     {(['json', 'jsonld'] as const).map(f => (
                       <label key={f} className="relative cursor-pointer">
                         <input type="radio" name="console-fmt" checked={format === f} onChange={() => update({ fmt: f })} className="peer sr-only" />
-                        <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-mono text-[12.5px] text-ink peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-focus-visible:ring-2 peer-focus-visible:ring-hepatica-300">
+                        <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-mono text-[12.5px] text-ink peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
                           {f === 'json' ? '.json' : '.jsonld'}
                         </span>
                       </label>
@@ -406,4 +406,4 @@ export default function Console({ apiBase }: { apiBase: string }) {
 export const CODE_SURFACE = 'pc-code bg-neutral-900 text-ink'
 const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10'
 const fieldClass =
-  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200'
+  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20'

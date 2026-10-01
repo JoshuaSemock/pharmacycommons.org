@@ -215,7 +215,7 @@
           <div class="paper-sheet" aria-hidden="true"></div>
           <!-- Mirrors src/Nav.tsx. The search is a plain GET form, so it works before
                (and without) JavaScript; the menu button is a placeholder until React mounts. -->
-          <header class="lp-rule-b sticky top-0 z-50 bg-paper/80">
+          <header class="pc-grain lp-rule-b sticky top-0 z-50 bg-paper">
             <div class="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
               <a href="/" class="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 md:h-auto" aria-label="Pharmacy Commons home">
                 <span class="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
@@ -235,8 +235,10 @@
                 <li><a href="/tools" class="flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] min-[360px]:text-[13.5px] text-ink min-[400px]:px-2.5 sm:text-[14px]">Tools</a></li>
               </ul>
               <span class="lp-raised hidden h-9 w-[8.5rem] shrink-0 rounded-md md:block" aria-hidden="true"></span>
-              <span class="lp-raised flex h-10 w-10 shrink-0 max-[359px]:w-9 items-center justify-center rounded-md text-ink" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+              <span class="lp-raised flex h-10 w-10 shrink-0 max-[359px]:w-9 flex-col items-center justify-center gap-[3.4px] rounded-md text-ink" aria-hidden="true">
+                <span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span>
+                <span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span>
+                <span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span>
               </span>
             </div>
           </header>

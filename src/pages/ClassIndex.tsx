@@ -143,7 +143,7 @@ export default function ClassIndex() {
               onChange={e => setQuery(e.target.value)}
               placeholder={showCodes ? 'Filter by name or code' : 'Filter by name'}
               aria-label="Filter classes"
-              className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-aqua-400 focus:outline-none sm:w-64"
+              className="w-full rounded-lg border border-sage-200 bg-white px-3 py-1.5 font-sans text-sm text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none sm:w-64"
             />
           </div>
 

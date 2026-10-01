@@ -173,7 +173,7 @@ function SignedIn({ email }: { email: string }) {
             onClick={() => setTab(t.key)}
             className={[
               'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
-              'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
+              'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
               tab === t.key
                 ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
                 : 'text-ink',
@@ -742,7 +742,7 @@ function TabButton({
       onClick={onClick}
       className={[
         'rounded-md px-3.5 py-1.5 font-sans text-sm font-medium transition-colors',
-        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-aqua-500',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
         active
           ? 'bg-white text-ink shadow-[0_1px_3px_rgb(0_0_0/0.14),0_1px_1px_rgb(0_0_0/0.06)] ring-1 ring-sage-200'
           : 'text-ink',
@@ -941,7 +941,7 @@ function RegisterForm() {
             type="checkbox"
             checked={agreedToTerms}
             onChange={e => setAgreedToTerms(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-ink focus:ring-mint-500"
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-mint-300 accent-mint-600 text-ink focus:ring-ink/20"
           />
           <span className="font-sans leading-relaxed">
             I agree to the Pharmacy Commons{' '}
@@ -989,13 +989,13 @@ function Field({
 }
 
 const inputClass =
-  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-aqua-400 focus:bg-white focus:ring-2 focus:ring-aqua-200'
+  'w-full rounded-lg border border-sage-200 bg-white/70 px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none transition-all focus:border-ink/40 focus:bg-white focus:ring-2 focus:ring-ink/20'
 
 const buttonClass =
-  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-40'
+  'rounded-md border border-sage-200 bg-white/60 px-2.5 py-1 font-sans text-sm text-ink transition-colors hover:border-sage-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
 
 const primaryButtonClass =
-  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-500 disabled:opacity-50'
+  'rounded-lg border border-aqua-400 bg-aqua-400/10 px-4 py-2 font-sans text-sm font-medium text-ink transition-colors hover:border-aqua-500 hover:bg-aqua-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-50'
 
 // primaryButtonClass already sets disabled:opacity-50; swap it rather than stack
 // two opacity utilities whose winner depends on stylesheet order.

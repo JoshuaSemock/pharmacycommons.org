@@ -91,7 +91,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
             role="region"
             aria-label="Medication table"
             tabIndex={0}
-            className="relative min-w-0 overflow-x-auto border-y border-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300"
+            className="relative min-w-0 overflow-x-auto border-y border-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
           >
             <table className="w-full border-separate border-spacing-0 font-sans text-[13.5px] text-ink">
               <thead>

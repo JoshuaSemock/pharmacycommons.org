@@ -437,7 +437,7 @@ function SmallButton({ onClick, children }: { onClick: () => void; children: Rea
     <button
       type="button"
       onClick={onClick}
-      className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+      className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
     >
       {children}
     </button>
@@ -450,7 +450,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`lp-flat rounded-md px-3 py-1.5 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${active ? 'font-medium' : ''}`}
+      className={`lp-flat rounded-md px-3 py-1.5 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${active ? 'font-medium' : ''}`}
     >
       {children}
     </button>

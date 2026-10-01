@@ -317,7 +317,7 @@ function SaveButton({
         disabled={pending}
         aria-pressed={saved}
         title={saved ? 'Remove from saved pages' : 'Save this page to your account'}
-        className="lp-toggle flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-sm font-medium text-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+        className="lp-toggle flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-sm font-medium text-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
       >
         <BookmarkIcon filled={saved} />
         {saved ? 'Saved' : 'Save'}
@@ -523,7 +523,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
             <Link
               to={`/classes/${c.slug}`}
               title={[c.source_code, c.name, c.is_direct ? null : '(via a sub-class)'].filter(Boolean).join(' · ')}
-              className={`inline-flex max-w-full items-baseline gap-1.5 rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700 ${
+              className={`inline-flex max-w-full items-baseline gap-1.5 rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
                 c.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
               }`}
             >
@@ -609,7 +609,7 @@ function BrandRow({ label, brands, muted = false }: { label: string; brands: Bra
             target="_blank"
             rel="noopener noreferrer"
             title={`${text} on Drugs@FDA${muted ? ' (discontinued)' : ''}`}
-            className={`${cls} ${muted ? '' : 'lp-press'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700`}
+            className={`${cls} ${muted ? '' : 'lp-press'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40`}
           >
             {text}
           </a>
@@ -691,7 +691,7 @@ function HierarchyList({ members }: { members: HierarchyMember[] }) {
           <li key={m.pcid_code}>
             <button
               onClick={() => navigate(`/drugs/${m.slug}`)}
-              className="lp-raised lp-press block w-full min-w-0 rounded-md px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+              className="lp-raised lp-press block w-full min-w-0 rounded-md px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
             >
               <span className="block break-words font-sans text-sm font-medium leading-snug text-ink">
                 {formatDrugName(m.name)}
@@ -884,7 +884,7 @@ function ListsCard({ pcidCode }: { pcidCode: string }) {
             <li key={l.slug}>
               <Link
                 to={`/lists/${l.slug}`}
-                className="lp-raised lp-press flex items-baseline justify-between gap-3 rounded-md px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+                className="lp-raised lp-press flex items-baseline justify-between gap-3 rounded-md px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
               >
                 <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">
                   {l.title}

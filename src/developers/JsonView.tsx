@@ -52,7 +52,7 @@ function Key({ name, path, onCopyPath }: { name: string | number; path: (string 
         type="button"
         title={`Copy path ${jsonPath(path)}`}
         onClick={() => onCopyPath?.(jsonPath(path))}
-        className="rounded-sm text-ink hover:bg-white/10 focus-visible:outline-1 focus-visible:outline-hepatica-300"
+        className="rounded-sm text-ink hover:bg-white/10 focus-visible:outline-1 focus-visible:outline-ink/40"
       >
         "{name}"
       </button>

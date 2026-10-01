@@ -157,7 +157,7 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
               {data.n_labels > 1 ? `${data.n_labels.toLocaleString()} labels on file ·` : ''} View another
             </span>
             <select
-              className="lp-raised min-w-0 max-w-[16rem] cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hepatica-700"
+              className="lp-raised min-w-0 max-w-[16rem] cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
               value=""
               onChange={e => e.target.value && onPick(e.target.value)}
             >

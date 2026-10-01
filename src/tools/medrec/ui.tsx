@@ -11,16 +11,16 @@ import type { Seg } from './sig'
 import type { Tone } from './model'
 
 export const inputClass =
-  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200 disabled:bg-neutral-100'
+  'w-full min-w-0 rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20 disabled:bg-neutral-100'
 export const numberClass = `${inputClass} font-mono text-[13.5px]`
 export const primaryButton =
-  'inline-flex items-center gap-1.5 rounded-lg border border-mint-700 bg-mint-100 px-3.5 py-1.5 font-sans text-[13px] font-medium text-ink transition-colors hover:bg-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300'
+  'inline-flex items-center gap-1.5 rounded-lg border border-mint-700 bg-mint-100 px-3.5 py-1.5 font-sans text-[13px] font-medium text-ink transition-colors hover:bg-mint-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const secondaryButton =
-  'inline-flex items-center gap-1.5 rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink transition-colors hover:border-mint-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300'
+  'inline-flex items-center gap-1.5 rounded-lg border border-mint-300 bg-white px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink transition-colors hover:border-mint-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const quietButton =
-  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-mint-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hepatica-300'
+  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-mint-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const dangerQuietButton =
-  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300'
+  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 
 /** Labelled control. Wrap exactly one input/select so the label names it. */
 export function Field({ label, hint, children, className = '' }: { label: ReactNode; hint?: ReactNode; children: ReactNode; className?: string }) {
@@ -52,7 +52,7 @@ export function ChipRadio<T extends string>({
       {options.map(([v, text]) => (
         <label key={v} className="relative cursor-pointer">
           <input type="radio" name={name} value={v} checked={value === v} onChange={() => onChange(v)} className="peer sr-only" />
-          <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-sans text-[13px] text-ink transition-colors hover:border-mint-400 peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-hepatica-300">
+          <span className="inline-block rounded-full border border-mint-200 bg-white px-3 py-1 font-sans text-[13px] text-ink transition-colors hover:border-mint-400 peer-checked:border-hepatica-300 peer-checked:bg-hepatica-100 peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
             {text}
           </span>
         </label>

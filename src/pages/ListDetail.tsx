@@ -286,7 +286,7 @@ function Items({ list }: { list: ListRecord }) {
           onChange={e => setQuery(e.target.value)}
           placeholder={`Filter ${list.items.length.toLocaleString()} drugs`}
           aria-label="Filter drugs on this list"
-          className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-hepatica-400 focus:outline-none focus:ring-2 focus:ring-hepatica-200 sm:w-64"
+          className="w-full rounded-lg border border-mint-200 bg-white px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/20 sm:w-64"
         />
         {tops.length > 0 && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
