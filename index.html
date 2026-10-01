@@ -69,10 +69,9 @@
     </script>
 
     <!-- The lichen background is the Largest Contentful Paint element, but CSS
-         only discovers it after the stylesheet loads. Preload whichever one the
-         breakpoint in src/index.css (780px) will use. -->
-    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg_mobile.webp" media="(max-width: 780px)" fetchpriority="high" />
-    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg.webp" media="(min-width: 781px)" fetchpriority="high" />
+         only discovers it after the stylesheet loads. One image for all screen
+         sizes (src/index.css, "Background"). -->
+    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg.webp" fetchpriority="high" />
 
     <!-- Machine-readable entry points for crawlers and AI agents. -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />

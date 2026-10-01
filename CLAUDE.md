@@ -147,9 +147,9 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   (display) + IBM Plex Sans Condensed / IBM Plex Mono. Page = a torn-edged
   paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,
   the reverse) over the lichen photo at full strength (`public/textures/lichen_bg.webp`,
-  `lichen_bg_mobile.webp` below 780px, preloaded in `index.html`; both made at the source's
-full resolution by `scripts/lichen-images.py` from `assets/textures/lichen_bg.jpg`, the
-mobile one as a portrait crop). Torn edges, rim relief,
+  one image for every screen size, still — no parallax since 2026-10-01 — preloaded in
+  `index.html`; made at the source's full resolution by `scripts/lichen-images.py` from
+  `assets/textures/lichen_bg.jpg`). Torn edges, rim relief,
   shadow and paper grain are cut from the photos `assets/textures/paper.png` and
   `paper-texture.png` by `scripts/paper-textures.py` → `public/textures/paper-*.webp`
   (sources aren't served; rerun the script after replacing either). **Dark mode** (2026-10-01): `<html data-theme>` set before paint
