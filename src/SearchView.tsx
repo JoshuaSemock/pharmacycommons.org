@@ -350,17 +350,6 @@ export default function SearchView() {
           </>
         )}
       </section>
-
-      {/* Data provenance footer */}
-      {!searching && (
-        <footer className="lp-rule-t mt-16 pt-8">
-          <div className="grid gap-6 sm:grid-cols-3">
-            <DataSource icon="🏛️" label="FDA DailyMed" desc="Structured product labels, NDC directory, drug interactions" />
-            <DataSource icon="🧪" label="PubChem / ChEMBL" desc="Chemical structure, CAS numbers, InChIKey identifiers" />
-            <DataSource icon="🌿" label="Founded by Dr. Joshua Semock, PharmD" desc="(Aug. 2026) contact@pharmacycommons.org" />
-          </div>
-        </footer>
-      )}
     </main>
   )
 }
@@ -546,17 +535,6 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
   )
 }
 
-function DataSource({ icon, label, desc }: { icon: string; label: string; desc: string }) {
-  return (
-    <div className="flex gap-3">
-      <span className="text-xl leading-none mt-0.5">{icon}</span>
-      <div className="min-w-0">
-        <p className="font-sans text-[13px] font-medium text-ink">{label}</p>
-        <p className="font-sans text-[12px] text-ink leading-relaxed">{desc}</p>
-      </div>
-    </div>
-  )
-}
 
 /**
  * The page-size dropdown. Letterpress: raised at rest, pressed in while its
