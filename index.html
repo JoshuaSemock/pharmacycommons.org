@@ -68,10 +68,30 @@
       })()
     </script>
 
-    <!-- The lichen background is the Largest Contentful Paint element, but CSS
-         only discovers it after the stylesheet loads. One image for all screen
-         sizes (src/index.css, "Background"). -->
-    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg.webp" fetchpriority="high" />
+    <!-- Background images (src/index.css, "Background"). CSS only discovers
+         them after the stylesheet loads, so they are preloaded here.
+         The Largest Contentful Paint element is the paper sheet, and its image
+         is the grain tile: phones get the 900px tile, larger screens the 1200px
+         one. The lichen is preloaded on larger screens only; on phones, where
+         it shows just in the strips beside the sheet, it waits for window load
+         (the .pc-bg-ready class below) so it doesn't compete with the page. -->
+    <link rel="preload" as="image" type="image/webp" href="/textures/paper-grain-sm.webp" media="(width <= 780px)" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/webp" href="/textures/paper-grain.webp" media="(width > 780px)" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/webp" href="/textures/lichen_bg.webp" media="(width > 780px)" />
+    <script>
+      // After window load AND after a frame has painted (two animation frames):
+      // load can fire before the first paint, and the lichen must not start
+      // downloading until the page (and its LCP) is on screen.
+      window.addEventListener('load', function () {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            setTimeout(function () {
+              document.documentElement.classList.add('pc-bg-ready')
+            }, 0)
+          })
+        })
+      })
+    </script>
 
     <!-- Machine-readable entry points for crawlers and AI agents. -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -222,14 +242,14 @@
           </header>
 
           <main class="mx-auto max-w-page px-4 pb-24 sm:px-6">
-            <section class="pt-8 pb-8 text-center sm:pt-16 sm:pb-14">
+            <section class="pt-8 pb-6 text-center sm:pt-16 sm:pb-14">
               <p class="mx-auto mb-2.5 max-w-2xl font-sans text-[12.5px] font-medium leading-snug text-pretty text-hepatica-700 sm:text-[13px]">
                 Together we can cultivate our commons to create an open compendium of drug information and clinical evidence accessible to all.
               </p>
               <h1 class="pc-hero-title mx-auto mb-3 max-w-4xl font-display font-semibold text-balance text-mint-950">
                 Pharmacy Commons
               </h1>
-              <p class="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-relaxed text-pretty text-hepatica-800 sm:text-[13.5px] sm:leading-normal">
+              <p class="mx-auto mb-6 max-w-xl font-sans text-[13px] leading-normal text-pretty text-hepatica-800 sm:text-[13.5px]">
                 Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
               </p>
               <p class="mt-5 font-sans text-[13px] text-mint-700 sm:text-[13.5px]">

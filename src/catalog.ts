@@ -49,7 +49,7 @@
  * leave the door open for a future "show combinations too" toggle.
  */
 
-import { supabase } from './supabaseClient'
+import { getSupabase } from './db'
 
 export type CatalogEntry = {
   /** Numeric payload of the PCID, e.g. 1000233 */
@@ -157,6 +157,7 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
   if (_loading) return _loading
 
   _loading = (async () => {
+    const supabase = await getSupabase()
     const [rows, comboRows, comboNameRows] = await Promise.all([
       fetchAll<CatalogRow>((from, to) =>
         supabase

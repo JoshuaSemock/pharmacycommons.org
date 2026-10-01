@@ -11,6 +11,7 @@ Outputs (served from public/textures/, used by "Background" in src/index.css):
                          laid over the paper color with soft-light, so it adds
                          the fibres and flecks without changing the paper's
                          color (works on floral white and black olive alike).
+  paper-grain-sm.webp    the same tile at 900px for phones (max-width: 780px).
   paper-edge-l.webp      the left / right torn edges of paper.png, straightened
   paper-edge-r.webp      and made to tile vertically. Alpha = the torn outline
                          (used as the mask); RGB = the edge's relief (rim
@@ -40,6 +41,10 @@ OUT = ROOT / 'public' / 'textures'
 GRAIN_CROP = 1200       # px of the scan per tile (shown at half size: 2x sharp)
 GRAIN_SIGMA = 24        # high-pass radius: keeps fibres and flecks, drops shading
 GRAIN_GAIN = 1.5        # strength baked into the tile (CSS opacity tunes it down)
+# Phones get the same tile at 900px (1.5x where it's drawn at 600px): about a
+# third of the bytes, and it is the Largest Contentful Paint image on mobile.
+GRAIN_PHONE = 900
+GRAIN_PHONE_QUALITY = 60
 
 
 def luminance(rgb: np.ndarray) -> np.ndarray:
@@ -66,7 +71,10 @@ def build_grain() -> None:
     detail = lum - gaussian_filter(lum, GRAIN_SIGMA)
     detail = make_seamless(detail)
     gray = np.clip(128 + detail * GRAIN_GAIN, 0, 255).astype(np.uint8)
-    Image.fromarray(gray, 'L').convert('RGB').save(OUT / 'paper-grain.webp', quality=72, method=6)
+    tile = Image.fromarray(gray, 'L').convert('RGB')
+    tile.save(OUT / 'paper-grain.webp', quality=72, method=6)
+    phone = tile.resize((GRAIN_PHONE, GRAIN_PHONE), Image.LANCZOS)
+    phone.save(OUT / 'paper-grain-sm.webp', quality=GRAIN_PHONE_QUALITY, method=6)
 
 
 # ── Edges ────────────────────────────────────────────────────────────────────
