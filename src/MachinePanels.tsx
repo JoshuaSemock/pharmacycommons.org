@@ -248,7 +248,7 @@ function RecordDialog({
         </div>
         <button
           onClick={onClose}
-          className="rounded-md px-2 py-1 font-sans text-sm text-ink hover:bg-sage-100"
+          className="rounded-md px-2 py-1 font-sans text-sm text-ink hover:bg-mint-100"
         >
           Close
         </button>
@@ -296,7 +296,7 @@ function JsonView({ doc }: { doc: EntityDocument }) {
           Open in API ↗
         </a>
       </div>
-      <pre className="overflow-x-auto rounded-lg bg-sage-50 p-4 font-mono text-2xs leading-relaxed text-ink">
+      <pre className="overflow-x-auto rounded-lg bg-mint-50 p-4 font-mono text-2xs leading-relaxed text-ink">
         {text}
       </pre>
     </div>
@@ -419,7 +419,7 @@ function UrlRow({ label, display, copy, href }: { label: string; display: string
           target="_blank"
           rel="noopener noreferrer"
           title={copy}
-          className="block break-all font-mono text-2xs leading-relaxed text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
+          className="block break-all font-mono text-2xs leading-relaxed text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-700"
         >
           {display}
         </a>
@@ -477,8 +477,8 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
 function Skeleton() {
   return (
     <div className="space-y-2" aria-busy="true">
-      <div className="h-4 w-4/5 animate-pulse rounded bg-sage-100" />
-      <div className="h-4 w-3/5 animate-pulse rounded bg-sage-100" />
+      <div className="h-4 w-4/5 animate-pulse rounded bg-mint-100" />
+      <div className="h-4 w-3/5 animate-pulse rounded bg-mint-100" />
     </div>
   )
 }

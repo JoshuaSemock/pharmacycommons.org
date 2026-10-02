@@ -60,7 +60,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
   const insidePre = useContext(InsidePre)
   if (insidePre) return <code>{children}</code>
   return (
-    <code className="rounded bg-sage-100 px-1 py-0.5 font-mono text-[0.88em] text-ink">
+    <code className="rounded bg-mint-100 px-1 py-0.5 font-mono text-[0.88em] text-ink">
       {children}
     </code>
   )
@@ -68,7 +68,7 @@ function CodeSpan({ children }: { children?: ReactNode }) {
 
 function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
   const className =
-    'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
+    'text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 
   // Internal route — keep it a client-side navigation.
   if (href && href.startsWith('/')) {
@@ -141,7 +141,7 @@ const components: Components = {
   strong: ({ children }) => <strong className="font-medium text-ink">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => (
-    <del className="text-ink line-through decoration-sage-400">{children}</del>
+    <del className="text-ink line-through decoration-mint-500">{children}</del>
   ),
 
   ul: ({ children }) => (
@@ -177,7 +177,7 @@ const components: Components = {
       <table className="w-full border-collapse font-sans text-md">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-sage-100">{children}</thead>,
+  thead: ({ children }) => <thead className="bg-mint-100">{children}</thead>,
   tr: ({ children }) => <tr className="border-b border-ink/15 last:border-0">{children}</tr>,
   th: ({ node: _node, children, ...props }) => (
     <th
@@ -214,7 +214,7 @@ const components: Components = {
         checked={checked}
         disabled={disabled}
         readOnly
-        className="mr-1.5 align-middle accent-aqua-600"
+        className="mr-1.5 align-middle accent-hepatica-600"
       />
     ) : null,
 

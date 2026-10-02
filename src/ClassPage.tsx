@@ -211,7 +211,7 @@ function SubClasses({ cls }: { cls: ClassDetail }) {
           <li key={c.slug}>
             <Link
               to={`/classes/${c.slug}`}
-              className="flex items-baseline gap-3 px-4 py-2.5 transition-colors hover:bg-sage-50"
+              className="flex items-baseline gap-3 px-4 py-2.5 transition-colors hover:bg-mint-50"
             >
               {c.source_code && (
                 <span className="w-20 shrink-0 font-mono text-[12px] text-ink">{c.source_code}</span>
@@ -296,7 +296,7 @@ function Members({ cls, directCount }: { cls: ClassDetail; directCount: number }
                   type="checkbox"
                   checked={directOnly}
                   onChange={e => setDirectOnly(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-aqua-600"
+                  className="h-3.5 w-3.5 accent-hepatica-600"
                 />
                 Direct members only
               </label>

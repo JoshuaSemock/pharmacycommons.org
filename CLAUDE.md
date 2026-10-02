@@ -139,42 +139,14 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 - **Styling:** Tailwind CSS v4, CSS-first — all tokens in `src/index.css` inside
   `@theme {}`, no `tailwind.config.js`. Watch for token-name collisions with Tailwind
   built-ins.
-- **Design system:** OKLCH palette — mint (primary), hepatica (secondary), salmon
-  (accent), rose (warning), marigold (caution, also eco-risk "moderate"), sky (info),
-  neutral (floral white `#faf9f5` → black olive `#3a3a3a`). Steps 50–950, base 400;
-  ramps are for fills, borders, rings and underlines only. **All text is `text-ink`**
-  (2026-10-01): neutral-800 `#3a3a3a` in light mode, neutral-50 `#faf9f5` in dark mode,
-  headings and body alike; code panels (`.pc-code`) use neutral-50 in both. Never give text
-  a palette color (mint, hepatica, neutral, white …). Legacy sage/aqua/violet/coral/
-  amber names are aliases pending migration. Fonts **as shipped**: Newsreader
-  (display) + IBM Plex Sans Condensed / IBM Plex Mono. Page = a torn-edged
-  paper sheet (`bg-paper`: `#faf9f5` light / `#3a3a3a` dark; default text `text-ink`,
-  the reverse) over the lichen photo at full strength (`public/textures/lichen_bg.webp`,
-  one image for every screen size, still — no parallax since 2026-10-01 — preloaded in
-  `index.html` on screens wider than 780px; on phones it is fetched only after load and first
-  paint (`.pc-bg-ready`), and phones get the 900px `paper-grain-sm.webp` (the mobile LCP image); made at the source's full resolution by `scripts/lichen-images.py` from
-  `assets/textures/lichen_bg.jpg`). Torn edges, rim relief,
-  shadow and paper grain are cut from the photos `assets/textures/paper.png` and
-  `paper-texture.png` by `scripts/paper-textures.py` → `public/textures/paper-*.webp`
-  (sources aren't served; rerun the script after replacing either). **Dark mode** (2026-10-01): `<html data-theme>` set before paint
-  by the script in `index.html` (saved choice → system), switch in Site menu → Appearance
-  (`src/theme.ts`). Dark flips every ramp end for end in `src/index.css`, so existing
-  classes need no `dark:` copy; `dark:` exists for exceptions; `.pc-code` keeps code
-  panels dark. **Boxes only where they mean something** (design note
-  `docs/design-paper-and-dark-mode.md`): clickable cards and link tiles, alerts/callouts,
-  the FDA boxed warning, the eco-risk card, tool results/editors, form controls, code.
-  Reading sections, rail panels and table wrappers are rules, not boxes.
-  **Dropdowns and date fields (2026-10-02): never a native `<select>` or `<input type="date">`**
-  — the OS draws their lists/calendars in its own colors. Use `src/components/PaperSelect.tsx`
-  (accepts `options` or `<option>`/`<optgroup>` children; `onChange(value)`; search field
-  auto-appears past 12 options) and `PaperDatePicker.tsx` (ISO `value`/`onChange`, month +
-  year menus for DOB). Both are colorless: raised trigger, pressed while open, grained paper
-  panel (`.lp-popover .pc-grain`), rows embossed when active and debossed when chosen
-  (`.lp-option`). Autocomplete lists reuse `.lp-popover` / `.lp-option[data-active]`. The
-  vanilla CrCl widget's controls are mirrored by `enhanceNativeControls()` (`nativeBridge.tsx`).
-  phi (1.618) type scale.
-  ⚠ An older note named Playfair + Figtree — that is **not** what the code uses. Ask
-  Joshua before changing fonts either way.
+- **Design system: read `docs/design-system.md` before styling anything.** It is the
+  single reference for the look: paper sheet on lichen, colorless letterpress
+  (emboss/deboss) controls, all text in one ink color, light/dark mode, the palette and
+  where color may appear, one sans-serif typeface (IBM Plex Sans Condensed; Mono only
+  for codes and IDs), the golden-ratio type scale, spacing, components (`Button`,
+  `Card`, `Stamp`, `PaperSelect`, `PaperDatePicker`) and open design questions. Never
+  use a native `<select>` or `<input type="date">`. Keep that doc in step with
+  `src/index.css` in the same commit as any styling change.
 - **Backend:** Supabase Postgres, project `nenwovhyrdcdkhxzjiiv` ("Pharmaceutical
   Commons Database"). RLS on every table. `src/supabaseClient.ts` is the single
   `createClient()` (publishable `sb_publishable_…` key). Code that runs on every page (header,
@@ -377,11 +349,8 @@ formulations in the moiety hierarchy (phase 10).
   `needs_manual_review.csv`.
 - Tests: `api.test.ts` / `integration.test.ts` not yet updated for moiety-only
   filtering and hierarchy.
-- **Heading sizes:** the `h1`–`h6` font-size rules in `src/index.css` are unlayered,
-  so they outrank Tailwind's `text-*` utilities (which live in `@layer utilities`).
-  A `text-[22px]` on an `h2` is ignored site-wide. Wrapping them in `@layer base`
-  fixes it but resizes headings everywhere — Joshua's design call. New code sets
-  heading sizes inline until then.
+- **Heading sizes:** the unlayered `h1`–`h6` rules beat Tailwind `text-*` utilities;
+  see `docs/design-system.md` §4 (Joshua's call to change).
 - **Migrations `phase8i_public_read_surfaces` and `phase8j_data_license` were never
   applied** (checked 2026-09-28 against `supabase_migrations.schema_migrations`), although
   both files say they were. Live effect: `api_meta.data_license` is NULL, so every API

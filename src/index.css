@@ -5,6 +5,7 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Design reference: docs/design-system.md. Keep the two in step. */
   /* One typeface for all reading text. --font-display is kept as a token
      so existing font-display classes and var(--font-display) styles keep
      working, but it now resolves to the same sans as body copy (the serif
@@ -47,7 +48,7 @@
      the light page. On the dark page (neutral-800) it flips: 50–400
      read as text (all >= 5.8:1), 600+ do not.
      --------------------------------------------------------------- */
-  /* Mint aquamarine — PRIMARY (base 400 = #62d6b2). Brand, frame, ink tint. */
+  /* Mint aquamarine — PRIMARY (base 400 = #62d6b2). Brand mark. */
   --color-mint-50: oklch(96.9% 0.022 172);    /* #e7faf3 */
   --color-mint-100: oklch(95.5% 0.038 170);   /* #d8f9ec */
   --color-mint-200: oklch(91.1% 0.093 170);   /* #a1f6d8 */
@@ -60,7 +61,7 @@
   --color-mint-900: oklch(33.7% 0.055 170);   /* #134033 */
   --color-mint-950: oklch(25.0% 0.033 170);   /* #10271f */
 
-  /* Purple hepatica — SECONDARY (base 400 = #cbabfd). Links, active/selected states. */
+  /* Purple hepatica — SECONDARY (base 400 = #cbabfd). Link underlines. */
   --color-hepatica-50: oklch(96.9% 0.012 301);/* #f6f3fc */
   --color-hepatica-100: oklch(95.4% 0.019 302);/* #f2edfb */
   --color-hepatica-200: oklch(91.0% 0.043 302);/* #e6dbfa */
@@ -176,50 +177,6 @@
   --shadow-deboss:
     inset 1px 1px 1px var(--lp-wall), inset 2px 2px 3px var(--lp-slope),
     inset 0 0 0 1px var(--lp-crease), inset -1px -1px 0 var(--lp-floor);
-
-  /* ---------------------------------------------------------------
-     LEGACY ALIASES — the pre-2026-09 names, repointed at the new ramps
-     so existing components recolor without edits. Values are literal
-     copies (not var() refs) so Tailwind's theme pruning can't drop the
-     target. Migrate components to the new names, then delete this block.
-       sage   -> mint       (dark steps shift: sage-600 -> mint-700, etc.)
-       aqua   -> hepatica
-       violet -> hepatica   (violet-600 -> hepatica-700 for text)
-       coral  -> rose       (coral-600 -> rose-700 for text)
-       amber  -> marigold
-     --------------------------------------------------------------- */
-  --color-sage-50: oklch(96.9% 0.022 172);    /* = mint-50 */
-  --color-sage-100: oklch(95.5% 0.038 170);   /* = mint-100 */
-  --color-sage-200: oklch(91.1% 0.093 170);   /* = mint-200 */
-  --color-sage-300: oklch(84.5% 0.122 170);   /* = mint-300 */
-  --color-sage-400: oklch(73.4% 0.114 170);   /* = mint-500 */
-  --color-sage-600: oklch(51.8% 0.103 170);   /* = mint-700 */
-  --color-sage-700: oklch(42.6% 0.083 170);   /* = mint-800 */
-  --color-sage-800: oklch(33.7% 0.055 170);   /* = mint-900 */
-  --color-sage-900: oklch(25.0% 0.033 170);   /* = mint-950 */
-
-  --color-aqua-100: oklch(95.4% 0.019 302);   /* = hepatica-100 */
-  --color-aqua-200: oklch(91.0% 0.043 302);   /* = hepatica-200 */
-  --color-aqua-300: oklch(84.4% 0.087 302);   /* = hepatica-300 */
-  --color-aqua-400: oklch(79.9% 0.118 302);   /* = hepatica-400 */
-  --color-aqua-500: oklch(73.4% 0.146 302);   /* = hepatica-500 */
-  --color-aqua-600: oklch(67.0% 0.165 301);   /* = hepatica-600 */
-  --color-aqua-700: oklch(54.7% 0.157 301);   /* = hepatica-700 */
-
-  --color-violet-100: oklch(95.4% 0.019 302); /* = hepatica-100 */
-  --color-violet-200: oklch(91.0% 0.043 302); /* = hepatica-200 */
-  --color-violet-300: oklch(84.4% 0.087 302); /* = hepatica-300 */
-  --color-violet-400: oklch(79.9% 0.118 302); /* = hepatica-400 */
-  --color-violet-600: oklch(54.7% 0.157 301); /* = hepatica-700 */
-
-  --color-coral-100: oklch(95.4% 0.018 0);    /* = rose-100 */
-  --color-coral-200: oklch(91.0% 0.043 360);  /* = rose-200 */
-  --color-coral-300: oklch(84.5% 0.086 1);    /* = rose-300 */
-  --color-coral-400: oklch(80.6% 0.117 0);    /* = rose-400 */
-  --color-coral-600: oklch(55.4% 0.179 0);    /* = rose-700 */
-
-  --color-amber-100: oklch(96.1% 0.032 85);   /* = marigold-100 */
-  --color-amber-400: oklch(87.1% 0.110 85);   /* = marigold-400 */
 }
 
 /* ---------------------------------------------------------------------------
@@ -477,39 +434,6 @@
   --color-neutral-800: oklch(91.0% 0.007 95);       /* = neutral-200 */
   --color-neutral-900: oklch(95.4% 0.006 95);       /* = neutral-100 */
   --color-neutral-950: oklch(98.2% 0.005 95);       /* = neutral-50 */
-
-  --color-sage-50: oklch(25.0% 0.033 170);          /* = mint-950 */
-  --color-sage-100: oklch(33.7% 0.055 170);         /* = mint-900 */
-  --color-sage-200: oklch(42.6% 0.083 170);         /* = mint-800 */
-  --color-sage-300: oklch(51.8% 0.103 170);         /* = mint-700 */
-  --color-sage-400: oklch(73.4% 0.114 170);         /* = mint-500 */
-  --color-sage-600: oklch(84.5% 0.122 170);         /* = mint-300 */
-  --color-sage-700: oklch(91.1% 0.093 170);         /* = mint-200 */
-  --color-sage-800: oklch(95.5% 0.038 170);         /* = mint-100 */
-  --color-sage-900: oklch(96.9% 0.022 172);         /* = mint-50 */
-
-  --color-aqua-100: oklch(35.2% 0.083 301);         /* = hepatica-900 */
-  --color-aqua-200: oklch(44.9% 0.124 301);         /* = hepatica-800 */
-  --color-aqua-300: oklch(54.7% 0.157 301);         /* = hepatica-700 */
-  --color-aqua-400: oklch(67.0% 0.165 301);         /* = hepatica-600 */
-  --color-aqua-500: oklch(73.4% 0.146 302);         /* = hepatica-500 */
-  --color-aqua-600: oklch(79.9% 0.118 302);         /* = hepatica-400 */
-  --color-aqua-700: oklch(84.4% 0.087 302);         /* = hepatica-300 */
-
-  --color-violet-100: oklch(35.2% 0.083 301);       /* = hepatica-900 */
-  --color-violet-200: oklch(44.9% 0.124 301);       /* = hepatica-800 */
-  --color-violet-300: oklch(54.7% 0.157 301);       /* = hepatica-700 */
-  --color-violet-400: oklch(67.0% 0.165 301);       /* = hepatica-600 */
-  --color-violet-600: oklch(84.4% 0.087 302);       /* = hepatica-300 */
-
-  --color-coral-100: oklch(35.6% 0.094 0);          /* = rose-900 */
-  --color-coral-200: oklch(45.5% 0.141 0);          /* = rose-800 */
-  --color-coral-300: oklch(55.4% 0.179 0);          /* = rose-700 */
-  --color-coral-400: oklch(67.0% 0.189 0);          /* = rose-600 */
-  --color-coral-600: oklch(84.5% 0.086 1);          /* = rose-300 */
-
-  --color-amber-100: oklch(34.5% 0.054 85);         /* = marigold-900 */
-  --color-amber-400: oklch(77.4% 0.108 85);         /* = marigold-600 */
 }
 
 /* Code panels (CODE_SURFACE in src/developers/Console.tsx) stay dark in both

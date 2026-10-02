@@ -179,7 +179,7 @@ function SignedIn({ email }: { email: string }) {
           >
             {t.label}
             {t.key === 'saved' && savedCount !== null && savedCount > 0 && (
-              <span className="ml-1.5 rounded-full bg-sage-200 px-1.5 py-0.5 font-mono text-xs text-ink">
+              <span className="ml-1.5 rounded-full bg-mint-200 px-1.5 py-0.5 font-mono text-xs text-ink">
                 {savedCount}
               </span>
             )}
@@ -1000,4 +1000,4 @@ const registerButtonClass = `${primaryButtonClass.replace('disabled:opacity-50',
 const consentLinkClass = 'font-medium underline'
 
 const errorClass =
-  'lp-sunken rounded-md bg-coral-100 px-3.5 py-2.5 font-sans text-sm text-ink'
+  'lp-sunken rounded-md bg-rose-100 px-3.5 py-2.5 font-sans text-sm text-ink'
