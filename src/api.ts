@@ -113,6 +113,13 @@ const HUMANIZED_FIELDS: Record<string, string> = {
   mpje_relevance: 'MPJE relevance',
 }
 
+/** A description to show, or null when it is missing, blank or the placeholder "Unassigned". */
+export function toDescription(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null
+  const text = raw.trim()
+  return text && text.toLowerCase() !== 'unassigned' ? text : null
+}
+
 /** Builds the detail page's attribute list from whichever satellite columns are populated. */
 function toAttributes(row: Record<string, unknown>): Record<string, unknown> {
   const attrs: Record<string, unknown> = {}
@@ -166,12 +173,9 @@ export async function getDrugBySlug(slug: string, options: { signal?: AbortSigna
     slug: entity.slug,
     name: entity.name,
     entity_type: toDrugEntityType(entityType),
-    // Hand-written one-liner (moieties.description_text, phase 13). Other blocks
-    // have no such column yet; the page shows "Unassigned" when this is null.
-    description:
-      typeof satellite.description_text === 'string' && satellite.description_text.trim()
-        ? satellite.description_text.trim()
-        : null,
+    // Hand-written one-liner (moieties.description_text, phase 13). Blank or
+    // "Unassigned" counts as none; other blocks have no such column yet.
+    description: toDescription(satellite.description_text),
     eco_risk: null, // no eco-metrics table yet — Phase 4
     status: 'full',
   }
