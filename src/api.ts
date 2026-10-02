@@ -166,8 +166,12 @@ export async function getDrugBySlug(slug: string, options: { signal?: AbortSigna
     slug: entity.slug,
     name: entity.name,
     entity_type: toDrugEntityType(entityType),
-    // The page shows "Unassigned" when this is null (DrugDetail.tsx).
-    description: typeof satellite.class_name === 'string' && satellite.class_name.trim() ? satellite.class_name : null,
+    // Hand-written one-liner (moieties.description_text, phase 13). Other blocks
+    // have no such column yet; the page shows "Unassigned" when this is null.
+    description:
+      typeof satellite.description_text === 'string' && satellite.description_text.trim()
+        ? satellite.description_text.trim()
+        : null,
     eco_risk: null, // no eco-metrics table yet — Phase 4
     status: 'full',
   }
