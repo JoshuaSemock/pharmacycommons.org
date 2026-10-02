@@ -215,6 +215,7 @@ vi.mock('@/supabaseClient', () => ({
 }))
 
 const {
+  toDescription,
   getDrugByPcid,
   getDrugBySlug,
   getDrugInteractions,
@@ -229,6 +230,19 @@ const ENTITY_TYPES: DrugEntityType[] = ['drug', 'combination']
 const PCID_RE = /^PCID-[12]\d{6}$/
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+describe('toDescription', () => {
+  it('drops missing, blank and placeholder descriptions', () => {
+    expect(toDescription(null)).toBeNull()
+    expect(toDescription('   ')).toBeNull()
+    expect(toDescription('Unassigned')).toBeNull()
+    expect(toDescription(' unassigned ')).toBeNull()
+  })
+
+  it('keeps written text, trimmed', () => {
+    expect(toDescription('  Biguanide for type 2 diabetes. ')).toBe('Biguanide for type 2 diabetes.')
+  })
+})
 
 describe('getDrugBySlug', () => {
   it('returns a Supabase-backed record for a known slug', async () => {

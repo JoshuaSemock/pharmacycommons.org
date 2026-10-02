@@ -27,7 +27,7 @@ import type { LabelState, Loadable } from './drugPageData'
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
 //
 // Header: name + INN on the left, Save on the right; entity type; brand names;
-// description ("Unassigned" when the record has none).
+// the one-line description (moieties.description_text), omitted when there is none.
 //
 // Reading order (phones stack exactly this way):
 //   1. Jump to FDA prescribing information
@@ -246,7 +246,9 @@ function DrugHeader({ drug }: { drug: DrugDetailType }) {
 
       <BrandLine brands={drug.brands ?? []} />
 
-      <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-ink">{drug.description || 'Unassigned'}</p>
+      {drug.description && (
+        <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-ink">{drug.description}</p>
+      )}
     </header>
   )
 }
