@@ -252,7 +252,7 @@ describe('getDrugBySlug', () => {
     // Every moiety gets a `hierarchy` object (see api.ts:getMoietyHierarchy);
     // the fixture's moiety_hierarchy table is empty, so it's all-empty, not null.
     const drug = await getDrugBySlug('ibuprofen')
-    expect(drug?.hierarchy).toEqual({ precise_forms: [], combinations: [], brand_names: [] })
+    expect(drug?.hierarchy).toEqual({ precise_forms: [], formulations: [], combinations: [], brand_names: [] })
   })
 
   it('leaves hierarchy null for a non-moiety entity', async () => {

@@ -87,9 +87,10 @@ export interface LabelText {
  * Pass `setid` to show a specific label (e.g. the user picked another
  * manufacturer); otherwise the entity's best-ranked label is used.
  */
-export async function getLabelText(slug: string, setid?: string): Promise<LabelText> {
+export async function getLabelText(slug: string, setid?: string, signal?: AbortSignal): Promise<LabelText> {
   const { data, error } = await supabase.functions.invoke<LabelText>('label-text', {
     body: setid ? { setid } : { slug },
+    signal,
   })
   if (error) throw new Error(`Failed to load label text for '${slug}': ${error.message}`)
   if (!data) throw new Error(`Empty label response for '${slug}'`)

@@ -48,13 +48,14 @@ export type HierarchyMember = {
 }
 
 /**
- * A moiety's precise forms, combination products, and known brand names —
- * derived from the `moiety_hierarchy` materialized view (base_name matching;
- * there's no FK for this yet). Only present on a moiety's DrugDetail; null
- * for every other entity type.
+ * A moiety's precise forms (block 3), single-ingredient brand formulations
+ * (block 4), combination products (block 2) and known brand names — from the
+ * `moiety_hierarchy` materialized view. Only present on a moiety's
+ * DrugDetail; null for every other entity type.
  */
 export type MoietyHierarchy = {
   precise_forms: HierarchyMember[]
+  formulations: HierarchyMember[]
   combinations: HierarchyMember[]
   brand_names: string[]
 }
@@ -316,6 +317,10 @@ export type EntityList = {
   rank: number | null
   value: number | null
   legal_status: string | null
+  /** What `legal_status` means on this list, e.g. "Risk" on the arrhythmia list; null when it is a legal status. */
+  status_label?: string | null
+  /** Per-entry note, e.g. "Xanax XR · tablet" (Do Not Crush) or "ARS 3 · ACB 3" (anticholinergic burden). */
+  note?: string | null
   /** Set when the drug is on the list through a form or combination of it, e.g. hydrocodone via hydrocodone/acetaminophen. */
   via_pcid: number | null
   via_name: string | null

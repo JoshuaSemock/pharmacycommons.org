@@ -164,8 +164,6 @@ Deliberate exceptions, all Tailwind utilities:
 - `tracking-[-0.01em]` on the Nav wordmark and `.pc-hero-title` (the home title is the
   wordmark, larger: same family, weight 500, tracking).
 - `tracking-[-0.015em]` on the large page titles in `SearchView.tsx` and `ClassPage.tsx`.
-- Small uppercase labels with `tracking-[0.08em]`–`[0.1em]` in `LabelSections.tsx` and
-  `MachinePanels.tsx` (FDA label section headings, machine panel labels).
 - `tracking-[0.02em]` on group headings inside `PaperSelect`.
 
 **Size: one golden-ratio scale** (φ = 1.618, base 16px), as Tailwind `--text-*` tokens:
@@ -377,7 +375,5 @@ list), with nav and footer removed; that page sets landscape itself.
 - **Remaining color** listed in §3: link underlines, mint/hepatica row washes, the
   Developers endpoint list, the mint scrollbar, the "Signed In" dot, the CrCl widget.
   Keep each as meaning, or take it colorless.
-- **Tracked uppercase labels** in the FDA label sections and machine panels conflict
-  with "no decorative tracked all-caps labels" (CLAUDE.md, Design philosophy).
 - **Heading sizes:** move the h1–h6 rules into `@layer base` (§4).
 - **`font-display`:** retire the alias and its uses, now that there is one typeface.

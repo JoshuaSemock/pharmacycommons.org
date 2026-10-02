@@ -399,7 +399,7 @@ function UrlRow({ label, display, copy, href }: { label: string; display: string
   return (
     <div>
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
-        <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">{label}</p>
+        <p className="font-sans text-sm font-semibold text-ink">{label}</p>
         <button
           onClick={() =>
             navigator.clipboard.writeText(copy).then(() => {
@@ -457,17 +457,20 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   )
 }
 
-/** Same look as DrugDetail's SideCard, so the rail reads as one column. */
+/**
+ * A ruled sub-section under the drug page's "Additional metadata" heading
+ * (h3, sentence case — no tracked capitals since 2026-10-02).
+ */
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="border-t border-ink/15">
       <div className="py-3">
-        <h2
-          className="font-semibold uppercase tracking-[0.1em] text-ink"
-          style={{ fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
+        <h3
+          className="font-semibold text-ink"
+          style={{ fontSize: 'var(--text-base)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 }}
         >
           {title}
-        </h2>
+        </h3>
       </div>
       <div className="pb-4">{children}</div>
     </div>
@@ -477,8 +480,8 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
 function Skeleton() {
   return (
     <div className="space-y-2" aria-busy="true">
-      <div className="h-4 w-4/5 animate-pulse rounded bg-mint-100" />
-      <div className="h-4 w-3/5 animate-pulse rounded bg-mint-100" />
+      <div className="h-4 w-4/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
+      <div className="h-4 w-3/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
     </div>
   )
 }
