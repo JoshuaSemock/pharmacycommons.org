@@ -153,14 +153,14 @@ function HeaderSearch() {
       </form>
 
       {focused && suggestions.length > 0 && (
-        <div className="absolute top-full z-10 mt-1.5 w-full overflow-hidden rounded-md bg-paper shadow-lg shadow-black/15">
+        <div className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid w-full gap-0.5 overflow-hidden rounded-lg bg-paper p-1.5">
           {suggestions.map(entry => {
             const schedule = toDrug(entry).schedule
             return (
               <button
                 key={entry.n}
                 onMouseDown={() => handleSuggestion(entry.slug)}
-                className="flex min-h-[48px] w-full items-center gap-3 px-3 py-2 text-left hover:bg-neutral-100"
+                className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:shadow-emboss focus-visible:shadow-emboss focus-visible:outline-none"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-sans text-[13.5px] font-medium text-ink">{entry.name}</span>
@@ -169,7 +169,7 @@ function HeaderSearch() {
                   </span>
                 </span>
                 {schedule && (
-                  <span className="lp-raised rounded-md bg-rose-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
+                  <span className="lp-raised rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                     {schedule}
                   </span>
                 )}

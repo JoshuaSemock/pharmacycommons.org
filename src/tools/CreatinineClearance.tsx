@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { PageTitle, RailHeading } from '@/pages/PageShell'
 import OnThisPage, { scrollToId, useHeadings } from '@/pages/OnThisPage'
 import Markdown from '@/pages/Markdown'
+import { enhanceNativeControls } from '@/components/nativeBridge'
 
 // Order matters: ES imports evaluate in sequence, and crcl-ui.js throws if
 // CrClCore is not already on window. These are side-effect imports of plain
@@ -51,7 +52,10 @@ export default function CreatinineClearance() {
 
   useEffect(() => {
     const el = mountRef.current
-    if (el) window.CrClCalculator?.init(el)
+    if (!el) return
+    window.CrClCalculator?.init(el)
+    // Swap the widget's native selects and date field for letterpress ones.
+    return enhanceNativeControls(el)
   }, [])
 
   // Declared after useHeadings so heading ids exist before a deep link resolves.

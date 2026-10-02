@@ -4,7 +4,9 @@ import { PageTitle } from '@/pages/PageShell'
 import { FORMS, FREQS, STRENGTH_UNITS, applyFormDefaults, formDef, isFormId, newMedication, type Medication, type StrengthPer, type StrengthUnit } from '@/tools/medrec/model'
 import { fmt, maxInfo, num, sigSegments, sigText, unitOf } from '@/tools/medrec/sig'
 import NameSearch from '@/tools/medrec/NameSearch'
-import { ChipRadio, Field, SectionHeading, SigText, inputClass, numberClass, quietButton, secondaryButton } from '@/tools/medrec/ui'
+import { ChipRadio, Field, SectionHeading, SigText, inputClass, numberClass, quietButton, secondaryButton, selectClass } from '@/tools/medrec/ui'
+import PaperSelect from '@/components/PaperSelect'
+import PaperDatePicker from '@/components/PaperDatePicker'
 import {
   INSULIN_DEFAULTS,
   SUPPORTED_GROUPS,
@@ -279,7 +281,7 @@ export default function DaysSupply() {
                 <NameSearch id="ds-drug" value={m.drug} pcid={m.pcid} placeholder="Search by generic or brand name" onChange={(drug, pcid) => patch({ drug, pcid })} />
               </div>
               <Field label="Form" hint={basis ? BASIS_NOTE[basis] : undefined}>
-                <select value={m.form} onChange={e => isFormId(e.target.value) && changeForm(e.target.value)} className={inputClass}>
+                <PaperSelect value={m.form} onChange={v => isFormId(v) && changeForm(v)} className={selectClass}>
                   {SUPPORTED_GROUPS.map(([group, ids]) => (
                     <optgroup key={group} label={group}>
                       {ids.map(id => (
@@ -289,7 +291,7 @@ export default function DaysSupply() {
                       ))}
                     </optgroup>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -297,22 +299,22 @@ export default function DaysSupply() {
                 <NumberInput value={m.sv} onChange={sv => patch({ sv })} />
               </Field>
               <Field label="Strength unit">
-                <select value={m.su} onChange={e => patch({ su: e.target.value as StrengthUnit })} className={inputClass}>
+                <PaperSelect value={m.su} onChange={v => patch({ su: v as StrengthUnit })} className={selectClass}>
                   {STRENGTH_UNITS.map(s => (
                     <option key={s} value={s}>
                       {s}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
               <Field label="Per" className="col-span-2 sm:col-span-1">
-                <select value={m.sper} onChange={e => patch({ sper: e.target.value as StrengthPer })} className={inputClass}>
+                <PaperSelect value={m.sper} onChange={v => patch({ sper: v as StrengthPer })} className={selectClass}>
                   {perOptions.map(([v, l]) => (
                     <option key={v} value={v}>
                       {l}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
             </div>
           </Group>
@@ -320,13 +322,13 @@ export default function DaysSupply() {
           <Group title="How it is used">
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Action">
-                <select value={m.verb} onChange={e => patch({ verb: e.target.value })} className={inputClass}>
+                <PaperSelect value={m.verb} onChange={v => patch({ verb: v })} className={selectClass}>
                   {f.verbs.map(v => (
                     <option key={v} value={v}>
                       {v}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
               <div className="grid min-w-0 content-start gap-1">
                 <span className="font-sans text-[12.5px] font-medium text-ink">How many</span>
@@ -346,35 +348,35 @@ export default function DaysSupply() {
               {f.units && (
                 <Field label="Unit" hint={basis === 'insulin' ? 'Units: counted as insulin.' : basis === 'injection' ? 'Counted as one dose per injection.' : undefined}>
                   {f.units.length > 1 ? (
-                    <select value={m.unit} onChange={e => patch({ unit: e.target.value })} className={inputClass}>
+                    <PaperSelect value={m.unit} onChange={v => patch({ unit: v })} className={selectClass}>
                       {f.units.map(x => (
                         <option key={x.sg} value={x.sg}>
                           {x.pl}
                         </option>
                       ))}
-                    </select>
+                    </PaperSelect>
                   ) : (
                     <input value={f.units[0].pl} disabled className={inputClass} />
                   )}
                 </Field>
               )}
               <Field label="Route">
-                <select value={m.route} onChange={e => patch({ route: e.target.value })} className={inputClass}>
+                <PaperSelect value={m.route} onChange={v => patch({ route: v })} className={selectClass}>
                   {f.routes.map(r => (
                     <option key={r} value={r}>
                       {r || 'No route needed'}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
               <Field label="How often">
-                <select value={m.freq} onChange={e => patch({ freq: e.target.value })} className={inputClass}>
+                <PaperSelect value={m.freq} onChange={v => patch({ freq: v })} className={selectClass}>
                   {FREQS.map(x => (
                     <option key={x.id} value={x.id}>
                       {x.text}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
               <div className="grid min-w-0 content-start gap-1">
                 <span className="font-sans text-[12.5px] font-medium text-ink">Scheduled or as needed</span>
@@ -435,7 +437,7 @@ export default function DaysSupply() {
             )}
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Fill date (optional)" hint="For the earliest refill date.">
-                <input type="date" value={fill} onChange={e => setFill(e.target.value)} className={inputClass} />
+                <PaperDatePicker value={fill} onChange={setFill} placeholder="No fill date" className={selectClass} />
               </Field>
               <Field label="Refill allowed at (% of days supply)" hint="Payers and controlled-substance rules differ. Set the one that applies.">
                 <NumberInput value={threshold} step="1" onChange={setThreshold} />

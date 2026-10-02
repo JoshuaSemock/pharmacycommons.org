@@ -14,6 +14,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { getListBySlug, listLists } from '../api'
 import type { ListDetail, ListItem, ListSummary } from '../api.generated'
 import { formatDrugName } from '../names'
+import PaperSelect from '../components/PaperSelect'
 
 const MAX_LISTS = 3
 const BATCH = 300
@@ -151,10 +152,10 @@ export default function ListCompare() {
         {slugs.length < MAX_LISTS && available.length > 0 && (
           <label className="flex items-center gap-2">
             <span className="sr-only">Add a list</span>
-            <select
+            <PaperSelect
               value=""
-              onChange={e => e.target.value && setSlugs([...slugs, e.target.value])}
-              className="lp-field w-full max-w-72 rounded-md px-2.5 py-1.5 font-sans text-[13px] text-ink"
+              onChange={v => v && setSlugs([...slugs, v])}
+              className="w-full max-w-72 rounded-md px-2.5 py-1.5 font-sans text-[13px] text-ink"
             >
               <option value="">+ Add a list</option>
               {available.map(l => (
@@ -162,7 +163,7 @@ export default function ListCompare() {
                   {l.title}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </label>
         )}
       </div>

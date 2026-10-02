@@ -163,7 +163,8 @@
      Tailwind inlines @theme shadow values into the utility, so
      redefining --shadow-* for dark mode would do nothing.
      Text has no shadow or impression; the ink stays crisp (2026-10-01).
-     Components: src/components/Button.tsx, Card.tsx, Stamp.tsx.
+     Components: src/components/Button.tsx, Card.tsx, Stamp.tsx,
+     PaperSelect.tsx, PaperDatePicker.tsx.
      --------------------------------------------------------------- */
   /* Raised: hard top-left rim, tight drop edge, faint ambient drop, plus
      a 1px bevel on the plateau (lit top-left, shaded bottom-right). */
@@ -242,6 +243,7 @@
   --lp-slope: rgb(0 0 0 / 0.07);
   --lp-crease: rgb(0 0 0 / 0.06);
   --lp-floor: rgb(255 255 255 / 0.9);
+  --lp-drop: rgb(0 0 0 / 0.14);
 }
 
 :root[data-theme="dark"] {
@@ -254,6 +256,7 @@
   --lp-slope: rgb(0 0 0 / 0.3);
   --lp-crease: rgb(0 0 0 / 0.25);
   --lp-floor: rgb(255 255 255 / 0.12);
+  --lp-drop: rgb(0 0 0 / 0.55);
 }
 
 /* Letterpress states, one class per behaviour (2026-10-01). Each sets the
@@ -332,6 +335,50 @@
 .lp-score { height: 1px; background: var(--lp-edge); box-shadow: 0 1px 0 var(--lp-rim); }
 .lp-score-v { width: 1px; background: var(--lp-edge); box-shadow: 1px 0 0 var(--lp-rim); }
 .lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+
+/* Dropdowns (2026-10-02). Every dropdown on the site is colorless: the
+   floating panel is a scrap of the same paper (bg-paper + .pc-grain) lifted
+   off the sheet, and the rows inside it are stamped, never tinted.
+     .lp-popover  the floating panel: embossed rim plus a soft drop where it
+                  sits above the page. Neutral scrollbar (the site default
+                  is mint). Add .pc-grain and bg-paper alongside it.
+     .lp-option   a row in the panel: flat at rest; embossed while it is the
+                  active row (pointer or arrow keys: data-active="true");
+                  debossed when it is the chosen value (aria-selected="true").
+                  Autocomplete lists, where aria-selected marks the active
+                  row, use data-active only.
+   Components: src/components/PaperSelect.tsx, PaperDatePicker.tsx. */
+.lp-popover {
+  box-shadow: var(--shadow-emboss), 0 12px 28px -8px var(--lp-drop), 0 2px 6px -2px var(--lp-drop);
+  scrollbar-color: var(--lp-edge) transparent;
+  --grain-size: 600px;
+  --grain-strength: 0.16;
+}
+:root[data-theme="dark"] .lp-popover {
+  --grain-strength: 0.42;
+}
+.lp-popover *::-webkit-scrollbar-thumb,
+.lp-popover::-webkit-scrollbar-thumb {
+  background: var(--lp-edge);
+}
+.lp-popover *,
+.lp-popover {
+  scrollbar-color: var(--lp-edge) transparent;
+}
+.lp-option {
+  transition: box-shadow 120ms ease;
+}
+.lp-option[data-active="true"] {
+  box-shadow: var(--shadow-emboss);
+}
+.lp-option[aria-selected="true"]:not([data-autocomplete]) {
+  box-shadow: var(--shadow-deboss);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-option {
+    transition: none;
+  }
+}
 
 /* Dark mode flips every ramp end for end (50 <-> 950, 100 <-> 900, …, 500
    stays), so the existing classes keep their meaning without a dark: copy:

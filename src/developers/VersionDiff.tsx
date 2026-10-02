@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react'
 import { diffDocuments, runRequest, type DiffRow } from './client.ts'
 import RefPicker from './RefPicker.tsx'
+import PaperSelect from '../components/PaperSelect'
 
 type VersionItem = { number: number; reason: string; created_at: string; changes?: number }
 
@@ -72,13 +73,13 @@ export default function VersionDiff({ apiBase }: { apiBase: string }) {
   const versionSelect = (label: string, value: number | null, set: (n: number) => void) => (
     <label className="grid min-w-0 gap-1">
       <span className="font-sans text-[12.5px] font-medium text-ink">{label}</span>
-      <select value={value ?? ''} onChange={e => set(Number(e.target.value))} className="lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink">
+      <PaperSelect value={value ?? ''} onChange={v => set(Number(v))} className="w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink">
         {versions?.map(v => (
           <option key={v.number} value={v.number}>
             Version {v.number} · {v.reason} · {fmtDate(v.created_at)}
           </option>
         ))}
-      </select>
+      </PaperSelect>
     </label>
   )
 

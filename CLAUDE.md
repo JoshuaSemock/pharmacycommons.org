@@ -164,6 +164,14 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   `docs/design-paper-and-dark-mode.md`): clickable cards and link tiles, alerts/callouts,
   the FDA boxed warning, the eco-risk card, tool results/editors, form controls, code.
   Reading sections, rail panels and table wrappers are rules, not boxes.
+  **Dropdowns and date fields (2026-10-02): never a native `<select>` or `<input type="date">`**
+  — the OS draws their lists/calendars in its own colors. Use `src/components/PaperSelect.tsx`
+  (accepts `options` or `<option>`/`<optgroup>` children; `onChange(value)`; search field
+  auto-appears past 12 options) and `PaperDatePicker.tsx` (ISO `value`/`onChange`, month +
+  year menus for DOB). Both are colorless: raised trigger, pressed while open, grained paper
+  panel (`.lp-popover .pc-grain`), rows embossed when active and debossed when chosen
+  (`.lp-option`). Autocomplete lists reuse `.lp-popover` / `.lp-option[data-active]`. The
+  vanilla CrCl widget's controls are mirrored by `enhanceNativeControls()` (`nativeBridge.tsx`).
   phi (1.618) type scale.
   ⚠ An older note named Playfair + Figtree — that is **not** what the code uses. Ask
   Joshua before changing fonts either way.

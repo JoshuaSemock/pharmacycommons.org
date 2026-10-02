@@ -19,6 +19,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getListBySlug } from '../api'
 import type { ListDetail as ListRecord, ListItem } from '../api.generated'
 import { formatDrugName } from '../names'
+import PaperSelect from '../components/PaperSelect'
 import {
   defaultSortKey,
   filterItems,
@@ -291,10 +292,10 @@ function Items({ list }: { list: ListRecord }) {
         {tops.length > 0 && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
             Show
-            <select
+            <PaperSelect
               value={top ?? ''}
-              onChange={e => update({ top: e.target.value || null })}
-              className="lp-field rounded-md px-2 py-1 font-sans text-[13px] text-ink"
+              onChange={v => update({ top: v || null })}
+              className="rounded-md px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All ranks</option>
               {tops.map(n => (
@@ -302,16 +303,16 @@ function Items({ list }: { list: ListRecord }) {
                   Top {n}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </label>
         )}
         {showStatus && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
             Status
-            <select
+            <PaperSelect
               value={status ?? ''}
-              onChange={e => update({ status: e.target.value || null })}
-              className="lp-field rounded-md px-2 py-1 font-sans text-[13px] text-ink"
+              onChange={v => update({ status: v || null })}
+              className="rounded-md px-2 py-1 font-sans text-[13px] text-ink"
             >
               <option value="">All</option>
               {statuses.map(s => (
@@ -319,7 +320,7 @@ function Items({ list }: { list: ListRecord }) {
                   {s}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </label>
         )}
       </div>

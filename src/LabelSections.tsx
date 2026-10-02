@@ -25,6 +25,7 @@ import {
   sanitizeTableHtml,
 } from './labels'
 import type { LabelBlock, LabelSection, LabelTable, LabelText } from './labels'
+import PaperSelect from './components/PaperSelect'
 
 const DEFAULT_OPEN = new Set(['indications_and_usage'])
 
@@ -156,19 +157,19 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
             <span>
               {data.n_labels > 1 ? `${data.n_labels.toLocaleString()} labels on file ·` : ''} View another
             </span>
-            <select
-              className="lp-raised min-w-0 max-w-[16rem] cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+            <PaperSelect
               value=""
-              onChange={e => e.target.value && onPick(e.target.value)}
-            >
-              <option value="">Choose a manufacturer…</option>
-              {data.other_labels.map(o => (
-                <option key={o.setid} value={o.setid}>
-                  {(o.labeler ?? 'Unknown labeler').replace(/\s+/g, ' ')}
-                  {o.effective_time ? ` — ${formatLabelDate(o.effective_time)}` : ''}
-                </option>
-              ))}
-            </select>
+              onChange={v => v && onPick(v)}
+              placeholder="Choose a manufacturer…"
+              searchPlaceholder="Search manufacturers"
+              menuMinWidth={280}
+              options={data.other_labels.map(o => ({
+                value: o.setid,
+                label: (o.labeler ?? 'Unknown labeler').replace(/\s+/g, ' '),
+                sublabel: o.effective_time ? (formatLabelDate(o.effective_time) ?? undefined) : undefined,
+              }))}
+              className="max-w-[16rem] px-2 py-1 text-sm"
+            />
           </label>
         )}
       </div>

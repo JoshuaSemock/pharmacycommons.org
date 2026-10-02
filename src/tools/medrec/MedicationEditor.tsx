@@ -33,7 +33,8 @@ import {
 } from './model'
 import { fmt, maxInfo, medTitle, showsMax, sigSegments, sigText, unitOf } from './sig'
 import NameSearch from './NameSearch'
-import { ChipRadio, Field, SigText, Tag, dangerQuietButton, inputClass, numberClass, primaryButton, quietButton } from './ui'
+import { ChipRadio, Field, SigText, Tag, dangerQuietButton, inputClass, numberClass, primaryButton, quietButton, selectClass } from './ui'
+import PaperSelect from '@/components/PaperSelect'
 
 type Props = {
   med: Medication
@@ -108,7 +109,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
             />
           </div>
           <Field label="Form">
-            <select value={m.form} onChange={e => isFormId(e.target.value) && onFormChange(e.target.value)} className={inputClass}>
+            <PaperSelect value={m.form} onChange={v => isFormId(v) && onFormChange(v)} className={selectClass}>
               {FORM_GROUPS.map(([group, ids]) => (
                 <optgroup key={group} label={group}>
                   {ids.map(id => (
@@ -118,7 +119,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                   ))}
                 </optgroup>
               ))}
-            </select>
+            </PaperSelect>
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -126,22 +127,22 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
             <input type="number" inputMode="decimal" min="0" step="any" value={m.sv} onChange={e => onPatch({ sv: e.target.value })} className={numberClass} />
           </Field>
           <Field label="Strength unit">
-            <select value={m.su} onChange={e => onPatch({ su: e.target.value as StrengthUnit })} className={inputClass}>
+            <PaperSelect value={m.su} onChange={v => onPatch({ su: v as StrengthUnit })} className={selectClass}>
               {STRENGTH_UNITS.map(s => (
                 <option key={s} value={s}>
                   {s}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </Field>
           <Field label="Per" className="col-span-2 sm:col-span-1">
-            <select value={m.sper} onChange={e => onPatch({ sper: e.target.value as StrengthPer })} className={inputClass}>
+            <PaperSelect value={m.sper} onChange={v => onPatch({ sper: v as StrengthPer })} className={selectClass}>
               {perOptions.map(([v, l]) => (
                 <option key={v} value={v}>
                   {l}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </Field>
         </div>
       </Group>
@@ -149,13 +150,13 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
       <Group title="Directions">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Action">
-            <select value={m.verb} onChange={e => onPatch({ verb: e.target.value })} className={inputClass}>
+            <PaperSelect value={m.verb} onChange={v => onPatch({ verb: v })} className={selectClass}>
               {f.verbs.map(v => (
                 <option key={v} value={v}>
                   {v}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </Field>
 
           {f.thin ? (
@@ -203,13 +204,13 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
           {!f.thin && f.units && (
             <Field label="Unit">
               {f.units.length > 1 ? (
-                <select value={m.unit} onChange={e => onPatch({ unit: e.target.value })} className={inputClass}>
+                <PaperSelect value={m.unit} onChange={v => onPatch({ unit: v })} className={selectClass}>
                   {f.units.map(x => (
                     <option key={x.sg} value={x.sg}>
                       {x.pl}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               ) : (
                 <input value={f.units[0].pl} disabled className={inputClass} />
               )}
@@ -218,14 +219,14 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
 
           <div className="grid min-w-0 content-start gap-1">
             <Field label="Route">
-              <select value={m.route} onChange={e => onPatch({ route: e.target.value })} className={inputClass}>
+              <PaperSelect value={m.route} onChange={v => onPatch({ route: v })} className={selectClass}>
                 {f.routes.map(r => (
                   <option key={r} value={r}>
                     {r || 'No route needed'}
                   </option>
                 ))}
                 <option value="other">Other (write in)</option>
-              </select>
+              </PaperSelect>
             </Field>
             {m.route === 'other' && (
               <input
@@ -239,13 +240,13 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
           </div>
 
           <Field label="How often">
-            <select value={m.freq} onChange={e => onPatch({ freq: e.target.value })} className={inputClass}>
+            <PaperSelect value={m.freq} onChange={v => onPatch({ freq: v })} className={selectClass}>
               {FREQS.map(x => (
                 <option key={x.id} value={x.id}>
                   {x.text}
                 </option>
               ))}
-            </select>
+            </PaperSelect>
           </Field>
         </div>
 
@@ -274,18 +275,18 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
           <div className="grid min-w-0 content-start gap-1">
             <span className="font-sans text-[12.5px] font-medium text-ink">How long</span>
             <div className="flex min-w-0 gap-2">
-              <select
+              <PaperSelect
                 aria-label="How long"
                 value={m.dur}
-                onChange={e => isDurationMode(e.target.value) && onPatch({ dur: e.target.value })}
-                className={inputClass}
+                onChange={v => isDurationMode(v) && onPatch({ dur: v })}
+                className={selectClass}
               >
                 {DURATIONS.map(([v, l]) => (
                   <option key={v} value={v}>
                     {l}
                   </option>
                 ))}
-              </select>
+              </PaperSelect>
               {(m.dur === 'days' || m.dur === 'weeks' || m.dur === 'months') && (
                 <input
                   aria-label={`Number of ${m.dur}`}
