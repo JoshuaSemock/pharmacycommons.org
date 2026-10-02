@@ -1,5 +1,5 @@
 /**
- * /classes/:slug — one drug class.
+ * /classifications/:slug — one drug class.
  *
  * Reads get_class(p_slug): the class, its ancestor chain (breadcrumb), its
  * sub-classes that have members, and every member drug. Members inherited
@@ -70,7 +70,7 @@ export default function ClassDetail() {
   }, [slug])
 
   useEffect(() => {
-    document.title = cls ? `${cls.name} · Classes · Pharmacy Commons` : 'Pharmacy Commons'
+    document.title = cls ? `${cls.name} · Classifications · Pharmacy Commons` : 'Pharmacy Commons'
   }, [cls])
 
   if (state === 'loading') {
@@ -83,8 +83,8 @@ export default function ClassDetail() {
         <p className="mb-2 font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
           {state === 'missing' ? `No class called “${slug}”.` : 'The class couldn’t be loaded right now.'}
         </p>
-        <Link to="/classes" className="font-sans text-sm text-ink hover:underline">
-          All classes
+        <Link to="/classifications" className="font-sans text-sm text-ink hover:underline">
+          All classifications
         </Link>
       </main>
     )
@@ -96,13 +96,13 @@ export default function ClassDetail() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       {/* Breadcrumb: Classes / ancestors… / this class */}
       <nav className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-4 font-sans text-sm text-ink">
-        <Link to="/classes" className="transition-colors">
-          Classes
+        <Link to="/classifications" className="transition-colors">
+          Classifications
         </Link>
         {cls.ancestors.map(a => (
           <span key={a.slug} className="flex min-w-0 items-center gap-1.5">
             <span aria-hidden="true">/</span>
-            <Link to={`/classes/${a.slug}`} className="break-words transition-colors">
+            <Link to={`/classifications/${a.slug}`} className="break-words transition-colors">
               {a.name}
             </Link>
           </span>
@@ -171,7 +171,7 @@ function SubclassesCard({
         {visible.map(c => (
           <li key={c.slug}>
             <Link
-              to={`/classes/${c.slug}`}
+              to={`/classifications/${c.slug}`}
               className="lp-raised lp-press flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
             >
               <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">

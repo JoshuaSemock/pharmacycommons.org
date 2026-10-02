@@ -440,7 +440,7 @@ function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
 //
 // Every class the drug belongs to (get_entity_classes), grouped by system in
 // the order the RPC returns them (ATC, VA, EPC, MOA, PE, CHEM, ChemOnt), each
-// chip linking to its /classes/:slug page. Inherited classes are included —
+// chip linking to its /classifications/:slug page. Inherited classes are included —
 // sertraline sits directly in ATC N06AB and only through it in N06A — and drawn
 // with a dashed border. Loaded in its own request like GuidelinesCard, so a
 // slow class lookup never holds up the page. The card is hidden when the drug
@@ -494,7 +494,7 @@ function ClassesCard({ pcidCode }: { pcidCode: string }) {
   const hasInherited = classes.some(c => !c.is_direct)
 
   return (
-    <SideCard title="Classes">
+    <SideCard title="Classifications">
       <div className="space-y-4">
         {groups.map(g => (
           <ClassGroupRow key={g.label} group={g} />
@@ -521,7 +521,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
         {visible.map(c => (
           <li key={c.slug} className="min-w-0 max-w-full">
             <Link
-              to={`/classes/${c.slug}`}
+              to={`/classifications/${c.slug}`}
               title={[c.source_code, c.name, c.is_direct ? null : '(via a sub-class)'].filter(Boolean).join(' · ')}
               className={`inline-flex max-w-full items-baseline gap-1.5 rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
                 c.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'

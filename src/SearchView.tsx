@@ -515,7 +515,7 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
           {' · '}
           {members.length} {members.length === 1 ? 'drug' : 'drugs'}
         </span>
-        <Link to={`/classes/${hit.slug}`} className="font-sans text-[12.5px] text-ink hover:underline">
+        <Link to={`/classifications/${hit.slug}`} className="font-sans text-[12.5px] text-ink hover:underline">
           Open class page
         </Link>
       </div>
