@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { searchClasses } from './api'
 import Button from './components/Button'
+import PaperSelect from './components/PaperSelect'
 import type { ClassSearchHit } from './api.generated'
 import {
   loadCatalog,
@@ -537,33 +538,24 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
 
 
 /**
- * The page-size dropdown. Letterpress: raised at rest, pressed in while its
- * list is open, raised again once a size is picked or it closes. A native
- * select has no open/close events, so the state is tracked from the pointer
- * and keys that open it, and cleared on change, Escape and blur.
+ * The page-size dropdown (letterpress, colorless): raised at rest, pressed in
+ * while its list is open. See src/components/PaperSelect.tsx.
  */
 function PageSizeSelect({
   value, onChange, children,
 }: {
   value: number; onChange: (v: string) => void; children: ReactNode
 }) {
-  const [open, setOpen] = useState(false)
   return (
-    <select
-      value={value}
-      onPointerDown={() => setOpen(o => !o)}
-      onKeyDown={e => {
-        if (e.key === 'Escape' || e.key === 'Tab') setOpen(false)
-        else if (e.key === 'Enter' || e.key === ' ' || (e.altKey && e.key === 'ArrowDown')) setOpen(true)
-      }}
-      onChange={e => {
-        setOpen(false)
-        onChange(e.target.value)
-      }}
-      onBlur={() => setOpen(false)}
-      className={`lp-toggle ${open ? 'lp-on' : ''} cursor-pointer rounded-md border-0 bg-transparent py-1 pr-1 pl-2 font-mono text-[12px] text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40`}
+    <PaperSelect
+      value={String(value)}
+      onChange={onChange}
+      searchable={false}
+      aria-label="Drugs per page"
+      menuMinWidth={120}
+      className="py-1 pr-1.5 pl-2 font-mono text-[12px]"
     >
       {children}
-    </select>
+    </PaperSelect>
   )
 }

@@ -118,7 +118,7 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
         <ul
           id={listId}
           role="listbox"
-          className="bg-paper shadow-lg shadow-black/15 absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-md py-1"
+          className="lp-popover pc-grain absolute left-0 right-0 top-full z-30 mt-1.5 grid max-h-72 content-start gap-0.5 overflow-y-auto rounded-lg bg-paper p-1.5"
         >
           {options.map((o, i) => (
             <li
@@ -126,15 +126,15 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
               id={`${listId}-${i}`}
               role="option"
               aria-selected={i === active}
+              data-autocomplete=""
+              data-active={i === active || undefined}
               // mousedown, not click: fires before the input's blur closes the list
               onMouseDown={e => {
                 e.preventDefault()
                 pick(o)
               }}
               onMouseEnter={() => setActive(i)}
-              className={`flex cursor-pointer items-baseline justify-between gap-3 px-3 py-1.5 font-sans text-[13.5px] ${
-                i === active ? 'bg-hepatica-100 text-ink' : 'text-ink'
-              }`}
+              className="lp-option flex cursor-pointer items-baseline justify-between gap-3 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink"
             >
               <span className="min-w-0 truncate">{o.label}</span>
               <span className="shrink-0 font-mono text-[10.5px] text-ink">{o.pcid ? `PCID-${o.pcid}` : (o.detail ?? '')}</span>

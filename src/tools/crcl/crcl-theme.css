@@ -230,3 +230,21 @@
 @media (prefers-reduced-motion: reduce) {
   .crcl.pc-crcl .crcl-btn { transition: none; }
 }
+
+/* ------------------------------------------------- letterpress dropdowns */
+/* The widget's selects and date field are hidden and mirrored by
+   PaperSelect / PaperDatePicker (src/components/nativeBridge.tsx). The
+   mirrors take the native controls' place in the flex row and keep the
+   site's colorless focus outline instead of the widget's accent one. */
+.crcl.pc-crcl .pc-native-host {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+}
+.crcl.pc-crcl .pc-native-host-select { flex: 1 1 100%; }
+.crcl.pc-crcl .pc-native-host-date { flex: 1 1 12rem; }
+.crcl-amp-item .pc-native-host { width: 100%; }
+.crcl.pc-crcl .pc-native-host button:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-ink) 40%, transparent);
+  outline-offset: 2px;
+}

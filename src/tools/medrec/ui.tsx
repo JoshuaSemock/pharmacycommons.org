@@ -13,6 +13,8 @@ import type { Tone } from './model'
 export const inputClass =
   'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink disabled:bg-neutral-100'
 export const numberClass = `${inputClass} font-mono text-[13.5px]`
+/** Trigger of a PaperSelect / PaperDatePicker in a form (colorless letterpress dropdown). */
+export const selectClass = 'w-full min-w-0 px-3 py-1.5 text-[14px]'
 export const primaryButton =
   'lp-raised lp-press inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 font-sans text-[13px] font-medium text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const secondaryButton =

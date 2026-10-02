@@ -8,7 +8,8 @@
 import { ALLERGEN_SUGGESTIONS, ALLERGY_TYPES, REACTIONS, SEVERITIES, isAllergyType, type Allergy } from './model'
 import { allergyLevel, allergyTypeText } from './sig'
 import NameSearch from './NameSearch'
-import { Field, RemoveIcon, SectionHeading, Tag, inputClass, secondaryButton } from './ui'
+import { Field, RemoveIcon, SectionHeading, Tag, inputClass, secondaryButton, selectClass } from './ui'
+import PaperSelect from '@/components/PaperSelect'
 
 type Props = {
   allergies: Allergy[]
@@ -92,17 +93,17 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
                 />
               </div>
               <Field label="Type">
-                <select value={a.type} onChange={e => isAllergyType(e.target.value) && onPatch(a.id, { type: e.target.value })} className={inputClass}>
+                <PaperSelect value={a.type} onChange={v => isAllergyType(v) && onPatch(a.id, { type: v })} className={selectClass}>
                   {ALLERGY_TYPES.map(([v, l]) => (
                     <option key={v} value={v}>
                       {l}
                     </option>
                   ))}
-                </select>
+                </PaperSelect>
               </Field>
               <div className="grid min-w-0 content-start gap-1">
                 <Field label="What was the reaction?">
-                  <select value={a.reaction} onChange={e => onPatch(a.id, { reaction: e.target.value })} className={inputClass}>
+                  <PaperSelect value={a.reaction} onChange={v => onPatch(a.id, { reaction: v })} className={selectClass}>
                     <option value="">Choose a reaction</option>
                     {REACTIONS.map(r => (
                       <option key={r} value={r}>
@@ -110,7 +111,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
                       </option>
                     ))}
                     <option value="other">Other (write in)</option>
-                  </select>
+                  </PaperSelect>
                 </Field>
                 {a.reaction === 'other' && (
                   <input
@@ -124,7 +125,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
               </div>
               <div className="grid min-w-0 content-start gap-1">
                 <Field label="How severe was it?">
-                  <select value={a.severity} onChange={e => onPatch(a.id, { severity: e.target.value })} className={inputClass}>
+                  <PaperSelect value={a.severity} onChange={v => onPatch(a.id, { severity: v })} className={selectClass}>
                     <option value="">Choose what happened</option>
                     {SEVERITIES.map(s => (
                       <option key={s.id} value={s.id}>
@@ -132,7 +133,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
                       </option>
                     ))}
                     <option value="other">Other (write in)</option>
-                  </select>
+                  </PaperSelect>
                 </Field>
                 {a.severity === 'other' && (
                   <input

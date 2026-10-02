@@ -28,6 +28,7 @@ import {
 import { formatBytes, runRequest, type ApiResult } from './client.ts'
 import JsonView from './JsonView.tsx'
 import RefPicker from './RefPicker.tsx'
+import PaperSelect from '../components/PaperSelect'
 
 export type ConsoleExample = { label: string; ep: EndpointId; values?: ParamValues; fmt?: Format }
 
@@ -138,17 +139,17 @@ export default function Console({ apiBase }: { apiBase: string }) {
       <nav aria-label="Endpoints" className="min-w-0">
         <label className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-1 lg:hidden">
           <span className="font-sans text-[12.5px] font-medium text-ink">Endpoint</span>
-          <select
+          <PaperSelect
             value={ep.id}
-            onChange={e => isEndpointId(e.target.value) && update({ ep: e.target.value })}
-            className="lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink"
+            onChange={v => isEndpointId(v) && update({ ep: v })}
+            className="w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink"
           >
             {ENDPOINTS.map(e => (
               <option key={e.id} value={e.id}>
                 {e.label} — {e.path}
               </option>
             ))}
-          </select>
+          </PaperSelect>
         </label>
         <ul className="hidden gap-0.5 lg:grid">
           {ENDPOINTS.map(e => {
@@ -203,10 +204,10 @@ export default function Console({ apiBase }: { apiBase: string }) {
                         onEnter={() => !missing.length && void run()}
                       />
                     ) : p.type === 'boolean' ? (
-                      <select id={fid} value={values[p.name] || p.default || 'false'} onChange={e => set(e.target.value)} className={fieldClass}>
+                      <PaperSelect id={fid} value={values[p.name] || p.default || 'false'} onChange={v => set(v)} className={selectFieldClass}>
                         <option value="false">false</option>
                         <option value="true">true</option>
-                      </select>
+                      </PaperSelect>
                     ) : (
                       <input
                         id={fid}
@@ -405,5 +406,6 @@ export default function Console({ apiBase }: { apiBase: string }) {
 /** The dark "code" surface: black olive from the palette, not pure black. */
 export const CODE_SURFACE = 'pc-code bg-neutral-900 text-ink'
 const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10'
+const selectFieldClass = 'w-full min-w-0 px-3 py-1.5 font-mono text-[13.5px]'
 const fieldClass =
   'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink'

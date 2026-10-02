@@ -26,7 +26,8 @@ import {
 } from './model'
 import { auditCScore, caffeineMgPerDay, drinksPerWeek, fmt, packYears } from './sig'
 import NameSearch from './NameSearch'
-import { ChipRadio, Field, RemoveIcon, SectionHeading, inputClass, numberClass, secondaryButton } from './ui'
+import { ChipRadio, Field, RemoveIcon, SectionHeading, inputClass, numberClass, secondaryButton, selectClass } from './ui'
+import PaperSelect from '@/components/PaperSelect'
 
 type Props = {
   subs: SubstanceState
@@ -133,22 +134,22 @@ export default function Substances({ subs, onChange }: Props) {
               {subs.caffeine.items.map(i => (
                 <div key={i.id} className={`${rowClass} sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto]`}>
                   <Field label="Source" className="col-span-2 sm:col-span-1">
-                    <select
+                    <PaperSelect
                       value={i.source}
-                      onChange={e =>
+                      onChange={v =>
                         patchItem('caffeine', i.id, {
-                          source: e.target.value,
-                          mg: String(CAFFEINE_BY_ID.get(e.target.value)?.mg ?? 0),
+                          source: v,
+                          mg: String(CAFFEINE_BY_ID.get(v)?.mg ?? 0),
                         })
                       }
-                      className={inputClass}
+                      className={selectClass}
                     >
                       {CAFFEINE_SOURCES.map(c => (
                         <option key={c.id} value={c.id}>
                           {c.label}
                         </option>
                       ))}
-                    </select>
+                    </PaperSelect>
                   </Field>
                   <Field label="Servings per day">
                     <input
@@ -200,13 +201,13 @@ export default function Substances({ subs, onChange }: Props) {
               {subs.nicotine.items.map(i => (
                 <div key={i.id} className={`${rowClass} sm:grid-cols-[minmax(0,1.6fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto]`}>
                   <Field label="Product" className="col-span-2 sm:col-span-1">
-                    <select value={i.product} onChange={e => patchItem('nicotine', i.id, { product: e.target.value })} className={inputClass}>
+                    <PaperSelect value={i.product} onChange={v => patchItem('nicotine', i.id, { product: v })} className={selectClass}>
                       {NICOTINE_PRODUCTS.map(n => (
                         <option key={n.id} value={n.id}>
                           {n.label}
                         </option>
                       ))}
-                    </select>
+                    </PaperSelect>
                   </Field>
                   <Field label="How many">
                     <input
@@ -220,18 +221,18 @@ export default function Substances({ subs, onChange }: Props) {
                     />
                   </Field>
                   <Field label={`${NICOTINE_BY_ID.get(i.product)?.unit ?? 'units'} per`}>
-                    <select
+                    <PaperSelect
                       value={i.per}
-                      onChange={e =>
+                      onChange={v =>
                         patchItem('nicotine', i.id, {
-                          per: e.target.value === 'week' ? 'week' : 'day',
+                          per: v === 'week' ? 'week' : 'day',
                         })
                       }
-                      className={inputClass}
+                      className={selectClass}
                     >
                       <option value="day">day</option>
                       <option value="week">week</option>
-                    </select>
+                    </PaperSelect>
                   </Field>
                   <Field label="Years used">
                     <input
@@ -290,14 +291,14 @@ export default function Substances({ subs, onChange }: Props) {
                 <div className="mt-3 grid gap-3">
                   {AUDIT_C.map(([q, answers], qi) => (
                     <Field key={q} label={q}>
-                      <select
+                      <PaperSelect
                         value={al.audit[qi]}
-                        onChange={e => {
+                        onChange={v => {
                           const audit = [...al.audit] as [string, string, string]
-                          audit[qi] = e.target.value
+                          audit[qi] = v
                           patch('alcohol', { audit })
                         }}
-                        className={inputClass}
+                        className={selectClass}
                       >
                         <option value="">Choose an answer</option>
                         {answers.map((a, ai) => (
@@ -305,7 +306,7 @@ export default function Substances({ subs, onChange }: Props) {
                             {a}
                           </option>
                         ))}
-                      </select>
+                      </PaperSelect>
                     </Field>
                   ))}
                   <p className="font-sans text-[12.5px] leading-snug text-ink">
@@ -338,30 +339,30 @@ export default function Substances({ subs, onChange }: Props) {
                     />
                   </div>
                   <Field label="How">
-                    <select value={i.how} onChange={e => patchItem('recreational', i.id, { how: e.target.value })} className={inputClass}>
+                    <PaperSelect value={i.how} onChange={v => patchItem('recreational', i.id, { how: v })} className={selectClass}>
                       {REC_HOW.map(([v, l]) => (
                         <option key={v} value={v}>
                           {l}
                         </option>
                       ))}
-                    </select>
+                    </PaperSelect>
                   </Field>
                   <Field label="How often">
-                    <select
+                    <PaperSelect
                       value={i.often}
-                      onChange={e =>
+                      onChange={v =>
                         patchItem('recreational', i.id, {
-                          often: e.target.value,
+                          often: v,
                         })
                       }
-                      className={inputClass}
+                      className={selectClass}
                     >
                       {REC_OFTEN.map(([v, l]) => (
                         <option key={v} value={v}>
                           {l}
                         </option>
                       ))}
-                    </select>
+                    </PaperSelect>
                   </Field>
                   <Field label="Last used">
                     <input

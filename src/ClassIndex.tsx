@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { listClasses } from './api'
 import type { ClassSummary, ClassType } from './api.generated'
 import { PageFrame, PageTitle } from './pages/PageShell'
+import PaperSelect from './components/PaperSelect'
 
 /**
  * /classes — every drug class with at least one member, one classification
@@ -161,17 +162,13 @@ export default function ClassIndex() {
         </div>
         <label className="block sm:hidden">
           <span className="mb-1.5 block font-sans text-[13px] font-medium text-ink">Classification system</span>
-          <select
+          <PaperSelect
             value={tab}
-            onChange={e => patch({ type: e.target.value === DEFAULT_TAB ? null : e.target.value })}
-            className="lp-field w-full rounded-md px-3 py-2 font-sans text-[14px] text-ink outline-none"
-          >
-            {TABS.map(t => (
-              <option key={t.key} value={t.key}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+            onChange={v => patch({ type: v === DEFAULT_TAB ? null : v })}
+            options={TABS.map(t => ({ value: t.key, label: t.label, sublabel: t.hint }))}
+            searchable={false}
+            className="w-full py-2 text-[14px]"
+          />
         </label>
 
         {/* Search */}

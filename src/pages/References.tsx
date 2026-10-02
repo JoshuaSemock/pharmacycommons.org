@@ -6,6 +6,7 @@ import { STYLES, formatList, formatPage, formatSource, todayISO } from '../cite'
 import type { Style } from '../cite'
 import { groupBy, isSourceDataset, journalReference, useReferences } from '../references'
 import type { ReferenceResource } from '../references'
+import PaperDatePicker from '../components/PaperDatePicker'
 
 /**
  * References (formerly Citations, /citations still redirects here). Style and
@@ -230,7 +231,7 @@ function PageCitation({
           />
         </Field>
         <Field label="Last updated" hint="Shown at the foot of each monograph">
-          <input type="date" value={updated} onChange={e => setUpdated(e.target.value)} className={inputClass} />
+          <PaperDatePicker value={updated} onChange={setUpdated} placeholder="Not given" className={pickerClass} />
         </Field>
       </div>
 
@@ -363,12 +364,12 @@ function CitationSettings({
         <label htmlFor="citation-accessed" className="mb-3 block font-sans text-sm font-medium text-ink">
           Accessed
         </label>
-        <input
+        <PaperDatePicker
           id="citation-accessed"
-          type="date"
           value={accessed}
-          onChange={e => onAccessed(e.target.value)}
-          className={inputClass}
+          onChange={onAccessed}
+          placeholder="Not given"
+          className={pickerClass}
         />
         <span className="mt-1.5 block font-sans text-2xs leading-snug text-ink">
           Applies to web citations. Journal articles are cited by DOI and don't take one.
@@ -464,6 +465,8 @@ function useCopy() {
 
 const inputClass =
   'lp-field w-full rounded-md px-3 py-2 font-sans text-md text-ink placeholder:text-ink outline-none'
+
+const pickerClass = 'w-full px-3 py-2 text-md'
 
 const buttonClass =
   'lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
