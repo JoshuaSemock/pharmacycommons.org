@@ -93,6 +93,6 @@ export default function Footer() {
 const focus =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 
-const link = `whitespace-nowrap text-ink underline decoration-sage-300 underline-offset-2 transition-colors hover:decoration-aqua-600 ${focus}`
+const link = `whitespace-nowrap text-ink underline decoration-mint-300 underline-offset-2 transition-colors hover:decoration-hepatica-600 ${focus}`
 
-const strongLink = `whitespace-nowrap font-medium text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600 ${focus}`
+const strongLink = `whitespace-nowrap font-medium text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600 ${focus}`

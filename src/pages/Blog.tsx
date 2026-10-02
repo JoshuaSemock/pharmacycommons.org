@@ -65,7 +65,7 @@ export default function Blog() {
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   <span>{post.readingMinutes} minute read</span>
                   {post.draft && (
-                    <span className="lp-raised rounded bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+                    <span className="lp-raised rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                       draft
                     </span>
                   )}

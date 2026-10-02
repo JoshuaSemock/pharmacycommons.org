@@ -5,7 +5,7 @@ import { THIRD_PARTY_TOOLS, TOOL_SECTIONS, toolsIn } from '../tools'
 import type { Tool, ToolStatus } from '../tools'
 
 const LINK =
-  'underline decoration-aqua-300 underline-offset-2 transition-colors hover:decoration-aqua-600'
+  'underline decoration-hepatica-300 underline-offset-2 transition-colors hover:decoration-hepatica-600'
 
 export default function Tools() {
   return (

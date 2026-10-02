@@ -474,7 +474,7 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
             </span>
           )}
           {drug.schedule && (
-            <span className="lp-raised rounded-md bg-coral-100 px-2 py-0.5 font-mono text-[10px] font-medium text-ink">
+            <span className="lp-raised rounded-md bg-rose-100 px-2 py-0.5 font-mono text-[10px] font-medium text-ink">
               {drug.schedule}
             </span>
           )}

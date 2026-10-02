@@ -18,7 +18,7 @@ export default function BlogPost() {
         <p className="pt-8">
           <Link
             to="/blog"
-            className="font-sans text-[15px] text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
+            className="font-sans text-[15px] text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600"
           >
             Back to all posts
           </Link>
@@ -52,7 +52,7 @@ export default function BlogPost() {
               {post.readingMinutes} minute read
             </p>
             {post.draft && (
-              <span className="lp-raised rounded bg-coral-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+              <span className="lp-raised rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                 draft
               </span>
             )}

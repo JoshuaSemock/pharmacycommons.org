@@ -123,7 +123,7 @@ export default function ClassIndex() {
       ) : !rows ? (
         <div className="space-y-2" aria-busy="true">
           {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="h-5 w-2/3 animate-pulse rounded bg-sage-100" />
+            <div key={i} className="h-5 w-2/3 animate-pulse rounded bg-mint-100" />
           ))}
         </div>
       ) : (
@@ -151,7 +151,7 @@ export default function ClassIndex() {
                 <li key={r.slug}>
                   <Link
                     to={`/classes/${r.slug}`}
-                    className="flex items-baseline justify-between gap-3 px-4 py-2 transition-colors hover:bg-sage-50"
+                    className="flex items-baseline justify-between gap-3 px-4 py-2 transition-colors hover:bg-mint-50"
                     style={
                       indent && r.level !== null && Number.isFinite(minLevel)
                         ? { paddingLeft: `calc(1rem + ${Math.min(r.level - minLevel, 6) * 1.1}rem)` }

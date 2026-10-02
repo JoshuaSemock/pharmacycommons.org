@@ -399,8 +399,8 @@ function GuidelinesCard({ pcidCode }: { pcidCode: string }) {
         <p className="font-sans text-sm text-ink">Guidelines couldn’t be loaded right now.</p>
       ) : guidelines === null ? (
         <div className="space-y-2" aria-busy="true">
-          <div className="h-4 w-4/5 animate-pulse rounded bg-sage-100" />
-          <div className="h-4 w-3/5 animate-pulse rounded bg-sage-100" />
+          <div className="h-4 w-4/5 animate-pulse rounded bg-mint-100" />
+          <div className="h-4 w-3/5 animate-pulse rounded bg-mint-100" />
         </div>
       ) : guidelines.length === 0 ? (
         <p className="font-sans text-sm leading-relaxed text-ink">
@@ -751,12 +751,12 @@ function EcoPanel({ eco }: { eco: unknown }) {
 
   const barColor =
     riskKey === 'high'
-      ? 'bg-coral-400'
+      ? 'bg-rose-400'
       : riskKey === 'moderate'
-        ? 'bg-amber-400'
+        ? 'bg-marigold-400'
         : riskKey === 'low'
-          ? 'bg-aqua-400'
-          : 'bg-sage-300'
+          ? 'bg-hepatica-400'
+          : 'bg-mint-300'
 
   return (
     <div className="lp-raised overflow-hidden rounded-md">
@@ -797,7 +797,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
         </div>
 
         {typeof metrics.dpd_category === 'string' && metrics.dpd_category && (
-          <div className="flex items-center justify-between rounded-lg bg-sage-50 px-3 py-2.5">
+          <div className="flex items-center justify-between rounded-lg bg-mint-50 px-3 py-2.5">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.08em] text-ink">
                 Drug persistence
@@ -936,7 +936,7 @@ function IdRow({ label, value, name }: { label: string; value: string | string[]
               target="_blank"
               rel="noopener noreferrer"
               title={source ? `Open in ${source}` : undefined}
-              className="text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-700"
+              className="text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-700"
             >
               {seg.text}
             </a>

@@ -107,7 +107,7 @@ function LinkItem({ link }: { link: ReferenceResource }) {
           href={link.href}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-ink underline decoration-sage-300 underline-offset-2 hover:decoration-aqua-600"
+          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-ink underline decoration-mint-300 underline-offset-2 hover:decoration-hepatica-600"
         >
           {link.name}
         </a>
@@ -131,4 +131,4 @@ function LinkItem({ link }: { link: ReferenceResource }) {
 }
 
 const linkClass =
-  'text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600'
+  'text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600'

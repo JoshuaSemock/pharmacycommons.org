@@ -113,7 +113,7 @@ export default function CreatinineClearance() {
                   onClick={e => {
                     if (scrollToId('method-and-sources', 'smooth')) e.preventDefault()
                   }}
-                  className="text-ink underline decoration-aqua-300 underline-offset-2 hover:decoration-aqua-600"
+                  className="text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600"
                 >
                   Equations, thresholds, and sources
                 </a>

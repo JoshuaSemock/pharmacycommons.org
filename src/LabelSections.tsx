@@ -268,7 +268,7 @@ function BoxedWarning({ section }: { section: LabelSection }) {
       aria-label="Boxed warning"
       className="overflow-hidden rounded-md border-2 border-ink"
     >
-      <div className="flex items-center gap-2 bg-coral-100 px-5 py-2.5">
+      <div className="flex items-center gap-2 bg-rose-100 px-5 py-2.5">
         <WarningIcon />
         <h3 className="font-semibold uppercase tracking-[0.08em] text-ink" style={BOXED_HEADING}>
           Boxed warning
@@ -307,7 +307,7 @@ function SectionAccordion({
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left transition-colors hover:bg-sage-50"
+          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left transition-colors hover:bg-mint-50"
         >
           <span className="font-display text-lg text-ink" style={{ fontFamily: 'var(--font-display)' }}>
             {section.title}
@@ -333,7 +333,7 @@ function SectionAccordion({
 function Block({ block, tables }: { block: LabelBlock; tables: LabelTable[] | null }) {
   if (block.heading === 'Summary') {
     return (
-      <div className="rounded-lg bg-sage-50 px-4 py-3">
+      <div className="rounded-lg bg-mint-50 px-4 py-3">
         <p className="mb-1.5 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
           At a glance
         </p>
@@ -464,8 +464,8 @@ const TABLE_CLASSES =
   '[&_caption]:px-3 [&_caption]:py-2 [&_caption]:text-left [&_caption]:font-semibold ' +
   '[&_table]:w-full [&_table]:border-collapse ' +
   '[&_td]:border-t [&_td]:border-ink/10 [&_td]:px-3 [&_td]:py-1.5 [&_td]:align-top ' +
-  '[&_th]:bg-sage-50 [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-left [&_th]:align-bottom [&_th]:font-semibold ' +
-  '[&_tr:first-child_td]:bg-sage-50 [&_tr:first-child_td]:font-semibold'
+  '[&_th]:bg-mint-50 [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-left [&_th]:align-bottom [&_th]:font-semibold ' +
+  '[&_tr:first-child_td]:bg-mint-50 [&_tr:first-child_td]:font-semibold'
 
 function LabelTableView({ html }: { html: string }) {
   const clean = useMemo(() => sanitizeTableHtml(html), [html])
