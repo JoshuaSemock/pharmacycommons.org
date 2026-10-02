@@ -89,6 +89,14 @@ function splitCodes(raw: string | null | undefined): string[] {
     .filter(Boolean)
 }
 
+/**
+ * Attach an AbortSignal to a PostgREST query when one is given. Callers that
+ * don't pass a signal (tests, the API console) get the builder back untouched.
+ */
+function withSignal<Q extends { abortSignal(signal: AbortSignal): Q }>(query: Q, signal?: AbortSignal): Q {
+  return signal ? query.abortSignal(signal) : query
+}
+
 const HUMANIZED_FIELDS: Record<string, string> = {
   legal_status: 'Legal status',
   rx_status: 'Rx status',
@@ -123,12 +131,12 @@ function toAttributes(row: Record<string, unknown>): Record<string, unknown> {
  * Fetch one drug by slug.
  * Returns null when the slug is absent from `entities` — a genuine 404.
  */
-export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
-  const { data: entity, error: entityError } = await supabase
-    .from('entities')
-    .select('pcid, slug, name, entity_type')
-    .eq('slug', slug)
-    .maybeSingle()
+export async function getDrugBySlug(slug: string, options: { signal?: AbortSignal } = {}): Promise<DrugDetail | null> {
+  const { signal } = options
+  const { data: entity, error: entityError } = await withSignal(
+    supabase.from('entities').select('pcid, slug, name, entity_type').eq('slug', slug),
+    signal,
+  ).maybeSingle()
 
   if (entityError) throw new Error(`Failed to load '${slug}': ${entityError.message}`)
   if (!entity) return null
@@ -138,16 +146,16 @@ export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
 
   let satellite: Record<string, unknown> = {}
   if (table) {
-    const { data, error } = await supabase.from(table).select('*').eq('pcid', pcid).maybeSingle()
+    const { data, error } = await withSignal(supabase.from(table).select('*').eq('pcid', pcid), signal).maybeSingle()
     if (error) throw new Error(`Failed to load '${slug}' details: ${error.message}`)
     if (data) satellite = data as Record<string, unknown>
   }
 
   const [components, interactions, brands, hierarchy] = await Promise.all([
-    getComponents(pcid),
-    getInteractions(pcid),
-    getBrands(pcid),
-    entityType === 'moiety' ? getMoietyHierarchy(pcid) : null,
+    getComponents(pcid, signal),
+    getInteractions(pcid, signal),
+    getBrands(pcid, signal),
+    entityType === 'moiety' ? getMoietyHierarchy(pcid, signal) : null,
   ])
 
   // The hierarchy's brand list is the moiety's own brands (kept for older callers).
@@ -158,7 +166,8 @@ export async function getDrugBySlug(slug: string): Promise<DrugDetail | null> {
     slug: entity.slug,
     name: entity.name,
     entity_type: toDrugEntityType(entityType),
-    description: typeof satellite.class_name === 'string' ? satellite.class_name : null,
+    // The page shows "Unassigned" when this is null (DrugDetail.tsx).
+    description: typeof satellite.class_name === 'string' && satellite.class_name.trim() ? satellite.class_name : null,
     eco_risk: null, // no eco-metrics table yet — Phase 4
     status: 'full',
   }
@@ -211,18 +220,24 @@ function toBrand(r: BrandRow): BrandName {
   }
 }
 
-/** Current brands first (discontinued last), then alphabetical. */
+/**
+ * Alphabetical. Marketing status is kept on each BrandName for the API and
+ * history diffs, but the drug page no longer orders or labels brands by it
+ * (2026-10-02: discontinued status isn't part of the clinical profile).
+ */
 function sortBrands(a: BrandName, b: BrandName): number {
-  const rank = (x: BrandName) => (x.marketed === false ? 1 : 0)
-  return rank(a) - rank(b) || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+  return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 }
 
 /** Brand names for one entity (moiety or combination) from `entity_brand_names`. */
-async function getBrands(pcid: number): Promise<BrandName[]> {
-  const { data, error } = await supabase
-    .from('entity_brand_names')
-    .select('pcid, brand_key, brand_display, marketed, appl_nos, brand_rxcui, sources')
-    .eq('pcid', pcid)
+async function getBrands(pcid: number, signal?: AbortSignal): Promise<BrandName[]> {
+  const { data, error } = await withSignal(
+    supabase
+      .from('entity_brand_names')
+      .select('pcid, brand_key, brand_display, marketed, appl_nos, brand_rxcui, sources')
+      .eq('pcid', pcid),
+    signal,
+  )
 
   if (error) throw new Error(`Failed to load brand names for PCID-${pcid}: ${error.message}`)
   return ((data ?? []) as BrandRow[]).map(toBrand).sort(sortBrands)
@@ -234,16 +249,19 @@ async function getBrands(pcid: number): Promise<BrandName[]> {
  */
 type EntityRef = { pcid: number; slug: string; name: string } | null
 
-async function getComponents(pcid: number): Promise<DrugComponent[]> {
+async function getComponents(pcid: number, signal?: AbortSignal): Promise<DrugComponent[]> {
   // `clinical_statements` has three FKs into `entities` (subject/object/comparator),
   // so the embed needs an explicit constraint hint to disambiguate.
-  const { data, error } = await supabase
-    .from('clinical_statements')
-    .select(
-      'qualifier_value, object:entities!clinical_statements_object_pcid_fkey(pcid, slug, name)',
-    )
-    .eq('subject_pcid', pcid)
-    .eq('predicate', 'has_component')
+  const { data, error } = await withSignal(
+    supabase
+      .from('clinical_statements')
+      .select(
+        'qualifier_value, object:entities!clinical_statements_object_pcid_fkey(pcid, slug, name)',
+      )
+      .eq('subject_pcid', pcid)
+      .eq('predicate', 'has_component'),
+    signal,
+  )
 
   if (error) throw new Error(`Failed to load components for PCID-${pcid}: ${error.message}`)
 
@@ -274,16 +292,19 @@ async function getComponents(pcid: number): Promise<DrugComponent[]> {
  * spans every block, so the join resolves a name/slug either way, and the
  * UI already renders a text-only interaction when there's no slug to link.
  */
-async function getInteractions(pcid: number): Promise<DrugInteraction[]> {
-  const { data, error } = await supabase
-    .from('clinical_statements')
-    .select(
-      'subject_pcid, object_label, risk_profile, qualifier_value, ' +
-        'subject:entities!clinical_statements_subject_pcid_fkey(pcid, slug, name), ' +
-        'object:entities!clinical_statements_object_pcid_fkey(pcid, slug, name)',
-    )
-    .eq('predicate', 'has_contraindication')
-    .or(`subject_pcid.eq.${pcid},object_pcid.eq.${pcid}`)
+async function getInteractions(pcid: number, signal?: AbortSignal): Promise<DrugInteraction[]> {
+  const { data, error } = await withSignal(
+    supabase
+      .from('clinical_statements')
+      .select(
+        'subject_pcid, object_label, risk_profile, qualifier_value, ' +
+          'subject:entities!clinical_statements_subject_pcid_fkey(pcid, slug, name), ' +
+          'object:entities!clinical_statements_object_pcid_fkey(pcid, slug, name)',
+      )
+      .eq('predicate', 'has_contraindication')
+      .or(`subject_pcid.eq.${pcid},object_pcid.eq.${pcid}`),
+    signal,
+  )
 
   if (error) throw new Error(`Failed to load interactions for PCID-${pcid}: ${error.message}`)
 
@@ -311,22 +332,21 @@ async function getInteractions(pcid: number): Promise<DrugInteraction[]> {
 }
 
 /**
- * A moiety's precise forms and combination products — from the
- * `moiety_hierarchy` materialized view (base_name matching against
- * precise_forms/formulations/combinations; there's no FK for this yet, see
- * the view's own comment in Supabase). Each member carries its own brand
- * names from `entity_brand_names` (combination products: "Janumet").
- * `brand_names` is filled in by getDrugBySlug with the moiety's own brands.
- *
- * Formulations (brand-name products) don't come back from the view at all
- * today — their base_name is the brand name itself (e.g. "ABILIFY"), not the
- * chemical name, so nothing links them to a moiety by that method.
+ * A moiety's precise forms, single-ingredient brand formulations and
+ * combination products — from the `moiety_hierarchy` materialized view (v4
+ * places formulations by the FDA `has_component` triples, phase 10d). Each
+ * member carries its own brand names from `entity_brand_names` (combination
+ * products: "Janumet"). `brand_names` is filled in by getDrugBySlug with the
+ * moiety's own brands.
  */
-async function getMoietyHierarchy(pcid: number): Promise<MoietyHierarchy> {
-  const { data, error } = await supabase
-    .from('moiety_hierarchy')
-    .select('member_pcid, member_slug, member_name, member_term_type, primary_brand, relation')
-    .eq('moiety_pcid', pcid)
+async function getMoietyHierarchy(pcid: number, signal?: AbortSignal): Promise<MoietyHierarchy> {
+  const { data, error } = await withSignal(
+    supabase
+      .from('moiety_hierarchy')
+      .select('member_pcid, member_slug, member_name, member_term_type, primary_brand, relation')
+      .eq('moiety_pcid', pcid),
+    signal,
+  )
 
   if (error) throw new Error(`Failed to load hierarchy for PCID-${pcid}: ${error.message}`)
 
@@ -343,10 +363,13 @@ async function getMoietyHierarchy(pcid: number): Promise<MoietyHierarchy> {
   const memberBrands = new Map<number, BrandName[]>()
   const ids = [...new Set(rows.map(r => r.member_pcid))]
   if (ids.length > 0) {
-    const { data: brandRows, error: brandError } = await supabase
-      .from('entity_brand_names')
-      .select('pcid, brand_key, brand_display, marketed, appl_nos, brand_rxcui, sources')
-      .in('pcid', ids)
+    const { data: brandRows, error: brandError } = await withSignal(
+      supabase
+        .from('entity_brand_names')
+        .select('pcid, brand_key, brand_display, marketed, appl_nos, brand_rxcui, sources')
+        .in('pcid', ids),
+      signal,
+    )
     if (brandError) throw new Error(`Failed to load member brands for PCID-${pcid}: ${brandError.message}`)
     for (const r of (brandRows ?? []) as BrandRow[]) {
       const list = memberBrands.get(r.pcid) ?? []
@@ -365,9 +388,10 @@ async function getMoietyHierarchy(pcid: number): Promise<MoietyHierarchy> {
   })
 
   const preciseForms = rows.filter(r => r.relation === 'precise_form').map(toMember)
+  const formulations = rows.filter(r => r.relation === 'formulation').map(toMember)
   const combinations = rows.filter(r => r.relation === 'combination').map(toMember)
 
-  return { precise_forms: preciseForms, combinations, brand_names: [] }
+  return { precise_forms: preciseForms, formulations, combinations, brand_names: [] }
 }
 
 /** Paginated browse against the `catalog_entries` view, restricted to moieties. */
@@ -474,11 +498,18 @@ export async function getClassBySlug(slug: string): Promise<ClassDetail | null> 
  * drug is in only through a sub-class (e.g. ATC N06A for sertraline, which sits
  * directly in N06AB) comes back too, with `is_direct: false`.
  */
-export async function getEntityClasses(pcid: number, includeInherited = false): Promise<EntityClass[]> {
-  const { data, error } = await supabase.rpc('get_entity_classes', {
-    p_pcid: pcid,
-    p_include_inherited: includeInherited,
-  })
+export async function getEntityClasses(
+  pcid: number,
+  includeInherited = false,
+  options: { signal?: AbortSignal } = {},
+): Promise<EntityClass[]> {
+  const { data, error } = await withSignal(
+    supabase.rpc('get_entity_classes', {
+      p_pcid: pcid,
+      p_include_inherited: includeInherited,
+    }),
+    options.signal,
+  )
   if (error) throw new Error(`Failed to load classes for PCID-${pcid}: ${error.message}`)
   return (data ?? []) as EntityClass[]
 }
@@ -545,8 +576,8 @@ export async function getListBySlug(slug: string): Promise<ListDetail | null> {
 }
 
 /** The lists one drug is on; for a moiety this includes lists that name its forms or combinations. */
-export async function getEntityLists(pcid: number): Promise<EntityList[]> {
-  const { data, error } = await supabase.rpc('get_entity_lists', { p_pcid: pcid })
+export async function getEntityLists(pcid: number, options: { signal?: AbortSignal } = {}): Promise<EntityList[]> {
+  const { data, error } = await withSignal(supabase.rpc('get_entity_lists', { p_pcid: pcid }), options.signal)
   if (error) throw new Error(`Failed to load lists for PCID-${pcid}: ${error.message}`)
   return ((data ?? []) as EntityList[]).map(l => ({ ...l, rank: toNum(l.rank), value: toNum(l.value) }))
 }

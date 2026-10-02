@@ -42,17 +42,20 @@ type Row = {
 }
 
 /** Guidelines for a drug page, current ones first, then by sort_order and newest year. */
-export async function getGuidelines(pcidCode: string): Promise<Guideline[]> {
+export async function getGuidelines(pcidCode: string, options: { signal?: AbortSignal } = {}): Promise<Guideline[]> {
   const m = /^PCID-(\d+)$/.exec(pcidCode)
   if (!m) return []
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('entity_guidelines')
     .select(
       'context, sort_order, guideline:guidelines(guideline_id, title, short_title, organization, pub_year, url, citation, superseded_by)',
     )
     .eq('pcid', Number(m[1]))
     .order('sort_order', { ascending: true })
+  if (options.signal) query = query.abortSignal(options.signal)
+
+  const { data, error } = await query
 
   if (error) throw new Error(`Failed to load guidelines for ${pcidCode}: ${error.message}`)
 

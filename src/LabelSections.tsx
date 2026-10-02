@@ -1,76 +1,60 @@
 /**
- * Clinical tab body: the drug's FDA prescribing information, rewritten into
- * readable sections instead of a "label applicable" stub.
+ * The drug's FDA prescribing information, split into readable sections.
  *
  * Layout, top to bottom:
  *   - Source strip: which label this is, who makes it, when it was revised,
  *     and a DailyMed link. Lets the reader switch to another manufacturer's label.
- *   - Boxed warning, if any, as a coral callout that is always open.
- *   - Jump links to each section.
+ *   - Section index (jump links) and a prominent Expand all / Collapse all.
+ *   - Boxed warning, if any: a callout whose header (with the warning's own
+ *     titles) is always visible; its text expands like any other section.
  *   - Core sections (uses, dosing, contraindications, warnings, side effects,
- *     interactions) as accordions; "What it's used for" starts open.
- *   - Special populations, then reference material (pharmacology, overdose,
- *     storage…) collapsed under their own group headings.
+ *     interactions), then special populations, then reference material.
  *
- * Data: src/labels.ts → `label-text` edge function. Text is verbatim label
- * language, split on the label's own subsection titles; nothing is paraphrased.
+ * Every section starts collapsed (2026-10-02) so the page doesn't open onto
+ * screens of label text; the Quick Facts box on the drug page links straight
+ * into the sections that matter most.
+ *
+ * Data and open/closed state live on the drug page (src/drugPageData.ts,
+ * DrugDetail.tsx) because Quick Facts reads the same label and opens
+ * sections here. Text is verbatim label language, split on the label's own
+ * subsection titles; nothing is paraphrased.
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import {
-  formatApplication,
-  formatLabelDate,
-  getLabelText,
-  sanitizeTableHtml,
-} from './labels'
+import { formatApplication, formatLabelDate, sanitizeTableHtml } from './labels'
 import type { LabelBlock, LabelSection, LabelTable, LabelText } from './labels'
+import type { LabelState } from './drugPageData'
 import PaperSelect from './components/PaperSelect'
-
-const DEFAULT_OPEN = new Set(['indications_and_usage'])
 
 // index.css sizes bare h3/h4 outside Tailwind's layers, which beats utility
 // classes — so headings here set size/family inline instead.
-const SMALL_CAPS_HEADING = { fontSize: 'var(--text-2xs)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 } as const
-const BOXED_HEADING = { fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 } as const
-const SUBHEADING = { fontSize: 'var(--text-md)', fontFamily: 'var(--font-sans)', lineHeight: 1.35 } as const
+const GROUP_HEADING = { fontSize: 'var(--text-base)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 } as const
+const BOXED_HEADING = { fontSize: 'var(--text-base)', fontFamily: 'var(--font-sans)', lineHeight: 1.4 } as const
+const SUBHEADING = { fontSize: 'var(--text-base)', fontFamily: 'var(--font-sans)', lineHeight: 1.35 } as const
 
 const GROUP_LABELS: Record<'populations' | 'reference', string> = {
   populations: 'Special populations',
   reference: 'Reference',
 }
 
-/** Mount with `key={slug}` so a new drug starts fresh on its own best-ranked label. */
-export default function LabelSections({ slug }: { slug: string }) {
-  const [setid, setSetid] = useState<string | undefined>(undefined)
-  const [data, setData] = useState<LabelText | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+/** DOM id of a section, for jump links from elsewhere on the page. */
+export function labelSectionId(key: string): string {
+  return `label-${key}`
+}
 
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError(null)
-    getLabelText(slug, setid)
-      .then(result => {
-        if (cancelled) return
-        // Picking another manufacturer's label keeps the original ranked list in the picker.
-        setData(prev =>
-          setid && prev ? { ...result, n_labels: prev.n_labels, other_labels: mergeOthers(prev, result) } : result,
-        )
-      })
-      .catch(err => {
-        if (cancelled) return
-        console.error(err)
-        setError('The label text could not be loaded right now.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [slug, setid])
+export default function LabelSections({
+  slug,
+  label,
+  open,
+  onOpenChange,
+}: {
+  slug: string
+  label: LabelState
+  open: ReadonlySet<string>
+  onOpenChange: (next: Set<string>) => void
+}) {
+  const { data, loading, error, pick } = label
 
   if (loading && !data) return <LabelSkeleton />
 
@@ -107,24 +91,15 @@ export default function LabelSections({ slug }: { slug: string }) {
 
   return (
     <div className={`space-y-5 transition-opacity ${loading ? 'opacity-50' : ''}`} aria-busy={loading}>
-      <SourceStrip data={data} onPick={setSetid} />
-      <LabelBody sections={data.sections} key={data.label.setid} />
-      <p className="px-1 font-sans text-2xs leading-relaxed text-ink">
+      <SourceStrip data={data} onPick={pick} />
+      <LabelBody sections={data.sections} open={open} onOpenChange={onOpenChange} />
+      <p className="px-1 font-sans text-sm leading-relaxed text-ink">
         Text is reproduced from the FDA-approved prescribing information and split into sections for
         reading; it is not a substitute for the full label or for clinical judgment. Always check the
         current label on DailyMed before making prescribing decisions.
       </p>
     </div>
   )
-}
-
-/** Keep the original ranked list stable when the user switches labels. */
-function mergeOthers(prev: LabelText, next: LabelText) {
-  const all = [
-    ...(prev.label ? [{ setid: prev.label.setid, labeler: prev.label.labeler, effective_time: prev.label.effective_time }] : []),
-    ...prev.other_labels,
-  ]
-  return all.filter(o => o.setid !== next.label?.setid)
 }
 
 // ─── Source strip ─────────────────────────────────────────────────────────────
@@ -136,13 +111,7 @@ function SourceStrip({ data, onPick }: { data: LabelText; onPick: (setid: string
 
   return (
     <div className="border-b border-ink/15 px-1 pb-4">
-      <p className="mb-1 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
-        FDA prescribing information
-      </p>
-      <p
-        className="font-display text-lg leading-snug text-ink"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
+      <p className="font-sans text-lg font-medium leading-snug text-ink">
         {toTitleCase(label.title ?? label.brand_name ?? 'Prescription drug label')}
       </p>
       <dl className="mt-2 flex flex-wrap gap-x-5 gap-y-1 font-sans text-sm text-ink">
@@ -188,55 +157,68 @@ function Meta({ term, children }: { term: string; children: ReactNode }) {
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
 
-function LabelBody({ sections }: { sections: LabelSection[] }) {
+function LabelBody({
+  sections,
+  open,
+  onOpenChange,
+}: {
+  sections: LabelSection[]
+  open: ReadonlySet<string>
+  onOpenChange: (next: Set<string>) => void
+}) {
   const boxed = sections.filter(s => s.group === 'safety')
   const core = sections.filter(s => s.group === 'core')
   const populations = sections.filter(s => s.group === 'populations')
   const reference = sections.filter(s => s.group === 'reference')
+  const all = [...boxed, ...core, ...populations, ...reference]
   const jumpable = [...core, ...populations, ...reference]
 
-  const [open, setOpen] = useState<Set<string>>(() => new Set(DEFAULT_OPEN))
-  const toggle = (key: string, next?: boolean) =>
-    setOpen(prev => {
-      const s = new Set(prev)
-      const shouldOpen = next ?? !s.has(key)
-      if (shouldOpen) s.add(key)
-      else s.delete(key)
-      return s
-    })
+  const toggle = (key: string, next?: boolean) => {
+    const s = new Set(open)
+    const shouldOpen = next ?? !s.has(key)
+    if (shouldOpen) s.add(key)
+    else s.delete(key)
+    onOpenChange(s)
+  }
 
   const jumpTo = (key: string) => {
     toggle(key, true)
     requestAnimationFrame(() =>
-      document.getElementById(`label-${key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+      document.getElementById(labelSectionId(key))?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
     )
   }
 
-  const allOpen = jumpable.every(s => open.has(s.key))
+  const allOpen = all.length > 0 && all.every(s => open.has(s.key))
 
   return (
     <>
-      {boxed.map(s => (
-        <BoxedWarning key={s.key} section={s} />
-      ))}
-
-      <nav aria-label="Label sections" className="flex flex-wrap items-center gap-1.5">
-        {jumpable.map(s => (
-          <button
-            key={s.key}
-            onClick={() => jumpTo(s.key)}
-            className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink"
-          >
-            {s.title}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <nav aria-label="Label sections" className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+          {jumpable.map(s => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => jumpTo(s.key)}
+              className="lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+            >
+              {s.title}
+            </button>
+          ))}
+        </nav>
         <button
-          onClick={() => setOpen(allOpen ? new Set() : new Set(jumpable.map(s => s.key)))}
-          className="ml-auto px-1 font-sans text-sm font-medium text-ink hover:underline"
+          type="button"
+          onClick={() => onOpenChange(allOpen ? new Set() : new Set(all.map(s => s.key)))}
+          aria-pressed={allOpen}
+          className="lp-toggle flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-base font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
         >
+          <Chevron open={allOpen} />
           {allOpen ? 'Collapse all' : 'Expand all'}
         </button>
-      </nav>
+      </div>
+
+      {boxed.map(s => (
+        <BoxedWarning key={s.key} section={s} open={open.has(s.key)} onToggle={() => toggle(s.key)} />
+      ))}
 
       <div>
         {core.map(s => (
@@ -249,7 +231,7 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
         if (list.length === 0) return null
         return (
           <div key={group}>
-            <h3 className="px-1 pt-2 pb-2.5 font-semibold uppercase tracking-[0.1em] text-ink" style={SMALL_CAPS_HEADING}>
+            <h3 className="px-1 pt-2 pb-2.5 font-semibold text-ink" style={GROUP_HEADING}>
               {GROUP_LABELS[group]}
             </h3>
             {list.map(s => (
@@ -262,28 +244,62 @@ function LabelBody({ sections }: { sections: LabelSection[] }) {
   )
 }
 
-function BoxedWarning({ section }: { section: LabelSection }) {
+/**
+ * The boxed warning starts collapsed like every other section, but its header
+ * always shows the warning's own titles ("Lactic acidosis"), so the warning is
+ * never hidden — only its full text is.
+ */
+function BoxedWarning({ section, open, onToggle }: { section: LabelSection; open: boolean; onToggle: () => void }) {
+  const panelId = `label-panel-${section.key}`
+  const titles = section.blocks
+    .map(b => b.heading)
+    .filter((h): h is string => Boolean(h) && h !== 'Summary')
+    .map(h => sentenceCase(h).replace(/^warning:\s*/i, ''))
+
   return (
     <section
+      id={labelSectionId(section.key)}
       aria-label="Boxed warning"
-      className="overflow-hidden rounded-md border-2 border-ink"
+      className="scroll-mt-[calc(var(--nav-h,3.5rem)_+_1rem)] overflow-hidden rounded-md border-2 border-ink"
     >
-      <div className="flex items-center gap-2 bg-rose-100 px-5 py-2.5">
-        <WarningIcon />
-        <h3 className="font-semibold uppercase tracking-[0.08em] text-ink" style={BOXED_HEADING}>
-          Boxed warning
-        </h3>
-      </div>
-      <div className="space-y-3 p-5">
-        {section.blocks.map((b, i) => (
-          <div key={i}>
-            {b.heading && (
-              <p className="mb-1.5 font-sans text-md font-semibold text-ink">{sentenceCase(b.heading)}</p>
-            )}
-            <BlockText text={b.text} />
-          </div>
-        ))}
-      </div>
+      <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="flex w-full items-start justify-between gap-3 bg-rose-100 px-5 py-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40"
+        >
+          <span className="flex min-w-0 items-start gap-2">
+            <span className="mt-0.5 shrink-0">
+              <WarningIcon />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-semibold text-ink" style={BOXED_HEADING}>
+                Boxed warning
+              </span>
+              {titles.length > 0 && (
+                <span className="mt-0.5 block font-sans text-sm leading-snug text-ink">{titles.join(' · ')}</span>
+              )}
+            </span>
+          </span>
+          <span className="mt-1 shrink-0 text-ink">
+            <Chevron open={open} />
+          </span>
+        </button>
+      </h3>
+      {open && (
+        <div id={panelId} className="space-y-3 p-5">
+          {section.blocks.map((b, i) => (
+            <div key={i}>
+              {b.heading && (
+                <p className="mb-1.5 font-sans text-base font-semibold text-ink">{sentenceCase(b.heading)}</p>
+              )}
+              <BlockText text={b.text} />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
@@ -301,15 +317,19 @@ function SectionAccordion({
   const panelId = `label-panel-${section.key}`
 
   return (
-    <section id={`label-${section.key}`} className="scroll-mt-20 border-b border-ink/15 first-of-type:border-t">
+    <section
+      id={labelSectionId(section.key)}
+      className="scroll-mt-[calc(var(--nav-h,3.5rem)_+_1rem)] border-b border-ink/15 first-of-type:border-t"
+    >
       <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
         <button
+          type="button"
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left transition-colors hover:bg-mint-50"
+          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40"
         >
-          <span className="font-display text-lg text-ink" style={{ fontFamily: 'var(--font-display)' }}>
+          <span className="font-sans text-lg font-medium text-ink">
             {section.title}
           </span>
           <span className="flex shrink-0 items-center gap-2 font-sans text-sm text-ink">
@@ -334,9 +354,7 @@ function Block({ block, tables }: { block: LabelBlock; tables: LabelTable[] | nu
   if (block.heading === 'Summary') {
     return (
       <div className="rounded-lg bg-mint-50 px-4 py-3">
-        <p className="mb-1.5 font-sans text-2xs font-semibold uppercase tracking-[0.1em] text-ink">
-          At a glance
-        </p>
+        <p className="mb-1.5 font-sans text-sm font-semibold text-ink">At a glance</p>
         <BlockText text={block.text} tables={tables} />
       </div>
     )
@@ -367,7 +385,7 @@ function BlockText({ text, tables = null }: { text: string; tables?: LabelTable[
   const visible = long && !expanded ? clampParts(parts, 900) : parts
 
   return (
-    <div className="space-y-2 font-sans text-md leading-relaxed text-ink">
+    <div className="space-y-2 font-sans text-base leading-relaxed text-ink">
       {visible.map((p, i) => {
         if (p.kind === 'list') {
           return (
@@ -491,7 +509,7 @@ function LabelSkeleton() {
 
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <div className="border-l-2 border-ink/25 py-1 pl-4 font-sans text-md leading-relaxed text-ink">
+    <div className="border-l-2 border-ink/25 py-1 pl-4 font-sans text-base leading-relaxed text-ink">
       {children}
     </div>
   )

@@ -199,10 +199,19 @@ Lighthouse baseline and fixes: `docs/performance-2026-09-25.md`.
 
 **Search/browse shows moieties only.** `src/catalog.ts` `loadCatalog()` filters
 `catalog_entries` to `entity_type='moiety'`; precise forms, brands and combinations
-nest under the moiety page (`HierarchyCard` in `DrugDetail.tsx`, fed by
-`moiety_hierarchy`). ⚠ `HierarchyCard` renders only `precise_forms` and
-`combinations`; `relation = 'formulation'` rows (single-ingredient brands such as
-Lipitor, Glucophage) are returned by the view but not yet displayed.
+nest under the moiety page (`HierarchySection` in `DrugDetail.tsx`, fed by
+`moiety_hierarchy`): base moiety → precise forms → brand formulations → combinations
+(formulations shown since 2026-10-02).
+
+**Drug page layout (2026-10-02, `src/DrugDetail.tsx`):** reading order is Jump to label →
+Quick Facts → hierarchy → FDA label (all sections collapsed, Expand all) → Identifiers →
+Guidelines (collapsed) → Classifications (FDA MOA/PE/CS first) → Lists → Additional
+metadata. On desktop Jump, Quick Facts and Identifiers sit in a sticky left rail; below
+`lg` both columns are `display: contents` and `order-*` interleaves them. The label,
+classes and lists are fetched once in `src/drugPageData.ts` (AbortController per
+request) and shared by Quick Facts and the full sections. Quick Facts' key lists are
+matched by slug: `most-used-drugs-us`, `do-not-crush`, `anticholinergic-burden`,
+`arrhythmia-risk` — renaming one of those lists breaks its row.
 
 ## Machine-readable API
 Public Edge Function `api` (v1, `verify_jwt = false`), design in
@@ -344,7 +353,6 @@ formulations in the moiety hierarchy (phase 10).
   record (separate reviewed minting batch); 27 brand lines mix ingredient sets across
   products (`fda_formulations_mixed_ingredient_sets_2026-09-25.csv`); IV fluids and
   electrolytes resolve to ion records ("Sodium cation") because no salt record exists.
-- `HierarchyCard` doesn't show `formulation` members yet (frontend PR pending).
 - `moieties.class_pcid` is NULL everywhere — class membership lives in
   `class_members` now; decide whether `class_pcid` is kept as a "primary class"
   pointer or retired (Joshua).
