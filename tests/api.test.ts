@@ -85,7 +85,7 @@ const { db, TOTAL, MOIETIES, COMBINATIONS } = vi.hoisted(() => {
 
   function addMoiety(pcid: number, slug: string, name: string, primary_brand: string | null = null) {
     entities.push({ pcid, slug, name, entity_type: 'moiety' })
-    moieties.push({ pcid, primary_brand, class_name: null })
+    moieties.push({ pcid, primary_brand, description_text: null })
     catalog_entries.push({
       pcid, slug, name, entity_type: 'moiety',
       primary_brand, controlled_schedule: null, is_controlled: null,
@@ -101,7 +101,7 @@ const { db, TOTAL, MOIETIES, COMBINATIONS } = vi.hoisted(() => {
   // Not returned by listDrugs/searchDrugs any more (moiety-only), but still
   // reachable directly via getDrugBySlug/getDrugByPcid.
   entities.push({ pcid: 2000100, slug: 'acetaminophen-pentazocine', name: 'acetaminophen-pentazocine', entity_type: 'combination' })
-  combinations.push({ pcid: 2000100, primary_brand: null, class_name: null })
+  combinations.push({ pcid: 2000100, primary_brand: null })
   catalog_entries.push({
     pcid: 2000100, slug: 'acetaminophen-pentazocine', name: 'acetaminophen-pentazocine',
     entity_type: 'combination', primary_brand: null, controlled_schedule: null, is_controlled: null,
@@ -215,6 +215,7 @@ vi.mock('@/supabaseClient', () => ({
 }))
 
 const {
+  toDescription,
   getDrugByPcid,
   getDrugBySlug,
   getDrugInteractions,
@@ -229,6 +230,19 @@ const ENTITY_TYPES: DrugEntityType[] = ['drug', 'combination']
 const PCID_RE = /^PCID-[12]\d{6}$/
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+describe('toDescription', () => {
+  it('drops missing, blank and placeholder descriptions', () => {
+    expect(toDescription(null)).toBeNull()
+    expect(toDescription('   ')).toBeNull()
+    expect(toDescription('Unassigned')).toBeNull()
+    expect(toDescription(' unassigned ')).toBeNull()
+  })
+
+  it('keeps written text, trimmed', () => {
+    expect(toDescription('  Biguanide for type 2 diabetes. ')).toBe('Biguanide for type 2 diabetes.')
+  })
+})
 
 describe('getDrugBySlug', () => {
   it('returns a Supabase-backed record for a known slug', async () => {
@@ -264,8 +278,8 @@ describe('getDrugBySlug', () => {
     await expect(getDrugBySlug('not-a-real-drug-xyz')).resolves.toBeNull()
   })
 
-  it('leaves description null when the satellite row has no class_name', async () => {
-    // Detail description comes from `class_name`, not `primary_brand` — the
+  it('leaves description null when the satellite row has no description_text', async () => {
+    // Detail description comes from `description_text`, not `primary_brand` — the
     // brand-based description ("Also marketed as …") is a list/search-only
     // presentation built by listDrugs/searchDrugs, not getDrugBySlug.
     const drug = await getDrugBySlug('oxycodone')

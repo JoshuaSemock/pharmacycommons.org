@@ -353,9 +353,12 @@ formulations in the moiety hierarchy (phase 10).
   record (separate reviewed minting batch); 27 brand lines mix ingredient sets across
   products (`fda_formulations_mixed_ingredient_sets_2026-09-25.csv`); IV fluids and
   electrolytes resolve to ion records ("Sodium cation") because no salt record exists.
-- `moieties.class_pcid` is NULL everywhere — class membership lives in
-  `class_members` now; decide whether `class_pcid` is kept as a "primary class"
-  pointer or retired (Joshua).
+- **Phase 13 (2026-10-02):** `moieties.description_text` (hand-written one-liner shown
+  under the drug name; Joshua writes them in a spreadsheet keyed by PCID and Claude
+  loads them, blanks skipped) replaces `class_name`/`class_pcid` on moieties. Applied:
+  13a (FK drop) and 13b (new column). **13c (drop `moieties.class_pcid` and
+  `moieties.class_name`) is not applied yet** — see `db/phase13_moieties_description_text.sql`.
+  The other three blocks still carry unused `class_pcid`/`class_name`.
 - `physiochemical` empty; ECOTOX/PPCP loader not written (needs real archive schema).
 - `Unclassified_Holding`: 634 rows still parked (no identifiers); 157 rows in
   `needs_manual_review.csv`.
