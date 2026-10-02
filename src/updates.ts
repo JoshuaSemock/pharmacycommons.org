@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'classifications',
+    date: '2026-10-02',
+    kind: 'Feature',
+    title: 'Classifications: one search, every system',
+    summary:
+      'Drug classes are now Classifications, in the top bar after Lists. One search covers WHO ATC, VA, FDA EPC/MOA/PE, ChemOnt and Pharmacy Commons groups at once, a filter narrows to one system, and up to three classes can be compared side by side.',
+    to: '/classifications',
+    cta: 'Take a look',
+  },
+  {
     id: 'paper-and-dark-mode',
     date: '2026-10-01',
     kind: 'Feature',

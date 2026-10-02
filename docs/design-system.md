@@ -277,8 +277,8 @@ line beside it, scored into the paper.
 
 | Thing | Treatment |
 | --- | --- |
-| Search bars (header, home, browse, classes, list filter) | `.lp-field`: embossed, debossed while typing |
-| Nav: Browse · Lists · Tools | `.lp-flat`: flat, debossed on the current page |
+| Search bars (header, home, browse, classifications, list filter) | `.lp-field`: embossed, debossed while typing |
+| Nav: Browse · Lists · Classifications · Tools | `.lp-flat`: flat, debossed on the current page. Below 600px and from md to lg the wordmark is hidden (logo tile only) so the four links fit |
 | Nav: "Log in / Register" | `.lp-raised .lp-press` |
 | Nav: "Signed In" | `.lp-sunken` |
 | Hamburger | `.lp-toggle`: embossed, debossed while open; three bars fold into an X |

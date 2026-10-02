@@ -49,9 +49,23 @@ const STATIC_ROUTES = [
     description: 'Browse every active ingredient in Pharmacy Commons from A to Z, with brand names, controlled-substance schedules and stable PCID identifiers.',
   },
   {
+    path: '/classifications',
+    title: 'Classifications',
+    description: 'Search pharmaceutical classifications across WHO ATC, the VA National Formulary, FDA EPC/MOA/PE, ChemOnt and curated Pharmacy Commons groups, and compare up to three classes side by side.',
+  },
+  {
+    // Old name for /classifications; the app redirects it. Kept so existing links still get a 200.
     path: '/classes',
-    title: 'Drug classes',
-    description: 'Pharmacologic, therapeutic and chemical drug classes from RxClass, ClassyFire and other public classification systems, each linked to its member drugs.',
+    title: 'Classifications',
+    description: 'Search pharmaceutical classifications across WHO ATC, the VA National Formulary, FDA EPC/MOA/PE, ChemOnt and curated Pharmacy Commons groups, and compare up to three classes side by side.',
+    index: false,
+    sitemap: false,
+  },
+  {
+    path: '/classifications/compare',
+    title: 'Compare classifications',
+    description: 'Compare up to three drug classes from any classification system side by side on Pharmacy Commons.',
+    sitemap: false,
   },
   {
     path: '/lists',
@@ -219,7 +233,7 @@ async function listRoutes() {
 async function classRoutes() {
   const rows = await rest('rpc/list_classes?select=slug,name,class_type_label,member_count')
   return rows.map(r => ({
-    path: `/classes/${r.slug}`,
+    path: `/classifications/${r.slug}`,
     title: r.name,
     heading: r.name,
     description: `${r.name}${r.class_type_label ? ` (${r.class_type_label})` : ''}: ${r.member_count} member drug${r.member_count === 1 ? '' : 's'} on Pharmacy Commons, with links to the source classification.`,

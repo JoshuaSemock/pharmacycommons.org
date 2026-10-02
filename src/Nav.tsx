@@ -6,12 +6,15 @@ import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
 
 /**
  * The site header: one bar, always in this order — logo, "Pharmacy Commons",
- * search, Browse · Lists · Tools, then the account button and the menu.
+ * search, Browse · Lists · Classifications · Tools, then the account button and the menu.
  *
  * md and up it is a single 56px flex row. Below md the same bar is a two-row
  * grid: name, links and menu on the first (the name truncates before anything
  * wraps), the search box full width on the second, and the account button
- * moves into the menu. The
+ * moves into the menu. Below 600px the wordmark is hidden and the logo tile
+ * alone is the home link: four bar links (Classifications is long) leave no
+ * room for it on a phone. It is hidden again from md to lg, where the bar is
+ * one row and the search box would otherwise be squeezed to nothing. The
  * search box is shown on every page, including / and /browse, which also have
  * their own.
  *
@@ -36,7 +39,7 @@ export default function Nav() {
 
   return (
     <nav ref={navRef} className="pc-grain lp-rule-b sticky top-0 z-50 bg-paper">
-      <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
+      <div className="mx-auto grid max-w-page grid-cols-[minmax(2rem,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
         <Link
           to="/"
           className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 md:h-auto"
@@ -45,7 +48,7 @@ export default function Nav() {
           <span className="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
-          <span className="font-sans text-[13px] min-w-0 truncate min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">
+          <span className="font-sans text-[13px] min-w-0 truncate max-[599px]:hidden md:max-lg:hidden min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">
             Pharmacy Commons
           </span>
         </Link>
@@ -78,7 +81,7 @@ export default function Nav() {
     NavLink sets aria-current="page", which .lp-flat keys off. */
 function barLinkClass({ isActive }: { isActive: boolean }): string {
   return [
-    'lp-flat flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[13px] text-ink min-[360px]:text-[13.5px] min-[400px]:px-2.5 sm:text-[14px]',
+    'lp-flat flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[12px] text-ink min-[360px]:text-[13px] min-[400px]:text-[13.5px] min-[400px]:px-2.5 sm:text-[14px]',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
     isActive ? 'font-medium' : '',
   ].join(' ')

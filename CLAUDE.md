@@ -162,7 +162,10 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   semicolons, `x => …` arrows.
 
 ## Routes (src/App.tsx)
-`/` · `/browse` · `/drugs/:slug` · `/classes` · `/classes/:slug` · `/lists` ·
+`/` · `/browse` · `/drugs/:slug` · `/classifications` (search across every class
+system, `?q=`, `?group=`, `?c=` compare tray) · `/classifications/compare?c=a,b,c` (up to three
+classes, `src/pages/ClassCompare.tsx`) · `/classifications/:slug` — `/classes`, `/classes/:slug`
+and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
@@ -325,7 +328,8 @@ formulations in the moiety hierarchy (phase 10).
   RxNorm / label migrations that were applied only via `apply_migration`.
 - Scripts named in `docs/project-history.md` (`02_transform.py`, `04_validate.py`,
   `04b`–`04f`) are not in `scripts/`.
-- Stray/dead files: `drug.html`, root `index.css`; `public/favicon.svg` and
+- Stray/dead files: `drug.html`, root `index.css`; `src/ClassIndex.tsx` and
+  `src/ClassPage.tsx` (old class pages, imported nowhere; the live ones are in `src/pages/`); `public/favicon.svg` and
   `public/Pharmacy_Commons_Logo_Canva_144.svg` (207 KB each, no longer linked);
   `assets/textures/*.jpg` (source files; the site serves `public/textures/*.webp`); `public/drug-catalog.json` (~31k lines, nothing reads it);
   `public/drug.html`; `docs/schema-updates.sql` and `docs/data-model-decisions.md` §4

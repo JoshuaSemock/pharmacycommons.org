@@ -25,13 +25,14 @@ import type { ThemeChoice } from './theme'
 export const BAR_LINKS = [
   { to: '/browse', label: 'Browse' },
   { to: '/lists', label: 'Lists' },
+  { to: '/classifications', label: 'Classifications' },
   { to: '/tools', label: 'Tools' },
 ]
 
 const EXPLORE_LINKS = [
   { to: '/browse', label: 'Browse A to Z' },
-  { to: '/classes', label: 'Drug classes' },
   { to: '/lists', label: 'Lists' },
+  { to: '/classifications', label: 'Classifications' },
   { to: '/tools', label: 'All tools' },
 ]
 

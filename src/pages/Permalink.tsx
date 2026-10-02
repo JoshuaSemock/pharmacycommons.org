@@ -45,7 +45,7 @@ export default function Permalink() {
         return
       }
       if (data?.slug) {
-        const base = data.entity_type === 'class' ? '/classes' : data.entity_type === 'list' ? '/lists' : '/drugs'
+        const base = data.entity_type === 'class' ? '/classifications' : data.entity_type === 'list' ? '/lists' : '/drugs'
         navigate(`${base}/${data.slug}`, { replace: true })
         return
       }

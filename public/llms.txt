@@ -10,7 +10,7 @@ Every medicine has a stable identifier, the PCID (Pharmacy Commons Identifier), 
 
 - [Browse the catalog](https://pharmacycommons.org/browse): every active ingredient, A to Z. Search with `/browse?q=<term>`.
 - [Drug pages](https://pharmacycommons.org/drugs/metformin): one page per active moiety at `/drugs/<slug>`, with identifiers, classes, FDA labeling, brands and sources.
-- [Drug classes](https://pharmacycommons.org/classes): pharmacologic, therapeutic and chemical classes from RxClass, ClassyFire and ChemOnt.
+- [Classifications](https://pharmacycommons.org/classifications): WHO ATC, VA, FDA EPC/MOA/PE, ChemOnt and curated Pharmacy Commons classes, searchable together, with a compare view for up to three classes.
 - [Lists](https://pharmacycommons.org/lists): compendium lists such as the most-used drugs in the US and Georgia MPJE drug lists.
 - [Tools](https://pharmacycommons.org/tools): clinical calculators, including creatinine clearance.
 - [About](https://pharmacycommons.org/about): mission, values, licensing and founder.

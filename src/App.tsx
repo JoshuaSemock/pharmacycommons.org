@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom'
 import Nav from './Nav'
 import Footer from './Footer'
 import Home from './pages/Home'
@@ -20,6 +20,7 @@ const Account = lazy(() => import('./pages/Account'))
 const Permalink = lazy(() => import('./pages/Permalink'))
 const ClassIndex = lazy(() => import('./pages/ClassIndex'))
 const ClassDetail = lazy(() => import('./pages/ClassDetail'))
+const ClassCompare = lazy(() => import('./pages/ClassCompare'))
 const ListIndex = lazy(() => import('./pages/ListIndex'))
 const ListDetail = lazy(() => import('./pages/ListDetail'))
 const ListCompare = lazy(() => import('./pages/ListCompare'))
@@ -43,6 +44,12 @@ function Moved({ to }: { to: string }) {
   return <Navigate to={`${to}${search}${hash}`} replace />
 }
 
+/** /classes/:slug → /classifications/:slug. */
+function MovedClass() {
+  const { slug = '' } = useParams<{ slug: string }>()
+  return <Moved to={`/classifications/${slug}`} />
+}
+
 export default function App() {
   return (
     <div className="min-h-full page-background">
@@ -55,8 +62,12 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<SearchView />} />
           <Route path="/drugs/:slug" element={<DrugDetail />} />
-          <Route path="/classes" element={<ClassIndex />} />
-          <Route path="/classes/:slug" element={<ClassDetail />} />
+          <Route path="/classifications" element={<ClassIndex />} />
+          <Route path="/classifications/compare" element={<ClassCompare />} />
+          <Route path="/classifications/:slug" element={<ClassDetail />} />
+          {/* "Drug classes" became "Classifications" 2026-10-02; old links and bookmarks keep working. */}
+          <Route path="/classes" element={<Moved to="/classifications" />} />
+          <Route path="/classes/:slug" element={<MovedClass />} />
           <Route path="/lists" element={<ListIndex />} />
           <Route path="/lists/compare" element={<ListCompare />} />
           <Route path="/lists/:slug" element={<ListDetail />} />
