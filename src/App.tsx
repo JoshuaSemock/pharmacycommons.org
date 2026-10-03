@@ -28,6 +28,7 @@ const ListCompare = lazy(() => import('./pages/ListCompare'))
 const CreatinineClearance = lazy(() => import('./tools/CreatinineClearance'))
 const MedicationReconciliation = lazy(() => import('./tools/MedicationReconciliation'))
 const DaysSupply = lazy(() => import('./tools/DaysSupply'))
+const Dictionary = lazy(() => import('./tools/Dictionary'))
 const Developers = lazy(() => import('./pages/Developers'))
 // Legal & governance pages; text comes from docs/*.md (see src/legal.ts).
 const Terms = lazy(() => import('./pages/Terms'))
@@ -84,6 +85,7 @@ export default function App() {
             element={<MedicationReconciliation />}
           />
           <Route path="/tools/days-supply" element={<DaysSupply />} />
+          <Route path="/tools/dictionary" element={<Dictionary />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/references" element={<References />} />

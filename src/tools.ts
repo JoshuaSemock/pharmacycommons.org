@@ -10,7 +10,7 @@ import { CURRENT_API_BASE } from './developers/endpoints'
 
 export type ToolStatus = 'live' | 'building' | 'planned'
 
-export type ToolSectionId = 'workup' | 'calculators' | 'lists' | 'environmental' | 'research' | 'planned'
+export type ToolSectionId = 'workup' | 'calculators' | 'lists' | 'reference' | 'environmental' | 'research' | 'planned'
 
 export type ToolSection = { id: ToolSectionId; label: string }
 
@@ -19,6 +19,7 @@ export const TOOL_SECTIONS: ToolSection[] = [
   { id: 'workup', label: 'Clinical workup' },
   { id: 'calculators', label: 'Clinical calculators' },
   { id: 'lists', label: 'Clinical lists' },
+  { id: 'reference', label: 'Writing and reference' },
   { id: 'environmental', label: 'Environmental' },
   { id: 'research', label: 'Research' },
   { id: 'planned', label: 'Planned' },
@@ -115,6 +116,18 @@ export const TOOLS: Tool[] = [
     status: 'live',
     section: 'lists',
     to: '/lists/arrhythmia-risk-long-qt',
+  },
+
+  // Writing and reference
+  {
+    id: 'dictionary',
+    name: 'Medical dictionary for Word',
+    blurb:
+      'A custom dictionary file for Microsoft Word with about 42,000 drug names, brand names, biologics, medical terms and abbreviations, so correct spellings stop being underlined and Word can suggest them. Step-by-step instructions for Windows and Mac, the full dictionary with definitions, and The Joint Commission "Do Not Use" abbreviations.',
+    summary: 'Spell-check drug names and medical terms in Word',
+    status: 'live',
+    section: 'reference',
+    to: '/tools/dictionary',
   },
 
   // Environmental

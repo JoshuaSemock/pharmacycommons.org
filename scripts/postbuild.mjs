@@ -105,6 +105,12 @@ const STATIC_ROUTES = [
     description: 'Work out the quantity to dispense for a number of days, or the days supply of a quantity, for tablets, liquids, eye and ear drops, inhalers, insulin and GLP-1 pens. Priming, drops per mL and in-use limits are counted in, and every step is shown.',
   },
   {
+    path: '/tools/dictionary',
+    title: 'Medical dictionary for Microsoft Word',
+    heading: 'Medical dictionary for Word',
+    description: 'Download a free custom dictionary for Microsoft Word with about 42,000 drug names, brand names, biologics, medical terms and abbreviations, with instructions for Windows and Mac and The Joint Commission "Do Not Use" list.',
+  },
+  {
     path: '/developers',
     title: 'Developers',
     heading: 'Pharmacy Commons API for developers',

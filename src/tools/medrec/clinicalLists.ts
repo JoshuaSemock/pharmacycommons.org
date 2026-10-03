@@ -96,7 +96,7 @@ export function buildClinicalIndex(lists: { slug: string; items: Pick<ListItem, 
     const def = CLINICAL_LISTS[slug]
     if (!def) continue
     for (const item of items) {
-      if (item.entity_type !== 'moiety') continue
+      if (item.entity_type !== 'moiety' || item.pcid === null) continue
       const entry: MedListEntry = {
         slug,
         label: def.label,

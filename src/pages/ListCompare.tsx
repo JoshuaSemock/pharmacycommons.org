@@ -19,7 +19,8 @@ import PaperSelect from '../components/PaperSelect'
 const MAX_LISTS = 3
 const BATCH = 300
 
-type Row = { pcid: number; slug: string; name: string; cells: (ListItem | null)[] }
+/** `key` is the PCID, or `term:<name>` for entries that are plain terms (no drug record). */
+type Row = { key: string; slug: string | null; name: string; cells: (ListItem | null)[] }
 type Show = 'all' | 'every' | 'some'
 
 export default function ListCompare() {
@@ -73,18 +74,19 @@ export default function ListCompare() {
 
   const rows = useMemo<Row[]>(() => {
     if (!ready) return []
-    const byPcid = new Map<number, Row>()
+    const byKey = new Map<string, Row>()
     shown.forEach((list, col) => {
       for (const item of list.items) {
-        let row = byPcid.get(item.pcid)
+        const key = item.pcid ? String(item.pcid) : `term:${item.source_name}`
+        let row = byKey.get(key)
         if (!row) {
-          row = { pcid: item.pcid, slug: item.slug, name: formatDrugName(item.name), cells: shown.map(() => null) }
-          byPcid.set(item.pcid, row)
+          row = { key, slug: item.slug, name: item.slug ? formatDrugName(item.name) : item.name, cells: shown.map(() => null) }
+          byKey.set(key, row)
         }
         if (!row.cells[col]) row.cells[col] = item
       }
     })
-    return [...byPcid.values()].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+    return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
   }, [ready, shown])
 
   const counts = useMemo(() => {
@@ -228,11 +230,15 @@ export default function ListCompare() {
               </thead>
               <tbody>
                 {filtered.slice(0, limit).map(r => (
-                  <tr key={r.pcid} className="border-b border-ink/10 last:border-b-0">
+                  <tr key={r.key} className="border-b border-ink/10 last:border-b-0">
                     <th scope="row" className="px-4 py-2 text-left font-medium">
-                      <Link to={`/drugs/${r.slug}`} className="text-ink">
-                        {r.name}
-                      </Link>
+                      {r.slug ? (
+                        <Link to={`/drugs/${r.slug}`} className="text-ink">
+                          {r.name}
+                        </Link>
+                      ) : (
+                        <span className="text-ink">{r.name}</span>
+                      )}
                     </th>
                     {r.cells.map((c, i) => (
                       <td key={i} className="px-4 py-2">
