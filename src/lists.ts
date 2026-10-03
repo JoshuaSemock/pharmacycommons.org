@@ -13,12 +13,12 @@ export type SortKey = 'rank' | 'value' | 'name' | 'status'
 export type SortOption = { key: SortKey; label: string }
 
 /** The sort options that make sense for this list, in display order. */
-export function sortOptions(list: Pick<ListDetail, 'items' | 'measure_label' | 'measure_unit'>): SortOption[] {
+export function sortOptions(list: Pick<ListDetail, 'items' | 'measure_label' | 'measure_unit'> & { status_label?: string | null }): SortOption[] {
   const opts: SortOption[] = []
   if (list.items.some(i => i.rank !== null)) opts.push({ key: 'rank', label: 'Rank' })
   if (list.items.some(i => i.value !== null)) opts.push({ key: 'value', label: valueLabel(list) })
   opts.push({ key: 'name', label: 'A–Z' })
-  if (list.items.some(i => i.legal_status)) opts.push({ key: 'status', label: 'Status' })
+  if (list.items.some(i => i.legal_status)) opts.push({ key: 'status', label: list.status_label ?? 'Status' })
   return opts
 }
 
@@ -126,18 +126,27 @@ function csvCell(v: string | number | null): string {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
+/**
+ * True when every entry is a plain term (an abbreviation or dose designation) rather than a
+ * drug record — the Joint Commission "Do Not Use" list. Pages then say "entries", not "drugs".
+ */
+export const isTermList = (items: Pick<ListItem, 'slug'>[]): boolean => items.length > 0 && items.every(i => !i.slug)
+
 /** CSV of the rows as currently shown, with a PCID column so the file joins back to the API. */
 export function listToCsv(list: Pick<ListDetail, 'measure_label'>, items: ListItem[]): string {
-  const header = ['rank', 'drug', 'pcid', 'name_in_source']
+  const terms = items.some(i => !i.slug)
+  const header = ['rank', terms ? 'entry' : 'drug', 'pcid', 'name_in_source']
   const hasValue = items.some(i => i.value !== null)
   const hasStatus = items.some(i => i.legal_status)
   if (hasValue) header.push(list.measure_label ?? 'value')
   if (hasStatus) header.push('legal_status')
+  if (terms) header.push('note')
   const lines = [header.map(csvCell).join(',')]
   for (const i of items) {
     const row: (string | number | null)[] = [i.rank, i.slug ? formatDrugName(i.name) : i.name, i.pcid ? `PCID-${i.pcid}` : '', i.source_name]
     if (hasValue) row.push(i.value)
     if (hasStatus) row.push(i.legal_status)
+    if (terms) row.push(i.note)
     lines.push(row.map(csvCell).join(','))
   }
   return lines.join('\n') + '\n'

@@ -24,6 +24,7 @@ import {
   defaultSortKey,
   filterItems,
   formatCount,
+  isTermList,
   listToCsv,
   sortItems,
   sortOptions,
@@ -117,7 +118,7 @@ export default function ListDetail() {
       <ListHeader list={list} />
 
       <div className="grid grid-cols-1 gap-8 pt-8 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section aria-label="Drugs on this list" className="min-w-0">
+        <section aria-label={isTermList(list.items) ? 'Entries on this list' : 'Drugs on this list'} className="min-w-0">
           <Items list={list} />
         </section>
         <aside className="space-y-4 lg:col-start-2 lg:row-start-1">
@@ -201,6 +202,10 @@ function Items({ list }: { list: ListRecord }) {
   const [limit, setLimit] = useState(BATCH)
 
   const options = useMemo(() => sortOptions(list), [list])
+  // Lists of abbreviations (the Joint Commission "Do Not Use" list) hold terms, not drugs.
+  const terms = isTermList(list.items)
+  const noun = terms ? 'entries' : 'drugs'
+  const statusLabel = list.status_label ?? 'Status'
   const statuses = useMemo(() => statusValues(list.items), [list])
   const maxRank = useMemo(() => list.items.reduce((m, i) => (i.rank !== null && i.rank > m ? i.rank : m), 0), [list])
   const tops = topChoices(maxRank)
@@ -270,7 +275,7 @@ function Items({ list }: { list: ListRecord }) {
           className="font-display text-[22px] font-semibold leading-snug text-ink"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          Drugs on this list{' '}
+          {terms ? 'Entries' : 'Drugs'} on this list{' '}
           <span className="ml-1 font-mono text-[13px] font-normal text-ink">
             {rows.length === list.items.length
               ? list.items.length.toLocaleString()
@@ -292,8 +297,8 @@ function Items({ list }: { list: ListRecord }) {
           type="search"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder={`Filter ${list.items.length.toLocaleString()} drugs`}
-          aria-label="Filter drugs on this list"
+          placeholder={`Filter ${list.items.length.toLocaleString()} ${noun}`}
+          aria-label={`Filter ${noun} on this list`}
           className="lp-field w-full rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink placeholder:text-ink sm:w-64"
         />
         {tops.length > 0 && (
@@ -315,7 +320,7 @@ function Items({ list }: { list: ListRecord }) {
         )}
         {showStatus && (
           <label className="flex items-center gap-2 font-sans text-[13px] text-ink">
-            Status
+            {statusLabel}
             <PaperSelect
               value={status ?? ''}
               onChange={v => update({ status: v || null })}
@@ -377,7 +382,7 @@ function Items({ list }: { list: ListRecord }) {
       </div>
 
       {rows.length === 0 ? (
-        <p className="py-6 font-sans text-[14px] text-ink">No drugs match these filters.</p>
+        <p className="py-6 font-sans text-[14px] text-ink">No {noun} match these filters.</p>
       ) : (
         <div className="overflow-hidden border-y border-ink/15">
           <div
@@ -386,9 +391,9 @@ function Items({ list }: { list: ListRecord }) {
             aria-hidden="true"
           >
             {showRank && <span>Rank</span>}
-            <span>Drug</span>
+            <span>{terms ? 'Entry' : 'Drug'}</span>
             {showValue && <span>{vLabel}</span>}
-            {showStatus && <span>Status</span>}
+            {showStatus && <span>{statusLabel}</span>}
           </div>
           <ol>
             {rows.slice(0, limit).map(i => (
@@ -467,6 +472,9 @@ function Row({
         {sourceDiffers && (
           <span className="block break-words font-sans text-[11.5px] text-ink">listed as “{item.source_name}”</span>
         )}
+        {isTerm && item.note && (
+          <span className="mt-0.5 block break-words font-sans text-[13px] leading-snug text-ink">{item.note}</span>
+        )}
       </span>
       {showValue && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
@@ -517,7 +525,7 @@ function AboutCard({ list }: { list: ListRecord }) {
         {place && <Fact label="Jurisdiction">{place}</Fact>}
         {list.measure_label && <Fact label="Measure">{list.measure_label}</Fact>}
         {list.rank_label && <Fact label="Ranked by">{list.rank_label}</Fact>}
-        <Fact label="Drugs">{list.item_count.toLocaleString()}</Fact>
+        <Fact label={isTermList(list.items) ? 'Entries' : 'Drugs'}>{list.item_count.toLocaleString()}</Fact>
         <Fact label="License">{list.license === 'CC0-1.0' ? 'CC0 1.0 (public domain)' : list.license}</Fact>
         <Fact label="Permanent address">
           <Link to={`/id/${list.pcid_code}`} className="font-mono text-[12px] text-ink hover:underline">

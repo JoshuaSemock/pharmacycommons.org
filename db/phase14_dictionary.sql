@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Phase 14 — Medical dictionary (/tools/dictionary) and term lists
--- Applied 2026-10-03 as migrations phase14a … phase14f (apply_migration).
+-- Applied 2026-10-03 as migrations phase14a … phase14g (apply_migration).
 -- Data loads (not migrations) are recorded at the bottom.
 -- =============================================================================
 
@@ -118,6 +118,18 @@ as $function$
   select bucket, count(*)::int from dictionary_terms group by bucket
 $function$;
 grant execute on function public.dictionary_buckets() to anon, authenticated;
+
+-- ── 14g which lists hold terms ───────────────────────────────────────────────
+-- The Lists index says "19 entries" (not "19 drugs") for lists of plain terms.
+create or replace function public.list_term_counts()
+ returns table (slug text, term_count integer) language sql stable security invoker set search_path to 'public'
+as $function$
+  select l.slug, count(*)::int
+  from lists l join list_items i on i.list_pcid = l.pcid
+  where i.term_id is not null
+  group by l.slug
+$function$;
+grant execute on function public.list_term_counts() to anon, authenticated;
 
 -- =============================================================================
 -- Data loads, 2026-10-03 (execute_sql; change_source tags in entity_changes)

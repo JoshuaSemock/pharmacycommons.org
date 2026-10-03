@@ -563,11 +563,22 @@ function toNum(v: unknown): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-/** Every published list, in index order (sub-lists carry `parent_slug`). */
+/**
+ * Every published list, in index order (sub-lists carry `parent_slug`). `term_count`
+ * comes from `list_term_counts` (phase 14g): lists of abbreviations hold plain terms,
+ * not drugs. If that call fails the lists still load, counted as drugs.
+ */
 export async function listLists(): Promise<ListSummary[]> {
-  const { data, error } = await supabase.rpc('list_lists')
-  if (error) throw new Error(`Failed to load lists: ${error.message}`)
-  return ((data ?? []) as ListSummary[]).map(l => ({ ...l, item_count: toNum(l.item_count) ?? 0 }))
+  const [lists, terms] = await Promise.all([supabase.rpc('list_lists'), supabase.rpc('list_term_counts')])
+  if (lists.error) throw new Error(`Failed to load lists: ${lists.error.message}`)
+  const termCount = new Map<string, number>(
+    ((terms.data ?? []) as { slug: string; term_count: number }[]).map(t => [t.slug, toNum(t.term_count) ?? 0]),
+  )
+  return ((lists.data ?? []) as ListSummary[]).map(l => ({
+    ...l,
+    item_count: toNum(l.item_count) ?? 0,
+    term_count: termCount.get(l.slug) ?? 0,
+  }))
 }
 
 /** One list with all its items. Returns null when no published list has this slug. */
