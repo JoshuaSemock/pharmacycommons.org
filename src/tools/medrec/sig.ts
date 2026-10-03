@@ -36,6 +36,7 @@ import {
   type Tone,
   type UnitDef,
 } from './model'
+import { clinicalFlags, type ClinicalIndex } from './clinicalLists'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Numbers and words
@@ -361,7 +362,12 @@ const stripClass = (s: string) =>
     .replace(/\s*\(class\)\s*$/, '')
     .trim()
 
-export function reviewFlags(state: MedRecState): Flag[] {
+/**
+ * Everything to check before the list is finished. Pass the clinical list index
+ * (clinicalLists.ts) to add anticholinergic burden, QT and do-not-crush flags;
+ * without it (still loading, offline, tests) those are simply left out.
+ */
+export function reviewFlags(state: MedRecState, clinical: ClinicalIndex | null = null): Flag[] {
   const out: Flag[] = []
   const named = state.allergies.filter(a => a.substance.trim())
   if (!state.nkda && !named.length)
@@ -411,6 +417,7 @@ export function reviewFlags(state: MedRecState): Flag[] {
       })
     }
   }
+  out.push(...clinicalFlags(state, clinical))
   return out
 }
 

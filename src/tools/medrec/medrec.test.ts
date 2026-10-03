@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { applyFormDefaults, exampleState, newMedication, type Medication } from './model'
 import { auditCScore, caffeineMgPerDay, fmt, maxInfo, medColumns, packYears, reviewFlags, sigText, words } from './sig'
 import { csvCell, fromCsv, parseCsv, toCsv } from './csv'
+import { buildClinicalIndex, clinicalFlags, clinicalFor, nameKey, summarize } from './clinicalLists'
 
 const med = (o: Partial<Medication>): Medication => ({
   ...newMedication(),
@@ -206,5 +207,70 @@ describe('CSV', () => {
 
   it('rejects a file this tool did not write', () => {
     expect(() => fromCsv('rank,drug\n1,metformin\n')).toThrow(/record_type/)
+  })
+})
+
+describe('clinical lists', () => {
+  const item = (pcid: number, name: string, o: { value?: number | null; legal_status?: string | null; note?: string | null; entity_type?: string } = {}) => ({
+    pcid,
+    name,
+    source_name: name,
+    entity_type: o.entity_type ?? 'moiety',
+    value: o.value ?? null,
+    legal_status: o.legal_status ?? null,
+    note: o.note ?? null,
+  })
+  const index = buildClinicalIndex([
+    { slug: 'anticholinergic-burden', items: [item(1, 'hydroxyzine', { value: 3 }), item(2, 'sertraline', { value: 1 }), item(3, 'paroxetine', { value: 3 })] },
+    {
+      slug: 'arrhythmia-risk',
+      items: [item(4, 'citalopram', { legal_status: 'Long QT' }), item(5, 'ondansetron', { legal_status: 'Long QT' }), item(6, 'lithium', { legal_status: 'Brugada' })],
+    },
+    {
+      slug: 'do-not-crush',
+      items: [item(7, 'alprazolam', { legal_status: 'Modified-release', note: 'Xanax XR · tablet' }), item(8, 'amoxicillin/clavulanate', { legal_status: 'Modified-release', entity_type: 'combination' })],
+    },
+    { slug: 'most-used-drugs-us', items: [item(2, 'sertraline', { value: 17 })] },
+  ])
+
+  it('matches by PCID, then by name with the salt stripped', () => {
+    expect(nameKey('Hydroxyzine Hydrochloride')).toBe('hydroxyzine')
+    expect(clinicalFor(med({ drug: 'hydroxyzine hydrochloride' }), index).map(e => e.slug)).toEqual(['anticholinergic-burden'])
+    expect(clinicalFor(med({ drug: 'Typed differently', pcid: 2 }), index)).toHaveLength(1)
+    expect(clinicalFor(med({ drug: 'amoxicillin/clavulanate' }), index)).toEqual([])
+  })
+
+  it('ignores lists that are not in the clinical registry', () => {
+    expect(clinicalFor(med({ drug: 'sertraline' }), index).map(e => e.slug)).toEqual(['anticholinergic-burden'])
+  })
+
+  it('sums anticholinergic burden over medications being taken and warns at 3 or more', () => {
+    const meds = [med({ drug: 'hydroxyzine' }), med({ drug: 'sertraline' }), med({ drug: 'paroxetine', status: 'stopped' })]
+    const s = summarize(meds, index)
+    expect(s.acb.total).toBe(4)
+    const flags = clinicalFlags({ meds }, index)
+    expect(flags[0]).toMatchObject({ tone: 'warn' })
+    expect(flags[0].text).toContain('Anticholinergic burden score 4 (hydroxyzine 3, sertraline 1)')
+    expect(clinicalFlags({ meds: [med({ drug: 'sertraline' })] }, index)[0]).toMatchObject({ tone: 'info' })
+    expect(summarize([med({ drug: 'hydroxyzine', form: 'cream' })], index).acb.total).toBe(0)
+  })
+
+  it('counts QT medications, notes Brugada, and warns when a do-not-crush drug goes through a feeding tube', () => {
+    const meds = [
+      med({ drug: 'citalopram' }),
+      med({ drug: 'ondansetron' }),
+      med({ drug: 'lithium' }),
+      med({ drug: 'alprazolam', route: 'through a feeding tube' }),
+    ]
+    const flags = clinicalFlags({ meds }, index)
+    expect(flags).toContainEqual({ tone: 'caution', text: '2 medications can prolong the QT interval: citalopram and ondansetron. Taken together, the risk adds up.' })
+    expect(flags.some(f => f.text.includes('Brugada'))).toBe(true)
+    expect(flags.find(f => f.text.startsWith('alprazolam'))).toMatchObject({ tone: 'warn' })
+  })
+
+  it('adds nothing until the lists have loaded', () => {
+    expect(clinicalFlags({ meds: [med({ drug: 'hydroxyzine' })] }, null)).toEqual([])
+    expect(reviewFlags(exampleState()).some(f => f.text.includes('Anticholinergic'))).toBe(false)
+    expect(reviewFlags(exampleState(), index).some(f => f.text.includes('Anticholinergic'))).toBe(true)
   })
 })

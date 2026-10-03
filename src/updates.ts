@@ -30,6 +30,15 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'medrec-clinical-lists',
+    date: '2026-10-03',
+    kind: 'Tool',
+    title: 'Medication reconciliation: anticholinergic burden, QT risk and do-not-crush',
+    summary:
+      'The medication reconciliation tool now marks drugs on the Anticholinergic Burden, QT and arrhythmia risk, and Do Not Crush lists, adds up the anticholinergic burden score, and puts a clinical risk summary on the printable list. Everything is still matched in your browser.',
+    to: '/tools/medication-reconciliation',
+  },
+  {
     id: 'drug-page-quick-facts',
     date: '2026-10-02',
     kind: 'Feature',

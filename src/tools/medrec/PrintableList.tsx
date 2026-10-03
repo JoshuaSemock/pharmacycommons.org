@@ -9,11 +9,12 @@
 import { CATEGORIES, SUBSTANCE_KEYS, type MedRecState } from './model'
 import { MED_COLUMNS, allergyTypeText, medColumns, reactionText, severityText, sigText, substanceSummary } from './sig'
 import { cell } from './ui'
+import { clinicalFor, markerText, summarize, type ClinicalIndex } from './clinicalLists'
 
 const th = 'border-b border-ink/15 py-1.5 pr-3 text-left align-bottom font-sans text-[12.5px] font-medium text-ink'
 const td = 'border-b border-ink/10 py-1.5 pr-3 align-top'
 
-export default function PrintableList({ state, prepared }: { state: MedRecState; prepared: string }) {
+export default function PrintableList({ state, prepared, clinical }: { state: MedRecState; prepared: string; clinical: ClinicalIndex | null }) {
   const named = state.allergies.filter(a => a.substance.trim())
   const groups = CATEGORIES.map(([k, label]) => [label, state.meds.filter(m => m.category === k)] as const).filter(([, ms]) => ms.length)
   const h3 = 'mb-2 border-b border-ink/25 pb-1 font-display font-semibold text-ink'
@@ -108,9 +109,13 @@ export default function PrintableList({ state, prepared }: { state: MedRecState;
                   </tr>,
                   ...ms.map(m => {
                     const c = medColumns(m)
+                    const marks = clinicalFor(m, clinical).map(markerText)
                     return (
                       <tr key={m.id}>
-                        <td className={`${td} font-semibold`}>{cell(c.name)}</td>
+                        <td className={`${td} font-semibold`}>
+                          {cell(c.name)}
+                          {marks.length > 0 && <span className="block font-normal text-[11.5px] print:text-[7.5pt]">{marks.join(' · ')}</span>}
+                        </td>
                         <td className={td}>{cell(c.strength)}</td>
                         <td className={td}>{cell(c.form)}</td>
                         <td className={td}>{cell(c.dose)}</td>
@@ -137,6 +142,8 @@ export default function PrintableList({ state, prepared }: { state: MedRecState;
         )}
       </div>
 
+      <ClinicalRiskSummary state={state} clinical={clinical} h3={h3} h3Style={h3Style} />
+
       <div>
         <h3 className={h3} style={h3Style}>
           Substance use
@@ -158,6 +165,60 @@ export default function PrintableList({ state, prepared }: { state: MedRecState;
       <p className="border-t border-ink/15 pt-2.5 text-[11.5px] text-ink">
         Made with the Pharmacy Commons medication reconciliation tool (pharmacycommons.org/tools/medication-reconciliation). This list is not a medical record.
         Bring it to every appointment and pharmacy visit, and review it with a pharmacist or prescriber.
+      </p>
+    </div>
+  )
+}
+
+/**
+ * Totals from the clinical lists for the medications being taken. Shown only
+ * when at least one medication is on one of them.
+ */
+function ClinicalRiskSummary({
+  state,
+  clinical,
+  h3,
+  h3Style,
+}: {
+  state: MedRecState
+  clinical: ClinicalIndex | null
+  h3: string
+  h3Style: { fontFamily: string; fontSize: string }
+}) {
+  if (!clinical) return null
+  const s = summarize(state.meds, clinical)
+  const rows: [string, string][] = []
+  if (s.acb.total > 0)
+    rows.push([
+      'Anticholinergic burden',
+      `Total score ${s.acb.total}${s.acb.total >= 3 ? ' (3 or more: clinically relevant)' : ''}: ${s.acb.meds.map(m => `${m.name} ${m.score}`).join(', ')}`,
+    ])
+  if (s.qt.length) rows.push(['QT prolongation', s.qt.join(', ')])
+  if (s.brugada.length) rows.push(['Risk in Brugada syndrome', s.brugada.join(', ')])
+  if (s.crush.length)
+    rows.push(['Some products should not be crushed', s.crush.map(c => (c.products ? `${c.name} (${c.products})` : c.name)).join('; ')])
+  if (rows.length === 0) return null
+
+  return (
+    <div>
+      <h3 className={h3} style={h3Style}>
+        Clinical risk summary
+      </h3>
+      <table className="w-full border-collapse">
+        <tbody>
+          {rows.map(([k, v]) => (
+            <tr key={k}>
+              <th scope="row" className={`${td} w-[28%] text-left font-medium`}>
+                {k}
+              </th>
+              <td className={td}>{v}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-1.5 text-[11.5px] text-ink">
+        Counts medications marked as taking (as prescribed or differently); creams, ointments, gels and lotions are left out of the anticholinergic total. From the Pharmacy Commons lists Anticholinergic Burden, Drugs Which Affect
+        Risk of Arrhythmias, and Do Not Crush (pharmacycommons.org/lists).
       </p>
     </div>
   )

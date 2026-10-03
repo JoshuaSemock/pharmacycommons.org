@@ -24,7 +24,9 @@ alike (one version, no audience toggle):
 
 Nothing is sent to Supabase or anywhere else. The list lives in `localStorage`
 (`pc-medrec-v1`) as a working copy, and is saved and reopened as a CSV file. The
-only network use is the public catalog fetch behind the name search.
+only network use is the public catalog fetch behind the name search and a one-time
+download of the clinical lists (below). Both are whole public datasets, matched in
+the browser, so no request ever names a medication on someone's list.
 
 ## Directions (sig) rules
 
@@ -51,6 +53,34 @@ search). The CSV carries it (`pcid` column), duplicate checks match by PCID, and
 the allergy-vs-medication check matches by PCID or name. Free text is always
 allowed; many supplements, herbals and allergens are not in the catalog.
 
+## Clinical lists (2026-10-03)
+
+`src/tools/medrec/clinicalLists.ts`. Lists that say something clinical about a drug
+feed the tool; every other list (most-used, Notable Drugs, Georgia MPJE) is ignored.
+The registry, `CLINICAL_LISTS`, is keyed by list slug with how each list combines:
+
+| Slug | Combines | Shows |
+| --- | --- | --- |
+| `anticholinergic-burden` | sum | marker "ACB n"; total in Check before you finish (3 or more = warning, 1 to 2 = note); total and contributors on the printable list |
+| `arrhythmia-risk` | count | marker "QT risk"; 2 or more QT drugs = caution, 1 = note; Brugada listed separately |
+| `do-not-crush` | each | marker "Do not crush"; warning when the route is a feeding tube, note otherwise, nothing when the form is already extended-release |
+
+Adding a clinical list is one registry line (plus wording in `markerText`,
+`markerDetail` and `clinicalFlags` if it needs its own).
+
+- **Matching:** by PCID, then by typed name ignoring case and a trailing salt
+  ("hydroxyzine hydrochloride" → hydroxyzine). Only moiety entries are used;
+  product- and combination-level entries (20 combinations and 9 precise forms on Do
+  Not Crush) need product data the tool does not record yet.
+- **What counts:** medications marked taking or taking differently. Creams,
+  ointments, gels and lotions are left out of the anticholinergic total (the scales
+  describe systemic exposure); eye drops still count.
+- **Not stored in the CSV.** List data is matched again whenever a list is opened,
+  so scores are always current and the CSV stays a record of what the person takes.
+  If the lists fail to load, the tool works as before without these flags.
+- Markers in the table open a short explanation with a link to the list, so the
+  detail works on touch screens as well as on hover.
+
 ## CSV format (version 1)
 
 One file, one row per item, `record_type` first: `list`,
@@ -68,3 +98,5 @@ the end only.
 - Strength and form choices from product data once formulations link to moieties.
 - Class-level checks (therapeutic duplication by ATC or `class_members`,
   allergy class vs drug) using the stored PCIDs.
+- Product-level clinical list matching (do-not-crush by formulation) once the tool
+  records the product, not just the drug.
