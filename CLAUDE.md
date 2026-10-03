@@ -319,8 +319,8 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 `dictionary_words()` / `dictionary_buckets()`. `list_items.member_pcid` is now nullable with
 `term_id` → `dictionary_terms` for term entries (check `list_items_member_or_term`); `get_list`
 left-joins and returns term items with `pcid`/`slug` null, `entity_type 'term'`. List 10000038
-`joint-commission-do-not-use` (19 terms) was created **unpublished** — publish once the
-frontend is deployed. Minted 60 moieties (1015621–1015680) and 120 combinations
+`joint-commission-do-not-use` (19 terms, published 2026-10-03). `list_term_counts()` (14g) tells the
+Lists index which lists hold terms; list pages read `status_label` for the status filter/column. Minted 60 moieties (1015621–1015680) and 120 combinations
 (2002471–2002590) from the dictionary. `stg_dictionary_*` staging tables can be dropped.
 
 Lists (Phase 9, `db/phase9-lists.md`): 22 published lists — `most-used-drugs-us`

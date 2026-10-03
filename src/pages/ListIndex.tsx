@@ -66,7 +66,7 @@ export default function ListIndex() {
         </h1>
         <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-ink">
           Collections of drugs gathered for a purpose: an exam, a practice setting, a question about use. Classes
-          say what a drug is; lists say why it is worth knowing. Every entry links to its drug page, and every list
+          say what a drug is; lists say why it is worth knowing. Every drug links to its drug page, and every list
           can be sorted, filtered and downloaded.
         </p>
         <div className="mt-7 flex flex-wrap gap-2.5">
@@ -175,7 +175,9 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
       )}
 
       <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-ink/10 pt-3">
-        <span className="font-mono text-[11.5px] text-ink">{list.item_count.toLocaleString()} drugs</span>
+        <span className="font-mono text-[11.5px] text-ink">
+          {list.item_count.toLocaleString()} {list.term_count ? (list.item_count === 1 ? 'entry' : 'entries') : list.item_count === 1 ? 'drug' : 'drugs'}
+        </span>
         <Link to={`/lists/${list.slug}`} className="font-sans text-[13px] font-medium text-ink hover:underline">
           Open list →
         </Link>

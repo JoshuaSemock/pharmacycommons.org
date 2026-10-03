@@ -60,7 +60,10 @@ duplicates were merged first. `primary_source = 'Pharmacy Commons dictionary imp
   `legal_status = 'ISMP addition'` and shown separately on the page.
 - `list_items` can now hold terms that are not drug records (`member_pcid` null, `term_id` set);
   `get_list` returns them with `pcid`/`slug` null and `entity_type = 'term'`. List pages, Compare and
-  CSV handle them.
+  CSV handle them. A list made only of terms (`isTermList` in `src/lists.ts`) says "entries" instead of
+  "drugs", shows each entry's note, and exports an `entry` and `note` column; the Lists index learns
+  which lists hold terms from `list_term_counts()` (phase 14g). Every list's status filter, column
+  and sort now use `lists.status_label` ("Source", "Risk", "Reason", "Schedule") when set.
 
 ## Differences from the original plan
 
@@ -73,9 +76,7 @@ duplicates were merged first. `primary_source = 'Pharmacy Commons dictionary imp
 
 ## Open
 
-1. **Publish the Do Not Use list after this branch is deployed:**
-   `update lists set published = true where slug = 'joint-commission-do-not-use';`
-   (it was created unpublished so the live list pages, which don't yet understand term items, never show it).
+1. ~~Publish the Do Not Use list~~ — published 2026-10-03 after PR #42 deployed.
 2. Misspellings in the source become "correct" in Word: e.g. `Midozalam`, `Chlorpheniramne`,
    `Bethamethasone` (the last two come from FDA product names). Decide whether to set `in_dic = false` on them.
 3. Live `entities.name` still carries mojibake on 15 records (e.g. `Î±-Methylfentanyl`,

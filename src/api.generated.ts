@@ -261,6 +261,8 @@ export type ListSummary = {
   measure_label: string | null
   default_sort: ListSort
   sort_order: number
+  /** Entries that are plain terms rather than drug records (from `list_term_counts`); 0 for drug lists. */
+  term_count?: number
 }
 
 /**
@@ -308,6 +310,8 @@ export type ListDetail = {
   measure_unit: string | null
   /** What `ListItem.rank` means, e.g. "Rank within category". */
   rank_label: string | null
+  /** What `ListItem.legal_status` means on this list ("Risk", "Reason", "Schedule", "Source"); null = legal status. */
+  status_label?: string | null
   default_sort: ListSort
   item_count: number
   updated_at: string

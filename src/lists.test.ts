@@ -4,6 +4,7 @@ import {
   defaultSortKey,
   filterItems,
   formatCount,
+  isTermList,
   listToCsv,
   sortItems,
   sortOptions,
@@ -126,5 +127,31 @@ describe('export and formatting', () => {
     expect(formatCount(27311800)).toBe('27.3 M')
     expect(formatCount(4889800)).toBe('4.89 M')
     expect(formatCount(517000)).toBe('517 K')
+  })
+})
+
+describe('term lists (Joint Commission "Do Not Use")', () => {
+  const term = (name: string, legal_status: string, note: string) =>
+    item({ name, legal_status, note, pcid: null, slug: null, entity_type: 'term', term_id: 1 })
+  const tjc = [
+    term('QD', 'The Joint Commission', 'Write "daily".'),
+    term('TAF', 'ISMP addition', 'Write the complete drug name.'),
+  ]
+
+  it('recognises a list made only of terms', () => {
+    expect(isTermList(tjc)).toBe(true)
+    expect(isTermList(meps)).toBe(false)
+    expect(isTermList([])).toBe(false)
+  })
+
+  it('names the status sort after the list\'s own label', () => {
+    expect(sortOptions({ items: tjc, measure_label: null, measure_unit: null, status_label: 'Source' }).find(o => o.key === 'status')?.label).toBe('Source')
+    expect(sortOptions({ items: tjc, measure_label: null, measure_unit: null }).find(o => o.key === 'status')?.label).toBe('Status')
+  })
+
+  it('exports entries with their notes and no PCID', () => {
+    const lines = listToCsv({ measure_label: null }, tjc).trim().split('\n')
+    expect(lines[0]).toBe('rank,entry,pcid,name_in_source,legal_status,note')
+    expect(lines[1]).toBe(',QD,,QD,The Joint Commission,"Write ""daily""."')
   })
 })
