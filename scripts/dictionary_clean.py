@@ -35,8 +35,12 @@ GREEK_MOJIBAKE = re.compile('(?:ãžâ|î|Î)([\u00b0-\u00bf])')
 
 MOJIBAKE = [
     ('â€™', '’'), ('â€˜', '‘'), ('â€²', '′'), ('â€œ', '“'), ('â€\x9d', '”'),
-    ('â€“', '–'), ('â€”', '—'),
+    ('â€“', '–'), ('â€”', '—'), ('â„¢', '™'),
+    ('â\x80\x99', '’'),   # the same apostrophe read as Latin-1
 ]
+
+# Latin-1 symbols (C2 xx) read as cp1252 show as "Â" + the symbol: "Â®", "(Â±)"; lower-cased "â®".
+LATIN1_MOJIBAKE = re.compile('[Ââ]([\\u00a0-\\u00bf])')
 
 WS = re.compile(r'\s+')
 
@@ -48,6 +52,7 @@ def clean_text(v):
     for bad, good in MOJIBAKE:
         s = s.replace(bad, good)
     s = GREEK_MOJIBAKE.sub(lambda m: chr(0x0380 + ord(m.group(1)) - 0x80), s)
+    s = LATIN1_MOJIBAKE.sub(r'\1', s)
     s = WS.sub(' ', s).strip()
     return s or None
 
