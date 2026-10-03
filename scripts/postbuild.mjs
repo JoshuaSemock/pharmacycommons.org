@@ -108,7 +108,7 @@ const STATIC_ROUTES = [
     path: '/tools/dictionary',
     title: 'Medical dictionary for Microsoft Word',
     heading: 'Medical dictionary for Word',
-    description: 'Download a free custom dictionary for Microsoft Word with about 42,000 drug names, brand names, biologics, medical terms and abbreviations, with instructions for Windows and Mac and The Joint Commission "Do Not Use" list.',
+    description: 'Download a free custom dictionary for Microsoft Word with about 43,000 drug names, brand names, biologics, medical terms and abbreviations, with instructions for Windows and Mac and The Joint Commission "Do Not Use" list.',
   },
   {
     path: '/developers',

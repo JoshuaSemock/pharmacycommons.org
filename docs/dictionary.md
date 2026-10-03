@@ -20,16 +20,19 @@ dictionary itself as a browsable A–Z page, plus The Joint Commission "Do Not U
 ## The `.dic` file
 
 - Built in the database on each download, so edits to `dictionary_terms` show up without a deploy.
-- Word checks spelling one word at a time, so terms are split on spaces and slashes; hyphenated
-  words are included whole and in parts. Surrounding brackets, quotes and commas are trimmed; a lone
-  trailing period is dropped (`q.d.` keeps its periods). Words are 2–64 characters and contain a letter.
+- Word checks spelling one word at a time and breaks words at spaces, slashes, brackets, commas,
+  semicolons and colons, so terms are split on all of those (phase 14f; before that, chemical names
+  produced ~4,400 unusable fragments such as `di(4`). Hyphenated words are included whole and in
+  parts. Surrounding quotes are trimmed; a lone trailing period is dropped (`q.d.` keeps its periods).
+  Words are 2–64 characters and contain a letter.
 - An all-lower-case word already covers its Capitalised and UPPER-CASE forms in Word, so other case
   variants are dropped when a lower-case one exists.
 - CRLF line endings, saved as **UTF-8 with a byte-order mark** (the plan asked for UTF-8; the BOM is
   what lets Word recognise the encoding of non-ASCII words such as α-methylfentanyl). A UTF-16 LE
   link sits beside the main button because that is the encoding Word writes its own dictionaries in;
   use it if accented letters come out wrong on an older Word.
-- 2026-10-03: 41,843 words, about 520 KB.
+- 2026-10-03 (after 14f): 42,893 words, about 515 KB. Checked as the anon role: all 53,928 terms
+  readable, 41 letter buckets, `dictionary_dic()` returns the full text, the Do Not Use list stays hidden until published.
 - **Every row goes in, including the Do Not Use abbreviations** (Joshua's call, 2026-10-03). Word will
   therefore not underline QD, IU, U and the rest; the page says so under the Do Not Use list.
   `dictionary_terms.in_dic` exists if that changes: set it false on the rows to leave out.

@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Phase 14 — Medical dictionary (/tools/dictionary) and term lists
--- Applied 2026-10-03 as migrations phase14a … phase14e (apply_migration).
+-- Applied 2026-10-03 as migrations phase14a … phase14f (apply_migration).
 -- Data loads (not migrations) are recorded at the bottom.
 -- =============================================================================
 
@@ -67,12 +67,14 @@ $function$;
 -- ── 14c (separate migration: constraint add) ─────────────────────────────────
 alter table public.list_items add constraint list_items_member_or_term check (member_pcid is not null or term_id is not null);
 
--- ── 14d the .dic word list ───────────────────────────────────────────────────
+-- ── 14d the .dic word list (as amended by 14f, 2026-10-03) ──────────────────
+-- 14f: split where Word itself breaks words — brackets, commas, semicolons and colons as well
+-- as spaces and slashes — so chemical names give whole words instead of fragments like "di(4".
 create or replace function public.dictionary_words()
  returns table (word text) language sql stable security invoker set search_path to 'public'
 as $function$
   with raw as (
-    select regexp_split_to_table(term, '[\s/]+') as tok from dictionary_terms where in_dic
+    select regexp_split_to_table(term, '[\s/(){}\[\],;:<>]+') as tok from dictionary_terms where in_dic
   ),
   parts as (
     select tok from raw
@@ -80,17 +82,19 @@ as $function$
     select regexp_split_to_table(tok, '-') from raw where tok like '%-%'
   ),
   trimmed as (
-    select regexp_replace(regexp_replace(tok, '^[(\[{"''“‘<,;:]+', ''), '[)\]}"''”’>,;:!?]+$', '') as tok from parts
+    select regexp_replace(regexp_replace(tok, '^["''“‘.\-]+', ''), '["''”’!?\-]+$', '') as tok from parts
   ),
   cleaned as (
+    -- a lone trailing period is sentence punctuation; keep it when the word has others (q.d., e.g.)
     select case when tok ~ '\.$' and tok !~ '\..*\.$' then left(tok, -1) else tok end as tok from trimmed
   ),
   words as (
     select distinct tok from cleaned
     where char_length(tok) between 2 and 64
-      and tok ~ '[A-Za-zÀ-ɏͰ-Ͽ]'
+      and tok ~ '[A-Za-z\u00C0-\u024F\u0370-\u03FF]'
   ),
   grouped as (
+    -- An all-lower-case entry already covers Capitalised and UPPER-CASE spellings in Word.
     select tok, bool_or(tok = lower(tok)) over (partition by lower(tok)) as has_lower from words
   )
   select tok from grouped where tok = lower(tok) or not has_lower

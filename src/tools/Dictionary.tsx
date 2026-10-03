@@ -79,7 +79,7 @@ export default function Dictionary() {
       <header className="pt-10 pb-10 sm:pt-14 lg:pb-12">
         <PageTitle
           title={TITLE}
-          lede="Teach Word to spell medicine. One file adds about 42,000 drug names, brand names, biologics, medical terms and abbreviations to Word's spell checker, so correct spellings stop being underlined and Word can suggest them when a name is mistyped."
+          lede="Teach Word to spell medicine. One file adds about 43,000 drug names, brand names, biologics, medical terms and abbreviations to Word's spell checker, so correct spellings stop being underlined and Word can suggest them when a name is mistyped."
         />
       </header>
 
