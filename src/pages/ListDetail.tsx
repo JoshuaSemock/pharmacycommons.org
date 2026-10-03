@@ -170,9 +170,16 @@ function ListHeader({ list }: { list: ListRecord }) {
         {list.title}
       </h1>
       {list.description && (
-        <p className="mt-4 max-w-[42rem] font-sans text-[17px] leading-relaxed text-pretty text-ink">
-          {list.description}
-        </p>
+        // Full page width (2026-10-03); each line break in the stored description starts a new paragraph.
+        <div className="mt-4 space-y-3 font-sans text-[17px] leading-relaxed text-pretty text-ink">
+          {list.description
+            .split(/\n+/)
+            .map(p => p.trim())
+            .filter(Boolean)
+            .map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+        </div>
       )}
       <div className="mt-6 flex flex-wrap gap-2.5">
         <Link
