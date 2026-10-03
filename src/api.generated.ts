@@ -263,7 +263,12 @@ export type ListSummary = {
   sort_order: number
 }
 
-/** One drug on a list. */
+/**
+ * One entry on a list: usually a drug record; on lists of abbreviations (the
+ * Joint Commission "Do Not Use" list) a plain term with no record, which comes
+ * back with pcid and slug null, entity_type 'term', name = source_name and
+ * term_id pointing at its dictionary_terms row (phase 14).
+ */
 export type ListItem = {
   /** 1-based order within the list as stored. */
   position: number
@@ -276,10 +281,12 @@ export type ListItem = {
   note: string | null
   /** The name exactly as the source wrote it. */
   source_name: string
-  pcid: number
-  slug: string
+  pcid: number | null
+  slug: string | null
   name: string
   entity_type: string
+  /** dictionary_terms.id for term entries; null or absent for drugs. */
+  term_id?: number | null
 }
 
 export type ListRef = { slug: string; title: string }

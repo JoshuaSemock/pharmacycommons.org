@@ -169,7 +169,8 @@ and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
-`/tools/days-supply` (browser-only; see `docs/days-supply.md`) · `/developers` (API console
+`/tools/days-supply` (browser-only; see `docs/days-supply.md`), `/tools/dictionary` (Word `.dic`
+download + A–Z dictionary; see `docs/dictionary.md`) · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read
@@ -310,8 +311,17 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 | `entity_brand_names` / `ingredient_moiety_map` | 6,896 / 16,559 |
 | `physiochemical` | **0** (CAS backfill not run) |
 
-`pcid_blocks.next_pcid` (2026-09-25): 1→1015620, 2→2002470, 3→3001452, 4→4006582,
-5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000023.
+`pcid_blocks.next_pcid` (2026-10-03): 1→1015681, 2→2002591, 3→3001452, 4→4006582,
+5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000039.
+
+**Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
+`dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
+`dictionary_words()` / `dictionary_buckets()`. `list_items.member_pcid` is now nullable with
+`term_id` → `dictionary_terms` for term entries (check `list_items_member_or_term`); `get_list`
+left-joins and returns term items with `pcid`/`slug` null, `entity_type 'term'`. List 10000038
+`joint-commission-do-not-use` (19 terms) was created **unpublished** — publish once the
+frontend is deployed. Minted 60 moieties (1015621–1015680) and 120 combinations
+(2002471–2002590) from the dictionary. `stg_dictionary_*` staging tables can be dropped.
 
 Lists (Phase 9, `db/phase9-lists.md`): 22 published lists — `most-used-drugs-us`
 (MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, and three Georgia MPJE

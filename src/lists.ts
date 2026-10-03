@@ -135,7 +135,7 @@ export function listToCsv(list: Pick<ListDetail, 'measure_label'>, items: ListIt
   if (hasStatus) header.push('legal_status')
   const lines = [header.map(csvCell).join(',')]
   for (const i of items) {
-    const row: (string | number | null)[] = [i.rank, formatDrugName(i.name), `PCID-${i.pcid}`, i.source_name]
+    const row: (string | number | null)[] = [i.rank, i.slug ? formatDrugName(i.name) : i.name, i.pcid ? `PCID-${i.pcid}` : '', i.source_name]
     if (hasValue) row.push(i.value)
     if (hasStatus) row.push(i.legal_status)
     lines.push(row.map(csvCell).join(','))

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { searchClasses } from './api'
 import Button from './components/Button'
+import CharacterIndex from './components/CharacterIndex'
 import PaperSelect from './components/PaperSelect'
 import type { ClassSearchHit } from './api.generated'
 import {
@@ -21,7 +22,6 @@ import {
   pcidOf,
   toDrug,
   getByPcid,
-  BUCKETS,
   type Bucket,
   type BucketDef,
   type CatalogEntry,
@@ -224,6 +224,8 @@ export default function SearchView() {
         counts={counts}
         active={searching ? null : bucket}
         onSelect={selectBucket}
+        showEmptyGreek={SHOW_EMPTY_GREEK}
+        showEmptySymbol={SHOW_EMPTY_SYMBOL}
       />
 
       <div ref={listTop} className="scroll-mt-[calc(var(--nav-h,5.75rem)_+_3rem)]" />
@@ -352,72 +354,6 @@ export default function SearchView() {
         )}
       </section>
     </main>
-  )
-}
-
-/**
- * A–Z, the numbers, the Greek descriptors, then the symbol bucket — set as type
- * rather than as chips, with hairline dividers between runs. Empty buckets in
- * the Latin and numeric runs stay inert; empty Greek and symbol buckets are
- * omitted entirely unless their SHOW_EMPTY flag is set.
- */
-function CharacterIndex({
-  counts, active, onSelect,
-}: {
-  counts: Record<Bucket, number> | null
-  active: Bucket | null
-  onSelect: (b: Bucket | null) => void
-}) {
-  const visible = BUCKETS.filter(b => {
-    const n = counts?.[b.key] ?? 0
-    if (b.kind === 'greek') return SHOW_EMPTY_GREEK || n > 0
-    if (b.kind === 'symbol') return SHOW_EMPTY_SYMBOL || n > 0
-    return true
-  })
-
-  return (
-    <nav
-      aria-label="Browse by first character"
-      className="lp-rule-y sticky top-[var(--nav-h,5.75rem)] z-30 -mx-4 bg-paper/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6"
-    >
-      <div className="flex items-center gap-1 overflow-x-auto sm:flex-wrap sm:overflow-visible">
-        <button
-          onClick={() => onSelect(null)}
-          aria-pressed={!active}
-          className={`lp-flat shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
-            !active ? 'font-medium' : ''
-          }`}
-        >
-          All
-        </button>
-
-        {visible.map((b, i) => {
-          const n = counts?.[b.key] ?? 0
-          const isActive = active === b.key
-          const startsRun = i > 0 && visible[i - 1].kind !== b.kind
-          return (
-            <span key={b.key} className="flex shrink-0 items-center">
-              <span
-                className={`lp-score-v mx-1 h-4 ${i === 0 || startsRun ? '' : 'hidden'}`}
-                aria-hidden="true"
-              />
-              <button
-                onClick={() => onSelect(isActive ? null : b.key)}
-                disabled={!n}
-                aria-pressed={isActive}
-                aria-label={b.kind === 'latin' || b.kind === 'numeric' ? undefined : b.name}
-                title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
-                className={`lp-flat rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
-                  !n ? 'cursor-default' : isActive ? 'font-medium' : ''
-                }`}
-              >
-                {b.label}
-              </button>
-            </span>
-          )
-        })}
-      </div>
-    </nav>
   )
 }
 

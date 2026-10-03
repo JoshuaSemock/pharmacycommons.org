@@ -440,7 +440,8 @@ function Row({
   valueWidth: number | null
   valueLabel: string
 }) {
-  const name = formatDrugName(item.name)
+  const isTerm = !item.slug
+  const name = isTerm ? item.name : formatDrugName(item.name)
   const sourceDiffers = item.source_name.trim().toLowerCase().replace(/\s*\/\s*/g, '/') !== item.name.trim().toLowerCase()
   return (
     <li
@@ -453,9 +454,13 @@ function Row({
         <span className="sm:hidden" aria-hidden="true" />
       )}
       <span className="min-w-0">
-        <Link to={`/drugs/${item.slug}`} className="break-words font-sans text-[14.5px] font-medium text-ink">
-          {name}
-        </Link>
+        {isTerm ? (
+          <span className="break-words font-mono text-[14px] font-medium text-ink">{name}</span>
+        ) : (
+          <Link to={`/drugs/${item.slug}`} className="break-words font-sans text-[14.5px] font-medium text-ink">
+            {name}
+          </Link>
+        )}
         {item.entity_type === 'combination' && (
           <span className="ml-2 font-sans text-[11.5px] text-ink">combination</span>
         )}
