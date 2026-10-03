@@ -8,6 +8,7 @@ import Allergies from '@/tools/medrec/Allergies'
 import Medications, { type Filter } from '@/tools/medrec/Medications'
 import Substances from '@/tools/medrec/Substances'
 import PrintableList from '@/tools/medrec/PrintableList'
+import { loadClinicalIndex, type ClinicalIndex } from '@/tools/medrec/clinicalLists'
 import { Field, SectionHeading, dangerQuietButton, inputClass, primaryButton, quietButton, secondaryButton } from '@/tools/medrec/ui'
 
 /**
@@ -21,8 +22,10 @@ import { Field, SectionHeading, dangerQuietButton, inputClass, primaryButton, qu
  *
  * Privacy: the list never leaves the browser. It is kept in localStorage as a
  * working copy, saved and reopened as a CSV file (medrec/csv.ts), and printed
- * or saved as PDF through the browser's print dialog. The only network call is
- * the public catalog fetch behind the name search.
+ * or saved as PDF through the browser's print dialog. The only network calls are
+ * the public catalog fetch behind the name search and a one-time download of
+ * the clinical lists (anticholinergic burden, QT risk, do not crush), which are
+ * matched against the list in the browser (medrec/clinicalLists.ts).
  *
  *   ┌───────────────────────────────────────────────────────────────┐
  *   │ Title · privacy note · Save / Open / Print / New list         │
@@ -58,6 +61,21 @@ export default function MedicationReconciliation() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [notice, setNotice] = useState<Notice | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const [clinical, setClinical] = useState<ClinicalIndex | null>(null)
+
+  // The clinical lists are public and downloaded whole, so nothing about this
+  // person's list is sent. If they fail to load, the tool works without them.
+  useEffect(() => {
+    let current = true
+    loadClinicalIndex()
+      .then(index => {
+        if (current) setClinical(index)
+      })
+      .catch((err: unknown) => console.warn('[medrec] clinical lists unavailable', err))
+    return () => {
+      current = false
+    }
+  }, [])
 
   useEffect(() => {
     document.title = `${TITLE} · Pharmacy Commons`
@@ -167,7 +185,7 @@ export default function MedicationReconciliation() {
     setNotice(null)
   }
 
-  const flags = reviewFlags(state)
+  const flags = reviewFlags(state, clinical)
   const dot = {
     warn: 'bg-rose-500',
     caution: 'bg-marigold-500',
@@ -347,6 +365,7 @@ export default function MedicationReconciliation() {
           onFormChange={changeForm}
           onRemove={removeMedication}
           onCopy={copy}
+          clinical={clinical}
         />
 
         <Substances subs={state.subs} onChange={subs => commit(s => ({ ...s, subs }))} />
@@ -359,7 +378,7 @@ export default function MedicationReconciliation() {
         <div className="print:hidden">
           <SectionHeading id="printable" title="Printable list" lede="This is what prints or saves as a PDF. It updates as you edit above." />
         </div>
-        <PrintableList state={state} prepared={today()} />
+        <PrintableList state={state} prepared={today()} clinical={clinical} />
       </section>
 
       <p className="mt-10 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-ink print:hidden">

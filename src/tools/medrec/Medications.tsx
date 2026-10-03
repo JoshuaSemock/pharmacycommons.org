@@ -11,7 +11,8 @@ import type { ReactNode } from 'react'
 import { CATEGORIES, STATUS, type CategoryId, type Medication } from './model'
 import { MED_COLUMNS, medColumns, sigSegments, sigText } from './sig'
 import MedicationEditor from './MedicationEditor'
-import { ChipRadio, RemoveIcon, SectionHeading, SigText, Tag, cell, quietButton, secondaryButton } from './ui'
+import { ChipRadio, ClinicalMarkers, RemoveIcon, SectionHeading, SigText, Tag, cell, quietButton, secondaryButton } from './ui'
+import { clinicalFor, type ClinicalIndex } from './clinicalLists'
 
 export type Filter = 'all' | CategoryId
 
@@ -26,6 +27,8 @@ type Props = {
   onFormChange: (id: string, form: Medication['form']) => void
   onRemove: (id: string) => void
   onCopy: (text: string) => void
+  /** Clinical list data (anticholinergic burden, QT risk, do not crush); null while loading. */
+  clinical: ClinicalIndex | null
 }
 
 /** Minimum widths, in column order after Name, so short cells don't wrap word by word. */
@@ -44,7 +47,7 @@ const MIN_WIDTH: Record<string, string> = {
   notes: 'min-w-[8rem]',
 }
 
-export default function Medications({ meds, openId, filter, onFilter, onAdd, onOpen, onPatch, onFormChange, onRemove, onCopy }: Props) {
+export default function Medications({ meds, openId, filter, onFilter, onAdd, onOpen, onPatch, onFormChange, onRemove, onCopy, clinical }: Props) {
   const counts = new Map<Filter, number>([['all', meds.length]])
   for (const [c] of CATEGORIES) counts.set(c, meds.filter(m => m.category === c).length)
   const list = meds.filter(m => filter === 'all' || m.category === filter)
@@ -130,6 +133,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                             {c.name || 'Unnamed medication'}
                           </button>
                           <Tag>{c.category}</Tag>
+                          <ClinicalMarkers entries={clinicalFor(m, clinical)} />
                         </div>
                       </th>
                       <td className={td}>{cell(c.strength)}</td>

@@ -6,9 +6,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Seg } from './sig'
 import type { Tone } from './model'
+import { markerDetail, markerText, markerTone, type MedListEntry } from './clinicalLists'
 
 export const inputClass =
   'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-sans text-[14px] text-ink placeholder:text-ink disabled:bg-neutral-100'
@@ -73,6 +75,48 @@ const TAG_TONES: Record<Tone, string> = {
 
 export function Tag({ tone = 'muted', children }: { tone?: Tone; children: ReactNode }) {
   return <span className={`lp-raised inline-block rounded px-1.5 py-0.5 font-mono text-[10.5px] leading-tight ${TAG_TONES[tone]}`}>{children}</span>
+}
+
+/**
+ * Clinical list markers under a medication's name ("ACB 3", "QT risk", "Do not
+ * crush"). Selecting them shows what each means, so the detail works on touch
+ * screens too, not only on hover.
+ */
+export function ClinicalMarkers({ entries }: { entries: MedListEntry[] }) {
+  const [open, setOpen] = useState(false)
+  const panelId = useId()
+  if (entries.length === 0) return null
+  return (
+    <div className="grid justify-items-start gap-1">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        title={entries.map(markerDetail).join(' ')}
+        onClick={() => setOpen(o => !o)}
+        className="flex flex-wrap gap-1 rounded text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20"
+      >
+        <span className="sr-only">Clinical lists: </span>
+        {entries.map(e => (
+          <Tag key={e.slug} tone={markerTone(e)}>
+            {markerText(e)}
+          </Tag>
+        ))}
+      </button>
+      {open && (
+        <ul id={panelId} className="grid max-w-[16rem] gap-1 font-sans text-[12px] leading-snug text-ink">
+          {entries.map(e => (
+            <li key={e.slug}>
+              {markerDetail(e)}{' '}
+              <a href={`/lists/${e.slug}`} target="_blank" rel="noopener" className="underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600">
+                View list
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
 }
 
 export function SectionHeading({ id, title, lede, action }: { id: string; title: string; lede?: string; action?: ReactNode }) {
