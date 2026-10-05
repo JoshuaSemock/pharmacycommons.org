@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'overview-history',
+    date: '2026-10-05',
+    kind: 'Feature',
+    title: 'Overview history and review',
+    summary:
+      'Every Overview now has a history: who changed what, when, and why, with a line-by-line comparison of each version. Verified providers can restore an earlier version in one step, and reviewers work through a queue of new edits, accepting or rejecting changes to high-alert drugs before they appear.',
+    to: '/drugs/sertraline/history',
+    cta: 'See an example',
+  },
+  {
     id: 'overview-editor',
     date: '2026-10-04',
     kind: 'Feature',

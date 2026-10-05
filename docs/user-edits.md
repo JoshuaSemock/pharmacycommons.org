@@ -245,8 +245,8 @@ counts checked against live data 2026-10-04):
    setup on first edit. Still to do: "My contributions" tab on Account.
 4. **Infobox editing** — per-row edit with citation; community/source display.
 5. **New pages** — type picker, duplicate "did you mean", create flow; red links.
-6. **History / diff / revert / patrol queue** (unpatrolled live edits + pending
-   edits on reviewed pages) and protection UI.
+6. **History / diff / revert / patrol queue** — ✅ 2026-10-05: `/drugs/:slug/history`
+   and `/review`. Still to do: admin UI for protection, roles and blocks (RPCs exist).
 7. **Legal + launch** — terms of use §3, licence notice, disclaimer banner; update
    API documents (page text + licence), `updates.ts`, ROADMAP item 7.
 
