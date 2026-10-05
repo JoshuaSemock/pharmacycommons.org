@@ -243,12 +243,23 @@ counts checked against live data 2026-10-04):
 3. **Editor** — ✅ 2026-10-04 (`src/OverviewEditor.tsx`): Write/Preview, `[[`
    autocomplete, required edit summary, licence notice, conflict screen, handle
    setup on first edit. Still to do: "My contributions" tab on Account.
-4. **Infobox editing** — per-row edit with citation; community/source display.
+4. **Infobox editing** — ✅ 2026-10-05 (`src/InfoboxFact.tsx`, phase 15f): per-row edit
+   with citation, community value shown first with the source value one tap away,
+   per-row history and review. Brand-name edits are not built (brands are RxNorm rows
+   and would need their own overlay).
 5. **New pages** — type picker, duplicate "did you mean", create flow; red links.
 6. **History / diff / revert / patrol queue** — ✅ 2026-10-05: `/drugs/:slug/history`
    and `/review`. Still to do: admin UI for protection, roles and blocks (RPCs exist).
 7. **Legal + launch** — terms of use §3, licence notice, disclaimer banner; update
    API documents (page text + licence), `updates.ts`, ROADMAP item 7.
+
+## 11a. Fixes after launch
+
+- 2026-10-05, phase 15f: `edit_infobox()` failed with a NOT NULL error on any page
+  without a `page_content` row (no Overview text yet), because the protection lookup
+  returned NULL. Found by the local test for 15f before any live Quick Facts edit
+  existed (0 rows); fixed with `coalesce(protection, 'open')` and covered by a
+  regression check.
 
 ## 12. Open items for Joshua
 
