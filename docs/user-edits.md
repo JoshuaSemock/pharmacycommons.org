@@ -240,8 +240,9 @@ counts checked against live data 2026-10-04):
 2. **Read path** — re-lay out `DrugDetail` (and a generic page for non-drug types)
    into §2's order; render the open section with `[[ ]]` and `{{ }}`; "What links
    here". Load Joshua's description spreadsheet as `seed` revisions.
-3. **Editor** — markdown editor with live preview, `[[` autocomplete, edit summary,
-   conflict screen; handle setup on Account; "My contributions" tab.
+3. **Editor** — ✅ 2026-10-04 (`src/OverviewEditor.tsx`): Write/Preview, `[[`
+   autocomplete, required edit summary, licence notice, conflict screen, handle
+   setup on first edit. Still to do: "My contributions" tab on Account.
 4. **Infobox editing** — per-row edit with citation; community/source display.
 5. **New pages** — type picker, duplicate "did you mean", create flow; red links.
 6. **History / diff / revert / patrol queue** (unpatrolled live edits + pending
