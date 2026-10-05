@@ -338,8 +338,12 @@ Frontend: Overview on drug pages (`src/OpenSection.tsx`, `src/pageContent.ts`,
 values; keys must match `refresh_page_links()`), with an editor for verified users
 (`src/OverviewEditor.tsx`, `src/contribute.ts`: handle setup, Write/Preview, `[[`
 autocomplete, required summary, licence notice, edit-conflict screen, pending on
-reviewed pages). History/diff/revert, patrol queue, infobox editing and page
-creation UI are not built yet.
+reviewed pages). History at `/drugs/:slug/history` (`src/pages/PageHistory.tsx`: line
+diffs via `src/diff.ts`, Restore, Mark reviewed, Accept/Reject in
+`src/components/RevisionActions.tsx`) and the reviewers' queue at `/review`
+(`src/pages/ReviewQueue.tsx`; pending first, then unreviewed live edits; authors come
+from `page_history()`, never author ids). Infobox editing and page creation UI are not
+built yet.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /

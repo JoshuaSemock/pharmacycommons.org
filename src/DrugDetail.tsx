@@ -215,6 +215,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
         <div className="contents lg:block lg:min-w-0 lg:space-y-12">
           <OpenSection
             pcidCode={drug.pcid_code}
+            slug={drug.slug}
             name={name}
             fallbackDescription={drug.description ?? null}
             labelAnchor={LABEL_ANCHOR}

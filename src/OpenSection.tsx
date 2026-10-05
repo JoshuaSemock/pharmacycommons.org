@@ -35,13 +35,14 @@ export const OPEN_SECTION_ID = 'overview'
 
 type Props = {
   pcidCode: string
+  slug: string
   name: string
   fallbackDescription: string | null
   labelAnchor: string
   className?: string
 }
 
-export default function OpenSection({ pcidCode, name, fallbackDescription, labelAnchor, className = '' }: Props) {
+export default function OpenSection({ pcidCode, slug, name, fallbackDescription, labelAnchor, className = '' }: Props) {
   const { data, failed, reload } = usePageContent(pcidCode)
   const { user, loading: sessionLoading } = useSession()
   const [statusKey, setStatusKey] = useState(0)
@@ -104,7 +105,21 @@ export default function OpenSection({ pcidCode, name, fallbackDescription, label
           }}
         />
       ) : (
-        <OverviewBody data={data} name={name} fallbackDescription={fallbackDescription} labelAnchor={labelAnchor} />
+        <>
+          <OverviewBody data={data} name={name} fallbackDescription={fallbackDescription} labelAnchor={labelAnchor} />
+          <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-sans text-sm text-ink">
+            {data.currentRevisionId !== null || data.pendingCount > 0 ? (
+              <Link to={`/drugs/${slug}/history`} className={LINK}>
+                History
+              </Link>
+            ) : null}
+            {status.kind === 'ready' && status.patroller && (
+              <Link to="/review" className={LINK}>
+                Review queue
+              </Link>
+            )}
+          </p>
+        </>
       )}
     </section>
   )
