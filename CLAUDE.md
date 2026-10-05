@@ -342,8 +342,14 @@ reviewed pages). History at `/drugs/:slug/history` (`src/pages/PageHistory.tsx`:
 diffs via `src/diff.ts`, Restore, Mark reviewed, Accept/Reject in
 `src/components/RevisionActions.tsx`) and the reviewers' queue at `/review`
 (`src/pages/ReviewQueue.tsx`; pending first, then unreviewed live edits; authors come
-from `page_history()`, never author ids). Infobox editing and page creation UI are not
-built yet.
+from `page_history()`, never author ids). Quick Facts rows are editable
+(`src/InfoboxFact.tsx`, `src/infobox.ts`): community value + citation shown first with the
+source value one tap away, per-row history with Restore / Mark reviewed / Accept / Reject,
+and a Quick Facts section in `/review`. Phase 15f (`db/phase15f_infobox_review.sql`,
+applied 2026-10-05) added `patrol_infobox_edit()` and `infobox_history()` and fixed
+`edit_infobox()` failing on pages without a `page_content` row. Behaviour tests:
+`db/phase15_test/` (49 checks; run stubs → phase15 → 15f → tests). Page creation UI is
+not built yet.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
