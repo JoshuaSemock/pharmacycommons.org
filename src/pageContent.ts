@@ -10,7 +10,7 @@
  * Design: docs/user-edits.md. Schema: db/phase15_community_editing.sql.
  */
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { isAbort } from './drugPageData'
 import { linkKey, propertyKey } from './wiki'
@@ -178,11 +178,13 @@ export async function getPageContent(pcid: number, signal?: AbortSignal): Promis
   }
 }
 
-export type PageContentState = { data: PageContent | null; failed: boolean }
+export type PageContentState = { data: PageContent | null; failed: boolean; reload: () => void }
 
 /** The open section's data for a page; refetches when the PCID changes. */
 export function usePageContent(pcidCode: string): PageContentState {
-  const [state, setState] = useState<PageContentState>({ data: null, failed: false })
+  const [state, setState] = useState<{ data: PageContent | null; failed: boolean }>({ data: null, failed: false })
+  const [version, setVersion] = useState(0)
+  const reload = useCallback(() => setVersion(v => v + 1), [])
 
   useEffect(() => {
     const m = /^PCID-(\d+)$/.exec(pcidCode)
@@ -191,7 +193,8 @@ export function usePageContent(pcidCode: string): PageContentState {
       return
     }
     const controller = new AbortController()
-    setState({ data: null, failed: false })
+    // A reload keeps the current text on screen until the new copy arrives.
+    if (version === 0) setState({ data: null, failed: false })
     getPageContent(Number(m[1]), controller.signal)
       .then(data => setState({ data, failed: false }))
       .catch((err: unknown) => {
@@ -200,7 +203,7 @@ export function usePageContent(pcidCode: string): PageContentState {
         setState({ data: null, failed: true })
       })
     return () => controller.abort()
-  }, [pcidCode])
+  }, [pcidCode, version])
 
-  return state
+  return { ...state, reload }
 }

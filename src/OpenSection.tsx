@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Button from './components/Button'
 import WikiMarkdown from './components/WikiMarkdown'
+import { useSession } from './auth'
+import { useContributorStatus } from './contribute'
+import type { ContributorStatus } from './contribute'
+import OverviewEditor from './OverviewEditor'
 import { usePageContent } from './pageContent'
 import type { PageContent } from './pageContent'
 import { entityHref } from './wiki'
@@ -12,8 +17,8 @@ import { entityHref } from './wiki'
  * then the contributor's markdown body with [[links]] and {{values}}, a line
  * saying who wrote it and when it was last patrolled, and "What links here".
  *
- * Read-only for now. The editor (save_page) is the next build step; until it
- * ships, the empty state says so instead of offering a button that does nothing.
+ * Verified contributors get an Edit button that swaps the section for
+ * OverviewEditor; everyone else sees how to become able to edit.
  *
  * `fallbackDescription` is moieties.description_text, shown until the page has
  * its own description in page_content.
@@ -37,17 +42,40 @@ type Props = {
 }
 
 export default function OpenSection({ pcidCode, name, fallbackDescription, labelAnchor, className = '' }: Props) {
-  const { data, failed } = usePageContent(pcidCode)
+  const { data, failed, reload } = usePageContent(pcidCode)
+  const { user, loading: sessionLoading } = useSession()
+  const [statusKey, setStatusKey] = useState(0)
+  const status = useContributorStatus(user ? `${user.id}:${statusKey}` : null, sessionLoading)
+  const [editing, setEditing] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
   const headingId = `${OPEN_SECTION_ID}-heading`
+  const pcid = Number(pcidCode.replace(/^PCID-/, ''))
 
   return (
     <section id={OPEN_SECTION_ID} aria-labelledby={headingId} className={`${className} ${ANCHOR_OFFSET} min-w-0`}>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id={headingId} className="font-semibold text-ink" style={SECTION_HEADING}>
-          Overview
-        </h2>
-        <span className="lp-raised rounded px-2 py-0.5 font-sans text-sm text-ink">Community-written</span>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h2 id={headingId} className="font-semibold text-ink" style={SECTION_HEADING}>
+            Overview
+          </h2>
+          <span className="lp-raised rounded px-2 py-0.5 font-sans text-sm text-ink">Community-written</span>
+        </div>
+        {!editing && data && (
+          <EditAffordance
+            status={status}
+            onEdit={() => {
+              setNotice(null)
+              setEditing(true)
+            }}
+          />
+        )}
       </div>
+
+      {notice && !editing && (
+        <p role="status" className="mb-4 rounded-md border border-sky-300 bg-sky-100/40 px-3 py-2 font-sans text-sm text-ink">
+          {notice}
+        </p>
+      )}
 
       {failed ? (
         <p className="font-sans text-base text-ink">The overview couldn’t be loaded right now.</p>
@@ -56,11 +84,56 @@ export default function OpenSection({ pcidCode, name, fallbackDescription, label
           <div className="h-4 w-4/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
           <div className="h-4 w-3/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
         </div>
+      ) : editing && status.kind === 'ready' ? (
+        <OverviewEditor
+          pcid={pcid}
+          name={name}
+          data={data}
+          status={status}
+          labelAnchor={labelAnchor}
+          onCancel={() => setEditing(false)}
+          onHandleSet={() => setStatusKey(k => k + 1)}
+          onSaved={({ pending }) => {
+            setEditing(false)
+            setNotice(
+              pending
+                ? 'Sent for review. Your edit will appear once a reviewer accepts it.'
+                : 'Saved. Your change is live and will be checked by a reviewer.',
+            )
+            reload()
+          }}
+        />
       ) : (
         <OverviewBody data={data} name={name} fallbackDescription={fallbackDescription} labelAnchor={labelAnchor} />
       )}
     </section>
   )
+}
+
+function EditAffordance({ status, onEdit }: { status: ContributorStatus; onEdit: () => void }) {
+  switch (status.kind) {
+    case 'loading':
+    case 'blocked':
+      return null
+    case 'ready':
+      return (
+        <Button size="sm" onClick={onEdit}>
+          Edit
+        </Button>
+      )
+    case 'signed-out':
+      return (
+        <Link to="/account" className={`font-sans text-sm ${LINK}`}>
+          Sign in to edit
+        </Link>
+      )
+    case 'unverified':
+      return (
+        <Link to="/account" className={`font-sans text-sm ${LINK}`}>
+          Verify your NPI to edit
+        </Link>
+      )
+  }
 }
 
 export function OverviewBody({
@@ -82,8 +155,8 @@ export function OverviewBody({
     <div className="space-y-6">
       {empty ? (
         <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
-          No overview has been written for {name} yet. Verified providers will be able to write one here: practical
-          notes, calculations and context the label leaves out, linked to other pages.
+          No overview has been written for {name} yet. NPI-verified providers can write one here: practical notes,
+          calculations and context the label leaves out, linked to other pages.
         </p>
       ) : (
         <div className="space-y-4">

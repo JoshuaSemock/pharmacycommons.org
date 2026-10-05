@@ -333,10 +333,13 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 `pcid_retired.replaced_by_pcid`; `provider_verifications.credential`. Applied as 15a–c via
 `apply_migration`, 15d–e via the SQL editor (recorded in `schema_migrations` by hand).
 Behaviour tests: `db/phase15_test/` (stub schema + 46 checks; run on a local Postgres 16).
-Frontend: read-only Overview on drug pages (`src/OpenSection.tsx`, `src/pageContent.ts`,
+Frontend: Overview on drug pages (`src/OpenSection.tsx`, `src/pageContent.ts`,
 `src/components/WikiMarkdown.tsx`, `src/wiki.ts` — `[[links]]` and `{{key:target}}`
-values; keys must match `refresh_page_links()`). Editor, history, patrol queue and
-page creation UI are not built yet.
+values; keys must match `refresh_page_links()`), with an editor for verified users
+(`src/OverviewEditor.tsx`, `src/contribute.ts`: handle setup, Write/Preview, `[[`
+autocomplete, required summary, licence notice, edit-conflict screen, pending on
+reviewed pages). History/diff/revert, patrol queue, infobox editing and page
+creation UI are not built yet.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
