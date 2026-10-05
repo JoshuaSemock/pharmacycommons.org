@@ -426,7 +426,7 @@ function LinkingTextarea({
 
 // ─── Handle setup ─────────────────────────────────────────────────────────────
 
-function HandleSetup({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
+export function HandleSetup({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
   const [handle, setHandle] = useState('')
   const [showCredential, setShowCredential] = useState(true)
   const [saving, setSaving] = useState(false)

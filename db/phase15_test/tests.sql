@@ -1,4 +1,5 @@
--- Phase 15 behaviour tests. Run after stubs.sql + the migration.
+-- Phase 15 behaviour tests. Run after stubs.sql, phase15_community_editing.sql and
+-- phase15f_infobox_review.sql.
 -- Each check prints PASS/FAIL; any FAIL means the migration needs work.
 \set ON_ERROR_STOP on
 create or replace function pg_temp.as_user(p uuid) returns void language sql as $$
@@ -130,6 +131,18 @@ begin
   perform review_infobox_edit(e, true, 'ok');
   perform pg_temp.check('accepted infobox edit is current',
     resolve_property('qtc_risk', 1002962) ->> 'value' = 'Low');
+
+  -- regression (15f): infobox edit on a page with no Overview text (no page_content row)
+  perform pg_temp.as_user(A);
+  e := edit_infobox(1000500, 'acb_score', '3', 'Boustani 2008', 'confirm');
+  perform pg_temp.check('infobox edit works on a page without Overview text',
+    (select is_current and patrol_status = 'unpatrolled' from infobox_edits where id = e));
+  perform pg_temp.check('infobox_history shows handle',
+    exists (select 1 from infobox_history(1000500, 'acb_score') where handle = 'alice_md'));
+  perform pg_temp.as_user(J);
+  perform patrol_infobox_edit(e);
+  perform pg_temp.check('reviewer marks a live infobox edit reviewed',
+    (select patrol_status from infobox_edits where id = e) = 'patrolled');
 
   -- new pages
   perform pg_temp.as_user(A);

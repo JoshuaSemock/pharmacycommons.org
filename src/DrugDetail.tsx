@@ -22,6 +22,10 @@ import type { LabelSection } from './labels'
 import { formatBrandName, formatDrugName } from './names'
 import MachinePanels from './MachinePanels'
 import OpenSection from './OpenSection'
+import InfoboxFact from './InfoboxFact'
+import type { InfoboxContext } from './InfoboxFact'
+import { dedupeContained, useInfobox } from './infobox'
+import { useContributorStatus } from './contribute'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
@@ -437,11 +441,12 @@ function JumpToLabel() {
 // subsection titles (never a clipped dose), the first contraindications, and
 // the boxed warning's titles. Each opens its full section in the label.
 
-const QUICK_LISTS: { slug: string; term: string }[] = [
-  { slug: 'most-used-drugs-us', term: 'Most used' },
-  { slug: 'do-not-crush', term: 'Do not crush' },
-  { slug: 'anticholinergic-burden', term: 'ACB score' },
-  { slug: 'arrhythmia-risk', term: 'QTc risk' },
+// `key` is the infobox_properties key the row's community values use.
+const QUICK_LISTS: { slug: string; term: string; key: string }[] = [
+  { slug: 'most-used-drugs-us', term: 'Most used', key: 'most_used' },
+  { slug: 'do-not-crush', term: 'Do not crush', key: 'do_not_crush' },
+  { slug: 'anticholinergic-burden', term: 'ACB score', key: 'acb_score' },
+  { slug: 'arrhythmia-risk', term: 'QTc risk', key: 'qtc_risk' },
 ]
 
 function QuickFacts({
@@ -457,6 +462,19 @@ function QuickFacts({
   lists: Loadable<EntityList[]>
   onOpenSection: (key: string) => void
 }) {
+  const { user, loading: sessionLoading } = useSession()
+  const [statusKey, setStatusKey] = useState(0)
+  const status = useContributorStatus(user ? `${user.id}:${statusKey}` : null, sessionLoading)
+  const infobox = useInfobox(drug.pcid_code)
+  const ctx: InfoboxContext = {
+    pcid: Number(drug.pcid_code.replace(/^PCID-/, '')),
+    protection: infobox.protection,
+    data: infobox.data,
+    status,
+    reload: infobox.reload,
+    onHandleSet: () => setStatusKey(k => k + 1),
+  }
+
   const labelLoading = label.loading && !label.data
   const sections = label.data?.label ? label.data.sections : []
   const noLabel = !labelLoading && sections.length === 0
@@ -476,8 +494,11 @@ function QuickFacts({
   }
 
   const boxed = find('boxed_warning')
-  const legal = [attr(drug, 'Rx status'), attr(drug, 'Legal status'), attr(drug, 'FDA marketing status')]
-    .filter((v, i, all): v is string => v !== null && all.indexOf(v) === i)
+  const legal = dedupeContained(
+    [attr(drug, 'Rx status'), attr(drug, 'Legal status'), attr(drug, 'FDA marketing status')].filter(
+      (v): v is string => v !== null,
+    ),
+  )
 
   return (
     <section aria-labelledby="quick-facts-heading" className="lp-raised rounded-md">
@@ -485,16 +506,16 @@ function QuickFacts({
         Quick facts
       </h2>
       <dl className="lp-divide-y">
-        <Fact term="Indications">
+        <InfoboxFact term="Indications" propertyKey="indications" ctx={ctx}>
           {labelFact('indications_and_usage', s => <span>{firstSentence(sectionText(s), 200)}</span>, 'Not in this label')}
-        </Fact>
-        <Fact term="Dosing">
+        </InfoboxFact>
+        <InfoboxFact term="Dosing" propertyKey="dosing" ctx={ctx}>
           {labelFact('dosage_and_administration', s => <span>{topicLine(s)}</span>, 'Not in this label')}
-        </Fact>
-        <Fact term="Contraindications">
+        </InfoboxFact>
+        <InfoboxFact term="Contraindications" propertyKey="contraindications" ctx={ctx}>
           {labelFact('contraindications', s => <Contraindications section={s} />, 'Not in this label')}
-        </Fact>
-        <Fact term="Boxed warning">
+        </InfoboxFact>
+        <InfoboxFact term="Boxed warning" propertyKey="boxed_warning" ctx={ctx}>
           {labelLoading ? (
             <FactSkeleton />
           ) : noLabel ? (
@@ -507,11 +528,11 @@ function QuickFacts({
           ) : (
             <span>None in this label</span>
           )}
-        </Fact>
-        <Fact term="Pharmacologic class (FDA)">
+        </InfoboxFact>
+        <InfoboxFact term="Pharmacologic class (FDA)" propertyKey="epc_class" ctx={ctx}>
           <EpcClasses classes={classes} />
-        </Fact>
-        <Fact term="Legal status">
+        </InfoboxFact>
+        <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
           {legal.length === 0 ? (
             <span>Not recorded</span>
           ) : (
@@ -523,23 +544,14 @@ function QuickFacts({
               ))}
             </span>
           )}
-        </Fact>
+        </InfoboxFact>
         {QUICK_LISTS.map(q => (
-          <Fact key={q.slug} term={q.term}>
+          <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>
             <KeyListFact slug={q.slug} lists={lists} />
-          </Fact>
+          </InfoboxFact>
         ))}
       </dl>
     </section>
-  )
-}
-
-function Fact({ term, children }: { term: string; children: ReactNode }) {
-  return (
-    <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-3 px-4 py-2.5">
-      <dt className="font-sans text-sm font-semibold leading-snug text-ink">{term}</dt>
-      <dd className="min-w-0 font-sans text-sm leading-snug text-ink [overflow-wrap:anywhere]">{children}</dd>
-    </div>
   )
 }
 
