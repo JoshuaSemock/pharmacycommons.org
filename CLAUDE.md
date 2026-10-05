@@ -204,8 +204,9 @@ nest under the moiety page (`HierarchySection` in `DrugDetail.tsx`, fed by
 `moiety_hierarchy`): base moiety → precise forms → brand formulations → combinations
 (formulations shown since 2026-10-02).
 
-**Drug page layout (2026-10-02, `src/DrugDetail.tsx`):** reading order is Jump to label →
-Quick Facts → hierarchy → FDA label (all sections collapsed, Expand all) → Identifiers →
+**Drug page layout (2026-10-02, Overview added 2026-10-04, `src/DrugDetail.tsx`):** reading
+order is Jump to label → Quick Facts → **Overview** (community-written, `src/OpenSection.tsx`)
+→ hierarchy → FDA label (all sections collapsed, Expand all) → Identifiers →
 Guidelines (collapsed) → Classifications (FDA MOA/PE/CS first) → Lists → Additional
 metadata. On desktop Jump, Quick Facts and Identifiers sit in a sticky left rail; below
 `lg` both columns are `display: contents` and `order-*` interleaves them. The label,
@@ -265,10 +266,21 @@ silently does nothing.
   `*_security_definer_function_executable` findings as blocking.
 - Views exposed to anon/authenticated: `WITH (security_invoker = true)` plus an
   explicit `GRANT SELECT`.
-- The only write path to live entity/statement tables for users is
-  `approve_revision()` applying rows from `revisions`. Contribution (`revisions`
-  submit) is gated on NPI verification in `provider_verifications`, written only by
-  the `verify-npi` function. `saved_entities` (bookmarks) is not gated.
+- **Community editing (phase 15, 2026-10-04, `docs/user-edits.md`):** users write only
+  through the phase-15 RPCs (`save_page`, `revert_page`, `edit_infobox`, `create_page`,
+  patrol/accept/reject, admin) — no table has a write policy. Publish-then-patrol, except
+  pages with `page_content.protection = 'reviewed'` (44 high-alert/NTI moieties + their
+  hierarchy = 217 pages), where non-patroller edits wait as `pending`. Every write RPC
+  checks `is_verified_contributor()` (active NPI, not blocked) or `has_role()`. These
+  SECURITY DEFINER functions are intentionally executable by `authenticated` (and
+  `page_history`/`resolve_property`/`resolve_page_target` by `anon`); the advisor
+  findings for them are expected. Community values never overwrite ingest columns:
+  infobox corrections live in `infobox_edits`, text in `page_content`/`page_revisions`.
+  `create_page` mints PCIDs from `pcid_blocks` in the database, so **the database, not the
+  workbook, is now the PCID authority** — refresh `PCID_Blocks`/`Dispatch_Log` from it.
+  `revisions` + `approve_revision()` remain for maintainer batch changes.
+  NPI verification lives in `provider_verifications` (now with `credential`), written
+  only by `verify-npi`. `saved_entities` (bookmarks) is not gated.
 - Join predicates of the form `x = a OR x = b` defeat hash/merge joins here — split
   into UNION'd plain equi-joins (this is why `moiety_hierarchy` is fast).
 - After bulk loads: `refresh materialized view concurrently public.moiety_hierarchy;`
@@ -313,6 +325,18 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 
 `pcid_blocks.next_pcid` (2026-10-03): 1→1015681, 2→2002591, 3→3001452, 4→4006582,
 5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000039.
+
+**Phase 15 — community editing (2026-10-04, `db/phase15_community_editing.sql`,
+`docs/user-edits.md`):** tables `page_content`, `page_revisions`, `page_links`,
+`page_property_refs`, `community_pages`, `infobox_properties` (10 rows), `infobox_edits`,
+`user_roles` (Joshua = admin), `contributor_profiles`, `contributor_blocks`;
+`pcid_retired.replaced_by_pcid`; `provider_verifications.credential`. Applied as 15a–c via
+`apply_migration`, 15d–e via the SQL editor (recorded in `schema_migrations` by hand).
+Behaviour tests: `db/phase15_test/` (stub schema + 46 checks; run on a local Postgres 16).
+Frontend: read-only Overview on drug pages (`src/OpenSection.tsx`, `src/pageContent.ts`,
+`src/components/WikiMarkdown.tsx`, `src/wiki.ts` — `[[links]]` and `{{key:target}}`
+values; keys must match `refresh_page_links()`). Editor, history, patrol queue and
+page creation UI are not built yet.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
