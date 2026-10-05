@@ -21,27 +21,31 @@ import type { Segment } from './identifiers'
 import type { LabelSection } from './labels'
 import { formatBrandName, formatDrugName } from './names'
 import MachinePanels from './MachinePanels'
+import OpenSection from './OpenSection'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
 //
-// Header: name + INN on the left, Save on the right; entity type; brand names;
-// the one-line description (moieties.description_text), omitted when there is none.
+// Header: name + INN on the left, Save on the right; entity type; brand names.
+// (The one-line description moved into the Overview on 2026-10-04.)
 //
 // Reading order (phones stack exactly this way):
 //   1. Jump to FDA prescribing information
 //   2. Quick Facts (infobox: indications, dosing, contraindications, boxed
 //      warning, FDA pharmacologic class, legal status, four key lists)
-//   3. Drug hierarchy (moiety → precise forms → brand formulations → combinations)
-//   4. FDA prescribing information (every section collapsed, Expand all)
-//   5. Identifiers (PCID, CAS, UNII, InChIKey, LactMed, Georgia statute, then others)
-//   6. Clinical guidelines (collapsed)
-//   7. Classifications (FDA MOA, PE and chemical structure first, then the rest)
-//   8. Lists
-//   9. Additional metadata / machine-readable
+//   3. Overview — the open, community-written section (OpenSection.tsx,
+//      phase 15): description, markdown body with [[links]] and {{values}},
+//      review status, What links here. Everything after it is ingest-owned.
+//   4. Drug hierarchy (moiety → precise forms → brand formulations → combinations)
+//   5. FDA prescribing information (every section collapsed, Expand all)
+//   6. Identifiers (PCID, CAS, UNII, InChIKey, LactMed, Georgia statute, then others)
+//   7. Clinical guidelines (collapsed)
+//   8. Classifications (FDA MOA, PE and chemical structure first, then the rest)
+//   9. Lists
+//  10. Additional metadata / machine-readable
 //
-// Desktop: 1, 2 and 5 sit in a sticky left rail so Quick Facts and the
+// Desktop: 1, 2 and 6 sit in a sticky left rail so Quick Facts and the
 // identifiers stay on screen while the label scrolls; everything else runs
 // down the main column in order. Both columns are `display: contents` below
 // lg, which lets the `order-*` classes interleave them into the single
@@ -203,22 +207,30 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
           <div className="order-2 min-w-0">
             <QuickFacts drug={drug} label={label} classes={classes} lists={lists} onOpenSection={openLabelSection} />
           </div>
-          <div className="order-5 min-w-0">
+          <div className="order-6 min-w-0">
             <IdentifiersSection drug={drug} />
           </div>
         </aside>
 
         <div className="contents lg:block lg:min-w-0 lg:space-y-12">
-          <HierarchySection drug={drug} name={name} className="order-3" />
+          <OpenSection
+            pcidCode={drug.pcid_code}
+            name={name}
+            fallbackDescription={drug.description ?? null}
+            labelAnchor={LABEL_ANCHOR}
+            className="order-3"
+          />
 
-          <PageSection id={LABEL_ANCHOR} title="FDA prescribing information" className="order-4">
+          <HierarchySection drug={drug} name={name} className="order-4" />
+
+          <PageSection id={LABEL_ANCHOR} title="FDA prescribing information" className="order-5">
             <LabelSections slug={drug.slug} label={label} open={openSections} onOpenChange={setOpenSections} />
           </PageSection>
 
-          <GuidelinesSection pcidCode={drug.pcid_code} className="order-6" />
-          <ClassificationsSection classes={classes} className="order-7" />
-          <ListsSection lists={lists} className="order-8" />
-          <MetadataSection drug={drug} className="order-9" />
+          <GuidelinesSection pcidCode={drug.pcid_code} className="order-7" />
+          <ClassificationsSection classes={classes} className="order-8" />
+          <ListsSection lists={lists} className="order-9" />
+          <MetadataSection drug={drug} className="order-10" />
         </div>
       </div>
     </div>
@@ -245,10 +257,6 @@ function DrugHeader({ drug }: { drug: DrugDetailType }) {
       <p className="mt-1 font-sans text-lg text-ink">{drug.entity_type}</p>
 
       <BrandLine brands={drug.brands ?? []} />
-
-      {drug.description && (
-        <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-ink">{drug.description}</p>
-      )}
     </header>
   )
 }

@@ -1,6 +1,7 @@
 # Pharmacy Commons — Terms of Use
 
 **Effective Date:** September 29, 2026
+**Last revised:** October 4, 2026 (Section 3, community contributions)
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
 
@@ -26,16 +27,27 @@ Pharmacy Commons reserves the right to suspend or terminate accounts that violat
 
 ### 3. Community Contributions
 
-Pharmacy Commons permits verified users to submit corrections, annotations, structured data, references, and other materials (“Contributions”).
+Pharmacy Commons permits verified users to write and edit page text, correct or add structured values (such as Quick Facts entries), create new pages, and submit references and other materials (“Contributions”).
 
-You retain ownership of the intellectual property rights that you hold in your Contributions. By submitting a Contribution, you grant Pharmacy Commons a non-exclusive, worldwide, royalty-free, perpetual license to use, reproduce, store, modify, adapt, organize, publish, distribute, display, and make the Contribution available as part of the Services, including in structured databases and machine-readable formats.
+**Publication and review.** Most Contributions are published as soon as they are saved and are reviewed afterwards by Pharmacy Commons patrollers, who may correct, revert, or remove them. Pages designated for clinical safety review (for example, high-alert and narrow-therapeutic-index medications) hold Contributions until a patroller accepts them. Every saved Contribution, including reverted and rejected ones, is kept in the page’s public revision history.
 
-All Contributions are subject to community moderation, maintainer review, and the `approve_revision()` workflow prior to live publication. You represent and warrant that:
+**Licensing of your Contributions.** You retain any intellectual property rights you hold in your Contributions. By saving a Contribution, you agree to license it as follows, irrevocably and worldwide:
 
-* You possess the right and authority to submit the Contribution.
-* The Contribution does not knowingly violate another party's copyrights, trademarks, or legal rights.
-* You have not included confidential, proprietary, or patient-identifiable information without proper and explicit authorization.
-* You have not knowingly misrepresented the source, provenance, or meaning of the information.
+* **Page text** (descriptions and other written prose): under the Creative Commons Attribution-ShareAlike 4.0 International license (CC BY-SA 4.0).
+* **Structured contributions** (infobox values, page records, identifiers, links between pages, and similar data): dedicated to the public domain under Creative Commons CC0 1.0 Universal (CC0 1.0), to the extent you hold rights in them.
+
+You also grant Pharmacy of the Commons, LLC a non-exclusive, worldwide, royalty-free, perpetual license to use, reproduce, store, modify, adapt, organize, publish, distribute, display, and make your Contributions available as part of the Services, including in structured databases and machine-readable formats.
+
+**Attribution.** You agree to be credited by the public handle you choose and, unless you turn it off, the credential listed for your NPI in the NPI Registry. Your legal name, NPI number, and account identifiers are not published.
+
+You represent and warrant that:
+
+* You possess the right and authority to submit the Contribution under the licenses above.
+* The Contribution does not knowingly violate another party's copyrights, trademarks, or legal rights, and any text copied from another source is compatible with CC BY-SA 4.0 and attributed.
+* You have not included confidential, proprietary, or patient-identifiable information.
+* You have not knowingly misrepresented the source, provenance, or meaning of the information, and structured values cite their source.
+
+Contributions are clinical information written by individual providers, not professional advice from Pharmacy Commons; see the Medical Information Disclaimer.
 
 ### 4. Prohibited Submissions and Conduct
 
@@ -108,4 +120,4 @@ For questions, legal inquiries, or concerns regarding these Terms, please contac
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
-**Operator:** Pharmacy of the Commons, LLC
+**Operator:** Pharmacy of the Commons, LLC

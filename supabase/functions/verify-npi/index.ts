@@ -9,6 +9,12 @@
 // uses the service role key to bypass RLS, but only after it has actually
 // confirmed the NPI against CMS and cross-checked the submitted last name.
 //
+// Phase 15 (2026-10-04): also stores the registry's `basic.credential`
+// (e.g. "PharmD, BCPS") in provider_verifications.credential. It feeds the
+// "@handle · PharmD" badge in page history via pc_credential_badge(); the
+// credential is self-reported to NPPES, so the UI labels it "as listed in the
+// NPI Registry". Deploy only after migration phase15a has added the column.
+//
 // CORS: every response (including the OPTIONS preflight) carries
 // Access-Control-Allow-Origin: * — this function is called from the
 // browser via supabase.functions.invoke(), and without these headers the
@@ -20,7 +26,7 @@
 //
 // Request:  POST { npi: string, last_name: string }
 //   Authorization: Bearer <user's access token>  (verified via getUser())
-// Response: { verified: true, status, name, taxonomy, enumeration_type }
+// Response: { verified: true, status, name, taxonomy, credential, enumeration_type }
 //        or { verified: false, reason: string }  (still 200 — a failed
 //        verification is an expected outcome, not a server error)
 //
@@ -133,6 +139,10 @@ Deno.serve(async req => {
           .join(' ')
       : (basic.organization_name ?? npi)
 
+  // Individuals only; organizations have no personal credential.
+  const credential =
+    enumerationType === 'NPI-1' && basic.credential?.trim() ? basic.credential.trim() : null
+
   const primaryTaxonomy =
     record.taxonomies?.find(t => t.primary)?.desc ?? record.taxonomies?.[0]?.desc ?? null
 
@@ -152,6 +162,7 @@ Deno.serve(async req => {
         verified_name: verifiedName,
         enumeration_type: enumerationType,
         primary_taxonomy: primaryTaxonomy,
+        credential,
         status: 'active',
         last_checked_at: new Date().toISOString(),
       },
@@ -172,6 +183,7 @@ Deno.serve(async req => {
     status: 'active',
     name: verifiedName,
     taxonomy: primaryTaxonomy,
+    credential,
     enumeration_type: enumerationType,
   })
 })
