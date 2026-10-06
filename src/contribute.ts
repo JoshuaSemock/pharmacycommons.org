@@ -106,10 +106,13 @@ export async function savePage(input: {
 export class ContributeError extends Error {
   reason: string
   code: string | undefined
-  constructor(reason: string, code?: string) {
+  /** The RPC's DETAIL text, e.g. the PCID of an existing page for 'page_exists'. */
+  detail: string | undefined
+  constructor(reason: string, code?: string, detail?: string) {
     super(contributeErrorMessage(reason, code))
     this.reason = reason
     this.code = code
+    this.detail = detail
   }
 }
 
@@ -132,6 +135,14 @@ export function contributeErrorMessage(reason: string, code?: string): string {
       return 'Someone else saved this page while you were editing.'
     case 'no_such_page':
       return 'This page no longer exists.'
+    case 'page_exists':
+      return 'A page with that name already exists.'
+    case 'identifier_exists':
+      return 'A page with that UNII or CAS number already exists.'
+    case 'kind_not_creatable':
+      return 'That kind of page can’t be created here.'
+    case 'bad_name':
+      return 'Give the page a name (up to 200 characters).'
   }
   if (code === '23505') return 'That handle is taken. Try another.'
   if (code === '23514') return 'Handles are 3–30 letters, numbers, dots, dashes or underscores.'
@@ -197,4 +208,79 @@ export function openLinkQuery(text: string, caret: number): { start: number; que
   const typed = before.slice(open + 2)
   if (/[\]\n|[]/.test(typed) || typed.length > 60) return null
   return { start: open, query: typed }
+}
+
+// ─── New pages ────────────────────────────────────────────────────────────────
+
+export type PageKindOption = {
+  id: string
+  label: string
+  hint: string
+  kind: 'moiety' | 'precise_form' | 'combination' | 'formulation' | 'clinical' | 'measurement' | 'target' | 'functional'
+  /** clinical: concept_type; functional: group_type; measurement: chosen separately. */
+  subtype?: string
+  /** Drug kinds take UNII/CAS for the duplicate check. */
+  identifiers?: boolean
+  group: 'Drugs and supplements' | 'Clinical concepts' | 'Other'
+}
+
+/** The type picker on /new, mapped to PCID blocks (docs/user-edits.md §7). */
+export const PAGE_KINDS: PageKindOption[] = [
+  { id: 'moiety', group: 'Drugs and supplements', label: 'Drug: single active ingredient', hint: 'e.g. metformin', kind: 'moiety', identifiers: true },
+  { id: 'precise_form', group: 'Drugs and supplements', label: 'Drug: salt or ester form', hint: 'e.g. metoprolol succinate', kind: 'precise_form', identifiers: true },
+  { id: 'combination', group: 'Drugs and supplements', label: 'Drug: combination product', hint: 'e.g. lisinopril/hydrochlorothiazide', kind: 'combination', identifiers: true },
+  { id: 'formulation', group: 'Drugs and supplements', label: 'Drug: branded product', hint: 'e.g. Glucophage XR', kind: 'formulation' },
+  { id: 'supplement', group: 'Drugs and supplements', label: 'Dietary supplement (a defined chemical)', hint: 'e.g. melatonin, cholecalciferol', kind: 'moiety', identifiers: true },
+  { id: 'herbal', group: 'Drugs and supplements', label: 'Herbal or biological source', hint: 'e.g. ashwagandha, fish oil', kind: 'functional', subtype: 'Botanical source' },
+  { id: 'indication', group: 'Clinical concepts', label: 'Indication', hint: 'a condition drugs treat', kind: 'clinical', subtype: 'Indication' },
+  { id: 'symptom', group: 'Clinical concepts', label: 'Symptom', hint: 'e.g. dizziness', kind: 'clinical', subtype: 'Symptom' },
+  { id: 'adverse', group: 'Clinical concepts', label: 'Adverse effect', hint: 'e.g. lactic acidosis', kind: 'clinical', subtype: 'Adverse Reaction' },
+  { id: 'contraindication', group: 'Clinical concepts', label: 'Contraindication', hint: 'e.g. severe renal impairment', kind: 'clinical', subtype: 'Contraindication' },
+  { id: 'risk', group: 'Clinical concepts', label: 'Risk factor', hint: 'e.g. QT prolongation history', kind: 'clinical', subtype: 'Risk Factor' },
+  { id: 'measurement', group: 'Other', label: 'Lab test or measurement', hint: 'e.g. serum potassium, CrCl', kind: 'measurement' },
+  { id: 'target', group: 'Other', label: 'Biological target', hint: 'e.g. CYP3A4, SGLT2', kind: 'target' },
+]
+
+/** measurement_type values already in use. */
+export const MEASUREMENT_TYPES = ['Serum Lab Panel', 'Vital Sign', 'Assessment Scale', 'Diagnostic Measure', 'Derived Calculation']
+
+export type CreatedPage = { pcid: number; pcid_code: string; slug: string; entity_type: string }
+
+export async function createPage(input: {
+  kind: PageKindOption['kind']
+  name: string
+  summary: string
+  description: string
+  subtype: string | null
+  unii: string
+  cas: string
+}): Promise<CreatedPage> {
+  const identifiers: Record<string, string> = {}
+  if (input.unii.trim()) identifiers.unii = input.unii.trim()
+  if (input.cas.trim()) identifiers.cas = input.cas.trim()
+  const { data, error } = await supabase.rpc('create_page', {
+    p_entity_kind: input.kind,
+    p_name: input.name.trim(),
+    p_summary: input.summary.trim(),
+    p_description: input.description.trim(),
+    p_body_md: '',
+    p_subtype: input.subtype,
+    p_identifiers: identifiers,
+  })
+  if (error) throw new ContributeError(error.message, error.code, error.details ?? undefined)
+  return data as CreatedPage
+}
+
+/** Mirrors pc_slugify() in the database, to preview a new page's address. */
+export function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+/** The subtype create_page stores for a chosen kind (measurements pick theirs). */
+export function subtypeFor(option: PageKindOption, measurementType: string): string | null {
+  if (option.kind === 'measurement') return measurementType || null
+  return option.subtype ?? null
 }

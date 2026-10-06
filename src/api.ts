@@ -70,6 +70,14 @@ const BLOCK_TABLE = {
   formulation: 'formulations',
 } as const
 
+/** Satellite tables of the non-drug blocks, read for concept pages (phase 15). */
+const CONCEPT_TABLE: Record<string, string> = {
+  clinical: 'clinical_concepts',
+  measurement: 'measurements',
+  target: 'biological_targets',
+  functional: 'functional_groups',
+}
+
 type BlockKind = keyof typeof BLOCK_TABLE
 
 function isBlockKind(entityType: string): entityType is BlockKind {
@@ -111,6 +119,17 @@ const HUMANIZED_FIELDS: Record<string, string> = {
   origin: 'Origin',
   statute_citation: 'Statute citation',
   mpje_relevance: 'MPJE relevance',
+  // Non-drug blocks (clinical concepts, measurements, herbals): shown on concept pages.
+  concept_type: 'Concept type',
+  measurement_type: 'Measurement type',
+  units: 'Units',
+  group_type: 'Group type',
+  target_type: 'Target type',
+  family: 'Family',
+  genus: 'Genus',
+  species: 'Species',
+  part_used: 'Part used',
+  traditional_use: 'Traditional use',
 }
 
 /** A description to show, or null when it is missing, blank or the placeholder "Unassigned". */
@@ -149,7 +168,7 @@ export async function getDrugBySlug(slug: string, options: { signal?: AbortSigna
   if (!entity) return null
 
   const { pcid, entity_type: entityType } = entity
-  const table = isBlockKind(entityType) ? BLOCK_TABLE[entityType as BlockKind] : null
+  const table = isBlockKind(entityType) ? BLOCK_TABLE[entityType as BlockKind] : (CONCEPT_TABLE[entityType] ?? null)
 
   let satellite: Record<string, unknown> = {}
   if (table) {
@@ -182,6 +201,7 @@ export async function getDrugBySlug(slug: string, options: { signal?: AbortSigna
 
   return {
     ...listItem,
+    block_kind: entityType,
     attributes: toAttributes(satellite),
     components,
     interactions,

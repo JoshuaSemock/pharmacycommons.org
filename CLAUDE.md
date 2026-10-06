@@ -170,7 +170,7 @@ and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
 `/tools/days-supply` (browser-only; see `docs/days-supply.md`), `/tools/dictionary` (Word `.dic`
-download + A–Z dictionary; see `docs/dictionary.md`) · `/developers` (API console
+download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/drugs/:slug/history` · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read
@@ -348,8 +348,12 @@ source value one tap away, per-row history with Restore / Mark reviewed / Accept
 and a Quick Facts section in `/review`. Phase 15f (`db/phase15f_infobox_review.sql`,
 applied 2026-10-05) added `patrol_infobox_edit()` and `infobox_history()` and fixed
 `edit_infobox()` failing on pages without a `page_content` row. Behaviour tests:
-`db/phase15_test/` (49 checks; run stubs → phase15 → 15f → tests). Page creation UI is
-not built yet.
+`db/phase15_test/` (49 checks; run stubs → phase15 → 15f → tests). Page creation (2026-10-05): `/new` (`src/pages/CreatePage.tsx`) calls `create_page()`;
+`PAGE_KINDS` in `src/contribute.ts` maps the type picker to blocks; red links go to
+`/new?name=…`. Non-drug blocks (clinical, measurement, target, functional) render the
+concept layout on `/drugs/:slug` (`ConceptPage` in `DrugDetail.tsx`, keyed on
+`block_kind`; helpers in `src/concepts.ts`); `getDrugBySlug` reads their satellite
+tables via `CONCEPT_TABLE` in `src/api.ts`.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /

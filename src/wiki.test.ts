@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import WikiMarkdown from './components/WikiMarkdown'
 import type { LinkedPage, PropertyValue } from './pageContent'
-import { entityHref, linkKey, propertyKey, tokenizeWiki } from './wiki'
+import { entityHref, linkKey, newPageHref, propertyKey, tokenizeWiki } from './wiki'
 
 describe('tokenizeWiki', () => {
   it('splits links, labelled links and properties out of text', () => {
@@ -70,6 +70,7 @@ describe('WikiMarkdown', () => {
     expect(html).toContain('href="/drugs/hypertension"')
     expect(html).toContain('>high blood pressure</a>')
     expect(html).toContain('No page for “No Such Page” yet')
+    expect(html).toContain('href="/new?name=No%20Such%20Page"')
     expect(html).toContain('title="ACB score: community value. Source: Boustani 2008">0')
     expect(html).toContain('href="/lists/anticholinergic-burden"')
     expect(html).toContain('>3<')
@@ -90,5 +91,14 @@ describe('WikiMarkdown', () => {
     expect(html).toContain('<h3')
     expect(html).not.toContain('<h2')
     expect(html).toContain('rel="nofollow ugc noopener noreferrer"')
+  })
+})
+
+describe('newPageHref', () => {
+  it('prefills the create form with the link target', () => {
+    expect(newPageHref('Lactic acidosis')).toBe('/new?name=Lactic%20acidosis')
+    expect(newPageHref('lactic-acidosis')).toBe('/new?name=lactic%20acidosis')
+    expect(newPageHref('serum potassium|K+')).toBe('/new?name=serum%20potassium')
+    expect(newPageHref('  ')).toBe('/new')
   })
 })
