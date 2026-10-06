@@ -229,6 +229,11 @@ counts checked against live data 2026-10-04):
 | `resolve_property(key, pcid)` | public | value for `{{…}}` and infobox |
 | `resolve_page_target(text)` | public | link resolution |
 | `page_history(pcid, limit?)` | public | revisions with handle + badge |
+| `patrol_infobox_edit(id)` / `infobox_history(pcid, key?, limit?)` (15f) | patroller / public | mark a live Quick Facts value reviewed; its history with handle + badge |
+| `my_contributions(limit?)` (15g) | signed in | the caller's own page edits, Quick Facts values and created pages, with status and reviewer note |
+| `new_pages_queue(limit?, unpatrolled_only?)` (15g) | public | created pages with handle + badge |
+| `patrol_new_page(pcid)` (15g) | patroller | mark a created page reviewed (not own) |
+| `admin_contributors(query?, limit?)` / `unblock_contributor(user)` (15g) | admin | find contributors by handle (roles, NPI state, block, activity; never NPI/email/name); lift a block |
 
 ## 11. Build order
 
@@ -243,7 +248,8 @@ counts checked against live data 2026-10-04):
    here". Load Joshua's description spreadsheet as `seed` revisions.
 3. **Editor** — ✅ 2026-10-04 (`src/OverviewEditor.tsx`): Write/Preview, `[[`
    autocomplete, required edit summary, licence notice, conflict screen, handle
-   setup on first edit. Still to do: "My contributions" tab on Account.
+   setup on first edit. "My contributions" tab on Account ✅ 2026-10-05
+   (`src/components/MyContributions.tsx`, phase 15g).
 4. **Infobox editing** — ✅ 2026-10-05 (`src/InfoboxFact.tsx`, phase 15f): per-row edit
    with citation, community value shown first with the source value one tap away,
    per-row history and review. Brand-name edits are not built (brands are RxNorm rows
@@ -259,7 +265,10 @@ counts checked against live data 2026-10-04):
    the page, grouped by predicate), identifiers and the machine-readable record. No
    label, Quick Facts or hierarchy.
 6. **History / diff / revert / patrol queue** — ✅ 2026-10-05: `/drugs/:slug/history`
-   and `/review`. Still to do: admin UI for protection, roles and blocks (RPCs exist).
+   and `/review`; new pages joined the queue with phase 15g. Admin UI ✅ 2026-10-05:
+   `/admin` (`src/pages/Admin.tsx`) — contributors by handle with reviewer/admin
+   roles, block (1/7/30 days or until lifted) and lift; page protection list with
+   filter, change level, protect any page by name. Admin-only; linked from Account.
 7. **Legal + launch** — terms of use §3, licence notice, disclaimer banner; update
    API documents (page text + licence), `updates.ts`, ROADMAP item 7.
 

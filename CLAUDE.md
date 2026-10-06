@@ -170,7 +170,7 @@ and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
 `/tools/days-supply` (browser-only; see `docs/days-supply.md`), `/tools/dictionary` (Word `.dic`
-download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/drugs/:slug/history` · `/developers` (API console
+download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/admin` (admins only) · `/drugs/:slug/history` · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read
@@ -354,6 +354,13 @@ applied 2026-10-05) added `patrol_infobox_edit()` and `infobox_history()` and fi
 concept layout on `/drugs/:slug` (`ConceptPage` in `DrugDetail.tsx`, keyed on
 `block_kind`; helpers in `src/concepts.ts`); `getDrugBySlug` reads their satellite
 tables via `CONCEPT_TABLE` in `src/api.ts`.
+**Phase 15g (`db/phase15g_contributions_admin.sql`, 2026-10-05; tests
+`db/phase15_test/tests_15g.sql`, 17 checks, run after `tests.sql`):** `my_contributions()`
+(Account → My contributions, `src/components/MyContributions.tsx`), `new_pages_queue()` +
+`patrol_new_page()` (New pages in `/review`), `admin_contributors()` +
+`unblock_contributor()` (`/admin`, `src/pages/Admin.tsx`; client calls in
+`src/contributions.ts`). **Not applied live yet** — the `apply_migration` approval was
+cancelled; Joshua runs it in the SQL editor, then record it in `schema_migrations`.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
