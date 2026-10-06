@@ -26,6 +26,9 @@ import InfoboxFact from './InfoboxFact'
 import type { InfoboxContext } from './InfoboxFact'
 import { dedupeContained, useInfobox } from './infobox'
 import { useContributorStatus } from './contribute'
+import { CONCEPT_ATTRS, conceptKindLine, getStatementsAbout, groupByPredicate, isConceptKind, predicateLabel } from './concepts'
+import type { ConceptStatement } from './concepts'
+import { entityHref } from './wiki'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
@@ -167,6 +170,7 @@ export default function DrugDetail() {
   }
 
   // Keyed by slug so every per-drug request and the open/closed label state start fresh.
+  if (isConceptKind(drug.block_kind)) return <ConceptPage key={drug.slug} drug={drug} />
   return <DrugPage key={drug.slug} drug={drug} />
 }
 
@@ -239,6 +243,170 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
         </div>
       </div>
     </div>
+  )
+}
+
+// ─── Concept pages ────────────────────────────────────────────────────────────
+//
+// Indications, symptoms, adverse effects, labs, targets and herbals (phase 15).
+// No FDA label, Quick Facts or hierarchy: name and kind, the community
+// Overview, then what the knowledge base already says about the concept
+// (clinical_statements whose object it is), its identifiers and the
+// machine-readable record.
+
+function ConceptPage({ drug }: { drug: DrugDetailType }) {
+  // Concept names keep their case (CYP3A4, QT prolongation); drug names are lower-cased.
+  const name = drug.name.trim()
+  const kind = conceptKindLine(drug.block_kind ?? '', drug.attributes)
+  const facts = CONCEPT_ATTRS.map(label => ({ label, value: attr(drug, label) })).filter(
+    (r): r is { label: (typeof CONCEPT_ATTRS)[number]; value: string } => r.value !== null,
+  )
+
+  return (
+    <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
+        <Link to="/" className={`hover:underline ${FOCUS}`}>
+          Browse
+        </Link>
+        <span aria-hidden="true">/</span>
+        <span className="min-w-0 truncate font-medium text-ink">{name}</span>
+      </nav>
+
+      <header className="mb-8 border-b border-ink/15 pb-6">
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">{name}</h1>
+          <div className="shrink-0">
+            <SaveButton pcidCode={drug.pcid_code} slug={drug.slug} name={drug.name} entityType={drug.block_kind ?? null} />
+          </div>
+        </div>
+        <p className="mt-1 font-sans text-lg text-ink">{kind}</p>
+      </header>
+
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:items-start lg:gap-10">
+        <div className="min-w-0 space-y-12">
+          <OpenSection
+            pcidCode={drug.pcid_code}
+            slug={drug.slug}
+            name={name}
+            fallbackDescription={drug.description ?? null}
+            labelAnchor=""
+          />
+          <StatementsSection pcidCode={drug.pcid_code} name={name} />
+          <MetadataSection drug={drug} className="" />
+        </div>
+
+        <aside aria-label="Identifiers" className="min-w-0 space-y-6 lg:sticky lg:top-[calc(var(--nav-h,3.5rem)_+_1.5rem)]">
+          <section aria-labelledby="identifiers-heading" id="identifiers" className={ANCHOR_OFFSET}>
+            <h2 id="identifiers-heading" className="mb-3 font-semibold text-ink" style={RAIL_HEADING}>
+              Identifiers
+            </h2>
+            <dl className="space-y-3">
+              <IdentifierRow label="PCID" source="Pharmacy Commons">
+                <Link to={`/id/${drug.pcid_code}`} title="Permanent link" className={`${STAMP_LINK} inline-block px-2 py-0.5 font-mono text-sm`}>
+                  {drug.pcid_code}
+                </Link>
+              </IdentifierRow>
+              {facts.map(f => (
+                <div key={f.label}>
+                  <dt className="mb-1 font-sans text-sm font-semibold text-ink">{f.label}</dt>
+                  <dd className="font-sans text-base text-ink [overflow-wrap:anywhere]">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+const STATEMENT_PREVIEW = 12
+
+/** What the knowledge base says about this concept: "metformin · side effect", grouped by relationship. */
+function StatementsSection({ pcidCode, name }: { pcidCode: string; name: string }) {
+  const [rows, setRows] = useState<ConceptStatement[] | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set())
+
+  useEffect(() => {
+    const controller = new AbortController()
+    getStatementsAbout(Number(pcidCode.replace(/^PCID-/, '')), controller.signal)
+      .then(setRows)
+      .catch((err: unknown) => {
+        if (controller.signal.aborted || isAbort(err)) return
+        console.error(`Failed to load statements about ${pcidCode}`, err)
+        setFailed(true)
+      })
+    return () => controller.abort()
+  }, [pcidCode])
+
+  let body: ReactNode
+  if (failed) body = <p className="font-sans text-base text-ink">These couldn’t be loaded right now.</p>
+  else if (!rows) body = <SectionSkeleton />
+  else if (rows.length === 0)
+    body = (
+      <p className="font-sans text-base text-ink">
+        No drug records point to {name} yet. Links written in Overviews show under “What links here” above.
+      </p>
+    )
+  else
+    body = (
+      <div className="space-y-6">
+        {groupByPredicate(rows).map(g => {
+          const open = expanded.has(g.predicate)
+          const shown = open ? g.rows : g.rows.slice(0, STATEMENT_PREVIEW)
+          return (
+            <div key={g.predicate}>
+              <h3 className="mb-2 font-semibold text-ink" style={GROUP_HEADING}>
+                {predicateLabel(g.predicate)} <span className="font-normal">({g.rows.length})</span>
+              </h3>
+              <ul className="flex flex-wrap gap-2">
+                {shown.map(r => (
+                  <li key={r.id} className="min-w-0">
+                    {r.subject ? (
+                      <Link
+                        to={entityHref(r.subject.entityType, r.subject.slug)}
+                        className={`${STAMP_LINK} inline-block max-w-full px-2.5 py-1 font-sans text-sm [overflow-wrap:anywhere]`}
+                        title={[r.qualifier, r.source].filter(Boolean).join(' · ') || undefined}
+                      >
+                        {formatDrugName(r.subject.name)}
+                        {r.qualifier && <span className="font-normal"> · {r.qualifier}</span>}
+                      </Link>
+                    ) : (
+                      <span className="font-sans text-sm text-ink">Unlinked record</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {g.rows.length > STATEMENT_PREVIEW && (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() =>
+                      setExpanded(prev => {
+                        const next = new Set(prev)
+                        if (next.has(g.predicate)) next.delete(g.predicate)
+                        else next.add(g.predicate)
+                        return next
+                      })
+                    }
+                    className={`font-sans text-sm font-medium text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink ${FOCUS}`}
+                  >
+                    {open ? 'Show fewer' : `Show all ${g.rows.length}`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    )
+
+  return (
+    <PageSection id="statements" title="In the knowledge base">
+      {body}
+    </PageSection>
   )
 }
 

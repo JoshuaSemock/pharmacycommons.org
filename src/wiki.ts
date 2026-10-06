@@ -122,3 +122,11 @@ export function entityHref(entityType: string | null | undefined, slug: string):
   if (entityType === 'list') return `/lists/${slug}`
   return `/drugs/${slug}`
 }
+
+/** The create-page form, prefilled with a red link's target (the part before any `|`). */
+export function newPageHref(target: string): string {
+  let name = target.split('|')[0].trim()
+  // A slug-style target ("lactic-acidosis") reads better as words.
+  if (/^[a-z0-9]+(-[a-z0-9]+)+$/.test(name)) name = name.replace(/-/g, ' ')
+  return name ? `/new?name=${encodeURIComponent(name)}` : '/new'
+}

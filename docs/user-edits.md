@@ -237,7 +237,8 @@ counts checked against live data 2026-10-04):
    saves, conflicts, revert, accept/stale/reject, links and red links, property
    values, citation rule, duplicate and kind blocks, PCID minting, badges, admin
    RPCs, blocks, and that API roles can't write tables or read author ids.
-2. **Read path** — re-lay out `DrugDetail` (and a generic page for non-drug types)
+2. **Read path** — re-lay out `DrugDetail` (and a generic page for non-drug types,
+   ✅ 2026-10-05 with step 5)
    into §2's order; render the open section with `[[ ]]` and `{{ }}`; "What links
    here". Load Joshua's description spreadsheet as `seed` revisions.
 3. **Editor** — ✅ 2026-10-04 (`src/OverviewEditor.tsx`): Write/Preview, `[[`
@@ -247,7 +248,16 @@ counts checked against live data 2026-10-04):
    with citation, community value shown first with the source value one tap away,
    per-row history and review. Brand-name edits are not built (brands are RxNorm rows
    and would need their own overlay).
-5. **New pages** — type picker, duplicate "did you mean", create flow; red links.
+5. **New pages** — ✅ 2026-10-05: `/new` (`src/pages/CreatePage.tsx`) with the §7
+   type picker (plus a measurement-type picker for labs), "Is it one of these?" name
+   matches while typing, optional UNII/CAS for drug kinds, and links to the existing
+   page when `create_page()` refuses a duplicate. Red links in an Overview open `/new`
+   with the name filled in; verified contributors also get "Create a page" under the
+   Overview. Clinical concepts, labs, targets and herbals get their own layout on
+   `/drugs/:slug` (`ConceptPage` in `src/DrugDetail.tsx`, `src/concepts.ts`): name and
+   kind, the Overview, "In the knowledge base" (`clinical_statements` whose object is
+   the page, grouped by predicate), identifiers and the machine-readable record. No
+   label, Quick Facts or hierarchy.
 6. **History / diff / revert / patrol queue** — ✅ 2026-10-05: `/drugs/:slug/history`
    and `/review`. Still to do: admin UI for protection, roles and blocks (RPCs exist).
 7. **Legal + launch** — terms of use §3, licence notice, disclaimer banner; update

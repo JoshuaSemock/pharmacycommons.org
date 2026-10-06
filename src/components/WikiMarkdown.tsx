@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { entityHref, linkKey, propertyKey, remarkWiki } from '../wiki'
+import { entityHref, linkKey, newPageHref, propertyKey, remarkWiki } from '../wiki'
 import type { LinkedPage, PropertyValue } from '../pageContent'
 
 /**
@@ -149,7 +149,19 @@ function WikiLink({
       </Link>
     )
   }
-  // Red link: saved but no page matches yet (or not saved, in a preview).
+  // Red link: saved but no page matches yet. It offers to create the page
+  // (/new checks sign-in and verification). Unsaved text in a preview stays plain.
+  if (page === null) {
+    return (
+      <Link
+        to={newPageHref(target)}
+        className="underline decoration-ink/40 decoration-dashed underline-offset-2 hover:decoration-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+        title={`No page for “${target}” yet. Create it`}
+      >
+        {children}
+      </Link>
+    )
+  }
   return (
     <span
       className="underline decoration-ink/40 decoration-dashed underline-offset-2"

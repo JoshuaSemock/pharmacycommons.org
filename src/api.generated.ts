@@ -90,6 +90,8 @@ export type DrugListItem = {
 
 /** Shape used by the drug detail page. */
 export type DrugDetail = DrugListItem & {
+  /** The PCID block kind from entities.entity_type ('moiety', 'clinical', 'measurement', …). */
+  block_kind?: string
   attributes: Record<string, unknown>
   components: DrugComponent[]
   interactions: DrugInteraction[]

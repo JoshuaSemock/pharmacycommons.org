@@ -38,6 +38,7 @@ const Privacy = lazy(() => import('./pages/Privacy'))
 // Community editing (phase 15): page history and the reviewers' queue.
 const PageHistory = lazy(() => import('./pages/PageHistory'))
 const ReviewQueue = lazy(() => import('./pages/ReviewQueue'))
+const CreatePage = lazy(() => import('./pages/CreatePage'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/drugs/:slug" element={<DrugDetail />} />
           <Route path="/drugs/:slug/history" element={<PageHistory />} />
           <Route path="/review" element={<ReviewQueue />} />
+          <Route path="/new" element={<CreatePage />} />
           <Route path="/classifications" element={<ClassIndex />} />
           <Route path="/classifications/compare" element={<ClassCompare />} />
           <Route path="/classifications/:slug" element={<ClassDetail />} />

@@ -113,6 +113,11 @@ export default function OpenSection({ pcidCode, slug, name, fallbackDescription,
                 History
               </Link>
             ) : null}
+            {status.kind === 'ready' && (
+              <Link to="/new" className={LINK}>
+                Create a page
+              </Link>
+            )}
             {status.kind === 'ready' && status.patroller && (
               <Link to="/review" className={LINK}>
                 Review queue
@@ -171,7 +176,8 @@ export function OverviewBody({
       {empty ? (
         <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
           No overview has been written for {name} yet. NPI-verified providers can write one here: practical notes,
-          calculations and context the label leaves out, linked to other pages.
+          {labelAnchor ? ' calculations and context the label leaves out,' : ' definitions, criteria and the drugs involved,'}{' '}
+          linked to other pages.
         </p>
       ) : (
         <div className="space-y-4">

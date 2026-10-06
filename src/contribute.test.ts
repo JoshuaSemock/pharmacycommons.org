@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { HANDLE_PATTERN, contributeErrorMessage, linkMarkup, openLinkQuery } from './contribute'
+import { HANDLE_PATTERN, PAGE_KINDS, contributeErrorMessage, linkMarkup, openLinkQuery, slugify, subtypeFor } from './contribute'
 
 describe('openLinkQuery', () => {
   it('finds an unfinished [[ before the caret', () => {
@@ -46,5 +46,37 @@ describe('HANDLE_PATTERN', () => {
     expect(HANDLE_PATTERN.test('ab')).toBe(false)
     expect(HANDLE_PATTERN.test('has space')).toBe(false)
     expect(HANDLE_PATTERN.test('a'.repeat(31))).toBe(false)
+  })
+})
+
+describe('new pages', () => {
+  it('maps every kind to a creatable PCID block', () => {
+    const creatable = ['moiety', 'precise_form', 'combination', 'formulation', 'clinical', 'measurement', 'target', 'functional']
+    for (const k of PAGE_KINDS) expect(creatable).toContain(k.kind)
+    expect(new Set(PAGE_KINDS.map(k => k.id)).size).toBe(PAGE_KINDS.length)
+    // Clinical concepts and herbals carry the subtype create_page stores.
+    for (const k of PAGE_KINDS.filter(k => k.kind === 'clinical' || k.kind === 'functional')) expect(k.subtype).toBeTruthy()
+  })
+
+  it('stores the chosen measurement type, else the option subtype', () => {
+    const lab = PAGE_KINDS.find(k => k.id === 'measurement')!
+    const symptom = PAGE_KINDS.find(k => k.id === 'symptom')!
+    const drug = PAGE_KINDS.find(k => k.id === 'moiety')!
+    expect(subtypeFor(lab, 'Vital Sign')).toBe('Vital Sign')
+    expect(subtypeFor(lab, '')).toBeNull()
+    expect(subtypeFor(symptom, 'Vital Sign')).toBe('Symptom')
+    expect(subtypeFor(drug, '')).toBeNull()
+  })
+
+  it('slugifies like pc_slugify()', () => {
+    expect(slugify('  Lactic Acidosis ')).toBe('lactic-acidosis')
+    expect(slugify('Lisinopril/Hydrochlorothiazide')).toBe('lisinopril-hydrochlorothiazide')
+    expect(slugify('Vitamin D3 (cholecalciferol)')).toBe('vitamin-d3-cholecalciferol')
+    expect(slugify('—')).toBe('')
+  })
+
+  it('explains duplicate refusals', () => {
+    expect(contributeErrorMessage('page_exists')).toMatch(/already exists/)
+    expect(contributeErrorMessage('identifier_exists')).toMatch(/UNII or CAS/)
   })
 })
