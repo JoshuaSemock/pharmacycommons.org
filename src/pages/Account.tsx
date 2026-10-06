@@ -20,23 +20,19 @@ import {
   verifyNpi,
 } from '../auth'
 import type { ProviderVerification, SavedEntity } from '../auth'
+import MyContributions from '../components/MyContributions'
+import { isAdmin } from '../contributions'
 
 /**
  * Sign in / register / account dashboard.
  *
- * Identity plus one gate: Supabase Auth sign-up/sign-in/sign-out, password
- * reset, and NPI verification. There is still no "propose an edit" UI or
- * role picker here — those depend on schema Joshua hasn't confirmed yet
- * (user_roles, revision_history) and on the moderator queue existing first,
- * per docs/phase5-community-moderation-workflow.md's own suggested build
- * order. But per Joshua's 2026-09-19 call, contribution (not registration)
- * is gated on a verified NPI, so that check lives here, ahead of the form
- * that will eventually use it: `revisions.submit_own`'s RLS policy now
- * requires a row in `provider_verifications` with status = 'active'
- * (db/phase5_provider_verification.sql), written only by the verify-npi
- * edge function after it confirms the NPI against the CMS NPI Registry.
+ * Identity plus the contribution gate: Supabase Auth sign-up/sign-in/sign-out,
+ * password reset, and NPI verification. Editing (phase 15, docs/user-edits.md)
+ * is gated on a verified NPI: provider_verifications.status = 'active',
+ * written only by the verify-npi edge function after it confirms the NPI
+ * against the CMS NPI Registry.
  *
- * Signed-in users get a small dashboard (Overview / Saved pages / Settings)
+ * Signed-in users get a small dashboard (Overview / My contributions / Saved pages / Settings)
  * rather than a single scrolling column — added 2026-09-20 alongside the
  * saved_entities table (db/phase5_saved_entities.sql) and the bookmark
  * button on DrugDetail.tsx.
@@ -127,10 +123,11 @@ export default function Account() {
 // Signed in — dashboard with Overview / Saved pages / Settings
 // ─────────────────────────────────────────────────────────────────────────────
 
-type DashboardTab = 'overview' | 'saved' | 'settings'
+type DashboardTab = 'overview' | 'contributions' | 'saved' | 'settings'
 
 const DASHBOARD_TABS: { key: DashboardTab; label: string }[] = [
   { key: 'overview', label: 'Overview' },
+  { key: 'contributions', label: 'My contributions' },
   { key: 'saved', label: 'Saved pages' },
   { key: 'settings', label: 'Settings' },
 ]
@@ -191,6 +188,7 @@ function SignedIn({ email }: { email: string }) {
         {tab === 'overview' && (
           <OverviewPanel email={email} savedCount={savedCount} savedCountError={savedCountError} />
         )}
+        {tab === 'contributions' && <MyContributions />}
         {tab === 'saved' && <SavedPanel onCountChange={setSavedCount} />}
         {tab === 'settings' && <SettingsPanel email={email} />}
       </div>
@@ -229,10 +227,45 @@ function OverviewPanel({
 
       <NpiVerification />
 
-      <p className="text-ink">
-        There's nothing to propose yet — the contribution form is still being built. This page
-        will grow a "your submissions" list once it exists.
+      <ContributingNote />
+    </div>
+  )
+}
+
+/** How to contribute, plus links for reviewers and admins. */
+function ContributingNote() {
+  const [admin, setAdmin] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    isAdmin().then(a => {
+      if (!cancelled) setAdmin(a)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return (
+    <div className="space-y-2 border-t border-ink/15 pt-3.5">
+      <p className="max-w-xl font-sans text-sm leading-relaxed text-ink">
+        With a verified NPI you can edit any page’s Overview and Quick Facts, or{' '}
+        <Link to="/new" className="underline underline-offset-2">
+          create a page
+        </Link>
+        . Your changes are listed under My contributions.
       </p>
+      {admin && (
+        <p className="font-sans text-sm text-ink">
+          <Link to="/review" className="underline underline-offset-2">
+            Review queue
+          </Link>{' '}
+          ·{' '}
+          <Link to="/admin" className="underline underline-offset-2">
+            Admin: contributors and page protection
+          </Link>
+        </p>
+      )}
     </div>
   )
 }

@@ -4,12 +4,14 @@ import Button from '../components/Button'
 import RevisionActions from '../components/RevisionActions'
 import RevisionDiff from '../components/RevisionDiff'
 import { useSession } from '../auth'
-import { useContributorStatus } from '../contribute'
+import { kindLabel, useContributorStatus } from '../contribute'
 import { STATUS_LABEL, getReviewQueue, reviewErrorMessage } from '../history'
 import type { QueueItem } from '../history'
-import { citationHref, getInfoboxQueue, patrolInfoboxEdit, reviewInfoboxEdit } from '../infobox'
+import { INFOBOX_KEY_LABEL, citationHref, getInfoboxQueue, patrolInfoboxEdit, reviewInfoboxEdit } from '../infobox'
 import type { InfoboxQueueItem } from '../infobox'
 import type { ContributorStatus } from '../contribute'
+import { adminErrorMessage, getNewPagesQueue, patrolNewPage } from '../contributions'
+import type { NewPage } from '../contributions'
 import { formatDrugName } from '../names'
 import { entityHref } from '../wiki'
 
@@ -31,6 +33,7 @@ export default function ReviewQueue() {
   const status = useContributorStatus(user?.id ?? null, sessionLoading)
   const [items, setItems] = useState<QueueItem[] | 'loading' | 'failed'>('loading')
   const [facts, setFacts] = useState<InfoboxQueueItem[]>([])
+  const [newPages, setNewPages] = useState<NewPage[]>([])
   const [open, setOpen] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
@@ -49,6 +52,13 @@ export default function ReviewQueue() {
       })
       .catch(() => {
         if (!cancelled) setItems('failed')
+      })
+    getNewPagesQueue()
+      .then(rows => {
+        if (!cancelled) setNewPages(rows)
+      })
+      .catch(() => {
+        if (!cancelled) setNewPages([])
       })
     getInfoboxQueue()
       .then(rows => {
@@ -164,6 +174,14 @@ export default function ReviewQueue() {
             'Already on the page. Mark reviewed once checked, or restore an earlier version from the page history.',
             unreviewed,
           )}
+          <NewPagesQueue
+            items={newPages}
+            status={status}
+            onDone={message => {
+              setNotice(message)
+              setVersion(v => v + 1)
+            }}
+          />
           <FactsQueue
             items={facts}
             status={status}
@@ -178,18 +196,6 @@ export default function ReviewQueue() {
   )
 }
 
-const KEY_LABEL: Record<string, string> = {
-  indications: 'Indications',
-  dosing: 'Dosing',
-  contraindications: 'Contraindications',
-  boxed_warning: 'Boxed warning',
-  epc_class: 'Pharmacologic class (FDA)',
-  legal_status: 'Legal status',
-  most_used: 'Most used',
-  do_not_crush: 'Do not crush',
-  acb_score: 'ACB score',
-  qtc_risk: 'QTc risk',
-}
 
 /** Quick Facts changes: held ones (accept/reject) and unreviewed live ones (mark reviewed). */
 function FactsQueue({
@@ -252,7 +258,7 @@ function FactsQueue({
                   ) : (
                     `PCID-${e.pcid}`
                   )}{' '}
-                  · {KEY_LABEL[e.property_key] ?? e.property_key}
+                  · {INFOBOX_KEY_LABEL[e.property_key] ?? e.property_key}
                 </span>
                 <span className="block whitespace-pre-line">{e.value ?? <em>Clear the community value</em>}</span>
                 <span className="block">
@@ -314,6 +320,81 @@ function FactsQueue({
                     </span>
                   </form>
                 )}
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </section>
+  )
+}
+
+/** Pages contributors created: check the name, kind and that it isn't a duplicate, then mark reviewed. */
+function NewPagesQueue({
+  items,
+  status,
+  onDone,
+}: {
+  items: NewPage[]
+  status: ContributorStatus
+  onDone: (message: string) => void
+}) {
+  const [busy, setBusy] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const me = status.kind === 'ready' ? status : null
+
+  async function mark(pcid: number) {
+    setBusy(pcid)
+    setError(null)
+    try {
+      await patrolNewPage(pcid)
+      onDone('Page marked reviewed.')
+    } catch (err) {
+      setError(adminErrorMessage(err))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="font-semibold text-ink" style={H2}>
+        New pages <span className="font-normal">({items.length})</span>
+      </h2>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-ink">
+        Pages contributors created. Check the name, the kind of page and that it doesn’t duplicate an existing one.
+        Duplicates are merged, never deleted: the PCID is retired and points to the page kept.
+      </p>
+      {error && (
+        <p role="alert" className="max-w-2xl rounded-md border border-rose-300 bg-rose-100/40 px-3 py-2 font-sans text-sm text-ink">
+          {error}
+        </p>
+      )}
+      {items.length === 0 ? (
+        <p className="font-sans text-base text-ink">Nothing here.</p>
+      ) : (
+        <ol className="lp-divide-y max-w-4xl">
+          {items.map(p => {
+            const own = me?.handle !== null && me?.handle === p.handle
+            return (
+              <li key={p.pcid} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 py-3 font-sans text-sm text-ink">
+                <span className="min-w-0">
+                  <Link to={entityHref(p.entity_type, p.slug)} className="block text-base font-medium hover:underline [overflow-wrap:anywhere]">
+                    {p.name}
+                  </Link>
+                  <span className="block">
+                    {kindLabel(p.entity_type)} · <span className="font-mono">PCID-{p.pcid}</span> · @{p.handle}
+                    {p.credential ? ` · ${p.credential}` : ''} · {new Date(p.created_at).toLocaleString()}
+                  </span>
+                </span>
+                {me?.patroller &&
+                  (own ? (
+                    <span>Your page: another reviewer has to check it.</span>
+                  ) : (
+                    <Button size="sm" disabled={busy !== null} onClick={() => void mark(p.pcid)}>
+                      Mark reviewed
+                    </Button>
+                  ))}
               </li>
             )
           })}

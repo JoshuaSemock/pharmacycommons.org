@@ -24,6 +24,20 @@ export type InfoboxKey =
   | 'acb_score'
   | 'qtc_risk'
 
+/** Row names for Quick Facts keys, as shown in queues and contribution lists. */
+export const INFOBOX_KEY_LABEL: Record<string, string> = {
+  indications: 'Indications',
+  dosing: 'Dosing',
+  contraindications: 'Contraindications',
+  boxed_warning: 'Boxed warning',
+  epc_class: 'Pharmacologic class (FDA)',
+  legal_status: 'Legal status',
+  most_used: 'Most used',
+  do_not_crush: 'Do not crush',
+  acb_score: 'ACB score',
+  qtc_risk: 'QTc risk',
+}
+
 export type InfoboxEdit = {
   id: number
   property_key: string

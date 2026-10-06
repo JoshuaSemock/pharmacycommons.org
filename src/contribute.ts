@@ -150,7 +150,7 @@ export function contributeErrorMessage(reason: string, code?: string): string {
 }
 
 /** A page suggestion for `[[` autocomplete. */
-export type PageSuggestion = { slug: string; name: string; entityType: string }
+export type PageSuggestion = { slug: string; name: string; entityType: string; pcid?: number }
 
 const KIND_LABEL: Record<string, string> = {
   moiety: 'drug',
@@ -174,19 +174,19 @@ export async function suggestPages(query: string, signal?: AbortSignal): Promise
   const q = query.trim().replace(/[%_\\]/g, '')
   if (q.length < 2) return []
   const query$ = (pattern: string) => {
-    const b = supabase.from('entities').select('slug, name, entity_type').ilike('name', pattern).order('name').limit(8)
+    const b = supabase.from('entities').select('pcid, slug, name, entity_type').ilike('name', pattern).order('name').limit(8)
     return signal ? b.abortSignal(signal) : b
   }
   const [prefix, contains] = await Promise.all([query$(`${q}%`), query$(`%${q}%`)])
   if (prefix.error) throw new Error(prefix.error.message)
   if (contains.error) throw new Error(contains.error.message)
-  const rows = [...(prefix.data ?? []), ...(contains.data ?? [])] as { slug: string; name: string; entity_type: string }[]
+  const rows = [...(prefix.data ?? []), ...(contains.data ?? [])] as { pcid: number; slug: string; name: string; entity_type: string }[]
   const seen = new Set<string>()
   const out: PageSuggestion[] = []
   for (const r of rows) {
     if (seen.has(r.slug)) continue
     seen.add(r.slug)
-    out.push({ slug: r.slug, name: r.name, entityType: r.entity_type })
+    out.push({ slug: r.slug, name: r.name, entityType: r.entity_type, pcid: r.pcid })
   }
   const rank = (t: string) => (t === 'moiety' ? 0 : t === 'clinical' ? 1 : 2)
   return out.sort((a, b) => rank(a.entityType) - rank(b.entityType)).slice(0, 8)
