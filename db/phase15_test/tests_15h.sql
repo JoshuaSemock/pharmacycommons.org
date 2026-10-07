@@ -69,6 +69,11 @@ begin
   perform pg_temp.as_user(A);
   select string_agg(property_key, ',' order by item_id) into v from my_contributions() where kind = 'brand';
   perform pg_temp.check('my_contributions includes brand changes', v = 'add:Glumetza,hide:Fortamet,clear:glumetza,add:Jantoven', v);
+  perform pg_temp.check('first Overview text on an existing page is listed (15g missed it)',
+    exists (select 1 from my_contributions() c join page_revisions r on r.id = c.item_id
+            where c.kind = 'page' and r.kind = 'create'));
+  perform pg_temp.check('created page still listed once',
+    (select count(*) from my_contributions() where pcid = 6000077) = 1);
   perform pg_temp.as_user(J);
   perform pg_temp.check('admin activity counts brand changes',
     (select edits from admin_contributors('alice')) >= 7);

@@ -13,7 +13,9 @@
 -- 'reviewed' pages hold non-reviewer changes as pending.
 --
 -- Also redefines my_contributions() and admin_contributors() (phase 15g) to
--- count brand changes.
+-- count brand changes, and fixes my_contributions() leaving out a person's
+-- first Overview text on an existing page (save_page records it as kind
+-- 'create'; 15g dropped every 'create' revision, meant only for new pages).
 -- ═══════════════════════════════════════════════════════════════════════════
 
 create table public.brand_edits (
@@ -160,7 +162,12 @@ language sql stable security definer set search_path = public as $$
     from page_revisions r
     join entities e on e.pcid = r.pcid
     left join page_content pc on pc.pcid = r.pcid
-    where r.created_by = auth.uid() and r.kind <> 'create'
+    where r.created_by = auth.uid()
+      -- A page's first Overview text is kind 'create'. Skip it only when the
+      -- same person created the page, which the 'new_page' row already lists
+      -- (15g skipped every 'create' revision, hiding first edits to existing pages).
+      and not (r.kind = 'create' and exists (select 1 from community_pages c
+                                             where c.pcid = r.pcid and c.created_by = r.created_by))
     union all
     select 'fact', i.id, i.pcid, e.slug, e.name, e.entity_type, i.property_key, i.summary, i.created_at,
            i.patrol_status, i.review_note, i.is_current
