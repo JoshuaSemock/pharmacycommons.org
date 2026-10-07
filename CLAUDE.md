@@ -361,6 +361,11 @@ tables via `CONCEPT_TABLE` in `src/api.ts`.
 `unblock_contributor()` (`/admin`, `src/pages/Admin.tsx`; client calls in
 `src/contributions.ts`). **Not applied live yet** — the `apply_migration` approval was
 cancelled; Joshua runs it in the SQL editor, then record it in `schema_migrations`.
+**Phase 15h (`db/phase15h_brand_edits.sql`, 2026-10-07, run after 15g; tests
+`db/phase15_test/tests_15h.sql`, 17 checks):** `brand_edits` (community brand overlay;
+`entity_brand_names` untouched), `edit_brand()`, `patrol_brand_edit()`, `review_brand_edit()`,
+`brand_history()`; redefines 15g's `my_contributions()`/`admin_contributors()` to count brand
+changes. Header brand line is `src/components/BrandNames.tsx`. **Not applied live yet.**
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /

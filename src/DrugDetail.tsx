@@ -22,6 +22,7 @@ import type { LabelSection } from './labels'
 import { formatBrandName, formatDrugName } from './names'
 import MachinePanels from './MachinePanels'
 import OpenSection from './OpenSection'
+import BrandNames from './components/BrandNames'
 import InfoboxFact from './InfoboxFact'
 import type { InfoboxContext } from './InfoboxFact'
 import { dedupeContained, useInfobox } from './infobox'
@@ -429,59 +430,8 @@ function DrugHeader({ drug }: { drug: DrugDetailType }) {
 
       <p className="mt-1 font-sans text-lg text-ink">{drug.entity_type}</p>
 
-      <BrandLine brands={drug.brands ?? []} />
+      <BrandNames pcidCode={drug.pcid_code} brands={drug.brands ?? []} />
     </header>
-  )
-}
-
-const BRAND_PREVIEW = 8
-
-function brandHref(b: BrandName): string | null {
-  const appl = b.appl_nos[0]?.replace(/^(NDA|BLA)/i, '')
-  return appl && /^\d{6}$/.test(appl)
-    ? `https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=${appl}`
-    : null
-}
-
-/** Every brand name, alphabetical, one style. Brands approved under an NDA/BLA link to Drugs@FDA. */
-function BrandLine({ brands }: { brands: BrandName[] }) {
-  const [showAll, setShowAll] = useState(false)
-  if (brands.length === 0) return null
-  const visible = showAll ? brands : brands.slice(0, BRAND_PREVIEW)
-
-  return (
-    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
-      <span className="font-sans text-sm font-medium text-ink">Brand names</span>
-      {visible.map(b => {
-        const href = brandHref(b)
-        const text = formatBrandName(b.name)
-        return href ? (
-          <a
-            key={b.name}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`${text} on Drugs@FDA`}
-            className={`${STAMP_LINK} px-2 py-0.5 font-sans text-sm`}
-          >
-            {text}
-          </a>
-        ) : (
-          <span key={b.name} className="lp-raised rounded-md px-2 py-0.5 font-sans text-sm text-ink">
-            {text}
-          </span>
-        )
-      })}
-      {brands.length > BRAND_PREVIEW && (
-        <button
-          type="button"
-          onClick={() => setShowAll(v => !v)}
-          className={`font-sans text-sm font-medium text-ink hover:underline ${FOCUS}`}
-        >
-          {showAll ? 'Show fewer' : `Show all ${brands.length}`}
-        </button>
-      )}
-    </div>
   )
 }
 

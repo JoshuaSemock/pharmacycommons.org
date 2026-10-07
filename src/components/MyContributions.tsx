@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { contributionStatus, countContributions, getMyContributions } from '../contributions'
 import type { Contribution } from '../contributions'
 import { INFOBOX_KEY_LABEL } from '../infobox'
+import { brandActionText } from '../brands'
+import type { BrandAction } from '../brands'
 import { formatDrugName } from '../names'
 import { entityHref } from '../wiki'
 
@@ -26,6 +28,10 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 function whatLabel(c: Contribution): string {
   if (c.kind === 'new_page') return 'Created the page'
+  if (c.kind === 'brand') {
+    const [action, ...rest] = (c.property_key ?? '').split(':')
+    return `Brand names: ${brandActionText(action as BrandAction, rest.join(':'))}`
+  }
   if (c.kind === 'fact') return `Quick Facts: ${INFOBOX_KEY_LABEL[c.property_key ?? ''] ?? c.property_key}`
   return 'Overview'
 }
