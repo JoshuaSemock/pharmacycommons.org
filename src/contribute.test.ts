@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { HANDLE_PATTERN, PAGE_KINDS, contributeErrorMessage, linkMarkup, openLinkQuery, slugify, subtypeFor } from './contribute'
+import { HANDLE_PATTERN, PAGE_KINDS, PAGE_KIND_GROUPS, contributeErrorMessage, linkMarkup, openLinkQuery, pageKindParam, slugify, subtypeFor } from './contribute'
 
 describe('openLinkQuery', () => {
   it('finds an unfinished [[ before the caret', () => {
@@ -51,11 +51,26 @@ describe('HANDLE_PATTERN', () => {
 
 describe('new pages', () => {
   it('maps every kind to a creatable PCID block', () => {
-    const creatable = ['moiety', 'precise_form', 'combination', 'formulation', 'clinical', 'measurement', 'target', 'functional']
+    const creatable = ['moiety', 'precise_form', 'combination', 'formulation', 'class', 'clinical', 'measurement', 'target', 'functional']
     for (const k of PAGE_KINDS) expect(creatable).toContain(k.kind)
+    // Every option sits in a group the picker shows.
+    const groups = PAGE_KIND_GROUPS.map(g => g.group)
+    for (const k of PAGE_KINDS) expect(groups).toContain(k.group)
     expect(new Set(PAGE_KINDS.map(k => k.id)).size).toBe(PAGE_KINDS.length)
     // Clinical concepts and herbals carry the subtype create_page stores.
     for (const k of PAGE_KINDS.filter(k => k.kind === 'clinical' || k.kind === 'functional')) expect(k.subtype).toBeTruthy()
+  })
+
+  it('offers classifications and terminology (psychedelics, lungs)', () => {
+    expect(PAGE_KINDS.find(k => k.id === 'class')?.kind).toBe('class')
+    expect(PAGE_KINDS.find(k => k.id === 'anatomy')).toMatchObject({ kind: 'clinical', subtype: 'Anatomy', group: 'Terminology' })
+    expect(PAGE_KINDS.find(k => k.id === 'term')).toMatchObject({ kind: 'clinical', subtype: 'Term' })
+  })
+
+  it('reads ?type= only when it names a page type', () => {
+    expect(pageKindParam('class')).toBe('class')
+    expect(pageKindParam('list')).toBe('')
+    expect(pageKindParam(null)).toBe('')
   })
 
   it('stores the chosen measurement type, else the option subtype', () => {

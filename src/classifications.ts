@@ -1,6 +1,7 @@
 /**
  * Classifications — every class system in one catalog (WHO ATC, VA, FDA
- * EPC/MoA/PE/Chemical, ChemOnt and Pharmacy Commons groups).
+ * EPC/MoA/PE/Chemical, ChemOnt, Pharmacy Commons groups and contributor
+ * classifications, class_type 'community', phase 15i).
  *
  * Shared by /classifications (search, group filter, compare tray) and
  * /classifications/compare. Kept free of React so the search ranking and the
@@ -11,7 +12,7 @@
 
 import { supabase } from './supabaseClient'
 
-/** One row of list_classes(): a class with at least one member. */
+/** One row of list_classes(): a class with at least one member, or any contributor classification. */
 export type ClassRow = {
   slug: string
   name: string
@@ -56,6 +57,7 @@ export const SYSTEMS: { type: string; badge: string }[] = [
   { type: 'chem', badge: 'FDA Chem' },
   { type: 'va', badge: 'VA' },
   { type: 'curated', badge: 'Pharmacy Commons' },
+  { type: 'community', badge: 'Contributors' },
   { type: 'chemont', badge: 'ChemOnt' },
 ]
 
@@ -65,7 +67,7 @@ export function systemBadge(type: string | null): string {
   return SYSTEMS.find(s => s.type === type)?.badge ?? 'Other'
 }
 
-export type GroupKey = 'all' | 'atc' | 'fda' | 'va' | 'curated' | 'chemont'
+export type GroupKey = 'all' | 'atc' | 'fda' | 'va' | 'curated' | 'community' | 'chemont'
 
 /** The taxonomy filter. FDA's four vocabularies (EPC, MoA, PE, Chemical) share one entry. */
 export const GROUPS: { key: GroupKey; label: string; sublabel: string; types: string[] }[] = [
@@ -83,6 +85,12 @@ export const GROUPS: { key: GroupKey; label: string; sublabel: string; types: st
     label: 'Pharmacy Commons curated',
     sublabel: 'Biologics, INN stems, natural products',
     types: ['curated'],
+  },
+  {
+    key: 'community',
+    label: 'Contributor classifications',
+    sublabel: 'Groups contributors created, such as psychedelics',
+    types: ['community'],
   },
   { key: 'chemont', label: 'ChemOnt taxonomy', sublabel: 'Chemical structure (ClassyFire)', types: ['chemont'] },
 ]

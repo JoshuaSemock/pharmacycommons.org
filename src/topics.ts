@@ -19,7 +19,7 @@ import type { Bucket } from './catalog'
 export type TopicKind = 'clinical' | 'measurement' | 'target' | 'functional'
 
 export const TOPIC_KINDS: { key: TopicKind; label: string; one: string; hint: string }[] = [
-  { key: 'clinical', label: 'Clinical concepts', one: 'Clinical concept', hint: 'Indications, symptoms, adverse effects, contraindications, risk factors and criteria' },
+  { key: 'clinical', label: 'Clinical concepts', one: 'Clinical concept', hint: 'Conditions, symptoms, adverse effects, contraindications and risk factors, plus terminology: anatomy, physiology, organisms, procedures, dosage forms, routes and other medical terms' },
   { key: 'measurement', label: 'Labs and measurements', one: 'Lab or measurement', hint: 'Lab panels, vital signs, scales and derived calculations' },
   { key: 'target', label: 'Biological targets', one: 'Biological target', hint: 'Enzymes, transporters, genes and proteins drugs act on or depend on' },
   { key: 'functional', label: 'Herbals and botanicals', one: 'Herbal or botanical', hint: 'Plants and other biological sources of medicines and supplements' },

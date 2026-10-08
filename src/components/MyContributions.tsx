@@ -69,9 +69,9 @@ export default function MyContributions() {
       <div className="border-t border-ink/15 py-6">
         <p className="max-w-xl font-sans text-sm leading-relaxed text-ink">
           Nothing yet. Once your NPI is verified, use <span className="font-medium">Edit</span> on any page’s
-          Overview or Quick Facts, or{' '}
-          <Link to="/new" className={LINK}>
-            create a page
+          Overview or Quick Facts, or create a page from{' '}
+          <Link to="/topics" className={LINK}>
+            Topics
           </Link>
           . Everything you change will be listed here with its review status.
         </p>

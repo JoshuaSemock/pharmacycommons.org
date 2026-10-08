@@ -249,9 +249,9 @@ function ContributingNote() {
   return (
     <div className="space-y-2 border-t border-ink/15 pt-3.5">
       <p className="max-w-xl font-sans text-sm leading-relaxed text-ink">
-        With a verified NPI you can edit any page’s Overview and Quick Facts, or{' '}
-        <Link to="/new" className="underline underline-offset-2">
-          create a page
+        With a verified NPI you can edit any page’s Overview and Quick Facts, and create new pages from{' '}
+        <Link to="/topics" className="underline underline-offset-2">
+          Topics
         </Link>
         . Your changes are listed under My contributions.
       </p>

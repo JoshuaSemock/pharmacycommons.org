@@ -7,28 +7,34 @@ import {
   ContributeError,
   MEASUREMENT_TYPES,
   PAGE_KINDS,
+  PAGE_KIND_GROUPS,
   createPage,
   kindLabel,
+  pageKindParam,
   slugify,
   subtypeFor,
   suggestPages,
   useContributorStatus,
 } from '../contribute'
-import type { PageKindOption, PageSuggestion } from '../contribute'
+import type { PageSuggestion } from '../contribute'
 import { HandleSetup } from '../OverviewEditor'
 import { formatDrugName } from '../names'
 import { entityHref } from '../wiki'
+import { abbreviationSuffix, getAbbreviations } from '../abbreviations'
 
 /**
  * /new — create a page (phase 15, docs/user-edits.md §7).
  *
  * The contributor picks what kind of thing the page is about; that decides
- * the PCID block create_page() mints from (drugs → blocks 1–4, clinical
- * concepts → 6, labs → 7, targets → 8, herbals → 9). Classes and lists stay
- * curated. While they type the name, pages with similar names are listed so
+ * the PCID block create_page() mints from (drugs → blocks 1–4, classifications
+ * → 5, clinical concepts and terminology → 6, labs → 7, targets → 8, herbals
+ * → 9). Lists stay curated. Reached from the Topics page (and red links,
+ * empty searches, dictionary terms and abbreviations there). While they type the name, pages with similar names are listed so
  * they link to an existing page instead of making a duplicate; the database
  * refuses exact name/slug matches and (for drugs) a UNII or CAS already on
- * record. `?name=` prefills the name (red links in an Overview point here).
+ * record. `?name=` prefills the name (red links in an Overview point here),
+ * `?type=` the type (an id from PAGE_KINDS). Non-drug pages preview the
+ * dictionary abbreviation that will follow the title ("… (HAPE)").
  */
 
 const FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
@@ -41,8 +47,6 @@ const NAME_MAX = 200
 const DESCRIPTION_MAX = 2000
 const SUMMARY_MAX = 500
 
-const GROUPS: PageKindOption['group'][] = ['Drugs and supplements', 'Clinical concepts', 'Other']
-
 export default function CreatePage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
@@ -50,7 +54,7 @@ export default function CreatePage() {
   const [statusKey, setStatusKey] = useState(0)
   const status = useContributorStatus(user ? `${user.id}:${statusKey}` : null, sessionLoading)
 
-  const [kindId, setKindId] = useState('')
+  const [kindId, setKindId] = useState(() => pageKindParam(params.get('type')))
   const [measurementType, setMeasurementType] = useState('')
   const [name, setName] = useState(() => (params.get('name') ?? '').slice(0, NAME_MAX))
   const [unii, setUnii] = useState('')
@@ -60,6 +64,7 @@ export default function CreatePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<{ message: string; existing: string | null } | null>(null)
   const [similar, setSimilar] = useState<PageSuggestion[]>([])
+  const [abbreviations, setAbbreviations] = useState<string[]>([])
 
   const option = PAGE_KINDS.find(k => k.id === kindId) ?? null
   const slug = slugify(name)
@@ -86,6 +91,26 @@ export default function CreatePage() {
       controller.abort()
     }
   }, [name])
+
+  // The dictionary abbreviation the page title will carry (not for drug pages).
+  const showsAbbreviation = option !== null && !option.identifiers && option.kind !== 'formulation'
+  useEffect(() => {
+    const q = name.trim()
+    if (!showsAbbreviation || q.length < 3) {
+      setAbbreviations([])
+      return
+    }
+    const controller = new AbortController()
+    const timer = setTimeout(() => {
+      getAbbreviations(q, controller.signal)
+        .then(setAbbreviations)
+        .catch(() => setAbbreviations([]))
+    }, 300)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [name, showsAbbreviation])
 
   const exact = useMemo(
     () => similar.find(s => s.slug === slug || s.name.trim().toLowerCase() === name.trim().toLowerCase()) ?? null,
@@ -175,9 +200,11 @@ export default function CreatePage() {
               <legend className="mb-3 font-semibold text-ink" style={LEGEND}>
                 What is the page about?
               </legend>
-              {GROUPS.map(group => (
+              {PAGE_KIND_GROUPS.map(({ group, hint }) => (
                 <div key={group}>
-                  <p className="mb-2 font-sans text-sm font-semibold text-ink">{group}</p>
+                  <p className="mb-2 font-sans text-sm text-ink">
+                    <span className="font-semibold">{group}</span> <span>· {hint}</span>
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {PAGE_KINDS.filter(k => k.group === group).map(k => (
                       <label key={k.id} className="relative cursor-pointer">
@@ -243,13 +270,19 @@ export default function CreatePage() {
               <p className="mt-1 font-sans text-sm text-ink [overflow-wrap:anywhere]">
                 {slug ? (
                   <>
-                    Address: <span className="font-mono">/drugs/{slug}</span>. Use the generic or most widely used
-                    name; brand names and synonyms can be linked from the text.
+                    Address: <span className="font-mono">{entityHref(option?.kind, slug)}</span>. Use the generic or
+                    most widely used name, spelled out; brand names, synonyms and abbreviations can be linked from the text.
                   </>
                 ) : (
                   'Use the generic or most widely used name.'
                 )}
               </p>
+              {abbreviations.length > 0 && !exact && (
+                <p className="mt-1 font-sans text-sm text-ink" aria-live="polite">
+                  The medical dictionary knows this as {abbreviations.join(', ')}, so the title will read “{name.trim()}{' '}
+                  {abbreviationSuffix(abbreviations)}”.
+                </p>
+              )}
               {similar.length > 0 && (
                 <div className="lp-sunken mt-3 rounded-md px-4 py-3" aria-live="polite">
                   <p className="font-sans text-sm font-semibold text-ink">
@@ -391,8 +424,9 @@ export default function CreatePage() {
           Create a page
         </h1>
         <p className="mt-2 max-w-2xl font-sans text-base leading-relaxed text-ink">
-          New pages for drugs, supplements, herbals, conditions, symptoms, adverse effects, labs and targets. Search
-          first: most drugs already have a page you can add to.
+          New pages for drugs, supplements and herbals, drug classes, conditions, symptoms and adverse effects,
+          anatomy and other medical terms, labs and targets. Search first: most drugs already have a page you can add
+          to.
         </p>
       </header>
       {body}

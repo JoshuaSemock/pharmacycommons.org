@@ -115,11 +115,31 @@ The type picker maps to PCID blocks:
 | Drug — branded product | 4 `formulation` | — |
 | Dietary supplement — defined chemical (melatonin, vitamin D) | 1 `moiety` | — |
 | Herbal / biological source (ashwagandha, fish oil) | 9 `functional` | `group_type` |
-| Indication · Symptom · Adverse effect · Contraindication · Risk factor | 6 `clinical` | `concept_type` (existing values) |
+| Drug class or category (psychedelics) — added 2026-10-08, phase 15i | 5 `class` | `class_type = 'community'` |
+| Disease or condition (stored as Indication) · Symptom · Adverse effect · Contraindication · Risk factor | 6 `clinical` | `concept_type` (existing values) |
+| Terminology — Anatomy (lungs) · Physiologic Process · Organism · Procedure · Dosage Form · Route of Administration · Term — added 2026-10-08 | 6 `clinical` | `concept_type` |
 | Lab / measurement | 7 `measurement` | `measurement_type` |
 | Biological target | 8 `target` | — |
 
-Class (5) and List (10) pages stay curated.
+List (10) pages stay curated. Contributor classifications (phase 15i) are
+`drug_classes` rows with `class_type 'community'`, `source_agency 'community'`,
+listed on `/classifications` under "Contributor classifications" even with no
+members, and every class page now has the Overview. They start with no members:
+membership is derived (`class_members`), so until a membership editor exists the
+Overview lists the drugs with `[[links]]`.
+
+**Where pages are created (2026-10-08):** the Topics page (`/topics`) has the
+"Create a page" panel, with shortcuts that preselect a type (`/new?type=<id>`);
+every dictionary abbreviation and medical term there offers "Create a page" (an
+abbreviation's page is its expansion). The account page no longer links to `/new`.
+
+**Abbreviations after the title (phase 15i):** `page_abbreviations(name)` returns
+dictionary abbreviations whose expansion equals the page name (case, hyphens and
+punctuation ignored), never one on the Joint Commission Do Not Use list in any
+spelling. Concept and class pages show them after the title ("High Altitude Pulmonary
+Edema (HAPE)"); `/new` previews them. Drug pages don't, because drug-name
+abbreviations are the error-prone kind. An abbreviation missing from the dictionary
+(HACE today) shows once it is added there.
 
 `create_page()`:
 - Blocks duplicates by slug, by name, and (drug kinds) by UNII or CAS, returning the

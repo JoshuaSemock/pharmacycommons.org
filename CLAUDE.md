@@ -384,6 +384,19 @@ grants, `created_by`/`patrolled_by` withheld; `edit_brand` refusals (already_lis
 not_a_source_brand, citation_required) write nothing; advisor shows only the expected
 public-RPC findings for the new functions.
 
+**Phase 15i (`db/phase15i_page_types_abbreviations.sql`, applied 2026-10-08 as 15i_a/b/c):**
+`create_page()` accepts `class` (block 5, `drug_classes.class_type = 'community'`; check
+constraint widened), `list_classes()` returns community classes with no members,
+`class_type_label('community')` = "Contributor classification", and
+`page_abbreviations(name)` (security invoker, expression index
+`dictionary_terms_abbr_expansion_idx`) gives the dictionary abbreviation shown after
+concept/class page titles (`src/abbreviations.ts`; never Joint Commission Do Not Use terms;
+not on drug pages). `PAGE_KINDS`/`PAGE_KIND_GROUPS` in `src/contribute.ts` add
+Classifications and Terminology (Anatomy, Physiologic Process, Organism, Procedure,
+Dosage Form, Route of Administration, Term — all `concept_type` on block 6). Page creation
+starts from the Topics "Create a page" panel (`/new?type=`); Account no longer links `/new`.
+Class pages (`src/pages/ClassDetail.tsx`) now carry the Overview.
+
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
 `dictionary_words()` / `dictionary_buckets()`. `list_items.member_pcid` is now nullable with

@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'page-types-abbreviations',
+    date: '2026-10-08',
+    kind: 'Feature',
+    title: 'Create pages for drug classes, anatomy and medical terms',
+    summary:
+      'Contributors can now start a page for a drug class (such as psychedelics), a body part, an organism, a procedure or any other medical term, from the Topics page. Pages whose name has a recognized abbreviation show it after the title, like High Altitude Pulmonary Edema (HAPE).',
+    to: '/topics',
+    cta: 'Go to Topics',
+  },
+  {
     id: 'list-notes-sources',
     date: '2026-10-07',
     kind: 'Feature',
@@ -86,8 +96,8 @@ export const UPDATES: Update[] = [
     title: 'Create a page for a condition, symptom, lab or drug',
     summary:
       'NPI-verified providers can now start a page for anything the reference is missing: an indication, symptom, adverse effect, lab test, target, herbal or drug. Each gets a permanent PCID, and a link to a page that doesn’t exist yet offers to create it.',
-    to: '/new',
-    cta: 'Create a page',
+    to: '/topics',
+    cta: 'Create a page from Topics',
   },
   {
     id: 'quick-facts-community',
