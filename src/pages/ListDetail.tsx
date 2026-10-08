@@ -472,8 +472,13 @@ function Row({
         {sourceDiffers && (
           <span className="block break-words font-sans text-[11.5px] text-ink">listed as “{item.source_name}”</span>
         )}
-        {isTerm && item.note && (
-          <span className="mt-0.5 block break-words font-sans text-[13px] leading-snug text-ink">{item.note}</span>
+        {item.note && (
+          <span className={`mt-0.5 block break-words font-sans leading-snug text-ink ${isTerm ? 'text-[13px]' : 'text-[12.5px]'}`}>
+            {item.note}
+          </span>
+        )}
+        {item.sources && item.sources.length > 0 && (
+          <span className="block break-words font-sans text-[11.5px] text-ink">Also listed by {item.sources.join(' and ')}</span>
         )}
       </span>
       {showValue && (
@@ -496,8 +501,20 @@ function Row({
       {showStatus && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {item.legal_status && (
-            <span className="lp-label inline-block max-w-full break-words rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
-              {item.legal_status}
+            // One label per value: "Modified-release; Irritant" is two reasons.
+            <span className="flex flex-wrap gap-1">
+              {item.legal_status
+                .split(';')
+                .map(part => part.trim())
+                .filter(Boolean)
+                .map(part => (
+                  <span
+                    key={part}
+                    className="lp-label inline-block max-w-full break-words rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] text-ink"
+                  >
+                    {part}
+                  </span>
+                ))}
             </span>
           )}
         </span>

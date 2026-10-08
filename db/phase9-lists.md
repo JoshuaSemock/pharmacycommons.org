@@ -8,7 +8,7 @@ Lists are collections of drugs made for a purpose (an exam list, a usage ranking
 |---|---|
 | `pcid_blocks` row 10 | `entity_kind = 'list'` |
 | `lists(pcid, slug, title, description, kind, parent_pcid, jurisdiction, source_citation, source_url, license, measure_label, measure_unit, rank_label, default_sort, published, item_count, sort_order)` | One row per list. `kind` = curated / authority / community. `default_sort` = rank / value_desc / name / position. |
-| `list_items(list_pcid, position, member_pcid, rank, value, source_name, legal_status, note)` | Members. PK `(list_pcid, position)`. `source_name` is the name exactly as written in the source. |
+| `list_items(list_pcid, position, member_pcid, rank, value, source_name, legal_status, note, sources)` | Members. PK `(list_pcid, position)`. `source_name` is the name exactly as written in the source. `legal_status` is the list's category column; `lists.status_label` names it when it is not a legal status (phase 9b). `sources` = other references that also list the drug. |
 | RLS | `lists` and `list_items` readable only when `published`. Writes: service role only. |
 | `list_lists()` | Index of lists (security invoker). |
 | `get_list(slug)` | jsonb: header, parent, children, items (with entity slug/name/type). |
@@ -26,6 +26,25 @@ UWorld RxPrep and McGraw Hill lists were **dropped by Joshua** and never loaded.
 | 10000020 | georgia-mpje-legend-drugs | 2,410 |
 | 10000021 | georgia-mpje-controlled-substances (O.C.G.A. §§ 16-13-25 to 16-13-29) | 405 |
 | 10000022 | georgia-mpje-exceptions | 105 |
+| 10000023 | do-not-crush (source: `Do_Not_Drugs.xlsx`, run `lists-do-not-crush-2026-09-25`) | 226 |
+| 10000024 | georgia-mpje — parent of 10000020–22 (run `lists-sublists-2026-09-25`) | 2,919 (union of the three parts; statuses combined) |
+| 10000025–30 | do-not-crush-* — one sub-list per reason, parent = do-not-crush | modified-release 142 · transmucosal 7 · irritant 25 · unpleasant-taste 14 · hazardous-teratogenic 33 · other 41 |
+
+### Sub-lists (2026-09-25, Joshua)
+
+- **Georgia MPJE** is one list with three parts. The three existing lists keep their PCIDs and slugs and now have `parent_pcid = 10000024`; titles became "Georgia MPJE: Legend drugs / Controlled substances / Exceptions". The parent holds every drug on any part (2,920 rows → 2,919 drugs; one drug is on two parts), with `legal_status` = the part's status (Legend, CS-n, non-Rx, …), so its Status filter reproduces each part.
+- **Do Not Crush** has a sub-list per reason. A drug with two reasons is on both sub-lists; each entry keeps its full reason, note and sources.
+
+### Do Not Crush (added 2026-09-25, migration `phase9b_lists_status_label_sources`)
+
+- 228 source rows → 226 items. Two rows were the same product and were merged: `fexofenadine/pseudoephedrine` + `pseudoephedrine/fexofenadine` (Allegra-D), `risperidone` + `risperidone odt` (Risperdal M-Tab).
+- `legal_status` holds the **reason(s)** (`lists.status_label = 'Reason'`): Modified-release (143) · Transmucosal (8) · Irritant (25) · Unpleasant taste (14) · Hazardous/teratogenic (33) · Other (41; the workbook's "Misc" column). Several reasons are joined with "; ".
+- `note` = brand(s) · dosage form(s) from the workbook — the entry is about those products, not every product with that ingredient.
+- `sources` = which outside references also list it: MPR (180) and/or Pharmacist's Letter (218).
+- Salt-named rows link to their precise form (metoprolol succinate → 3000725, morphine sulfate, diclofenac sodium, docusate sodium, erythromycin ethylsuccinate, ferrous gluconate/sulfate, isavuconazonium sulfate, chlorpheniramine maleate). "hydromorphone er" → hydromorphone; "pancreatic enzymes" → pancrelipase; "bisacodyl" → 1006482 (the name index pointed at "bisacodyl tannex"; overridden).
+- Combinations linked to existing block-2 records; **one new PCID minted:** 2002470 drospirenone/estetrol (Nextstellis). Duplicate combination records exist for several of these (e.g. three elexacaftor/tezacaftor/ivacaftor, two esomeprazole/naproxen) — merge candidates for Joshua, not merged.
+- `georgia-mpje-controlled-substances` now has `status_label = 'Schedule'`.
+- **On the site (shipped 2026-10-07, ported from the unmerged `lists-pages` branch):** list pages show each entry's note under the name and "Also listed by …" from `sources`; a multi-value status ("Modified-release; Irritant") shows as one label per value; list search also matches the note (so a brand finds its entry); the CSV names the status column after `status_label` and adds `note` and `also_listed_by` columns. Notes and sources on the arrhythmia and anticholinergic lists show the same way.
 
 ### Joshua's decisions applied (2026-09-25)
 
