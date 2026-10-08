@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
+import { entryKindLine, loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
 import { formatDate } from '../blog'
 import { ctaFor, whatsNew } from '../updates'
 import Stamp from '../components/Stamp'
@@ -127,7 +127,7 @@ function Hero() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-sans text-[14px] font-medium text-ink">{entry.name}</span>
                     <span className="block truncate font-sans text-[12px] text-ink">
-                      {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
+                      {entryKindLine(entry)}
                     </span>
                   </span>
                   {schedule && (

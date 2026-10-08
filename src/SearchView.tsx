@@ -9,6 +9,7 @@ import type { ClassSearchHit } from './api.generated'
 import {
   loadCatalog,
   searchCatalog,
+  entryKindLine,
   browse,
   orderedCatalog,
   bucketCounts,
@@ -27,6 +28,7 @@ import {
   type CatalogEntry,
 } from './catalog'
 import { drugWithBrand, formatBrandName, formatDrugName } from './names'
+import { newPageHref } from './wiki'
 
 /** 0 means no cap — every remaining entry renders at once. */
 const PAGE_SIZES = [50, 100, 500, 0] as const
@@ -190,7 +192,7 @@ export default function SearchView() {
           Browse the catalog
         </h1>
         <p className="mt-4 max-w-[42rem] font-sans text-[16px] leading-relaxed text-pretty text-ink">
-          Every drug in the Commons, from A onward. Search by name, brand, combination or drug class, or jump to a letter.
+          Every drug in the Commons, from A onward. Search by name, brand, combination or drug class (or a condition, lab, target or herbal), or jump to a letter.
         </p>
 
         <div className="mt-6 max-w-lg">
@@ -296,9 +298,14 @@ export default function SearchView() {
             <p className="font-sans text-ink">
               Nothing in the catalog matches <span className="font-medium text-ink">{query}</span>.
             </p>
-            <button onClick={() => setQuery('')} className="mt-2 font-sans text-[13px] text-ink hover:underline">
-              Browse every drug instead
-            </button>
+            <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 font-sans text-[13px] text-ink">
+              <button onClick={() => setQuery('')} className="hover:underline">
+                Browse every drug instead
+              </button>
+              <Link to={newPageHref(query)} className="hover:underline">
+                Create a page for “{query.trim()}”
+              </Link>
+            </p>
           </div>
         ) : (
           <>
@@ -307,7 +314,7 @@ export default function SearchView() {
             ))}
 
             {total > 0 && classMatches.length > 0 && (
-              <h3 className="mb-3 font-sans text-[13px] text-ink">Drugs matching by name or brand</h3>
+              <h3 className="mb-3 font-sans text-[13px] text-ink">Pages matching by name or brand</h3>
             )}
 
             {total > 0 && groups.map(g => (
@@ -373,14 +380,18 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
   const drug = toDrug(entry)
   const monogram = entry.name.replace(/[^a-z0-9]/gi, '').slice(0, 2).toUpperCase() || '··'
   // A brand hit reads "metformin (Glucophage)"; the line under it lists the drug's other brands.
-  const title = entry.matchedBrand ? drugWithBrand(entry.name, entry.matchedBrand) : formatDrugName(entry.name)
+  // Concept pages keep their own casing ("QT prolongation", "CYP3A4"); drug names are lower-cased.
+  const title =
+    entry.type === 4 ? entry.name : entry.matchedBrand ? drugWithBrand(entry.name, entry.matchedBrand) : formatDrugName(entry.name)
   const otherBrands = entry.brands.filter(b => b !== entry.matchedBrand).map(formatBrandName)
   const subtitle =
-    otherBrands.length > 0
+    entry.type === 4
+      ? entryKindLine(entry)
+      : otherBrands.length > 0
       ? otherBrands.slice(0, 3).join(', ') + (otherBrands.length > 3 ? ` +${otherBrands.length - 3} more` : '')
       : entry.type === 1
         ? 'combination product'
-        : drug.entryType
+        : 'single ingredient'
 
   return (
     <button

@@ -202,7 +202,11 @@ Lighthouse baseline and fixes: `docs/performance-2026-09-25.md`.
 `catalog_entries` to `entity_type='moiety'`; precise forms, brands and combinations
 nest under the moiety page (`HierarchySection` in `DrugDetail.tsx`, fed by
 `moiety_hierarchy`): base moiety → precise forms → brand formulations → combinations
-(formulations shown since 2026-10-02).
+(formulations shown since 2026-10-02). **Concept pages are searchable (2026-10-07):** `loadCatalog()` also
+loads blocks 6–9 (clinical, measurement, target, functional) from `entities` with their
+subtype embeds; they are search-only (type 4, `kind` label via `conceptKind()`), never in
+browse, and rank just below a drug with the same text. Medication reconciliation passes
+`{ concepts: false }`. Empty searches offer "Create a page for …".
 
 **Drug page layout (2026-10-02, Overview added 2026-10-04, `src/DrugDetail.tsx`):** reading
 order is Jump to label → Quick Facts → **Overview** (community-written, `src/OpenSection.tsx`)
