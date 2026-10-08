@@ -52,7 +52,7 @@ export default function Nav() {
           <span className="flex h-7 w-7 shrink-0 items-center justify-center max-[359px]:h-6 max-[359px]:w-6">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
-          <span className="font-sans text-[13px] min-w-0 truncate max-[599px]:hidden md:max-lg:hidden min-[360px]:text-[14px] font-bold tracking-[-0.01em] text-ink sm:text-[15px]">
+          <span className="font-sans text-[13px] min-w-0 truncate max-[599px]:hidden md:max-lg:hidden min-[360px]:text-[14px] tracking-[-0.01em] text-ink sm:text-[15px]">
             Pharmacy Commons
           </span>
         </NavLink>

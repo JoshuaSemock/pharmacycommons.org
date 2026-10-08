@@ -13,7 +13,7 @@ import { UpDownIcon, useOutsidePress, usePopoverPlacement, useRegisterWithParent
  * (.lp-toggle + aria-expanded). The list is a floating scrap of the same
  * paper with its grain (.lp-popover .pc-grain bg-paper). Rows are embossed
  * like every clickable thing; the row under the pointer or arrow keys and
- * the chosen row are debossed (.lp-option), and the label is bold. An optional search field at the top is embossed at
+ * the chosen row are debossed (.lp-option). An optional search field at the top is embossed at
  * rest and debossed while typed into (.lp-field). Badges are Stamps.
  *
  * Options come from `options`, or from <option>/<optgroup> children so a
