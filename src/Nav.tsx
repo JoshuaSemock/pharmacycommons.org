@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
+import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
 import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
 
 /**
@@ -168,7 +168,7 @@ function HeaderSearch() {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-sans text-[13.5px] font-medium text-ink">{entry.name}</span>
                   <span className="block truncate font-sans text-[12px] text-ink">
-                    {entry.brand ?? (entry.type === 1 ? 'Combination product' : 'Single ingredient')}
+                    {entryKindLine(entry)}
                   </span>
                 </span>
                 {schedule && (

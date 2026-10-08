@@ -56,7 +56,7 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
       .map(s => ({ key: `s:${s}`, label: s, pcid: null }))
     const found =
       catalog && ready
-        ? searchCatalog(value, 8)
+        ? searchCatalog(value, 8, { concepts: false })
             .filter(e => e.type === 0)
             .map(e => ({
               key: `c:${e.n}`,

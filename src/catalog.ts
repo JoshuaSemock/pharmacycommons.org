@@ -39,6 +39,14 @@
  * Drug-class searches ("ssri") are a separate server-side lookup — see
  * `searchClasses` in api.ts and the `search_classes` RPC.
  *
+ * 2026-10-07: concept pages. Clinical concepts (indications, symptoms, adverse
+ * effects…), labs and measurements, biological targets and herbal sources
+ * (blocks 6–9, ~175 pages, plus any a contributor creates at /new) are loaded
+ * from `entities` and searched by name, type 4, labelled by kind ("Indication",
+ * "Lab test · Serum Lab Panel"). Like combinations they never appear in browse,
+ * and drugs outrank them for the same text. Salts, brands and combinations stay
+ * out of search as before.
+ *
  * The public surface (loadCatalog, searchCatalog, browse, the A–Z bucket
  * machinery, toDrug, pcidOf, …) is unchanged on purpose, so SearchView.tsx,
  * Home.tsx and Nav.tsx did not need to change: only where the data comes
@@ -60,8 +68,10 @@ export type CatalogEntry = {
   brand: string | null
   /** Every known brand name, current ones first. */
   brands: string[]
-  /** 0 = moiety, 1 = combination, 2 = precise form, 3 = formulation */
-  type: 0 | 1 | 2 | 3
+  /** 0 = moiety, 1 = combination, 2 = precise form, 3 = formulation, 4 = concept page (blocks 6–9) */
+  type: 0 | 1 | 2 | 3 | 4
+  /** Concept pages only: what kind of page it is, e.g. "Indication", "Lab test · Vital Sign". */
+  kind?: string
   /** Controlled-substance schedule label, e.g. "CII" — null if not controlled */
   schedule: string | null
   /**
@@ -84,7 +94,7 @@ const ENTITY_TYPE_TO_CODE: Record<string, 0 | 1 | 2 | 3> = {
 
 export type Drug = CatalogEntry & {
   pcid: string
-  entryType: 'moiety' | 'combination' | 'precise_form' | 'formulation'
+  entryType: 'moiety' | 'combination' | 'precise_form' | 'formulation' | 'concept'
   schedule: string | null
   /** Kept for API compatibility with earlier callers; always 'full' now. */
   completeness: 'full'
@@ -107,6 +117,61 @@ type CatalogRow = {
 
 type ComboBrandRow = { brand: string; pcid: number; slug: string; name: string }
 
+type Sub<K extends string> = { [P in K]: string | null } | { [P in K]: string | null }[] | null
+type ConceptRow = {
+  pcid: number
+  slug: string
+  name: string
+  entity_type: string
+  clinical_concepts: Sub<'concept_type'>
+  measurements: Sub<'measurement_type'>
+  biological_targets: Sub<'target_type'>
+  functional_groups: Sub<'group_type'>
+}
+
+/** Concept blocks searched by name (not browsed). */
+export const CONCEPT_ENTITY_TYPES = ['clinical', 'measurement', 'target', 'functional'] as const
+
+function subValue<K extends string>(v: Sub<K>, key: K): string | null {
+  const row = Array.isArray(v) ? v[0] : v
+  const val = row?.[key]
+  return typeof val === 'string' && val.trim() ? val.trim() : null
+}
+
+/** "Indication", "Lab test · Serum Lab Panel", "CYP450 Enzyme", "Herbal or botanical source". */
+export function conceptKind(entityType: string, subtype: string | null): string {
+  switch (entityType) {
+    case 'clinical':
+      return subtype ?? 'Clinical concept'
+    case 'measurement':
+      return subtype ? `Lab test · ${subtype}` : 'Lab test or measurement'
+    case 'target':
+      return subtype ?? 'Biological target'
+    case 'functional':
+      return subtype && !/^botanical/i.test(subtype) ? subtype : 'Herbal or botanical source'
+  }
+  return 'Concept'
+}
+
+function conceptEntry(r: ConceptRow): CatalogEntry {
+  const subtype =
+    subValue(r.clinical_concepts, 'concept_type') ??
+    subValue(r.measurements, 'measurement_type') ??
+    subValue(r.biological_targets, 'target_type') ??
+    subValue(r.functional_groups, 'group_type')
+  return {
+    n: r.pcid,
+    slug: r.slug,
+    name: r.name,
+    brand: null,
+    brands: [],
+    type: 4,
+    kind: conceptKind(r.entity_type, subtype),
+    schedule: null,
+    stub: 0,
+  }
+}
+
 const PAGE_SIZE = 1000
 
 let _catalog: CatalogEntry[] | null = null
@@ -116,6 +181,8 @@ let _byNum: Map<number, CatalogEntry> | null = null
 let _comboBrands: { brand: string; entry: CatalogEntry }[] = []
 /** Combination products with their name split into words, for ingredient-list search. */
 let _comboNames: { entry: CatalogEntry; words: string[] }[] = []
+/** Concept pages (blocks 6–9), reachable only through search. */
+let _concepts: CatalogEntry[] = []
 let _loading: Promise<CatalogEntry[]> | null = null
 
 function rowToEntry(r: CatalogRow): CatalogEntry {
@@ -158,7 +225,7 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
 
   _loading = (async () => {
     const supabase = await getSupabase()
-    const [rows, comboRows, comboNameRows] = await Promise.all([
+    const [rows, comboRows, comboNameRows, conceptRows] = await Promise.all([
       fetchAll<CatalogRow>((from, to) =>
         supabase
           .from('catalog_entries')
@@ -188,6 +255,21 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
         console.warn('[catalog] combination names unavailable:', err.message)
         return [] as CatalogRow[]
       }),
+      // Concept pages: search-only, so a failure leaves drug search untouched.
+      fetchAll<ConceptRow>((from, to) =>
+        supabase
+          .from('entities')
+          .select(
+            'pcid,slug,name,entity_type,clinical_concepts(concept_type),measurements(measurement_type),' +
+              'biological_targets(target_type),functional_groups(group_type)',
+          )
+          .in('entity_type', [...CONCEPT_ENTITY_TYPES])
+          .order('pcid', { ascending: true })
+          .range(from, to),
+      ).catch(err => {
+        console.warn('[catalog] concept pages unavailable:', err.message)
+        return [] as ConceptRow[]
+      }),
     ])
 
     const entries = rows.map(rowToEntry)
@@ -211,6 +293,8 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
       return { entry, words: norm(entry.name).split(' ').filter(w => w && !JOINERS.has(w)) }
     })
 
+    _concepts = conceptRows.map(conceptEntry)
+
     _ordered = null // invalidate derived caches
     _counts = null
     _offsets = null
@@ -226,11 +310,18 @@ export async function loadCatalog(): Promise<CatalogEntry[]> {
 
 export const pcidOf = (e: CatalogEntry): string => `PCID-${e.n}`
 
-const ENTRY_TYPE_LABEL: Record<0 | 1 | 2 | 3, Drug['entryType']> = {
+const ENTRY_TYPE_LABEL: Record<0 | 1 | 2 | 3 | 4, Drug['entryType']> = {
   0: 'moiety',
   1: 'combination',
   2: 'precise_form',
   3: 'formulation',
+  4: 'concept',
+}
+
+/** The second line of a search suggestion: a brand, the kind of concept page, or what the drug record is. */
+export function entryKindLine(e: CatalogEntry): string {
+  if (e.type === 4) return e.kind ?? 'Concept'
+  return e.brand ?? (e.type === 1 ? 'Combination product' : 'Single ingredient')
 }
 
 export function toDrug(e: CatalogEntry): Drug {
@@ -567,7 +658,7 @@ function scoreText(text: string, q: string, exact: number, prefix: number, word:
  * `matchedBrand`, so the result can read "metformin (Glucophage)".
  * ~15k entries scans in well under a frame; no index needed client-side.
  */
-export function searchCatalog(query: string, limit = 25): CatalogEntry[] {
+export function searchCatalog(query: string, limit = 25, opts: { concepts?: boolean } = {}): CatalogEntry[] {
   if (!_catalog) return []
   const q = norm(query)
   if (!q) return []
@@ -637,6 +728,14 @@ export function searchCatalog(query: string, limit = 25): CatalogEntry[] {
     }
   }
   scored.push(...seenCombos.values())
+
+  // Concept pages by name, just below a drug with the same text
+  if (opts.concepts !== false) {
+    for (const e of _concepts) {
+      const s = e.slug === query.toLowerCase() ? 94 : scoreText(norm(e.name), q, 93, 78, 58, 38)
+      if (s) scored.push({ e, s })
+    }
+  }
 
   scored.sort((a, b) => b.s - a.s || a.e.name.length - b.e.name.length)
   return scored.slice(0, limit).map(x => x.e)

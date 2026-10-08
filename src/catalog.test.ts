@@ -20,6 +20,14 @@ const combinations: Row[] = [
   { pcid: 2000200, slug: 'glipizide-and-metformin-hcl', name: 'GLIPIZIDE AND METFORMIN HCL', entity_type: 'combination', primary_brand: null, controlled_schedule: null, brand_names: [] },
 ]
 
+const concepts: Row[] = [
+  { pcid: 6000010, slug: 'lactic-acidosis', name: 'Lactic acidosis', entity_type: 'clinical', clinical_concepts: { concept_type: 'Adverse Reaction' }, measurements: null, biological_targets: null, functional_groups: null },
+  { pcid: 7000003, slug: 'serum-potassium', name: 'Serum potassium', entity_type: 'measurement', clinical_concepts: null, measurements: [{ measurement_type: 'Serum Lab Panel' }], biological_targets: null, functional_groups: null },
+  { pcid: 8000004, slug: 'cyp3a4', name: 'CYP3A4', entity_type: 'target', clinical_concepts: null, measurements: null, biological_targets: { target_type: 'CYP450 Enzyme' }, functional_groups: null },
+  { pcid: 9000020, slug: 'ashwagandha', name: 'Ashwagandha', entity_type: 'functional', clinical_concepts: null, measurements: null, biological_targets: null, functional_groups: { group_type: 'Botanical source' } },
+  { pcid: 6000011, slug: 'glipizide-hypoglycemia', name: 'Glipizide hypoglycemia', entity_type: 'clinical', clinical_concepts: null, measurements: null, biological_targets: null, functional_groups: null },
+]
+
 const comboBrands: Row[] = [
   { brand: 'Janumet', pcid: 2000101, slug: 'sitagliptin-and-metformin-hydrochloride', name: 'SITAGLIPTIN AND METFORMIN HYDROCHLORIDE' },
 ]
@@ -34,6 +42,10 @@ vi.mock('./supabaseClient', () => {
         current = current.filter(r => r[col] === v)
         return b
       },
+      in: (col: string, vs: unknown[]) => {
+        current = current.filter(r => vs.includes(r[col]))
+        return b
+      },
       range: (from: number, to: number) => Promise.resolve({ data: current.slice(from, to + 1), error: null }),
     }
     return b
@@ -41,12 +53,12 @@ vi.mock('./supabaseClient', () => {
   return {
     supabase: {
       from: (table: string) =>
-        builder(table === 'combination_brand_index' ? comboBrands : [...moieties, ...combinations]),
+        builder(table === 'combination_brand_index' ? comboBrands : table === 'entities' ? concepts : [...moieties, ...combinations]),
     },
   }
 })
 
-const { loadCatalog, searchCatalog } = await import('./catalog')
+const { entryKindLine, loadCatalog, searchCatalog } = await import('./catalog')
 
 beforeAll(async () => {
   await loadCatalog()
@@ -111,5 +123,36 @@ describe('searchCatalog — combinations by ingredient', () => {
   it('never puts combinations in browse', async () => {
     const { browse } = await import('./catalog')
     expect(browse({ limit: 100 }).entries.every(e => e.type === 0)).toBe(true)
+  })
+})
+
+// ─── Concept pages (blocks 6–9) ──────────────────────────────────────────────
+
+describe('searchCatalog — concept pages', () => {
+  it('finds clinical concepts, labs, targets and herbals by name, labelled by kind', () => {
+    const kinds = (q: string) => searchCatalog(q, 5).map(e => [e.slug, entryKindLine(e)])
+    expect(kinds('lactic')).toEqual([['lactic-acidosis', 'Adverse Reaction']])
+    expect(kinds('potassium')).toEqual([['serum-potassium', 'Lab test · Serum Lab Panel']])
+    expect(kinds('cyp3a4')).toEqual([['cyp3a4', 'CYP450 Enzyme']])
+    expect(kinds('ashwa')).toEqual([['ashwagandha', 'Herbal or botanical source']])
+  })
+
+  it('falls back to the block when no subtype is recorded', () => {
+    expect(searchCatalog('glipizide hypo', 5).map(entryKindLine)).toContain('Clinical concept')
+  })
+
+  it('ranks a drug above a concept page that merely contains its name', () => {
+    const hits = slugs('glipizide')
+    expect(hits[0]).toBe('glipizide')
+    expect(hits).toContain('glipizide-hypoglycemia')
+  })
+
+  it('can leave concept pages out (medication reconciliation)', () => {
+    expect(searchCatalog('lactic', 5, { concepts: false })).toEqual([])
+  })
+
+  it('never puts concept pages in browse', async () => {
+    const { browse } = await import('./catalog')
+    expect(browse({ limit: 100 }).entries.some(e => e.type === 4)).toBe(false)
   })
 })
