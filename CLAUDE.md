@@ -209,7 +209,11 @@ subtype embeds; they are search-only (type 4, `kind` label via `conceptKind()`),
 browse, and rank just below a drug with the same text. Medication reconciliation passes
 `{ concepts: false }`. Empty searches offer "Create a page for …". `/topics` is their browse page:
 connections = distinct `clinical_statements` subjects plus `page_links` sources pointing at
-the topic, read client-side (no RPC).
+the topic, read client-side (no RPC). Its "From the dictionary" chips show `dictionary_terms` that aren't drug
+names: Abbreviations (kind Abbreviation/Grammar, 7,864) and Medical terms (kind Term, not
+generic/brand, 12,010; only 29 have a real definition), a letter at a time via `loadBucket()` /
+`searchDictionary()`. Terms are not pages: each offers "Start a page", or "Open the page" when an
+entity with the same slug exists (848 do: drugs, classes, topics).
 
 **Drug page layout (2026-10-02, Overview added 2026-10-04, `src/DrugDetail.tsx`):** reading
 order is Jump to label → Quick Facts → **Overview** (community-written, `src/OpenSection.tsx`)

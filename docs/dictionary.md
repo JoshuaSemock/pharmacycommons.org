@@ -74,6 +74,17 @@ duplicates were merged first. `primary_source = 'Pharmacy Commons dictionary imp
   record type, PCID, one-line description and classes (FDA EPC/MOA first).
 - There is no `btn-primary` class; the download uses the letterpress `Button` (the design system is colorless).
 
+## On /topics (2026-10-07)
+
+`/topics` has two "From the dictionary" chips: **Abbreviations** (Abbreviation + Grammar, 7,864)
+and **Medical terms** (Term rows that aren't generic/brand names, 12,010). Drug and brand names
+stay out because they are drug pages already. Terms are shown, not minted: each medical term
+offers "Start a page" (`/new?name=…`), or "Open the page" when an entity with the same slug
+exists (848 terms match a drug, class or topic by slug; about 60 more match only by name, and
+`create_page()` still refuses those with a link to the existing page). Only 29 of the 12,010
+medical terms carry a definition other than the term itself, and the set mixes conditions
+("sleep apnea") with ingredient and plain words ("diisostearyl", "thousand").
+
 ## Open
 
 1. ~~Publish the Do Not Use list~~ — published 2026-10-03 after PR #42 deployed.
