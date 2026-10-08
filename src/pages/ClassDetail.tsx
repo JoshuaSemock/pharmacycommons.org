@@ -8,7 +8,9 @@
  * several thousand members, so the list renders in batches with a filter.
  *
  * The rail carries the same Sources / Machine-readable cards as drug pages —
- * a class is a PCID record like any other.
+ * a class is a PCID record like any other. Every class has the community
+ * Overview (phase 15i), and contributor classifications (class_type
+ * 'community', created on /new) start with no members.
  *
  * Destination: src/pages/ClassDetail.tsx
  */
@@ -19,6 +21,8 @@ import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import MachinePanels from '../MachinePanels'
 import { formatDrugName } from '../names'
+import OpenSection from '../OpenSection'
+import { abbreviationSuffix, useAbbreviations } from '../abbreviations'
 
 type ClassRef = { slug: string; name: string; source_code: string | null }
 
@@ -44,6 +48,7 @@ export default function ClassDetail() {
   const { slug = '' } = useParams<{ slug: string }>()
   const [cls, setCls] = useState<ClassRecord | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
+  const abbreviations = useAbbreviations(cls?.name)
 
   useEffect(() => {
     let cancelled = false
@@ -126,6 +131,12 @@ export default function ClassDetail() {
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {cls.name}
+          {abbreviations.length > 0 && (
+            <span className="font-normal" title="Recognized abbreviation, from the medical dictionary">
+              {' '}
+              {abbreviationSuffix(abbreviations)}
+            </span>
+          )}
         </h1>
         <p className="mt-2 font-sans text-md text-ink">
           {(cls.member_count ?? cls.members.length).toLocaleString()}{' '}
@@ -144,9 +155,12 @@ export default function ClassDetail() {
           <MachinePanels pcidCode={pcidCode} slug={cls.slug} />
         </aside>
 
-        <section aria-label="Members" className="min-w-0">
-          <MemberList members={cls.members} />
-        </section>
+        <div className="min-w-0 space-y-12">
+          <OpenSection pcidCode={pcidCode} slug={cls.slug} name={cls.name} fallbackDescription={null} labelAnchor="" />
+          <section aria-label="Members" className="min-w-0">
+            <MemberList members={cls.members} community={cls.class_type === 'community'} />
+          </section>
+        </div>
       </div>
     </main>
   )
@@ -201,7 +215,7 @@ function SubclassesCard({
 
 // ─── Members ──────────────────────────────────────────────────────────────────
 
-function MemberList({ members }: { members: ClassRecord['members'] }) {
+function MemberList({ members, community }: { members: ClassRecord['members']; community: boolean }) {
   const [query, setQuery] = useState('')
   const [limit, setLimit] = useState(BATCH)
 
@@ -216,7 +230,12 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
   const hasInherited = members.some(m => !m.is_direct)
 
   if (members.length === 0) {
-    return <p className="font-sans text-md text-ink">No drugs are linked to this class yet.</p>
+    return (
+      <p className="font-sans text-md text-ink">
+        No drugs are linked to this class yet.
+        {community && ' Until membership can be edited here, list the drugs in the Overview with [[links]]; each drug’s page then shows this class under What links here.'}
+      </p>
+    )
   }
 
   return (

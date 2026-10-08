@@ -30,6 +30,7 @@ import { useContributorStatus } from './contribute'
 import { CONCEPT_ATTRS, conceptKindLine, getStatementsAbout, groupByPredicate, isConceptKind, predicateLabel } from './concepts'
 import type { ConceptStatement } from './concepts'
 import { entityHref } from './wiki'
+import { abbreviationSuffix, useAbbreviations } from './abbreviations'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
@@ -259,6 +260,7 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
   // Concept names keep their case (CYP3A4, QT prolongation); drug names are lower-cased.
   const name = drug.name.trim()
   const kind = conceptKindLine(drug.block_kind ?? '', drug.attributes)
+  const abbreviations = useAbbreviations(name)
   const facts = CONCEPT_ATTRS.map(label => ({ label, value: attr(drug, label) })).filter(
     (r): r is { label: (typeof CONCEPT_ATTRS)[number]; value: string } => r.value !== null,
   )
@@ -275,7 +277,15 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
 
       <header className="mb-8 border-b border-ink/15 pb-6">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">{name}</h1>
+          <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">
+            {name}
+            {abbreviations.length > 0 && (
+              <span className="font-normal" title="Recognized abbreviation, from the medical dictionary">
+                {' '}
+                {abbreviationSuffix(abbreviations)}
+              </span>
+            )}
+          </h1>
           <div className="shrink-0">
             <SaveButton pcidCode={drug.pcid_code} slug={drug.slug} name={drug.name} entityType={drug.block_kind ?? null} />
           </div>

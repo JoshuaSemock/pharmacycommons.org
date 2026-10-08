@@ -18,7 +18,7 @@ import {
 } from '../topics'
 import type { Topic, TopicKind, TopicSort } from '../topics'
 import { entityHref, newPageHref } from '../wiki'
-import { slugify } from '../contribute'
+import { PAGE_KINDS, slugify } from '../contribute'
 import { supabase } from '../supabaseClient'
 
 /**
@@ -35,9 +35,14 @@ import { supabase } from '../supabaseClient'
  *      matches, the page offers to create it.
  *   5. "From the dictionary": the medical dictionary's abbreviations and the
  *      medical terms that aren't drug names (dictionary_terms, phase 14),
- *      a letter at a time. Terms are not pages: each offers "Start a page",
- *      or "Open the page" when a topic with that name exists. Drug and brand
- *      names stay out; they are drug pages already.
+ *      a letter at a time. Terms are not pages: each offers "Create a page",
+ *      or "Open the page" when a page with that name exists. An abbreviation's
+ *      page is its expansion (DKA → "Diabetic Ketoacidosis"), and that page's
+ *      title then carries the abbreviation. Drug and brand names stay out;
+ *      they are drug pages already.
+ * Topics is where contributors create pages (moved here from the account
+ * page, 2026-10-08): the "Create a page" panel links to /new, with shortcuts
+ * that preselect a type (?type=).
  * State lives in the URL (?kind=&type=&q=&sort=), so any view can be shared.
  */
 
@@ -46,6 +51,16 @@ const CHIP =
   'block rounded-md px-3 py-1 font-sans text-[13px] text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
 const FIELD = 'lp-field block w-full rounded-md px-3 py-2 font-sans text-ink placeholder:text-ink/60'
 const NO_SUBTYPE = '_none'
+
+/** Type shortcuts in the "Create a page" panel (ids from PAGE_KINDS). */
+const CREATE_SHORTCUTS = ['indication', 'symptom', 'adverse', 'class', 'anatomy', 'term', 'measurement', 'target', 'herbal']
+
+/** /new for a type, keeping any typed name. */
+function createHref(typeId: string | null, name = ''): string {
+  const base = newPageHref(name)
+  if (!typeId) return base
+  return `${base}${base.includes('?') ? '&' : '?'}type=${encodeURIComponent(typeId)}`
+}
 
 /** Dictionary entries shown on /topics: the words and abbreviations that aren't drug names. */
 type DictKind = 'abbreviations' | 'terms'
@@ -134,15 +149,16 @@ export default function TopicIndex() {
         </h1>
         <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-ink">
           Everything in the Commons that isn’t a drug: the conditions drugs treat and cause, the labs that monitor
-          them, the enzymes and transporters they act on, and the plants medicines come from. Narrow by kind, read the
+          them, the enzymes and transporters they act on, the plants medicines come from, and the anatomy and
+          terminology around them. Narrow by kind, read the
           list A to Z, or sort by how many drugs and pages connect to each.
         </p>
         <p className="mt-6 flex flex-wrap gap-2.5">
           <HeaderLink to="/browse">Drugs A to Z</HeaderLink>
           <HeaderLink to="/classifications">Classifications</HeaderLink>
           <HeaderLink to="/lists">Lists</HeaderLink>
-          <HeaderLink to="/new">Create a page</HeaderLink>
         </p>
+        <CreatePanel />
       </header>
 
       {topics === 'failed' ? (
@@ -338,6 +354,36 @@ function HeaderLink({ to, children }: { to: string; children: ReactNode }) {
   )
 }
 
+/** Where contributors start a new page: the form, or the form with a type already chosen. */
+function CreatePanel() {
+  const shortcuts = CREATE_SHORTCUTS.map(id => PAGE_KINDS.find(k => k.id === id)).filter(k => k !== undefined)
+  return (
+    <section aria-labelledby="create-page-heading" className="lp-sunken mt-8 max-w-[46rem] rounded-md px-4 py-4 sm:px-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <h2 id="create-page-heading" className="font-semibold text-ink" style={{ fontSize: 'var(--text-xl)', fontFamily: 'var(--font-sans)', lineHeight: 1.25 }}>
+          Create a page
+        </h2>
+        <Link to="/new" className={`lp-raised lp-press rounded-md px-4 py-1.5 font-sans text-[13.5px] text-ink ${FOCUS}`}>
+          Start a new page
+        </Link>
+      </div>
+      <p className="mt-2 font-sans text-[14px] leading-relaxed text-ink">
+        Anything a pharmacist might look up: a condition, a drug class, a body part, a lab, a term. Contributors with a
+        verified NPI can create pages; search first so you add to a page that exists. Or start one for a specific kind:
+      </p>
+      <ul className="mt-3 flex flex-wrap gap-1.5">
+        {shortcuts.map(k => (
+          <li key={k.id}>
+            <Link to={createHref(k.id)} className={`lp-press block rounded-md px-2.5 py-1 font-sans text-[13px] text-ink ${FOCUS}`}>
+              {k.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function ChipGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
@@ -357,6 +403,22 @@ function Chip({ name, checked, onChange, children }: { name: string; checked: bo
 
 function Count({ n }: { n: number }) {
   return <span className="font-mono text-[11.5px]">{n}</span>
+}
+
+/**
+ * The page a dictionary entry would be: a term is its own page; an
+ * abbreviation's page is what it stands for ("DKA" → "Diabetic Ketoacidosis"),
+ * so the abbreviation then shows after that page's title. Abbreviations with
+ * no expansion, or a rule rather than an expansion (Grammar rows, long
+ * sentences), have no page.
+ */
+function pageNameOf(e: DictionaryEntry, kind: DictKind): string {
+  if (kind === 'terms') return e.term
+  if (e.kind !== 'Abbreviation') return ''
+  // First sense only ("congestive heart failure, chronic heart failure"), no trailing gloss.
+  const d = (e.definition ?? '').split(/[;,]/)[0].replace(/\s*\([^)]*\)\s*$/, '').replace(/\.$/, '').trim()
+  if (!d || d.length > 80 || d.toLowerCase() === e.term.toLowerCase()) return ''
+  return d.charAt(0).toUpperCase() + d.slice(1)
 }
 
 /**
@@ -418,7 +480,7 @@ function DictionaryTopics({
 
   useEffect(() => {
     if (!Array.isArray(rows) || rows.length === 0) return
-    const wanted = [...new Set(rows.map(r => slugify(r.term)).filter(sl => sl && !topicSlugs.has(sl)))]
+    const wanted = [...new Set(rows.map(r => slugify(pageNameOf(r, kind))).filter(sl => sl && !topicSlugs.has(sl)))]
     if (wanted.length === 0) return
     const controller = new AbortController()
     supabase
@@ -477,7 +539,8 @@ function DictionaryTopics({
           ) : (
             <ul className="gap-x-10 sm:columns-2">
               {rows.map(e => {
-                const sl = slugify(e.term)
+                const pageName = pageNameOf(e, kind)
+                const sl = slugify(pageName)
                 const page = existing.get(sl) ?? topicSlugs.get(sl)
                 const def = displayDefinition(e)
                 const tag = tagOf(e)
@@ -491,9 +554,13 @@ function DictionaryTopics({
                         Open the page
                       </Link>
                     ) : (
-                      kind === 'terms' && (
-                        <Link to={newPageHref(e.term)} className={`lp-press mt-1 block w-fit rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink ${FOCUS}`}>
-                          Start a page
+                      sl && (
+                        <Link
+                          to={newPageHref(pageName)}
+                          aria-label={`Create a page for ${pageName}`}
+                          className={`lp-press mt-1 block w-fit rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink ${FOCUS}`}
+                        >
+                          Create a page
                         </Link>
                       )
                     )}

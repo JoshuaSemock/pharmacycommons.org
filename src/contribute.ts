@@ -216,15 +216,30 @@ export type PageKindOption = {
   id: string
   label: string
   hint: string
-  kind: 'moiety' | 'precise_form' | 'combination' | 'formulation' | 'clinical' | 'measurement' | 'target' | 'functional'
+  kind: 'moiety' | 'precise_form' | 'combination' | 'formulation' | 'class' | 'clinical' | 'measurement' | 'target' | 'functional'
   /** clinical: concept_type; functional: group_type; measurement: chosen separately. */
   subtype?: string
   /** Drug kinds take UNII/CAS for the duplicate check. */
   identifiers?: boolean
-  group: 'Drugs and supplements' | 'Clinical concepts' | 'Other'
+  group: PageKindGroup
 }
 
-/** The type picker on /new, mapped to PCID blocks (docs/user-edits.md §7). */
+export type PageKindGroup = 'Drugs and supplements' | 'Classifications' | 'Clinical concepts' | 'Terminology' | 'Labs and biology'
+
+/** The groups of the type picker on /new, in order. */
+export const PAGE_KIND_GROUPS: { group: PageKindGroup; hint: string }[] = [
+  { group: 'Drugs and supplements', hint: 'Something a person takes' },
+  { group: 'Classifications', hint: 'A group of drugs' },
+  { group: 'Clinical concepts', hint: 'Conditions, symptoms and effects' },
+  { group: 'Terminology', hint: 'Medical words that aren’t a drug or a condition' },
+  { group: 'Labs and biology', hint: 'What gets measured, and what drugs act on' },
+]
+
+/**
+ * The type picker on /new, mapped to PCID blocks (docs/user-edits.md §7):
+ * drugs → 1–4, classifications → 5 (class_type 'community'), clinical concepts
+ * and terminology → 6 (concept_type), labs → 7, targets → 8, herbals → 9.
+ */
 export const PAGE_KINDS: PageKindOption[] = [
   { id: 'moiety', group: 'Drugs and supplements', label: 'Drug: single active ingredient', hint: 'e.g. metformin', kind: 'moiety', identifiers: true },
   { id: 'precise_form', group: 'Drugs and supplements', label: 'Drug: salt or ester form', hint: 'e.g. metoprolol succinate', kind: 'precise_form', identifiers: true },
@@ -232,14 +247,27 @@ export const PAGE_KINDS: PageKindOption[] = [
   { id: 'formulation', group: 'Drugs and supplements', label: 'Drug: branded product', hint: 'e.g. Glucophage XR', kind: 'formulation' },
   { id: 'supplement', group: 'Drugs and supplements', label: 'Dietary supplement (a defined chemical)', hint: 'e.g. melatonin, cholecalciferol', kind: 'moiety', identifiers: true },
   { id: 'herbal', group: 'Drugs and supplements', label: 'Herbal or biological source', hint: 'e.g. ashwagandha, fish oil', kind: 'functional', subtype: 'Botanical source' },
-  { id: 'indication', group: 'Clinical concepts', label: 'Indication', hint: 'a condition drugs treat', kind: 'clinical', subtype: 'Indication' },
+  { id: 'class', group: 'Classifications', label: 'Drug class or category', hint: 'e.g. psychedelics, GLP-1 receptor agonists, gabapentinoids', kind: 'class' },
+  { id: 'indication', group: 'Clinical concepts', label: 'Disease or condition', hint: 'e.g. diabetic ketoacidosis, a condition drugs treat', kind: 'clinical', subtype: 'Indication' },
   { id: 'symptom', group: 'Clinical concepts', label: 'Symptom', hint: 'e.g. dizziness', kind: 'clinical', subtype: 'Symptom' },
   { id: 'adverse', group: 'Clinical concepts', label: 'Adverse effect', hint: 'e.g. lactic acidosis', kind: 'clinical', subtype: 'Adverse Reaction' },
   { id: 'contraindication', group: 'Clinical concepts', label: 'Contraindication', hint: 'e.g. severe renal impairment', kind: 'clinical', subtype: 'Contraindication' },
   { id: 'risk', group: 'Clinical concepts', label: 'Risk factor', hint: 'e.g. QT prolongation history', kind: 'clinical', subtype: 'Risk Factor' },
-  { id: 'measurement', group: 'Other', label: 'Lab test or measurement', hint: 'e.g. serum potassium, CrCl', kind: 'measurement' },
-  { id: 'target', group: 'Other', label: 'Biological target', hint: 'e.g. CYP3A4, SGLT2', kind: 'target' },
+  { id: 'anatomy', group: 'Terminology', label: 'Anatomy or body part', hint: 'e.g. lungs, nephron, blood–brain barrier', kind: 'clinical', subtype: 'Anatomy' },
+  { id: 'physiology', group: 'Terminology', label: 'Physiologic process', hint: 'e.g. acclimatization, gluconeogenesis', kind: 'clinical', subtype: 'Physiologic Process' },
+  { id: 'organism', group: 'Terminology', label: 'Organism or pathogen', hint: 'e.g. Staphylococcus aureus, Candida auris', kind: 'clinical', subtype: 'Organism' },
+  { id: 'procedure', group: 'Terminology', label: 'Procedure or therapy', hint: 'e.g. hemodialysis, ECMO, total parenteral nutrition', kind: 'clinical', subtype: 'Procedure' },
+  { id: 'dosage_form', group: 'Terminology', label: 'Dosage form', hint: 'e.g. extended-release tablet, transdermal patch', kind: 'clinical', subtype: 'Dosage Form' },
+  { id: 'route', group: 'Terminology', label: 'Route of administration', hint: 'e.g. intrathecal, sublingual', kind: 'clinical', subtype: 'Route of Administration' },
+  { id: 'term', group: 'Terminology', label: 'Other medical term', hint: 'e.g. half-life, therapeutic index, bioavailability', kind: 'clinical', subtype: 'Term' },
+  { id: 'measurement', group: 'Labs and biology', label: 'Lab test or measurement', hint: 'e.g. serum potassium, CrCl', kind: 'measurement' },
+  { id: 'target', group: 'Labs and biology', label: 'Biological target', hint: 'e.g. CYP3A4, SGLT2, 5-HT2A receptor', kind: 'target' },
 ]
+
+/** A ?type= value on /new (an id from PAGE_KINDS), or ''. */
+export function pageKindParam(value: string | null): string {
+  return value && PAGE_KINDS.some(k => k.id === value) ? value : ''
+}
 
 /** measurement_type values already in use. */
 export const MEASUREMENT_TYPES = ['Serum Lab Panel', 'Vital Sign', 'Assessment Scale', 'Diagnostic Measure', 'Derived Calculation']
