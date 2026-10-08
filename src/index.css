@@ -224,8 +224,8 @@
    The rule since 2026-10-07: anything that can be clicked is embossed, and
    it presses in (debosses) under the pointer, while it is being clicked, and
    while the keyboard is on it. Things that are only labels or panels never
-   react. Clickable controls carry bold text; clickable cards keep their body
-   text regular and bold only the words that name the link.
+   react. Nothing stamped is bold: embossed and debossed text is regular
+   weight.
 
    Static (never react):
      .lp-label    flat: a small non-clickable label or stamp (Stamp.tsx,
@@ -237,9 +237,9 @@
                   sit there looking dead.
      .lp-sunken   debossed, always (signed-in badge, wells)
    Interactive (hover / :active / :focus-visible deboss them):
-     .lp-press    a button or link: embossed, bold text. Pairs with
+     .lp-press    a button or link: embossed. Pairs with
                   .lp-raised in older markup; either alone is enough.
-     .lp-toggle   a control with a state: embossed, bold text, and stays
+     .lp-toggle   a control with a state: embossed, and stays
                   debossed while pressed/open/selected/current:
                   aria-pressed / aria-expanded / aria-selected /
                   aria-checked = "true", aria-current="page", or .lp-on.
@@ -251,15 +251,15 @@
                   debossed under the pointer and for as long as it has focus,
                   i.e. clicked into and typed in.
      .lp-card     a whole card that is one link or button: embossed, body
-                  text regular; its title (h2-h4 or .lp-link-text) is bold.
+                  text regular, title included.
                   Stays debossed while aria-expanded="true" (a row that
                   opens in place, e.g. a revision in page history).
      .lp-chip     the visible span of a radio/checkbox chip
                   (<label><input class="peer sr-only"><span class="lp-chip">):
-                  debossed while checked or hovered, bold text.
-     .lp-link-text  bold words inside a card or a dropdown row.
-   A link inside an embossed panel (.lp-raised), e.g. a list card's title,
-   is bold too: the words that hold the link carry the weight.
+                  debossed while checked or hovered.
+     .lp-link-text  marks the words that name a card's or row's link
+                  (regular weight; a hook if they need a style later).
+   A link inside an embossed panel (.lp-raised) keeps its own weight.
    Rules are scored into the paper (a shaded line with a lit line below)
    instead of colored borders:
      .lp-rule-t / .lp-rule-b / .lp-rule-y   on a container's top/bottom/both
@@ -308,17 +308,29 @@ details[open] > summary.lp-toggle,
 :is(.lp-press, .lp-toggle, .lp-card, button.lp-raised):disabled {
   box-shadow: none;
 }
-/* Bold ink on everything you can press. Unlayered, so it outranks the
-   font-medium / font-semibold utilities left in older markup. */
+/* No bold on anything stamped (2026-10-07): the relief says what it is, so
+   embossed and debossed text is regular weight, including a card's title
+   and the main words of a dropdown row. Unlayered, so it outranks the
+   font-medium / font-semibold / font-bold utilities in the markup. Text
+   that sits inside a content panel (.lp-raised section headings) keeps its
+   own weight. */
+.lp-raised,
+.lp-sunken,
 .lp-press,
 .lp-toggle,
+.lp-field,
+.lp-card,
 .lp-chip,
-a.lp-raised,
-button.lp-raised,
+.lp-option,
+.lp-label,
 .lp-card :is(h2, h3, h4),
 .lp-link-text,
-.lp-raised a {
-  font-weight: 700;
+.lp-option *,
+.lp-press *,
+.lp-toggle *,
+.lp-card *,
+.lp-chip * {
+  font-weight: 400;
 }
 .lp-press,
 .lp-toggle,
@@ -373,7 +385,7 @@ button.lp-raised {
                   the chosen value (aria-selected="true"). Autocomplete
                   lists, where aria-selected marks the active row, set
                   data-autocomplete and use data-active only. Its main words
-                  carry .lp-link-text (bold).
+                  carry .lp-link-text.
    Components: src/components/PaperSelect.tsx, PaperDatePicker.tsx. */
 .lp-popover {
   box-shadow: var(--shadow-emboss), 0 12px 28px -8px var(--lp-drop), 0 2px 6px -2px var(--lp-drop);

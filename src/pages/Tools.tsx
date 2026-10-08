@@ -6,7 +6,7 @@ import type { Tool, ToolStatus } from '../tools'
 
 const LINK =
   'underline decoration-hepatica-300 underline-offset-2 transition-colors hover:decoration-hepatica-600'
-/** A tool's name is the button that opens it (embossed, bold). */
+/** A tool's name is the button that opens it (embossed). */
 const TOOL_BUTTON = 'lp-press inline-block max-w-full rounded-md px-2.5 py-1 text-ink'
 
 export default function Tools() {

@@ -256,9 +256,12 @@ so redefining `--shadow-*` for dark mode would do nothing.
 **The interactive rule (2026-10-07).** Anything that can be clicked is embossed,
 and it presses in (debosses) under the pointer, while it is being clicked, and while
 the keyboard is on it. Text fields stay debossed for as long as they have focus, so a
-search bar you have clicked into stays pressed in. Clickable controls have **bold**
-text; a clickable card keeps its body text regular and bolds only the words that name
-the link. Labels and stamps that can't be clicked are flat (`.lp-label`), so
+search bar you have clicked into stays pressed in. Nothing stamped is bold (2026-10-07):
+embossed and debossed text — buttons, nav links, chips, card titles, dropdown rows,
+labels — is regular weight; the relief alone says it can be pressed. An unlayered rule in
+`src/index.css` sets `font-weight: 400` on every `.lp-*` element (and on everything inside
+a button, toggle, chip, card or dropdown row), so `font-medium`/`font-semibold` left in the
+markup has no effect there. Headings inside a content panel keep their weight. Labels and stamps that can't be clicked are flat (`.lp-label`), so
 embossing always means "you can press this"; content panels stay embossed. None of
 them react. Hover only applies where there is a
 real pointer (`@media (hover: hover)`), so a tap on a phone doesn't leave a button
@@ -269,16 +272,16 @@ stuck pressed in. A disabled control lies flat and doesn't react.
 | Class | At rest | Pressed in when | Text |
 | --- | --- | --- | --- |
 | `.lp-label` | flat (no relief) | never: small non-clickable labels and stamps (`Stamp.tsx`, "live", "Community", "INN", PCID, schedule and system-code badges) | |
-| `.lp-raised` | embossed | never (panels and cards that hold content). On an `<a>`/`<button>` it acts like `.lp-press` | links inside it are bold |
+| `.lp-raised` | embossed | never (panels and cards that hold content). On an `<a>`/`<button>` it acts like `.lp-press` | regular |
 | `.lp-sunken` | debossed | always (wells, the "Signed In" badge) | |
-| `.lp-press` | embossed | hover, `:active`, `:focus-visible` (buttons and standalone links) | bold |
-| `.lp-toggle` | embossed | hover, `:active`, `:focus-visible`, and while `aria-pressed/expanded/selected/checked="true"`, `aria-current="page"/"true"/"location"`, `.lp-on`, or (on a `<summary>`) while its `<details>` is open | bold |
+| `.lp-press` | embossed | hover, `:active`, `:focus-visible` (buttons and standalone links) | regular |
+| `.lp-toggle` | embossed | hover, `:active`, `:focus-visible`, and while `aria-pressed/expanded/selected/checked="true"`, `aria-current="page"/"true"/"location"`, `.lp-on`, or (on a `<summary>`) while its `<details>` is open | regular |
 | `.lp-field` | embossed | hover and `:focus-within` (clicked into / typing). On the wrapper round the input. No outline. | |
-| `.lp-card` | embossed | hover, `:active`, `:focus-visible`, `aria-expanded="true"` (a whole card that is one link or button) | body regular; `h2`–`h4` and `.lp-link-text` bold |
-| `.lp-chip` | embossed | hover, and while its radio/checkbox is checked (`<label><input class="peer sr-only"><span class="lp-chip">`) | bold |
-| `.lp-option` | embossed | hover, active row (`data-active="true"`), chosen value (`aria-selected="true"`; autocomplete rows set `data-autocomplete` so only `data-active` counts) | `.lp-link-text` bold |
+| `.lp-card` | embossed | hover, `:active`, `:focus-visible`, `aria-expanded="true"` (a whole card that is one link or button) | regular, title included |
+| `.lp-chip` | embossed | hover, and while its radio/checkbox is checked (`<label><input class="peer sr-only"><span class="lp-chip">`) | regular |
+| `.lp-option` | embossed | hover, active row (`data-active="true"`), chosen value (`aria-selected="true"`; autocomplete rows set `data-autocomplete` so only `data-active` counts) | regular |
 | `.lp-popover` | embossed rim plus a soft drop | (floating panel; neutral scrollbar) | |
-| `.lp-link-text` | — | — | bold words inside a card or dropdown row |
+| `.lp-link-text` | — | — | marks the words that name a card's or row's link (regular; a styling hook) |
 
 `.lp-flat` (flat at rest) was retired on 2026-10-07: everything that used it is now
 `.lp-toggle`.
@@ -294,16 +297,16 @@ line beside it, scored into the paper.
 | --- | --- |
 | Search bars (header, home, browse, classifications, list filter) | `.lp-field`: embossed, debossed under the pointer and while clicked into |
 | Nav: home button (logo tile + wordmark, one button) | `.lp-toggle` (a `NavLink end`): debossed on `/` and under the pointer |
-| Nav: Browse · Lists · Classifications · Tools | `.lp-toggle`: embossed, debossed on their page and under the pointer, bold. Below 600px "Classifications" reads "Classes" (`BAR_LINKS.short`) and the wordmark is hidden (logo tile only) so the four buttons fit at 320px; from md to lg the wordmark is hidden too |
-| Nav: "Log in / Register" | `.lp-raised .lp-press`, bold |
+| Nav: Browse · Lists · Classifications · Tools | `.lp-toggle`: embossed, debossed on their page and under the pointer. Below 600px "Classifications" reads "Classes" (`BAR_LINKS.short`) and the wordmark is hidden (logo tile only) so the four buttons fit at 320px; from md to lg the wordmark is hidden too |
+| Nav: "Log in / Register" | `.lp-raised .lp-press` |
 | Nav: "Signed In" | `.lp-sunken` (a status stamp, not a button to press) |
 | Hamburger | `.lp-toggle`: embossed, debossed while open; three bars fold into an X |
 | Site menu links, tool links | `.lp-toggle`, debossed on the current page, stacked with a 6px gap |
 | Appearance switch | `.lp-toggle` radios, the chosen one debossed |
-| Buttons (`Button.tsx`) | `.lp-toggle`: embossed, bold; `selected` makes a toggle, debossed when pressed |
+| Buttons (`Button.tsx`) | `.lp-toggle`: embossed; `selected` makes a toggle, debossed when pressed |
 | Text actions ("Show all", "Show more", "Reload", back links, breadcrumbs, "Open in API", copy buttons) | `.lp-press`, small padding |
-| Whole-card links (Browse drug cards, sub-class and sub-list rows, blog newer/older, page-history rows) | `.lp-card`, title bold |
-| Panels (`Card.tsx`, Quick Facts, list cards) | `.lp-raised` (static); links inside are bold |
+| Whole-card links (Browse drug cards, sub-class and sub-list rows, blog newer/older, page-history rows) | `.lp-card` |
+| Panels (`Card.tsx`, Quick Facts, list cards) | `.lp-raised` (static) |
 | Labels and stamps (`Stamp.tsx` kinds, "machine-assisted", "live", "Community", "INN", PCID / schedule / system-code badges) | `.lp-label`: flat, no relief, no color (except the existing schedule/warning tints). `Stamp sunken` stays debossed for status marks such as "Do not use" |
 | A–Z letters, tabs, "On this page" | `.lp-toggle`, debossed when selected / current; letters with no entries are disabled and flat |
 | FDA label section headers | `.lp-toggle`, debossed while the section is open (the Boxed Warning keeps its own boxed style) |

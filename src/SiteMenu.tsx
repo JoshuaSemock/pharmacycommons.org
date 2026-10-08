@@ -167,12 +167,12 @@ export default function SiteMenu() {
  * /account. The email address is deliberately not shown in the bar.
  * Letterpress: "Log in / Register" is raised (a button to press, pressed in
  * under the pointer); "Signed In" stays pressed in, a stamp that says the
- * session is on. Both are bold, like every other control.
+ * session is on. Neither is bold.
  */
 export function AccountButton({ block = false }: { block?: boolean }) {
   const { user, loading } = useSession()
   const base = [
-    'items-center justify-center rounded-md px-3 font-sans text-[13px] font-bold whitespace-nowrap text-ink',
+    'items-center justify-center rounded-md px-3 font-sans text-[13px] whitespace-nowrap text-ink',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
     block ? 'flex h-11 w-full' : 'inline-flex h-9',
   ].join(' ')
