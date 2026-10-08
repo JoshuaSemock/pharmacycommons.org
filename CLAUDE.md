@@ -393,9 +393,13 @@ left-joins and returns term items with `pcid`/`slug` null, `entity_type 'term'`.
 Lists index which lists hold terms; list pages read `status_label` for the status filter/column. Minted 60 moieties (1015621–1015680) and 120 combinations
 (2002471–2002590) from the dictionary. `stg_dictionary_*` staging tables can be dropped.
 
-Lists (Phase 9, `db/phase9-lists.md`): 22 published lists — `most-used-drugs-us`
-(MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, and three Georgia MPJE
-lists (legend 2,410 · controlled 405 · exceptions 105). Read RPCs: `list_lists`,
+Lists (Phase 9, `db/phase9-lists.md`): 38 published lists (checked 2026-10-07) — `most-used-drugs-us`
+(MEPS, 247), `notable-drugs` (1,093) + 17 category sub-lists, `georgia-mpje` (2,919) + 3 parts
+(legend 2,410 · controlled 405 · exceptions 105), `do-not-crush` (226; reason per drug in
+`legal_status`, named by `lists.status_label`, brand/form in `note`, MPR / Pharmacist's Letter in
+`sources`; `db/phase9b_lists_status_label_sources.sql`) + 6 reason sub-lists, `arrhythmia-risk` + 2,
+`anticholinergic-burden` + 3, and `joint-commission-do-not-use`. List pages show `note` and
+"Also listed by" `sources` for every entry. Read RPCs: `list_lists`,
 `get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
 Deployed Edge Functions (8): `api` (public), `label-text`, `drugsfda-ingest`,
@@ -446,13 +450,14 @@ formulations in the moiety hierarchy (phase 10).
   filtering and hierarchy.
 - **Heading sizes:** the unlayered `h1`–`h6` rules beat Tailwind `text-*` utilities;
   see `docs/design-system.md` §4 (Joshua's call to change).
-- **Migrations `phase8i_public_read_surfaces` and `phase8j_data_license` were never
-  applied** (checked 2026-09-28 against `supabase_migrations.schema_migrations`), although
-  both files say they were. Live effect: `api_meta.data_license` is NULL, so every API
-  document reports `"license": null`; the class RPCs are still SECURITY DEFINER; and
-  `entity_labels` is a SECURITY DEFINER view with INSERT/UPDATE/DELETE/TRUNCATE granted to
-  anon (not exploitable today — the view is not updatable — but untidy). Apply both once
-  Joshua confirms.
+- `phase8i_public_read_surfaces` and `phase8j_data_license` were **not actually applied
+  until 2026-09-28** (both files had said 2026-09-24). Now applied as written (re-checked
+  2026-10-07: `schema_migrations` 20260928142919 / 20260928142944, `api_meta.data_license =
+  'CC0-1.0'`, `entity_labels` security_invoker): API documents report
+  `license.data = "CC0-1.0"`; the class RPCs are SECURITY INVOKER; label tables have
+  `public_read` policies and `entity_labels` is SELECT-only. `api_snapshot_all()` was run
+  for every type afterwards and recorded 15,688 versions. **Lesson: after any migration,
+  confirm it in `supabase_migrations.schema_migrations` before writing "applied" in a file.**
 - `db/CLAUDE.md` is a stale copy of this file from 2026-09-24; the root `CLAUDE.md` is
   authoritative.
 - Duplicate combination records exist under different name orders, e.g. "hydrochlorothiazide;

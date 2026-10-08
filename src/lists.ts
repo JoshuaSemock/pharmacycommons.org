@@ -92,7 +92,8 @@ export type ItemFilter = {
 export function filterItems(items: ListItem[], f: ItemFilter): ListItem[] {
   const q = f.query?.trim().toLowerCase() ?? ''
   return items.filter(i => {
-    if (q && !i.name.toLowerCase().includes(q) && !i.source_name.toLowerCase().includes(q)) return false
+    if (q && !i.name.toLowerCase().includes(q) && !i.source_name.toLowerCase().includes(q) && !(i.note ?? '').toLowerCase().includes(q))
+      return false
     if (f.top && (i.rank === null || i.rank > f.top)) return false
     if (f.status && !statusParts(i.legal_status).includes(f.status)) return false
     return true
@@ -132,21 +133,29 @@ function csvCell(v: string | number | null): string {
  */
 export const isTermList = (items: Pick<ListItem, 'slug'>[]): boolean => items.length > 0 && items.every(i => !i.slug)
 
-/** CSV of the rows as currently shown, with a PCID column so the file joins back to the API. */
-export function listToCsv(list: Pick<ListDetail, 'measure_label'>, items: ListItem[]): string {
+/**
+ * CSV of the rows as currently shown, with a PCID column so the file joins back to the API.
+ * The status column is named after the list's `status_label` ("reason", "schedule") when it
+ * has one; notes and other listing references are included when any row has them.
+ */
+export function listToCsv(list: Pick<ListDetail, 'measure_label' | 'status_label'>, items: ListItem[]): string {
   const terms = items.some(i => !i.slug)
   const header = ['rank', terms ? 'entry' : 'drug', 'pcid', 'name_in_source']
   const hasValue = items.some(i => i.value !== null)
   const hasStatus = items.some(i => i.legal_status)
+  const hasNote = items.some(i => i.note)
+  const hasSources = items.some(i => i.sources?.length)
   if (hasValue) header.push(list.measure_label ?? 'value')
-  if (hasStatus) header.push('legal_status')
-  if (terms) header.push('note')
+  if (hasStatus) header.push(list.status_label ? list.status_label.toLowerCase() : 'legal_status')
+  if (hasNote) header.push('note')
+  if (hasSources) header.push('also_listed_by')
   const lines = [header.map(csvCell).join(',')]
   for (const i of items) {
     const row: (string | number | null)[] = [i.rank, i.slug ? formatDrugName(i.name) : i.name, i.pcid ? `PCID-${i.pcid}` : '', i.source_name]
     if (hasValue) row.push(i.value)
     if (hasStatus) row.push(i.legal_status)
-    if (terms) row.push(i.note)
+    if (hasNote) row.push(i.note)
+    if (hasSources) row.push(i.sources?.join('; ') ?? null)
     lines.push(row.map(csvCell).join(','))
   }
   return lines.join('\n') + '\n'

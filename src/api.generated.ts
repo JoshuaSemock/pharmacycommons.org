@@ -280,9 +280,15 @@ export type ListItem = {
   rank: number | null
   /** Measured value (see ListDetail.measure_label); null when the list has none. */
   value: number | null
-  /** E.g. "CS-2" or "Legend" — only on lists with a jurisdiction. */
+  /** The list's category for this entry: a legal status ("CS-2", "Legend") or, on lists
+   *  whose `ListDetail.status_label` says so, something else ("Modified-release"). Several
+   *  values are separated by "; ". */
   legal_status: string | null
+  /** Free text about the entry, e.g. the brands and dosage forms a Do Not Crush entry is
+   *  about ("Toprol-XL · tablet"), or a term's meaning on the Do Not Use list. */
   note: string | null
+  /** Other references that also list this entry, e.g. ["MPR", "Pharmacist's Letter"]. */
+  sources?: string[] | null
   /** The name exactly as the source wrote it. */
   source_name: string
   pcid: number | null
