@@ -65,7 +65,7 @@ export default function Blog() {
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   <span>{post.readingMinutes} minute read</span>
                   {post.draft && (
-                    <span className="lp-raised rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+                    <span className="lp-label rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                       draft
                     </span>
                   )}
@@ -77,7 +77,7 @@ export default function Blog() {
                 >
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+                    className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                   >
                     {post.title}
                   </Link>

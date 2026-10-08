@@ -118,7 +118,7 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
         <ul
           id={listId}
           role="listbox"
-          className="lp-popover pc-grain absolute left-0 right-0 top-full z-30 mt-1.5 grid max-h-72 content-start gap-0.5 overflow-y-auto rounded-lg bg-paper p-1.5"
+          className="lp-popover pc-grain absolute left-0 right-0 top-full z-30 mt-1.5 grid max-h-72 content-start gap-1.5 overflow-y-auto rounded-lg bg-paper p-1.5"
         >
           {options.map((o, i) => (
             <li
@@ -136,7 +136,7 @@ export default function NameSearch({ id, value, pcid, onChange, placeholder, sug
               onMouseEnter={() => setActive(i)}
               className="lp-option flex cursor-pointer items-baseline justify-between gap-3 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink"
             >
-              <span className="min-w-0 truncate">{o.label}</span>
+              <span className="lp-link-text min-w-0 truncate">{o.label}</span>
               <span className="shrink-0 font-mono text-[10.5px] text-ink">{o.pcid ? `PCID-${o.pcid}` : (o.detail ?? '')}</span>
             </li>
           ))}

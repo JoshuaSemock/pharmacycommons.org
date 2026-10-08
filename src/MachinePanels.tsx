@@ -108,7 +108,7 @@ function SourceRow({ source: s }: { source: ProvenanceSource }) {
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-sans text-sm font-medium leading-snug text-ink underline-offset-2 hover:underline"
+            className="lp-press inline-block rounded-md px-2 py-0.5 font-sans text-sm leading-snug text-ink"
           >
             {s.name}
           </a>
@@ -117,7 +117,7 @@ function SourceRow({ source: s }: { source: ProvenanceSource }) {
         )}
         {s.kind === 'machine_assisted' && (
           <span
-            className="lp-raised shrink-0 rounded px-1.5 py-px font-sans text-2xs text-ink"
+            className="lp-label shrink-0 rounded px-1.5 py-px font-sans text-2xs text-ink"
             title="Assigned by a rule or an AI-assisted review rather than taken from a published source"
           >
             machine-assisted
@@ -248,7 +248,7 @@ function RecordDialog({
         </div>
         <button
           onClick={onClose}
-          className="rounded-md px-2 py-1 font-sans text-sm text-ink hover:bg-mint-100"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink"
         >
           Close
         </button>
@@ -291,7 +291,7 @@ function JsonView({ doc }: { doc: EntityDocument }) {
           href={doc.links.self}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-sans text-sm text-ink underline-offset-2 hover:underline"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink"
         >
           Open in API ↗
         </a>
@@ -338,7 +338,7 @@ function HistoryView({ doc }: { doc: EntityDocument }) {
                   href={v.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-sans text-sm font-medium text-ink underline-offset-2 hover:underline"
+                  className="lp-press inline-block rounded-md px-2 py-0.5 font-sans text-sm text-ink"
                 >
                   Version {v.number}
                 </a>
@@ -450,7 +450,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`lp-flat rounded-md px-3 py-1.5 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${active ? 'font-medium' : ''}`}
+      className={`lp-toggle rounded-md px-3 py-1.5 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${active ? 'font-medium' : ''}`}
     >
       {children}
     </button>

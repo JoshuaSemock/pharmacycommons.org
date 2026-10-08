@@ -279,11 +279,10 @@ export default function PaperDatePicker({
                             className={[
                               'relative flex h-9 w-full items-center justify-center rounded-md font-sans text-[13px] text-ink tabular-nums',
                               'transition-shadow duration-150 motion-reduce:transition-none outline-none',
-                              isSel
-                                ? 'shadow-deboss font-semibold'
-                                : off
-                                  ? 'cursor-default opacity-25'
-                                  : 'hover:shadow-emboss focus-visible:shadow-emboss active:shadow-deboss',
+                              // Every pickable day is a stamped key (.lp-toggle:
+                              // pressed in under the pointer and when chosen via
+                              // aria-pressed); days you can't pick lie flat.
+                              off ? 'cursor-default opacity-25 font-normal' : 'lp-toggle',
                               isSel ? 'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40' : '',
                               !inMonth && !isSel && !off ? 'opacity-40' : '',
                             ].join(' ')}

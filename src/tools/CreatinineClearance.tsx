@@ -69,7 +69,7 @@ export default function CreatinineClearance() {
       <header className="pt-10 pb-10 sm:pt-14 lg:pb-12">
         <Link
           to="/tools"
-          className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors"
+          className="lp-press mb-4 inline-block rounded-md px-2.5 py-1 font-sans text-[13px] text-ink"
         >
           All tools
         </Link>

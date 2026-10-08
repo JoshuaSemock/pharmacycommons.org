@@ -189,7 +189,7 @@ export function Section({
 
 export function Pending({ children }: { children: ReactNode }) {
   return (
-    <span className="lp-raised ml-2 rounded px-1.5 py-0.5 align-middle font-mono text-[10px] text-ink">
+    <span className="lp-label ml-2 rounded px-1.5 py-0.5 align-middle font-mono text-[10px] text-ink">
       {children}
     </span>
   )

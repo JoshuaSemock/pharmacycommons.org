@@ -88,7 +88,7 @@ export default function ListDetail() {
         <p className="mb-2 font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
           {state === 'missing' ? `No list called “${slug}”.` : 'The list couldn’t be loaded right now.'}
         </p>
-        <Link to="/lists" className="font-sans text-sm text-ink hover:underline">
+        <Link to="/lists" className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
           All lists
         </Link>
       </main>
@@ -98,13 +98,13 @@ export default function ListDetail() {
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-4 font-sans text-[13px] text-ink">
-        <Link to="/lists" className="transition-colors">
+        <Link to="/lists" className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
           Lists
         </Link>
         {list.parent && (
           <span className="flex min-w-0 items-center gap-1.5">
             <span aria-hidden="true">/</span>
-            <Link to={`/lists/${list.parent.slug}`} className="break-words transition-colors">
+            <Link to={`/lists/${list.parent.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 break-words">
               {list.parent.title}
             </Link>
           </span>
@@ -130,9 +130,9 @@ export default function ListDetail() {
                   <li key={c.slug}>
                     <Link
                       to={`/lists/${c.slug}`}
-                      className="lp-raised lp-press flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
+                      className="lp-card flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
                     >
-                      <span className="min-w-0 break-words font-sans text-[13px] leading-snug text-ink">
+                      <span className="lp-link-text min-w-0 break-words font-sans text-[13px] leading-snug text-ink">
                         {c.title.replace(/^.*?:\s*/, '')}
                       </span>
                       <span className="shrink-0 font-mono text-[11px] text-ink">{c.item_count}</span>
@@ -156,11 +156,11 @@ function ListHeader({ list }: { list: ListRecord }) {
     <header className="border-b border-ink/15 pb-8">
       <div className="flex flex-wrap gap-1.5">
         {place && (
-          <span className="lp-raised rounded-md px-2 py-0.5 font-mono text-[11px] font-medium text-ink">
+          <span className="lp-label rounded-md px-2 py-0.5 font-mono text-[11px] font-medium text-ink">
             {place}
           </span>
         )}
-        <span className="lp-raised rounded-md px-2 py-0.5 font-mono text-[11px] text-ink">
+        <span className="lp-label rounded-md px-2 py-0.5 font-mono text-[11px] text-ink">
           {list.pcid_code}
         </span>
       </div>
@@ -462,7 +462,7 @@ function Row({
         {isTerm ? (
           <span className="break-words font-mono text-[14px] font-medium text-ink">{name}</span>
         ) : (
-          <Link to={`/drugs/${item.slug}`} className="break-words font-sans text-[14.5px] font-medium text-ink">
+          <Link to={`/drugs/${item.slug}`} className="lp-press inline-block max-w-full break-words rounded-md px-2 py-0.5 font-sans text-[14.5px] text-ink">
             {name}
           </Link>
         )}
@@ -496,7 +496,7 @@ function Row({
       {showStatus && (
         <span className="col-start-2 min-w-0 sm:col-start-auto">
           {item.legal_status && (
-            <span className="lp-raised inline-block max-w-full break-words rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
+            <span className="lp-label inline-block max-w-full break-words rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
               {item.legal_status}
             </span>
           )}
@@ -528,7 +528,7 @@ function AboutCard({ list }: { list: ListRecord }) {
         <Fact label={isTermList(list.items) ? 'Entries' : 'Drugs'}>{list.item_count.toLocaleString()}</Fact>
         <Fact label="License">{list.license === 'CC0-1.0' ? 'CC0 1.0 (public domain)' : list.license}</Fact>
         <Fact label="Permanent address">
-          <Link to={`/id/${list.pcid_code}`} className="font-mono text-[12px] text-ink hover:underline">
+          <Link to={`/id/${list.pcid_code}`} className="lp-press inline-block rounded-md px-1.5 py-0.5 font-mono text-[12px] text-ink">
             /id/{list.pcid_code}
           </Link>
         </Fact>

@@ -128,7 +128,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                           <button
                             type="button"
                             onClick={() => onOpen(m.id)}
-                            className="text-left font-sans text-[14.5px] font-semibold text-ink underline-offset-2 [overflow-wrap:anywhere] hover:underline"
+                            className="lp-press rounded-md px-2 py-0.5 text-left font-sans text-[14.5px] text-ink [overflow-wrap:anywhere]"
                           >
                             {c.name || 'Unnamed medication'}
                           </button>
@@ -163,7 +163,7 @@ export default function Medications({ meds, openId, filter, onFilter, onAdd, onO
                           type="button"
                           onClick={() => onRemove(m.id)}
                           aria-label={`Remove ${c.name || 'medication'}`}
-                          className="rounded p-1.5 align-middle text-ink hover:bg-rose-50"
+                          className="lp-press rounded-md p-1.5 align-middle text-ink"
                         >
                           <RemoveIcon />
                         </button>

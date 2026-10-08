@@ -6,6 +6,8 @@ import type { Tool, ToolStatus } from '../tools'
 
 const LINK =
   'underline decoration-hepatica-300 underline-offset-2 transition-colors hover:decoration-hepatica-600'
+/** A tool's name is the button that opens it (embossed, bold). */
+const TOOL_BUTTON = 'lp-press inline-block max-w-full rounded-md px-2.5 py-1 text-ink'
 
 export default function Tools() {
   return (
@@ -32,7 +34,7 @@ export default function Tools() {
                 href={tool.url}
                 target="_blank"
                 rel="noreferrer"
-                className={`font-sans text-[14.5px] font-medium text-ink [overflow-wrap:anywhere] ${LINK}`}
+                className={`${TOOL_BUTTON} font-sans text-[14.5px] [overflow-wrap:anywhere]`}
               >
                 {tool.name}
               </a>
@@ -97,14 +99,14 @@ function ToolList({ id, heading, tools }: { id: string; heading: string; tools: 
 function ToolName({ tool }: { tool: Tool }) {
   if (tool.to) {
     return (
-      <Link to={tool.to} className={LINK}>
+      <Link to={tool.to} className={TOOL_BUTTON}>
         {tool.name}
       </Link>
     )
   }
   if (tool.href) {
     return (
-      <a href={tool.href} target="_blank" rel="noreferrer" className={LINK}>
+      <a href={tool.href} target="_blank" rel="noreferrer" className={TOOL_BUTTON}>
         {tool.name}
       </a>
     )
@@ -114,7 +116,7 @@ function ToolName({ tool }: { tool: Tool }) {
 
 function StatusTag({ status }: { status: ToolStatus }) {
   const styles: Record<ToolStatus, string> = {
-    live: 'lp-raised',
+    live: 'lp-label',
     building: 'lp-sunken',
     planned: 'border border-dashed border-ink/30',
   }

@@ -399,7 +399,7 @@ function SavedPanel({ onCountChange }: { onCountChange: (count: number) => void 
           <div className="min-w-0">
             <Link
               to={`/drugs/${row.slug}`}
-              className="block truncate font-sans text-md font-medium text-ink hover:underline"
+              className="lp-press block max-w-full truncate rounded-md px-2 py-0.5 font-sans text-md text-ink"
             >
               {row.name}
             </Link>
@@ -859,7 +859,7 @@ function SignInForm() {
           type="button"
           onClick={handleForgotPassword}
           disabled={status === 'loading'}
-          className="font-sans text-sm text-ink underline-offset-2 hover:underline disabled:opacity-50"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink disabled:opacity-50"
         >
           Forgot password?
         </button>

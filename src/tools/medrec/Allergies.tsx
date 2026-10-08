@@ -72,7 +72,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
                 type="button"
                 onClick={() => onRemove(a.id)}
                 aria-label={`Remove ${a.substance || 'allergy'}`}
-                className="rounded p-1.5 text-ink hover:bg-rose-50"
+                className="lp-press rounded-md p-1.5 text-ink"
               >
                 <RemoveIcon />
               </button>

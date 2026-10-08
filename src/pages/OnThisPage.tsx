@@ -187,7 +187,7 @@ export default function OnThisPage({ headings }: { headings: TocHeading[] }) {
   return (
     <nav aria-label="On this page">
       <p className="mb-3 font-sans text-[12.5px] font-medium text-ink">On this page</p>
-      <ol className="border-l border-ink/15">
+      <ol className="grid gap-1.5">
         {headings.map(h => {
           const isActive = active === h.id
           return (
@@ -197,12 +197,11 @@ export default function OnThisPage({ headings }: { headings: TocHeading[] }) {
                 onClick={e => jump(e, h.id)}
                 aria-current={isActive ? 'location' : undefined}
                 className={[
-                  '-ml-px block border-l-2 py-1 pr-2 font-sans text-[13px] leading-snug transition-colors',
+                  // Embossed; the section you are reading stays pressed in
+                  // (.lp-toggle keys off aria-current="location").
+                  'lp-toggle block rounded-md py-1 pr-2 pl-2.5 font-sans text-[13px] leading-snug text-ink',
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
-                  h.level === 3 ? 'pl-6' : 'pl-3',
-                  isActive
-                    ? 'border-ink text-ink'
-                    : 'border-transparent text-ink hover:border-ink/25',
+                  h.level === 3 ? 'ml-3' : '',
                 ].join(' ')}
               >
                 {h.text}

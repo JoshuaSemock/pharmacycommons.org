@@ -107,14 +107,14 @@ function LinkItem({ link }: { link: ReferenceResource }) {
           href={link.href}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 break-words font-sans text-[14.5px] font-medium text-ink underline decoration-mint-300 underline-offset-2 hover:decoration-hepatica-600"
+          className="lp-press min-w-0 break-words rounded-md px-2 py-0.5 font-sans text-[14.5px] text-ink"
         >
           {link.name}
         </a>
         {badges.map(badge => (
           <span
             key={badge}
-            className="lp-raised rounded px-1.5 py-0.5 font-mono text-[10px] text-ink"
+            className="lp-label rounded px-1.5 py-0.5 font-mono text-[10px] text-ink"
           >
             {badge}
           </span>

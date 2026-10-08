@@ -160,9 +160,9 @@ export default function Console({ apiBase }: { apiBase: string }) {
                   type="button"
                   onClick={() => update({ ep: e.id })}
                   aria-current={on ? 'true' : undefined}
-                  className={`grid w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors ${on ? 'bg-hepatica-100 text-ink' : 'text-ink hover:bg-mint-50'}`}
+                  className="lp-toggle grid w-full gap-0.5 rounded-lg px-3 py-2 text-left text-ink"
                 >
-                  <span className="font-sans text-[14px] font-medium">{e.label}</span>
+                  <span className="lp-link-text font-sans text-[14px]">{e.label}</span>
                   <span className={`truncate font-mono text-[11px] ${on ? 'text-ink' : 'text-ink'}`}>{e.path}</span>
                 </button>
               </li>
@@ -237,7 +237,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                     {(['json', 'jsonld'] as const).map(f => (
                       <label key={f} className="relative cursor-pointer">
                         <input type="radio" name="console-fmt" checked={format === f} onChange={() => update({ fmt: f })} className="peer sr-only" />
-                        <span className="inline-block rounded-md shadow-emboss peer-checked:shadow-deboss px-3 py-1 font-mono text-[12.5px] text-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
+                        <span className="inline-block rounded-md lp-chip px-3 py-1 font-mono text-[12.5px] text-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
                           {f === 'json' ? '.json' : '.jsonld'}
                         </span>
                       </label>
@@ -294,7 +294,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
             {result && !result.networkError && (
               <div role="tablist" aria-label="Response view" className="ml-auto flex gap-1">
                 {(['body', 'headers'] as const).map(t => (
-                  <button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className={`${darkButton} ${tab === t ? 'bg-white/20 text-ink' : ''}`}>
+                  <button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className={darkButton}>
                     {t === 'body' ? 'Body' : `Headers (${result.headers.length})`}
                   </button>
                 ))}
@@ -385,7 +385,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
                 aria-selected={lang === id}
                 type="button"
                 onClick={() => setLang(id)}
-                className={`rounded-md px-2.5 py-1 font-sans text-[13px] ${lang === id ? 'bg-hepatica-100 font-medium text-ink' : 'text-ink hover:bg-mint-50'}`}
+                className="lp-toggle rounded-md px-2.5 py-1 font-sans text-[13px] text-ink"
               >
                 {label}
               </button>
@@ -405,7 +405,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
 
 /** The dark "code" surface: black olive from the palette, not pure black. */
 export const CODE_SURFACE = 'pc-code bg-neutral-900 text-ink'
-const darkButton = 'rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10'
+const darkButton = 'lp-toggle rounded-md px-2 py-1 font-sans text-[12px] text-ink'
 const selectFieldClass = 'w-full min-w-0 px-3 py-1.5 font-mono text-[13.5px]'
 const fieldClass =
   'lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:text-ink'

@@ -38,7 +38,7 @@ const FIELD = 'lp-field block w-full rounded-md px-3 py-2 font-sans text-base te
 const H1 = { fontSize: 'var(--text-3xl)', fontFamily: 'var(--font-sans)', lineHeight: 1.15 } as const
 const H2 = { fontSize: 'var(--text-xl)', fontFamily: 'var(--font-sans)', lineHeight: 1.25 } as const
 const CHIP =
-  'block rounded-md px-3 py-1 font-sans text-sm text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
+  'block rounded-md px-3 py-1 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
 
 export default function Admin() {
   const { user, loading } = useSession()
@@ -456,7 +456,7 @@ function ProtectionSection({ onNotice }: { onNotice: (m: string) => void }) {
                 <li key={p.pcid} className="space-y-2 py-2.5 font-sans text-sm text-ink">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <span className="min-w-0 [overflow-wrap:anywhere]">
-                      <Link to={entityHref(p.entityType, p.slug)} className="text-base font-medium hover:underline">
+                      <Link to={entityHref(p.entityType, p.slug)} className="lp-press inline-block rounded-md px-2 py-0.5 text-base">
                         {label}
                       </Link>{' '}
                       · {kindLabel(p.entityType)}
@@ -545,10 +545,10 @@ function AddProtection({ busy, onSave }: { busy: boolean; onSave: (pcid: number,
           className={FIELD}
         />
         {results.length > 0 && (
-          <ul className="lp-sunken mt-2 rounded-md px-3 py-2">
+          <ul className="lp-sunken mt-2 grid gap-1.5 rounded-md p-2">
             {results.map(s => (
               <li key={s.slug}>
-                <button type="button" onClick={() => pick(s)} className={`py-1 text-left font-sans text-sm text-ink hover:underline ${FOCUS}`}>
+                <button type="button" onClick={() => pick(s)} className={`lp-press w-full rounded-md px-2.5 py-1 text-left font-sans text-sm text-ink ${FOCUS}`}>
                   {pageName(s.name, s.entityType)} <span>· {kindLabel(s.entityType)}</span>
                 </button>
               </li>

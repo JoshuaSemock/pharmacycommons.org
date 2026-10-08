@@ -11,9 +11,9 @@ import { UpDownIcon, useOutsidePress, usePopoverPlacement, useRegisterWithParent
  * Colorless by rule: no fills, tints, colored rims or focus rings. The
  * trigger is raised out of the paper and presses in while its list is open
  * (.lp-toggle + aria-expanded). The list is a floating scrap of the same
- * paper with its grain (.lp-popover .pc-grain bg-paper). Rows are flat; the
- * row under the pointer or arrow keys is embossed, the chosen row is
- * debossed (.lp-option). An optional search field at the top is embossed at
+ * paper with its grain (.lp-popover .pc-grain bg-paper). Rows are embossed
+ * like every clickable thing; the row under the pointer or arrow keys and
+ * the chosen row are debossed (.lp-option), and the label is bold. An optional search field at the top is embossed at
  * rest and debossed while typed into (.lp-field). Badges are Stamps.
  *
  * Options come from `options`, or from <option>/<optgroup> children so a
@@ -277,7 +277,7 @@ export default function PaperSelect({
               aria-label={ariaLabel ?? placeholder}
               aria-activedescendant={!withSearch && active >= 0 ? `${listId}-${active}` : undefined}
               style={{ maxHeight: Math.max(96, maxHeight - (withSearch ? 64 : 16)) }}
-              className="grid min-h-0 content-start gap-0.5 overflow-y-auto overscroll-contain p-0.5 outline-none"
+              className="grid min-h-0 content-start gap-1.5 overflow-y-auto overscroll-contain p-0.5 outline-none"
             >
               {shown.length === 0 && <p className="px-3 py-3 text-center text-[13px] text-ink">No matches</p>}
               {shown.map((o, i) => (
@@ -332,17 +332,16 @@ function OptionRow({
         onClick={onPick}
         className={[
           'lp-option flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-md px-2.5 py-1.5 text-ink',
-          selected ? 'font-medium' : '',
           option.disabled ? 'cursor-default opacity-50' : '',
           typeClass,
         ].join(' ')}
       >
         <span className="min-w-0 flex-1">
-          <span className="block break-words">{option.label}</span>
+          <span className="lp-link-text block break-words">{option.label}</span>
           {option.sublabel && <span className="block truncate text-[12px] font-normal">{option.sublabel}</span>}
         </span>
         {option.badge && (
-          <span className="lp-raised inline-flex shrink-0 items-center rounded px-1.5 py-0.5 font-mono text-[10.5px] font-medium text-ink">
+          <span className="lp-label inline-flex shrink-0 items-center rounded px-1.5 py-0.5 font-mono text-[10.5px] font-medium text-ink">
             {option.badge}
           </span>
         )}

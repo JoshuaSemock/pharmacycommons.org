@@ -110,7 +110,7 @@ export default function ListCompare() {
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-1.5 py-4 font-sans text-[13px] text-ink">
-        <Link to="/lists" className="transition-colors">
+        <Link to="/lists" className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
           Lists
         </Link>
         <span aria-hidden="true">/</span>
@@ -136,14 +136,14 @@ export default function ListCompare() {
         {slugs.map((slug, i) => (
           <span
             key={slug}
-            className="lp-raised flex max-w-full items-center gap-2 rounded-md py-1.5 pl-3 pr-1.5 font-sans text-[13px] font-medium text-ink"
+            className="lp-label flex max-w-full items-center gap-2 rounded-md py-1.5 pl-3 pr-1.5 font-sans text-[13px] font-medium text-ink"
           >
             <span className="min-w-0 break-words">{lists[i]?.title ?? slug}</span>
             <button
               type="button"
               onClick={() => setSlugs(slugs.filter(s => s !== slug))}
               aria-label={`Remove ${lists[i]?.title ?? slug}`}
-              className="flex rounded p-1 text-ink hover:bg-hepatica-200"
+              className="lp-press flex rounded p-1 text-ink"
             >
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                 <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -233,7 +233,7 @@ export default function ListCompare() {
                   <tr key={r.key} className="border-b border-ink/10 last:border-b-0">
                     <th scope="row" className="px-4 py-2 text-left font-medium">
                       {r.slug ? (
-                        <Link to={`/drugs/${r.slug}`} className="text-ink">
+                        <Link to={`/drugs/${r.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
                           {r.name}
                         </Link>
                       ) : (
@@ -279,7 +279,7 @@ function Cell({ item }: { item: ListItem | null }) {
     <span className="flex flex-wrap items-center gap-2">
       {item.rank !== null && <span className="font-mono text-[12.5px] text-ink">#{item.rank}</span>}
       {item.legal_status && (
-        <span className="lp-raised rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
+        <span className="lp-label rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
           {item.legal_status}
         </span>
       )}

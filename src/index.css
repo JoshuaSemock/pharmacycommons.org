@@ -216,22 +216,50 @@
   --lp-drop: rgb(0 0 0 / 0.55);
 }
 
-/* Letterpress states, one class per behaviour (2026-10-01). Each sets the
-   shadow, so markup needs one class. Text is never shadowed (see the
-   text-shadow rule below): the relief is in the paper, the ink stays crisp.
-     .lp-raised   embossed, always (labels, cards, plain buttons)
+/* Letterpress states, one class per behaviour (2026-10-01; interactive
+   relief 2026-10-07). Each sets the shadow, so markup needs one class. Text
+   is never shadowed (see the text-shadow rule below): the relief is in the
+   paper, the ink stays crisp.
+
+   The rule since 2026-10-07: anything that can be clicked is embossed, and
+   it presses in (debosses) under the pointer, while it is being clicked, and
+   while the keyboard is on it. Things that are only labels or panels never
+   react. Clickable controls carry bold text; clickable cards keep their body
+   text regular and bold only the words that name the link.
+
+   Static (never react):
+     .lp-label    flat: a small non-clickable label or stamp (Stamp.tsx,
+                  "live", "Community", PCID and schedule badges, system
+                  codes). No relief at all, so embossing always means
+                  "you can press this" (2026-10-07).
+     .lp-raised   embossed, always (panels and cards that hold content). On an <a> or a
+                  <button> it behaves like .lp-press, so a raised link can't
+                  sit there looking dead.
      .lp-sunken   debossed, always (signed-in badge, wells)
-     .lp-field    a text field: embossed at rest, debossed while focused
-                  (being typed into). Put it on the wrapper round the input.
-     .lp-toggle   embossed, debossed while pressed/open/selected:
-                  aria-pressed="true", aria-expanded="true",
-                  aria-selected="true", aria-checked="true",
-                  aria-current="page" or .lp-on.
-     .lp-flat     no relief at rest, debossed when aria-current="page",
-                  aria-pressed="true" or aria-selected="true" (bar links,
-                  the A-Z letters, tabs).
-     .lp-press    add to a raised link or card: it presses in while
-                  clicked. There is no hover lift; paper doesn't float.
+   Interactive (hover / :active / :focus-visible deboss them):
+     .lp-press    a button or link: embossed, bold text. Pairs with
+                  .lp-raised in older markup; either alone is enough.
+     .lp-toggle   a control with a state: embossed, bold text, and stays
+                  debossed while pressed/open/selected/current:
+                  aria-pressed / aria-expanded / aria-selected /
+                  aria-checked = "true", aria-current="page", or .lp-on.
+                  A <summary class="lp-toggle"> stays debossed while its
+                  <details> is open.
+                  The nav bar links, A-Z letters, tabs and menu links use it
+                  (they were the flat .lp-flat until 2026-10-07).
+     .lp-field    a text field (on the wrapper round the input): embossed,
+                  debossed under the pointer and for as long as it has focus,
+                  i.e. clicked into and typed in.
+     .lp-card     a whole card that is one link or button: embossed, body
+                  text regular; its title (h2-h4 or .lp-link-text) is bold.
+                  Stays debossed while aria-expanded="true" (a row that
+                  opens in place, e.g. a revision in page history).
+     .lp-chip     the visible span of a radio/checkbox chip
+                  (<label><input class="peer sr-only"><span class="lp-chip">):
+                  debossed while checked or hovered, bold text.
+     .lp-link-text  bold words inside a card or a dropdown row.
+   A link inside an embossed panel (.lp-raised), e.g. a list card's title,
+   is bold too: the words that hold the link carry the weight.
    Rules are scored into the paper (a shaded line with a lit line below)
    instead of colored borders:
      .lp-rule-t / .lp-rule-b / .lp-rule-y   on a container's top/bottom/both
@@ -240,9 +268,15 @@
      .lp-score-v  a 1px vertical line element
      .lp-divide-y between the children of a list */
 .lp-raised,
+.lp-press,
 .lp-field,
-.lp-toggle {
+.lp-toggle,
+.lp-card,
+.lp-chip {
   box-shadow: var(--shadow-emboss);
+}
+.lp-label {
+  box-shadow: none;
 }
 .lp-sunken,
 .lp-field:focus-within,
@@ -250,32 +284,66 @@
 .lp-toggle[aria-expanded="true"],
 .lp-toggle[aria-selected="true"],
 .lp-toggle[aria-current="page"],
+.lp-toggle[aria-current="true"],
+.lp-toggle[aria-current="location"],
+.lp-card[aria-expanded="true"],
 .lp-toggle[aria-checked="true"],
 .lp-toggle.lp-on,
-.lp-flat[aria-current="page"],
-.lp-flat[aria-pressed="true"],
-.lp-flat[aria-selected="true"],
-.lp-press:active {
+details[open] > summary.lp-toggle,
+.peer:checked ~ .lp-chip,
+:is(.lp-press, .lp-toggle, .lp-card, a.lp-raised, button.lp-raised):not(:disabled, [aria-disabled="true"]):active,
+:is(.lp-press, .lp-toggle, .lp-card, .lp-field, a.lp-raised, button.lp-raised):focus-visible {
   box-shadow: var(--shadow-deboss);
 }
-.lp-field,
+/* Hover only where there is a real pointer: on a phone a tap would leave
+   the last thing touched stuck pressed in. */
+@media (hover: hover) {
+  :is(.lp-press, .lp-toggle, .lp-card, .lp-field, a.lp-raised, button.lp-raised):not(:disabled, [aria-disabled="true"]):hover,
+  label:hover > .lp-chip,
+  .peer:not(:disabled) + .lp-chip:hover {
+    box-shadow: var(--shadow-deboss);
+  }
+}
+/* Something you can't press right now lies flat in the paper. */
+:is(.lp-press, .lp-toggle, .lp-card, button.lp-raised):disabled {
+  box-shadow: none;
+}
+/* Bold ink on everything you can press. Unlayered, so it outranks the
+   font-medium / font-semibold utilities left in older markup. */
+.lp-press,
 .lp-toggle,
-.lp-flat,
-.lp-press {
+.lp-chip,
+a.lp-raised,
+button.lp-raised,
+.lp-card :is(h2, h3, h4),
+.lp-link-text,
+.lp-raised a {
+  font-weight: 700;
+}
+.lp-press,
+.lp-toggle,
+.lp-field,
+.lp-card,
+.lp-chip,
+a.lp-raised,
+button.lp-raised {
   transition: box-shadow 150ms ease;
 }
-/* A field shows focus by pressing in, so no browser outline on it or on the
-   input inside it. */
+/* Debossed is the focus cue, so no browser outline on fields (or the input
+   inside them). Buttons keep their neutral ink outline for keyboard users. */
 .lp-field,
 .lp-field:focus,
 .lp-field :focus {
   outline: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .lp-field,
+  .lp-press,
   .lp-toggle,
-  .lp-flat,
-  .lp-press {
+  .lp-field,
+  .lp-card,
+  .lp-chip,
+  a.lp-raised,
+  button.lp-raised {
     transition: none;
   }
 }
@@ -299,11 +367,13 @@
      .lp-popover  the floating panel: embossed rim plus a soft drop where it
                   sits above the page. Neutral scrollbar (the site default
                   is mint). Add .pc-grain and bg-paper alongside it.
-     .lp-option   a row in the panel: flat at rest; embossed while it is the
-                  active row (pointer or arrow keys: data-active="true");
-                  debossed when it is the chosen value (aria-selected="true").
-                  Autocomplete lists, where aria-selected marks the active
-                  row, use data-active only.
+     .lp-option   a row in the panel: embossed at rest like every other
+                  clickable thing; debossed while it is the active row
+                  (pointer, or arrow keys: data-active="true") and when it is
+                  the chosen value (aria-selected="true"). Autocomplete
+                  lists, where aria-selected marks the active row, set
+                  data-autocomplete and use data-active only. Its main words
+                  carry .lp-link-text (bold).
    Components: src/components/PaperSelect.tsx, PaperDatePicker.tsx. */
 .lp-popover {
   box-shadow: var(--shadow-emboss), 0 12px 28px -8px var(--lp-drop), 0 2px 6px -2px var(--lp-drop);
@@ -323,13 +393,18 @@
   scrollbar-color: var(--lp-edge) transparent;
 }
 .lp-option {
+  box-shadow: var(--shadow-emboss);
   transition: box-shadow 120ms ease;
 }
-.lp-option[data-active="true"] {
-  box-shadow: var(--shadow-emboss);
-}
-.lp-option[aria-selected="true"]:not([data-autocomplete]) {
+.lp-option[data-active="true"],
+.lp-option[aria-selected="true"]:not([data-autocomplete]),
+.lp-option:active {
   box-shadow: var(--shadow-deboss);
+}
+@media (hover: hover) {
+  .lp-option:not([aria-disabled="true"]):hover {
+    box-shadow: var(--shadow-deboss);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .lp-option {

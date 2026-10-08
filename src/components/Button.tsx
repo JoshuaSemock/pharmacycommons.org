@@ -3,8 +3,9 @@ import type { ButtonHTMLAttributes } from 'react'
 /**
  * A letterpress button (plan 4.3): stamped out of the paper itself. It has
  * no fill of its own (bg-transparent, so the sheet and its grain show
- * through) and no border, and it is raised at rest and
- * pressed in when selected. Only the 1-2px micro-shadows change between the
+ * through) and no border, and it is raised at rest, pressed in under the
+ * pointer, and pressed in when selected. Its text is bold, like every
+ * clickable thing on the site. Only the 1-2px micro-shadows change between the
  * two states; the text has no shadow. Tokens live in
  * src/index.css (search "Letterpress").
  *
@@ -49,9 +50,9 @@ export default function Button({
       type={type}
       aria-pressed={selected}
       className={[
-        'inline-flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent font-sans font-medium text-ink',
-        'shadow-emboss transition-all duration-150 motion-reduce:transition-none',
-        'aria-pressed:shadow-deboss aria-pressed:translate-y-px',
+        // .lp-toggle (src/index.css): embossed, bold, pressed in under the
+        // pointer and while aria-pressed is true.
+        'lp-toggle inline-flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent font-sans text-ink',
         'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink/40',
         'disabled:cursor-default disabled:opacity-50',
         SIZES[size],

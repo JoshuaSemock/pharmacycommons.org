@@ -234,7 +234,7 @@ export default function DaysSupply() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="grid gap-5 pt-10 pb-8 sm:pt-14">
         <div>
-          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors">
+          <Link to="/tools" className="lp-press mb-4 inline-block rounded-md px-2.5 py-1 font-sans text-[13px] text-ink">
             All tools
           </Link>
           <PageTitle

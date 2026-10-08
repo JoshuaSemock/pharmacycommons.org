@@ -268,7 +268,7 @@ function ReferenceItem({
           href={source.href}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 break-words font-sans text-md font-medium text-ink underline decoration-mint-300 underline-offset-2 hover:decoration-hepatica-600"
+          className="lp-press min-w-0 break-words rounded-md px-2 py-0.5 font-sans text-md text-ink"
         >
           {source.name}
         </a>
@@ -472,10 +472,10 @@ const buttonClass =
   'lp-raised lp-press rounded-md px-2.5 py-1 font-sans text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 disabled:opacity-40'
 
 const sourceBadgeClass =
-  'lp-raised rounded px-1.5 py-0.5 font-mono text-xs text-ink'
+  'lp-label rounded px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const badgeClass =
-  'lp-raised rounded px-1.5 py-0.5 font-mono text-xs text-ink'
+  'lp-label rounded px-1.5 py-0.5 font-mono text-xs text-ink'
 
 const linkClass =
   'text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600'

@@ -83,7 +83,7 @@ export default function ClassDetail() {
         <p className="mb-2 font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
           {state === 'missing' ? `No class called “${slug}”.` : 'The class couldn’t be loaded right now.'}
         </p>
-        <Link to="/classifications" className="font-sans text-sm text-ink hover:underline">
+        <Link to="/classifications" className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
           All classifications
         </Link>
       </main>
@@ -96,13 +96,13 @@ export default function ClassDetail() {
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       {/* Breadcrumb: Classes / ancestors… / this class */}
       <nav className="flex flex-wrap items-center gap-x-1.5 gap-y-1 py-4 font-sans text-sm text-ink">
-        <Link to="/classifications" className="transition-colors">
+        <Link to="/classifications" className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
           Classifications
         </Link>
         {cls.ancestors.map(a => (
           <span key={a.slug} className="flex min-w-0 items-center gap-1.5">
             <span aria-hidden="true">/</span>
-            <Link to={`/classifications/${a.slug}`} className="break-words transition-colors">
+            <Link to={`/classifications/${a.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 break-words">
               {a.name}
             </Link>
           </span>
@@ -172,13 +172,13 @@ function SubclassesCard({
           <li key={c.slug}>
             <Link
               to={`/classifications/${c.slug}`}
-              className="lp-raised lp-press flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
+              className="lp-card flex items-baseline justify-between gap-2 rounded-md px-3 py-2"
             >
               <span className="min-w-0 break-words font-sans text-sm leading-snug text-ink">
                 {showCodes && c.source_code && (
                   <span className="mr-1.5 font-mono text-2xs text-ink">{c.source_code}</span>
                 )}
-                {c.name}
+                <span className="lp-link-text">{c.name}</span>
               </span>
               {typeof c.member_count === 'number' && (
                 <span className="shrink-0 font-sans text-2xs text-ink">{c.member_count}</span>
@@ -190,7 +190,7 @@ function SubclassesCard({
       {items.length > SUBCLASS_PREVIEW && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="mt-2 font-sans text-sm font-medium text-ink hover:underline"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-2"
         >
           {showAll ? 'Show fewer' : `Show all ${items.length}`}
         </button>
@@ -250,7 +250,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
                 to={`/drugs/${m.slug}`}
                 title={m.is_direct ? undefined : 'In this class through one of its sub-classes'}
                 className={`inline-block max-w-full break-words rounded px-2 py-0.5 font-sans text-sm leading-snug text-ink ${
-                  m.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
+                  m.is_direct ? 'lp-press' : 'lp-press border border-dashed border-ink/30'
                 }`}
               >
                 {formatDrugName(m.name)}
@@ -263,7 +263,7 @@ function MemberList({ members }: { members: ClassRecord['members'] }) {
       {filtered.length > limit && (
         <button
           onClick={() => setLimit(l => l + BATCH * 4)}
-          className="mt-4 font-sans text-sm font-medium text-ink hover:underline"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-4"
         >
           Show more ({(filtered.length - limit).toLocaleString()} left)
         </button>

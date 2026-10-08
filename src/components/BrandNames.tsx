@@ -30,7 +30,7 @@ const FIELD = 'lp-field block w-full rounded-md px-3 py-1.5 font-sans text-sm te
 const LABEL = 'mb-1 block font-sans text-sm font-semibold text-ink'
 const SMALL_TEXT = { fontSize: 'var(--text-sm)' } as const
 const CHIP =
-  'block rounded-md px-2.5 py-1 font-sans text-sm text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
+  'block rounded-md px-2.5 py-1 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
 const PREVIEW = 8
 
 function fdaHref(b: BrandName): string | null {
@@ -82,7 +82,7 @@ export default function BrandNames({ pcidCode, brands }: { pcidCode: string; bra
           <button
             type="button"
             onClick={() => setShowAll(v => !v)}
-            className={`font-sans text-sm font-medium text-ink hover:underline ${FOCUS}`}
+            className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
           >
             {showAll
               ? 'Show fewer'
@@ -100,7 +100,7 @@ export default function BrandNames({ pcidCode, brands }: { pcidCode: string; bra
               setNotice(null)
               setEditing(true)
             }}
-            className={`font-sans text-sm text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink ${FOCUS}`}
+            className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
           >
             Edit brand names
           </button>
@@ -193,7 +193,7 @@ function BrandChip({ b }: { b: ShownBrand }) {
       {text}
     </a>
   ) : (
-    <span className="lp-raised rounded-md px-2 py-0.5 font-sans text-sm text-ink">{text}</span>
+    <span className="lp-label rounded-md px-2 py-0.5 font-sans text-sm text-ink">{text}</span>
   )
 }
 

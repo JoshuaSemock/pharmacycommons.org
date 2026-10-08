@@ -107,7 +107,7 @@ export default function RefPicker({ id, value, onChange, apiBase, types, placeho
         className="lp-field w-full min-w-0 rounded-md px-3 py-1.5 font-mono text-[13.5px] text-ink placeholder:font-sans placeholder:text-ink"
       />
       {show && (
-        <ul id={listId} role="listbox" className="lp-popover pc-grain absolute left-0 right-0 top-full z-30 mt-1.5 grid max-h-72 content-start gap-0.5 overflow-y-auto rounded-lg bg-paper p-1.5">
+        <ul id={listId} role="listbox" className="lp-popover pc-grain absolute left-0 right-0 top-full z-30 mt-1.5 grid max-h-72 content-start gap-1.5 overflow-y-auto rounded-lg bg-paper p-1.5">
           {hits.map((h, i) => (
             <li
               key={h.pcid}
@@ -124,7 +124,7 @@ export default function RefPicker({ id, value, onChange, apiBase, types, placeho
               className="lp-option flex cursor-pointer items-baseline justify-between gap-3 rounded-md px-3 py-1.5 font-sans text-[13.5px] text-ink"
             >
               <span className="min-w-0 truncate">
-                {h.name}
+                <span className="lp-link-text">{h.name}</span>
                 {h.match?.on === 'brand' && h.match.text && <span className="text-ink"> · {h.match.text}</span>}
               </span>
               <span className="shrink-0 font-mono text-[11px] text-ink">
