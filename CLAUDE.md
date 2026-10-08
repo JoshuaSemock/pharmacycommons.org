@@ -367,8 +367,11 @@ functions, SECURITY DEFINER, only `new_pages_queue` executable by anon). Its
 `entity_brand_names` untouched), `edit_brand()`, `patrol_brand_edit()`, `review_brand_edit()`,
 `brand_history()`; redefines 15g's `my_contributions()`/`admin_contributors()` to count brand
 changes, and fixes the 15g `my_contributions()` gap. Header brand line is
-`src/components/BrandNames.tsx`. **Not applied live yet** (run-once file records 15g + 15h
-in `schema_migrations`).
+`src/components/BrandNames.tsx`. Applied by Joshua 2026-10-07; 15g and 15h recorded in
+`schema_migrations` (20261007230001/2). Checked live: RLS on, read policy only, no table
+grants, `created_by`/`patrolled_by` withheld; `edit_brand` refusals (already_listed,
+not_a_source_brand, citation_required) write nothing; advisor shows only the expected
+public-RPC findings for the new functions.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
