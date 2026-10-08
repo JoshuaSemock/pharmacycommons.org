@@ -22,6 +22,7 @@ const ClassIndex = lazy(() => import('./pages/ClassIndex'))
 const ClassDetail = lazy(() => import('./pages/ClassDetail'))
 const ClassCompare = lazy(() => import('./pages/ClassCompare'))
 const ListIndex = lazy(() => import('./pages/ListIndex'))
+const TopicIndex = lazy(() => import('./pages/TopicIndex'))
 const ListDetail = lazy(() => import('./pages/ListDetail'))
 const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
@@ -78,6 +79,7 @@ export default function App() {
           {/* "Drug classes" became "Classifications" 2026-10-02; old links and bookmarks keep working. */}
           <Route path="/classes" element={<Moved to="/classifications" />} />
           <Route path="/classes/:slug" element={<MovedClass />} />
+          <Route path="/topics" element={<TopicIndex />} />
           <Route path="/lists" element={<ListIndex />} />
           <Route path="/lists/compare" element={<ListCompare />} />
           <Route path="/lists/:slug" element={<ListDetail />} />

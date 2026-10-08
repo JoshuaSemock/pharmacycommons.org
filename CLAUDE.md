@@ -165,7 +165,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/` · `/browse` · `/drugs/:slug` · `/classifications` (search across every class
 system, `?q=`, `?group=`, `?c=` compare tray) · `/classifications/compare?c=a,b,c` (up to three
 classes, `src/pages/ClassCompare.tsx`) · `/classifications/:slug` — `/classes`, `/classes/:slug`
-and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/lists` ·
+and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/topics` (blocks 6–9 A–Z with kind/subtype filters and
+"Most connected" sort; `src/pages/TopicIndex.tsx`, `src/topics.ts`) · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
@@ -206,7 +207,9 @@ nest under the moiety page (`HierarchySection` in `DrugDetail.tsx`, fed by
 loads blocks 6–9 (clinical, measurement, target, functional) from `entities` with their
 subtype embeds; they are search-only (type 4, `kind` label via `conceptKind()`), never in
 browse, and rank just below a drug with the same text. Medication reconciliation passes
-`{ concepts: false }`. Empty searches offer "Create a page for …".
+`{ concepts: false }`. Empty searches offer "Create a page for …". `/topics` is their browse page:
+connections = distinct `clinical_statements` subjects plus `page_links` sources pointing at
+the topic, read client-side (no RPC).
 
 **Drug page layout (2026-10-02, Overview added 2026-10-04, `src/DrugDetail.tsx`):** reading
 order is Jump to label → Quick Facts → **Overview** (community-written, `src/OpenSection.tsx`)
