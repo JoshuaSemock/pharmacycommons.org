@@ -137,6 +137,19 @@ export async function loadBucket(
   return { rows: (data ?? []) as DictionaryEntry[], total: count ?? 0 }
 }
 
+/** How many entries a chip covers (used by /topics for its dictionary chips). */
+export async function countDictionary(filter: DictionaryFilter, signal?: AbortSignal): Promise<number> {
+  let q = supabase.from('dictionary_terms').select('id', { count: 'exact', head: true })
+  const f = filterParts(filter)
+  if (f.inCol && f.inVals) q = q.in(f.inCol, f.inVals)
+  if (f.kind) q = q.eq('kind', f.kind)
+  if (f.or) q = q.or(f.or)
+  if (signal) q = q.abortSignal(signal)
+  const { count, error } = await q
+  if (error) throw new Error(`Failed to count dictionary entries: ${error.message}`)
+  return count ?? 0
+}
+
 /** Escape LIKE wildcards in what the user typed. */
 export function ilikePattern(q: string): string {
   return q.trim().replace(/[\\%_]/g, m => `\\${m}`)
