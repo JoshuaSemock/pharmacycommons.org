@@ -319,7 +319,7 @@ function SectionAccordion({
   return (
     <section
       id={labelSectionId(section.key)}
-      className="scroll-mt-[calc(var(--nav-h,3.5rem)_+_1rem)] border-b border-ink/15 first-of-type:border-t"
+      className="scroll-mt-[calc(var(--nav-h,3.5rem)_+_1rem)] py-1"
     >
       <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
         <button
@@ -327,9 +327,9 @@ function SectionAccordion({
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40"
+          className="lp-toggle flex w-full items-center justify-between gap-3 rounded-md px-3 py-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40"
         >
-          <span className="font-sans text-lg font-medium text-ink">
+          <span className="font-sans text-lg text-ink">
             {section.title}
           </span>
           <span className="flex shrink-0 items-center gap-2 font-sans text-sm text-ink">
@@ -339,7 +339,7 @@ function SectionAccordion({
         </button>
       </h3>
       {open && (
-        <div id={panelId} className="space-y-4 border-t border-ink/10 px-1 pt-4 pb-6">
+        <div id={panelId} className="space-y-4 px-1 pt-4 pb-6">
           {section.blocks.map((b, i) => (
             <Block key={i} block={b} tables={section.tables_html} />
           ))}
@@ -405,7 +405,7 @@ function BlockText({ text, tables = null }: { text: string; tables?: LabelTable[
       {long && (
         <button
           onClick={() => setExpanded(e => !e)}
-          className="font-sans text-sm font-medium text-ink hover:underline"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink"
         >
           {expanded ? 'Show less' : 'Show more'}
         </button>
@@ -521,7 +521,7 @@ function ExternalLink({ href, children }: { href: string; children: ReactNode })
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-sans text-sm font-medium text-ink underline-offset-2 hover:underline"
+      className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink"
     >
       {children} ↗
     </a>

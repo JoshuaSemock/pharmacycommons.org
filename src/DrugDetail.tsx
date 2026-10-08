@@ -162,7 +162,7 @@ export default function DrugDetail() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className={`font-sans text-base text-ink hover:underline ${FOCUS}`}
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
         >
           Return to search
         </button>
@@ -196,7 +196,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
   return (
     <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
-        <Link to="/" className={`hover:underline ${FOCUS}`}>
+        <Link to="/" className={`lp-press inline-flex items-center rounded-md px-2 py-0.5 ${FOCUS}`}>
           Browse
         </Link>
         <span aria-hidden="true">/</span>
@@ -266,7 +266,7 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
   return (
     <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
-        <Link to="/" className={`hover:underline ${FOCUS}`}>
+        <Link to="/" className={`lp-press inline-flex items-center rounded-md px-2 py-0.5 ${FOCUS}`}>
           Browse
         </Link>
         <span aria-hidden="true">/</span>
@@ -392,7 +392,7 @@ function StatementsSection({ pcidCode, name }: { pcidCode: string; name: string 
                         return next
                       })
                     }
-                    className={`font-sans text-sm font-medium text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink ${FOCUS}`}
+                    className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
                   >
                     {open ? 'Show fewer' : `Show all ${g.rows.length}`}
                   </button>
@@ -421,7 +421,7 @@ function DrugHeader({ drug }: { drug: DrugDetailType }) {
           <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">
             {formatDrugName(drug.name)}
           </h1>
-          <span className="lp-raised shrink-0 rounded px-2 py-0.5 font-mono text-sm text-ink">INN</span>
+          <span className="lp-label shrink-0 rounded px-2 py-0.5 font-mono text-sm text-ink">INN</span>
         </div>
         <div className="shrink-0">
           <SaveButton pcidCode={drug.pcid_code} slug={drug.slug} name={drug.name} entityType={drug.entity_type ?? null} />
@@ -678,7 +678,7 @@ function MoreButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className={`mt-1 block font-sans text-sm font-medium text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink ${FOCUS}`}
+      className={`lp-press inline-flex items-center rounded-md px-2 py-0.5 mt-1 font-sans text-sm text-ink ${FOCUS}`}
     >
       Read in label ↓
     </button>
@@ -901,7 +901,7 @@ function TileGrid<T>({ items, render }: { items: T[]; render: (item: T) => React
         <button
           type="button"
           onClick={() => setShowAll(v => !v)}
-          className={`mt-2 font-sans text-sm font-medium text-ink hover:underline ${FOCUS}`}
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-2 ${FOCUS}`}
         >
           {showAll ? 'Show fewer' : `Show all ${items.length}`}
         </button>
@@ -1075,7 +1075,7 @@ function GuidelinesSection({ pcidCode, className }: { pcidCode: string; classNam
                     target="_blank"
                     rel="noopener noreferrer"
                     title={g.title}
-                    className={`font-sans text-base font-medium leading-snug text-ink underline-offset-2 hover:underline ${FOCUS}`}
+                    className={`lp-press inline-block rounded-md px-2 py-0.5 font-sans text-base leading-snug text-ink ${FOCUS}`}
                   >
                     {g.short_title}
                     <span aria-hidden="true" className="ml-0.5">
@@ -1195,7 +1195,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
                 to={`/classifications/${c.slug}`}
                 title={[c.source_code, c.name, c.is_direct ? null : '(via a sub-class)'].filter(Boolean).join(' · ')}
                 className={`inline-flex max-w-full items-baseline gap-1.5 rounded-md px-2 py-0.5 font-sans text-sm leading-snug text-ink ${FOCUS} ${
-                  c.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
+                  c.is_direct ? 'lp-press' : 'lp-press border border-dashed border-ink/30'
                 }`}
               >
                 {c.source_code && group.type === 'atc' && <span className="shrink-0 font-mono text-sm">{c.source_code}</span>}
@@ -1209,7 +1209,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
         <button
           type="button"
           onClick={() => setShowAll(v => !v)}
-          className={`mt-1.5 font-sans text-sm font-medium text-ink hover:underline ${FOCUS}`}
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-1.5 ${FOCUS}`}
         >
           {showAll ? 'Show fewer' : `Show all ${group.classes.length}`}
         </button>
@@ -1306,7 +1306,7 @@ function EcoPanel({ eco }: { eco: unknown }) {
         <h3 className="font-semibold text-ink" style={GROUP_HEADING}>
           Environmental risk
         </h3>
-        <span className={`lp-raised shrink-0 rounded px-2 py-0.5 font-sans text-sm font-semibold ${riskMeta.bg} ${riskMeta.text}`}>
+        <span className={`lp-label shrink-0 rounded px-2 py-0.5 font-sans text-sm font-semibold ${riskMeta.bg} ${riskMeta.text}`}>
           {riskMeta.label} risk
         </span>
       </div>

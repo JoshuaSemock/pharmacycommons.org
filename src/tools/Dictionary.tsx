@@ -143,7 +143,7 @@ function DownloadPanel() {
             type="button"
             onClick={() => download('utf16')}
             disabled={state === 'busy'}
-            className="font-sans text-[13px] text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink"
+            className="lp-press rounded-md px-2.5 py-1 font-sans text-[13px] text-ink disabled:opacity-50"
           >
             UTF-16 version
           </button>
@@ -488,7 +488,7 @@ function Entry({ entry, doNotUse }: { entry: DictionaryEntry; doNotUse: boolean 
         {entry.member_pcid ? (
           <DrugPreviewLink
             pcid={entry.member_pcid}
-            className="min-w-0 break-words font-sans text-[15px] font-medium text-ink underline decoration-ink/25 underline-offset-2 hover:decoration-ink"
+            className="lp-press min-w-0 break-words rounded-md px-2 py-0.5 font-sans text-[15px] text-ink"
           >
             {entry.term}
           </DrugPreviewLink>

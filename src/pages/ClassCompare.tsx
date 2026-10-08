@@ -225,7 +225,7 @@ export default function ClassCompare() {
                       </th>
                       {classes.map(c => (
                         <th key={c.slug} scope="col" className="px-4 py-2 font-medium text-ink">
-                          <Link to={`/classifications/${c.slug}`} className="hover:underline">
+                          <Link to={`/classifications/${c.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
                             {c.name}
                           </Link>
                         </th>
@@ -236,7 +236,7 @@ export default function ClassCompare() {
                     {filtered.slice(0, limit).map(r => (
                       <tr key={r.pcid} className="border-b border-ink/10 last:border-b-0">
                         <th scope="row" className="px-4 py-2 text-left font-medium">
-                          <Link to={`/drugs/${r.slug}`} className="text-ink hover:underline">
+                          <Link to={`/drugs/${r.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
                             {formatDrugName(r.name)}
                           </Link>
                         </th>
@@ -282,7 +282,7 @@ function ClassCard({ cls, unique, onRemove }: { cls: ClassRecord; unique: number
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap gap-1.5">
           <Stamp>{systemBadge(cls.class_type)}</Stamp>
-          {code && <span className="lp-raised rounded px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">{code}</span>}
+          {code && <span className="lp-label rounded px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">{code}</span>}
         </div>
         <button
           type="button"

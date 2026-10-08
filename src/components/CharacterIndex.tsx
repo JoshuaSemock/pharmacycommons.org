@@ -48,7 +48,7 @@ export default function CharacterIndex({
           <button
             onClick={() => onSelect(null)}
             aria-pressed={!active}
-            className={`lp-flat shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
+            className={`lp-toggle shrink-0 rounded px-2 py-1 font-sans text-[12px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
               !active ? 'font-medium' : ''
             }`}
           >
@@ -72,7 +72,7 @@ export default function CharacterIndex({
                 aria-pressed={isActive}
                 aria-label={b.kind === 'latin' || b.kind === 'numeric' ? undefined : b.name}
                 title={n ? `${b.name} — ${n.toLocaleString()} entries` : `${b.name} — no entries`}
-                className={`lp-flat rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
+                className={`lp-toggle rounded px-[7px] py-1 font-mono text-[13px] leading-none text-ink disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${
                   !n ? 'cursor-default' : isActive ? 'font-medium' : ''
                 }`}
               >

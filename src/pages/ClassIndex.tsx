@@ -285,7 +285,7 @@ function ClassItem({
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 pt-0.5">
             <Stamp>{systemBadge(row.class_type)}</Stamp>
             {code && (
-              <span className="lp-raised rounded px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">{code}</span>
+              <span className="lp-label rounded px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">{code}</span>
             )}
           </div>
           <button
@@ -372,7 +372,7 @@ function CompareTray({
             <span
               aria-disabled="true"
               title="Pick one more class to compare"
-              className="lp-raised cursor-default rounded-md px-4 py-2 font-sans text-[13px] font-medium text-ink opacity-50"
+              className="lp-label cursor-default rounded-md px-4 py-2 font-sans text-[13px] font-medium text-ink opacity-50"
             >
               Compare
             </span>

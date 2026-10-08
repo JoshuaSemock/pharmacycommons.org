@@ -22,9 +22,9 @@ export const primaryButton =
 export const secondaryButton =
   'lp-raised lp-press inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-[12.5px] font-medium text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const quietButton =
-  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-mint-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
+  'lp-press inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-sans text-[12.5px] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 export const dangerQuietButton =
-  'inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-sans text-[12.5px] text-ink transition-colors hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
+  'lp-press inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-sans text-[12.5px] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20'
 
 /** Labelled control. Wrap exactly one input/select so the label names it. */
 export function Field({ label, hint, children, className = '' }: { label: ReactNode; hint?: ReactNode; children: ReactNode; className?: string }) {
@@ -56,7 +56,7 @@ export function ChipRadio<T extends string>({
       {options.map(([v, text]) => (
         <label key={v} className="relative cursor-pointer">
           <input type="radio" name={name} value={v} checked={value === v} onChange={() => onChange(v)} className="peer sr-only" />
-          <span className="inline-block rounded-md shadow-emboss peer-checked:shadow-deboss px-3 py-1 font-sans text-[13px] text-ink peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
+          <span className="inline-block rounded-md lp-chip px-3 py-1 font-sans text-[13px] text-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20">
             {text}
           </span>
         </label>
@@ -74,7 +74,7 @@ const TAG_TONES: Record<Tone, string> = {
 }
 
 export function Tag({ tone = 'muted', children }: { tone?: Tone; children: ReactNode }) {
-  return <span className={`lp-raised inline-block rounded px-1.5 py-0.5 font-mono text-[10.5px] leading-tight ${TAG_TONES[tone]}`}>{children}</span>
+  return <span className={`lp-label inline-block rounded px-1.5 py-0.5 font-mono text-[10.5px] leading-tight ${TAG_TONES[tone]}`}>{children}</span>
 }
 
 /**

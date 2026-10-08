@@ -76,7 +76,7 @@ export default function OverviewEditor({ pcid, name, data, status, labelAnchor, 
     return (
       <Notice>
         This page is locked to reviewers right now, so it can’t be edited.{' '}
-        <button type="button" onClick={onCancel} className={`font-medium underline ${FOCUS}`}>
+        <button type="button" onClick={onCancel} className={`lp-press ml-1 rounded-md px-2 py-0.5 ${FOCUS}`}>
           Back
         </button>
       </Notice>
@@ -148,7 +148,7 @@ export default function OverviewEditor({ pcid, name, data, status, labelAnchor, 
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`lp-flat rounded-md px-3 py-1.5 font-sans text-sm font-medium text-ink ${FOCUS}`}
+            className={`lp-toggle rounded-md px-3 py-1.5 font-sans text-sm font-medium text-ink ${FOCUS}`}
           >
             {t === 'write' ? 'Write' : 'Preview'}
           </button>
@@ -263,7 +263,7 @@ function Notice({ children }: { children: ReactNode }) {
 function SyntaxHelp() {
   return (
     <details className="mt-2 font-sans text-sm text-ink">
-      <summary className={`cursor-pointer font-medium ${FOCUS}`}>Formatting help</summary>
+      <summary className={`lp-toggle inline-block cursor-pointer rounded-md px-2.5 py-1 ${FOCUS}`}>Formatting help</summary>
       <ul className="mt-2 list-disc space-y-1 pl-5">
         <li>
           <code className="font-mono">## Heading</code>, <code className="font-mono">**bold**</code>,{' '}
@@ -397,7 +397,7 @@ function LinkingTextarea({
           id={listId}
           role="listbox"
           aria-label="Pages to link"
-          className="pc-grain lp-raised absolute right-0 left-0 z-20 mt-1 max-h-72 overflow-y-auto rounded-md bg-paper py-1"
+          className="lp-popover pc-grain absolute right-0 left-0 z-20 mt-1 grid max-h-72 content-start gap-1.5 overflow-y-auto rounded-lg bg-paper p-1.5"
         >
           {items.map((s, i) => (
             <li
@@ -410,11 +410,11 @@ function LinkingTextarea({
                 choose(s)
               }}
               onMouseEnter={() => setActive(i)}
-              className={`flex cursor-pointer items-baseline justify-between gap-3 px-3 py-1.5 font-sans text-sm text-ink ${
-                i === active ? 'lp-raised' : ''
-              }`}
+              data-autocomplete=""
+              data-active={i === active || undefined}
+              className="lp-option flex cursor-pointer items-baseline justify-between gap-3 rounded-md px-3 py-1.5 font-sans text-sm text-ink"
             >
-              <span className="min-w-0 truncate font-medium">{s.name}</span>
+              <span className="lp-link-text min-w-0 truncate">{s.name}</span>
               <span className="shrink-0">{kindLabel(s.entityType)}</span>
             </li>
           ))}

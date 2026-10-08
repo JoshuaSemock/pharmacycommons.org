@@ -289,7 +289,7 @@ export default function SearchView() {
         {failed ? (
           <div className="py-16 text-center">
             <p className="font-sans text-ink">The catalog didn’t load.</p>
-            <button onClick={() => window.location.reload()} className="mt-2 font-sans text-[13px] text-ink hover:underline">
+            <button onClick={() => window.location.reload()} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-3">
               Reload the page
             </button>
           </div>
@@ -302,11 +302,11 @@ export default function SearchView() {
             <p className="font-sans text-ink">
               Nothing in the catalog matches <span className="font-medium text-ink">{query}</span>.
             </p>
-            <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 font-sans text-[13px] text-ink">
-              <button onClick={() => setQuery('')} className="hover:underline">
+            <p className="mt-3 flex flex-wrap justify-center gap-2 font-sans text-[13px] text-ink">
+              <button onClick={() => setQuery('')} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
                 Browse every drug instead
               </button>
-              <Link to={newPageHref(query)} className="hover:underline">
+              <Link to={newPageHref(query)} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
                 Create a page for “{query.trim()}”
               </Link>
             </p>
@@ -400,7 +400,7 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
   return (
     <button
       onClick={onSelect}
-      className="lp-raised lp-press group rounded-md p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+      className="lp-card group rounded-md p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
     >
       <div className="mb-3 flex items-start gap-2">
         <span className="lp-sunken flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-mono text-[11px] font-medium text-ink">
@@ -420,12 +420,12 @@ function DrugCard({ entry, onSelect }: { entry: CatalogEntry; onSelect: () => vo
         <span className="font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
         <span className="flex items-center gap-1.5">
           {entry.stub === 1 && (
-            <span className="lp-raised rounded px-2 py-0.5 font-sans text-[10px] text-ink">
+            <span className="lp-label rounded px-2 py-0.5 font-sans text-[10px] text-ink">
               Needs an editor
             </span>
           )}
           {drug.schedule && (
-            <span className="lp-raised rounded-md bg-rose-100 px-2 py-0.5 font-mono text-[10px] font-medium text-ink">
+            <span className="lp-label rounded-md bg-rose-100 px-2 py-0.5 font-mono text-[10px] font-medium text-ink">
               {drug.schedule}
             </span>
           )}
@@ -466,7 +466,7 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
           {' · '}
           {members.length} {members.length === 1 ? 'drug' : 'drugs'}
         </span>
-        <Link to={`/classifications/${hit.slug}`} className="font-sans text-[12.5px] text-ink hover:underline">
+        <Link to={`/classifications/${hit.slug}`} className="lp-press rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink">
           Open class page
         </Link>
       </div>
@@ -478,7 +478,7 @@ function ClassMatch({ hit, onSelect }: { hit: ClassSearchHit; onSelect: (slug: s
       {members.length > CLASS_PREVIEW && (
         <button
           onClick={() => setShowAll(v => !v)}
-          className="mt-3 font-sans text-[13px] font-medium text-ink hover:underline"
+          className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-3"
         >
           {showAll ? 'Show fewer' : `Show all ${members.length} drugs in this class`}
         </button>

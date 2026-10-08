@@ -36,7 +36,7 @@ export default function BlogPost() {
     <>
       <Link
         to="/blog"
-        className="inline-block font-sans text-[13.5px] text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+        className="lp-press inline-block rounded-md px-2.5 py-1 font-sans text-[13.5px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
       >
         ← All posts
       </Link>
@@ -52,7 +52,7 @@ export default function BlogPost() {
               {post.readingMinutes} minute read
             </p>
             {post.draft && (
-              <span className="lp-raised rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+              <span className="lp-label rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] text-ink">
                 draft
               </span>
             )}
@@ -102,10 +102,10 @@ export default function BlogPost() {
           className="mt-16 grid gap-6 border-t border-ink/15 pt-8 sm:grid-cols-2"
         >
           {newer ? (
-            <Link to={`/blog/${newer.slug}`} className="group block">
+            <Link to={`/blog/${newer.slug}`} className="lp-card group block rounded-md p-4">
               <span className="block font-sans text-[12.5px] text-ink">Newer post</span>
               <span
-                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-ink transition-colors"
+                className="lp-link-text mt-1 block font-display text-[18px] leading-snug text-ink"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {newer.title}
@@ -115,10 +115,10 @@ export default function BlogPost() {
             <span className="hidden sm:block" />
           )}
           {older && (
-            <Link to={`/blog/${older.slug}`} className="group block sm:text-right">
+            <Link to={`/blog/${older.slug}`} className="lp-card group block rounded-md p-4 sm:text-right">
               <span className="block font-sans text-[12.5px] text-ink">Older post</span>
               <span
-                className="mt-1 block font-display text-[18px] leading-snug font-semibold text-ink transition-colors"
+                className="lp-link-text mt-1 block font-display text-[18px] leading-snug text-ink"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {older.title}

@@ -62,12 +62,12 @@ export default function PageHistory() {
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
-        <Link to="/" className={`hover:underline ${FOCUS}`}>
+        <Link to="/" className={`lp-press inline-flex items-center rounded-md px-2 py-0.5 ${FOCUS}`}>
           Browse
         </Link>
         <span aria-hidden="true">/</span>
         {typeof state === 'object' ? (
-          <Link to={entityHref(state.page.entityType, state.page.slug)} className={`hover:underline ${FOCUS}`}>
+          <Link to={entityHref(state.page.entityType, state.page.slug)} className={`lp-press inline-flex items-center rounded-md px-2 py-0.5 min-w-0 truncate ${FOCUS}`}>
             {name}
           </Link>
         ) : (
@@ -167,10 +167,10 @@ export function EntryRow({
       type="button"
       onClick={onToggle}
       aria-expanded={open}
-      className={`grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-1 text-left font-sans text-ink ${FOCUS}`}
+      className={`lp-card grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-1 rounded-md px-3 py-2 text-left font-sans text-ink ${FOCUS}`}
     >
       <span className="min-w-0">
-        <span className="block text-base font-medium [overflow-wrap:anywhere]">{entry.summary}</span>
+        <span className="lp-link-text block text-base [overflow-wrap:anywhere]">{entry.summary}</span>
         <span className="block text-sm">
           @{entry.handle}
           {entry.credential ? ` · ${entry.credential}` : ''} · {formatWhen(entry.created_at)}
@@ -182,7 +182,7 @@ export function EntryRow({
           {delta}
         </span>
         <span className="flex flex-wrap justify-end gap-1">
-          {isCurrent && <span className="lp-raised rounded px-1.5 py-0.5">live</span>}
+          {isCurrent && <span className="lp-label rounded px-1.5 py-0.5">live</span>}
           <span
             className={`rounded px-1.5 py-0.5 ${
               entry.patrol_status === 'pending' || entry.patrol_status === 'unpatrolled'

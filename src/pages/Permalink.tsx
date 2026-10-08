@@ -81,12 +81,11 @@ export default function Permalink() {
       <p className="mb-3 max-w-lg font-display text-xl text-ink" style={{ fontFamily: 'var(--font-display)' }}>
         {message}
       </p>
-      <p className="font-sans text-sm text-ink">
-        <Link to="/browse" className="text-ink hover:underline">
+      <p className="flex flex-wrap gap-2 font-sans text-sm text-ink">
+        <Link to="/browse" className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
           Browse all records
         </Link>
-        {' · '}
-        <a href={`${API_BASE}/v1`} className="text-ink hover:underline">
+        <a href={`${API_BASE}/v1`} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
           API
         </a>
       </p>

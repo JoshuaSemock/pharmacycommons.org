@@ -95,7 +95,7 @@ function OneColumn({ col, fill, threshold, onCopy }: { col: Column } & Omit<Prop
       </div>
 
       <details className="group">
-        <summary className="cursor-pointer font-sans text-[13.5px] font-medium text-ink">How this was worked out</summary>
+        <summary className="lp-toggle inline-block cursor-pointer rounded-md px-2.5 py-1 font-sans text-[13.5px] text-ink">How this was worked out</summary>
         <ol className="mt-2 grid list-decimal gap-1.5 pl-5 font-sans text-[13.5px] leading-snug text-ink marker:text-ink">
           {r.steps.map((s, i) => (
             <li key={i} className="[overflow-wrap:anywhere]">

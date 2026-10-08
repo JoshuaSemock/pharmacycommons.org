@@ -103,7 +103,7 @@ export default function MyContributions() {
               onChange={() => setFilter(f.key)}
               className="peer sr-only"
             />
-            <span className="block rounded-md px-3 py-1 font-sans text-sm text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
+            <span className="block rounded-md px-3 py-1 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
               {f.label}
             </span>
           </label>
@@ -119,7 +119,7 @@ export default function MyContributions() {
             return (
               <li key={`${c.kind}-${c.item_id}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-0.5 border-b border-ink/15 py-3">
                 <span className="min-w-0 font-sans text-base font-medium text-ink [overflow-wrap:anywhere]">
-                  <Link to={href} className="hover:underline">
+                  <Link to={href} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
                     {displayName(c)}
                   </Link>
                 </span>

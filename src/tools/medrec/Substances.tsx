@@ -64,7 +64,7 @@ function Result({ items }: { items: [string, string][] }) {
 
 function Remove({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} aria-label="Remove row" className="self-end rounded p-1.5 text-ink hover:bg-rose-50">
+    <button type="button" onClick={onClick} aria-label="Remove row" className="lp-press self-end rounded-md p-1.5 text-ink">
       <RemoveIcon />
     </button>
   )
@@ -287,7 +287,7 @@ export default function Substances({ subs, onChange }: Props) {
                 ]}
               />
               <details open={al.audit.some(x => x !== '')} className="lp-raised rounded-md p-3">
-                <summary className="cursor-pointer font-sans text-[13.5px] font-medium text-ink">AUDIT-C screening questions</summary>
+                <summary className="lp-toggle inline-block cursor-pointer rounded-md px-2.5 py-1 font-sans text-[13.5px] text-ink">AUDIT-C screening questions</summary>
                 <div className="mt-3 grid gap-3">
                   {AUDIT_C.map(([q, answers], qi) => (
                     <Field key={q} label={q}>

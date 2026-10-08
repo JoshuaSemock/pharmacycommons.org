@@ -24,7 +24,7 @@ import { HandleSetup } from './OverviewEditor'
 
 const FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 const LINK = `underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600 ${FOCUS}`
-const TEXT_BTN = `font-sans text-xs font-medium text-ink underline-offset-2 hover:underline ${FOCUS}`
+const TEXT_BTN = `lp-press inline-flex items-center rounded-md px-2 py-0.5 font-sans text-xs text-ink ${FOCUS}`
 const FIELD = 'lp-field block w-full rounded-md px-2.5 py-1.5 font-sans text-sm leading-snug text-ink placeholder:text-ink/60'
 const LABEL = 'mb-1 block font-sans text-xs font-semibold text-ink'
 // index.css sizes form controls outside Tailwind's layers; set the size inline.
@@ -155,7 +155,7 @@ function CommunityMark({ edit }: { edit: InfoboxEdit }) {
   const href = citationHref(edit.citation)
   return (
     <span className="mt-1 block font-sans text-xs">
-      <span className="lp-raised mr-1 rounded px-1 py-px">Community</span>
+      <span className="lp-label mr-1 rounded px-1 py-px">Community</span>
       Source:{' '}
       {href ? (
         <a href={href} target="_blank" rel="nofollow ugc noopener noreferrer" className={LINK}>

@@ -189,7 +189,7 @@ export default function CreatePage() {
                           onChange={() => setKindId(k.id)}
                           className="peer sr-only"
                         />
-                        <span className="block rounded-md px-3 py-1.5 font-sans text-sm text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
+                        <span className="block rounded-md px-3 py-1.5 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
                           {k.label}
                         </span>
                       </label>
@@ -216,7 +216,7 @@ export default function CreatePage() {
                           onChange={() => setMeasurementType(t)}
                           className="peer sr-only"
                         />
-                        <span className="block rounded-md px-3 py-1.5 font-sans text-sm text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
+                        <span className="block rounded-md px-3 py-1.5 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30">
                           {t}
                         </span>
                       </label>

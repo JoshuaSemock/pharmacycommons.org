@@ -68,7 +68,7 @@ function CodeBlock({ children, label }: { children: string; label?: string }) {
             setTimeout(() => setCopied(false), 1500)
           })
         }
-        className="absolute right-2 top-1.5 rounded-md px-2 py-1 font-sans text-[12px] text-ink hover:bg-white/10"
+        className="lp-press absolute right-2 top-1.5 rounded-md px-2 py-1 font-sans text-[12px] text-ink"
       >
         {copied ? 'Copied' : 'Copy'}
       </button>
@@ -128,7 +128,7 @@ export default function Developers() {
                 setTimeout(() => setCopied(false), 1500)
               })
             }
-            className="rounded-md px-2 py-1 font-sans text-[12.5px] text-ink hover:bg-white/10"
+            className="lp-press rounded-md px-2 py-1 font-sans text-[12.5px] text-ink"
           >
             {copied ? 'Copied' : 'Copy'}
           </button>
@@ -149,9 +149,9 @@ export default function Developers() {
           </li>
         </ul>
 
-        <nav aria-label="On this page" className="flex flex-wrap gap-x-5 gap-y-1 border-y border-ink/15 py-2 font-sans text-[14px]">
+        <nav aria-label="On this page" className="flex flex-wrap gap-2 border-y border-ink/15 py-2 font-sans text-[14px]">
           {SECTIONS.map(([id, label]) => (
-            <a key={id} href={`#${id}`} className="text-ink hover:underline">
+            <a key={id} href={`#${id}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
               {label}
             </a>
           ))}

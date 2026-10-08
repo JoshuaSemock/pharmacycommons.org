@@ -59,7 +59,7 @@ export default function OpenSection({ pcidCode, slug, name, fallbackDescription,
           <h2 id={headingId} className="font-semibold text-ink" style={SECTION_HEADING}>
             Overview
           </h2>
-          <span className="lp-raised rounded px-2 py-0.5 font-sans text-sm text-ink">Community-written</span>
+          <span className="lp-label rounded px-2 py-0.5 font-sans text-sm text-ink">Community-written</span>
         </div>
         {!editing && data && (
           <EditAffordance
@@ -253,7 +253,7 @@ function Backlinks({ pages }: { pages: PageContent['backlinks'] }) {
         <button
           type="button"
           onClick={() => setShowAll(v => !v)}
-          className={`mt-2 font-sans text-sm font-medium text-ink hover:underline ${FOCUS}`}
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink mt-2 ${FOCUS}`}
         >
           {showAll ? 'Show fewer' : `Show all ${pages.length}`}
         </button>

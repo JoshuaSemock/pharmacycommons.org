@@ -164,9 +164,9 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
             <li key={s.slug} className="min-w-0 max-w-full">
               <Link
                 to={`/lists/${s.slug}`}
-                className="lp-raised lp-press inline-flex max-w-full items-baseline gap-1.5 rounded-md px-2 py-0.5 font-sans text-[13px] text-ink"
+                className="lp-card inline-flex max-w-full items-baseline gap-1.5 rounded-md px-2 py-0.5 font-sans text-[13px] text-ink"
               >
-                <span className="min-w-0 break-words">{s.title.replace(/^.*?:\s*/, '')}</span>
+                <span className="lp-link-text min-w-0 break-words">{s.title.replace(/^.*?:\s*/, '')}</span>
                 <span className="shrink-0 font-mono text-[11px] text-ink">{s.item_count}</span>
               </Link>
             </li>
@@ -178,7 +178,7 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
         <span className="font-mono text-[11.5px] text-ink">
           {list.item_count.toLocaleString()} {list.term_count ? (list.item_count === 1 ? 'entry' : 'entries') : list.item_count === 1 ? 'drug' : 'drugs'}
         </span>
-        <Link to={`/lists/${list.slug}`} className="font-sans text-[13px] font-medium text-ink hover:underline">
+        <Link to={`/lists/${list.slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 font-sans text-[13px] text-ink">
           Open list →
         </Link>
       </div>
@@ -189,7 +189,7 @@ function ListCard({ list, sublists }: { list: ListSummary; sublists: ListSummary
 function Badge({ tone, children }: { tone: 'mint' | 'sky'; children: string }) {
   const cls =
     tone === 'sky' ? 'bg-sky-50 text-ink' : 'text-ink'
-  return <span className={`lp-raised rounded px-2 py-0.5 font-mono text-[11px] font-medium ${cls}`}>{children}</span>
+  return <span className={`lp-label rounded px-2 py-0.5 font-mono text-[11px] font-medium ${cls}`}>{children}</span>
 }
 
 function SectionHeading({ children }: { children: string }) {

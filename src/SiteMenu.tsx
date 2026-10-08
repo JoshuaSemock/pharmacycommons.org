@@ -21,11 +21,12 @@ import type { ThemeChoice } from './theme'
  * backdrop is an absolute layer one viewport tall under the bar.
  */
 
-/** Always visible in the bar, in this order. */
-export const BAR_LINKS = [
+/** Always visible in the bar, in this order. `short` replaces the label below
+    600px, where four bold embossed buttons and the menu share a phone's width. */
+export const BAR_LINKS: { to: string; label: string; short?: string }[] = [
   { to: '/browse', label: 'Browse' },
   { to: '/lists', label: 'Lists' },
-  { to: '/classifications', label: 'Classifications' },
+  { to: '/classifications', label: 'Classifications', short: 'Classes' },
   { to: '/tools', label: 'Tools' },
 ]
 
@@ -138,7 +139,7 @@ export default function SiteMenu() {
               {ACTIVE_TOOL_SECTIONS.map(section => (
                 <section key={section.id} aria-label={section.label} className="pb-2">
                   <p className="px-3 pt-2 pb-0.5 font-sans text-[12.5px] text-ink">{section.label}</p>
-                  <ul>
+                  <ul className="grid gap-1.5 px-0.5">
                     {section.tools.map(tool => (
                       <li key={tool.id}>
                         <ToolLink tool={tool} current={pathname === tool.to} />
@@ -164,13 +165,14 @@ export default function SiteMenu() {
 /**
  * "Log in / Register" when signed out, "Signed In" once signed in; both go to
  * /account. The email address is deliberately not shown in the bar.
- * Letterpress: "Log in / Register" is raised (a button to press); "Signed In"
- * stays pressed in, a stamp that says the session is on.
+ * Letterpress: "Log in / Register" is raised (a button to press, pressed in
+ * under the pointer); "Signed In" stays pressed in, a stamp that says the
+ * session is on. Both are bold, like every other control.
  */
 export function AccountButton({ block = false }: { block?: boolean }) {
   const { user, loading } = useSession()
   const base = [
-    'items-center justify-center rounded-md px-3 font-sans text-[13px] font-medium whitespace-nowrap text-ink',
+    'items-center justify-center rounded-md px-3 font-sans text-[13px] font-bold whitespace-nowrap text-ink',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
     block ? 'flex h-11 w-full' : 'inline-flex h-9',
   ].join(' ')
@@ -214,20 +216,17 @@ function MenuGroup({ label, links, small = false }: { label: string; links: Menu
   return (
     <section aria-label={label} className="pb-2">
       <GroupLabel>{label}</GroupLabel>
-      <ul>
+      <ul className="grid gap-1.5 px-0.5">
         {links.map(link => (
           <li key={link.to}>
             <NavLink
               to={link.to}
               end
-              className={({ isActive }) =>
-                [
-                  'lp-flat flex min-h-11 items-center rounded-md px-3 font-sans text-ink md:min-h-9',
-                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40',
-                  small ? 'text-[13px]' : 'text-[14.5px]',
-                  isActive ? 'font-medium' : '',
-                ].join(' ')
-              }
+              className={[
+                'lp-toggle flex min-h-11 items-center rounded-md px-3 font-sans text-ink md:min-h-9',
+                'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40',
+                small ? 'text-[13px]' : 'text-[14.5px]',
+              ].join(' ')}
             >
               {link.label}
             </NavLink>
@@ -240,9 +239,8 @@ function MenuGroup({ label, links, small = false }: { label: string; links: Menu
 
 function ToolLink({ tool, current }: { tool: Tool; current: boolean }) {
   const className = [
-    'lp-flat flex min-h-11 items-center rounded-md px-3 font-sans text-[14.5px] text-ink md:min-h-9',
+    'lp-toggle flex min-h-11 items-center rounded-md px-3 font-sans text-[14.5px] text-ink md:min-h-9',
     'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40',
-    current ? 'font-medium' : '',
   ].join(' ')
   if (tool.to) {
     return (
@@ -287,7 +285,6 @@ function AppearanceControl() {
               className={[
                 'lp-toggle min-h-9 rounded-md px-3 font-sans text-[13px] text-ink',
                 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40',
-                selected ? 'font-medium' : '',
               ].join(' ')}
             >
               {option.label}

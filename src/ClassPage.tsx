@@ -350,7 +350,7 @@ function MemberLink({ member }: { member: ClassMember }) {
         to={`/drugs/${member.slug}`}
         title={member.is_direct ? undefined : 'Filed under a sub-class of this class'}
         className={`flex items-baseline justify-between gap-3 rounded-md px-3 py-2 ${
-          member.is_direct ? 'lp-raised lp-press' : 'border border-dashed border-ink/30'
+          member.is_direct ? 'lp-press' : 'lp-press border border-dashed border-ink/30'
         }`}
       >
         <span

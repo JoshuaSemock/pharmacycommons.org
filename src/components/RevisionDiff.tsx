@@ -62,7 +62,7 @@ export function DiffView({ before, after, label }: { before: string; after: stri
           <span aria-label={`${added} lines added`}>+{added}</span> /{' '}
           <span aria-label={`${removed} lines removed`}>−{removed}</span>
         </span>
-        <button type="button" onClick={() => setFull(v => !v)} className={`font-medium underline-offset-2 hover:underline ${FOCUS}`}>
+        <button type="button" onClick={() => setFull(v => !v)} className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}>
           {full ? 'Show changes only' : 'Show whole text'}
         </button>
       </div>

@@ -43,7 +43,7 @@ import { supabase } from '../supabaseClient'
 
 const FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 const CHIP =
-  'block rounded-md px-3 py-1 font-sans text-[13px] text-ink shadow-emboss peer-checked:font-medium peer-checked:shadow-deboss peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
+  'block rounded-md px-3 py-1 font-sans text-[13px] text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
 const FIELD = 'lp-field block w-full rounded-md px-3 py-2 font-sans text-ink placeholder:text-ink/60'
 const NO_SUBTYPE = '_none'
 
@@ -272,7 +272,7 @@ export default function TopicIndex() {
                         key={g.bucket}
                         href={`#topics-${bucketToParam(g.bucket)}`}
                         aria-label={bucketName(g.bucket)}
-                        className={`lp-flat rounded px-2 py-1 font-sans text-[12.5px] text-ink ${FOCUS}`}
+                        className={`lp-toggle rounded px-2 py-1 font-sans text-[12.5px] text-ink ${FOCUS}`}
                       >
                         {bucketLabel(g.bucket)}
                       </a>
@@ -322,7 +322,7 @@ function TopicName({ t, showKind, withConnections = false }: { t: Topic; showKin
     .join(' · ')
   return (
     <span className="block min-w-0">
-      <Link to={`/drugs/${t.slug}`} className={`font-sans text-[15px] font-medium text-ink hover:underline [overflow-wrap:anywhere] ${FOCUS}`}>
+      <Link to={`/drugs/${t.slug}`} className={`lp-press inline-block max-w-full rounded-md px-2 py-0.5 font-sans text-[15px] text-ink [overflow-wrap:anywhere] ${FOCUS}`}>
         {t.name}
       </Link>
       {detail && <span className="block font-sans text-[12.5px] text-ink">{detail}</span>}
@@ -446,7 +446,7 @@ function DictionaryTopics({
               type="button"
               aria-pressed={b.key === letter}
               onClick={() => onLetter(b.key)}
-              className={`rounded px-2 py-1 font-sans text-[12.5px] text-ink ${b.key === letter ? 'lp-sunken font-medium' : 'lp-flat'} ${FOCUS}`}
+              className={`lp-toggle rounded px-2 py-1 font-sans text-[12.5px] text-ink ${FOCUS}`}
             >
               {b.label}
             </button>
@@ -487,12 +487,12 @@ function DictionaryTopics({
                     {tag && tag !== 'Abbreviation' && kind === 'abbreviations' && <span className="ml-2 font-sans text-[12px] text-ink">{tag}</span>}
                     {def && def !== e.term && <span className="block font-sans text-[13.5px] leading-snug text-ink">{def}</span>}
                     {page ? (
-                      <Link to={entityHref(page.entityType, page.slug)} className={`mt-0.5 block w-fit font-sans text-[12.5px] underline underline-offset-2 ${FOCUS}`}>
+                      <Link to={entityHref(page.entityType, page.slug)} className={`lp-press mt-1 block w-fit rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink ${FOCUS}`}>
                         Open the page
                       </Link>
                     ) : (
                       kind === 'terms' && (
-                        <Link to={newPageHref(e.term)} className={`mt-0.5 block w-fit font-sans text-[12.5px] text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink ${FOCUS}`}>
+                        <Link to={newPageHref(e.term)} className={`lp-press mt-1 block w-fit rounded-md px-2 py-0.5 font-sans text-[12.5px] text-ink ${FOCUS}`}>
                           Start a page
                         </Link>
                       )

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
 import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
 
@@ -13,8 +13,9 @@ import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
  * wraps), the search box full width on the second, and the account button
  * moves into the menu. Below 600px the wordmark is hidden and the logo tile
  * alone is the home link: four bar links (Classifications is long) leave no
- * room for it on a phone. It is hidden again from md to lg, where the bar is
- * one row and the search box would otherwise be squeezed to nothing. The
+ * room for it on a phone, and below 600px "Classifications" reads "Classes"
+ * (BAR_LINKS.short) so the bold embossed buttons fit. The wordmark is hidden
+ * again from md to lg, where the bar is one row and the search box would otherwise be squeezed to nothing. The
  * search box is shown on every page, including / and /browse, which also have
  * their own.
  *
@@ -40,26 +41,36 @@ export default function Nav() {
   return (
     <nav ref={navRef} className="pc-grain lp-rule-b sticky top-0 z-50 bg-paper">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(2rem,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
-        <Link
+        {/* The home button: logo tile and wordmark stamped as one button,
+            pressed in under the pointer and on the home page itself. */}
+        <NavLink
           to="/"
-          className="flex h-12 min-w-0 items-center gap-2 max-[359px]:gap-1.5 md:shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 md:h-auto"
+          end
+          className="lp-toggle flex h-9 min-w-0 items-center gap-2 justify-self-start rounded-md px-1 max-[359px]:gap-1.5 md:shrink-0 min-[600px]:pr-2.5 md:max-lg:pr-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
           aria-label="Pharmacy Commons home"
         >
-          <span className="lp-raised flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-[359px]:h-7 max-[359px]:w-7">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center max-[359px]:h-6 max-[359px]:w-6">
             <img src="/logo-40.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
           </span>
-          <span className="font-sans text-[13px] min-w-0 truncate max-[599px]:hidden md:max-lg:hidden min-[360px]:text-[14px] font-medium tracking-[-0.01em] text-ink sm:text-[15px]">
+          <span className="font-sans text-[13px] min-w-0 truncate max-[599px]:hidden md:max-lg:hidden min-[360px]:text-[14px] font-bold tracking-[-0.01em] text-ink sm:text-[15px]">
             Pharmacy Commons
           </span>
-        </Link>
+        </NavLink>
 
         <HeaderSearch />
 
-        <ul className="flex shrink-0 items-center md:ml-auto">
+        <ul className="flex shrink-0 items-center gap-1 max-[399px]:gap-0.5 md:ml-auto">
           {BAR_LINKS.map(link => (
             <li key={link.to}>
               <NavLink to={link.to} className={barLinkClass}>
-                {link.label}
+                {link.short ? (
+                  <>
+                    <span className="min-[600px]:hidden">{link.short}</span>
+                    <span className="max-[599px]:hidden">{link.label}</span>
+                  </>
+                ) : (
+                  link.label
+                )}
               </NavLink>
             </li>
           ))}
@@ -77,15 +88,13 @@ export default function Nav() {
   )
 }
 
-/** Bar links sit flat on the paper; the current page's link is pressed in.
-    NavLink sets aria-current="page", which .lp-flat keys off. */
-function barLinkClass({ isActive }: { isActive: boolean }): string {
-  return [
-    'lp-flat flex h-8 items-center rounded-md px-1.5 max-[359px]:px-1 font-sans text-[12px] text-ink min-[360px]:text-[13px] min-[400px]:text-[13.5px] min-[400px]:px-2.5 sm:text-[14px]',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
-    isActive ? 'font-medium' : '',
-  ].join(' ')
-}
+/** Bar links are embossed buttons; the current page's link stays pressed in
+    and the others press in under the pointer. NavLink sets
+    aria-current="page", which .lp-toggle keys off. */
+const barLinkClass = [
+  'lp-toggle flex h-8 items-center rounded-md px-1 font-sans text-[12px] text-ink min-[360px]:px-1.5 min-[360px]:text-[13px] min-[400px]:px-2 min-[400px]:text-[13.5px] sm:px-2.5 sm:text-[14px]',
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
+].join(' ')
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Header search
@@ -156,23 +165,24 @@ function HeaderSearch() {
       </form>
 
       {focused && suggestions.length > 0 && (
-        <div className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid w-full gap-0.5 overflow-hidden rounded-lg bg-paper p-1.5">
+        <div className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid w-full gap-1.5 overflow-hidden rounded-lg bg-paper p-1.5">
           {suggestions.map(entry => {
             const schedule = toDrug(entry).schedule
             return (
               <button
                 key={entry.n}
                 onMouseDown={() => handleSuggestion(entry.slug)}
-                className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:shadow-emboss focus-visible:shadow-emboss focus-visible:outline-none"
+                data-autocomplete
+                className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 py-2 text-left focus-visible:shadow-deboss focus-visible:outline-none"
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-sans text-[13.5px] font-medium text-ink">{entry.name}</span>
+                  <span className="lp-link-text block truncate font-sans text-[13.5px] text-ink">{entry.name}</span>
                   <span className="block truncate font-sans text-[12px] text-ink">
                     {entryKindLine(entry)}
                   </span>
                 </span>
                 {schedule && (
-                  <span className="lp-raised rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
+                  <span className="lp-label rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                     {schedule}
                   </span>
                 )}

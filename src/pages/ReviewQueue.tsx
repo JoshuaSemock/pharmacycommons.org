@@ -270,7 +270,7 @@ function FactsQueue({
               <li key={e.id} className="space-y-1.5 py-3 font-sans text-sm text-ink">
                 <span className="block text-base font-medium">
                   {e.page ? (
-                    <Link to={entityHref(e.page.entityType, e.page.slug)} className="hover:underline">
+                    <Link to={entityHref(e.page.entityType, e.page.slug)} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
                       {formatDrugName(e.page.name)}
                     </Link>
                   ) : (
@@ -397,7 +397,7 @@ function NewPagesQueue({
             return (
               <li key={p.pcid} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 py-3 font-sans text-sm text-ink">
                 <span className="min-w-0">
-                  <Link to={entityHref(p.entity_type, p.slug)} className="block text-base font-medium hover:underline [overflow-wrap:anywhere]">
+                  <Link to={entityHref(p.entity_type, p.slug)} className="lp-press inline-block rounded-md px-2 py-0.5 text-base [overflow-wrap:anywhere]">
                     {p.name}
                   </Link>
                   <span className="block">
@@ -477,7 +477,7 @@ function BrandQueue({
             return (
               <li key={e.id} className="space-y-1.5 py-3 font-sans text-sm text-ink">
                 <span className="block text-base font-medium">
-                  <Link to={entityHref(e.entity_type, e.slug)} className="hover:underline">
+                  <Link to={entityHref(e.entity_type, e.slug)} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
                     {formatDrugName(e.name)}
                   </Link>{' '}
                   · {brandActionText(e.action, formatBrandName(e.brand_display))}

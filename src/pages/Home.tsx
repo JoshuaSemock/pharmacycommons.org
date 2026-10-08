@@ -115,23 +115,24 @@ function Hero() {
         </form>
 
         {focused && suggestions.length > 0 && (
-          <div className="lp-popover pc-grain absolute top-full z-20 mt-1.5 grid w-full gap-0.5 overflow-hidden rounded-lg bg-paper p-1.5">
+          <div className="lp-popover pc-grain absolute top-full z-20 mt-1.5 grid w-full gap-1.5 overflow-hidden rounded-lg bg-paper p-1.5">
             {suggestions.map(entry => {
               const schedule = toDrug(entry).schedule
               return (
                 <button
                   key={entry.n}
                   onMouseDown={() => navigate(`/drugs/${entry.slug}`)}
-                  className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-4 py-2.5 text-left hover:shadow-emboss focus-visible:shadow-emboss focus-visible:outline-none"
+                  data-autocomplete
+                  className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-4 py-2.5 text-left focus-visible:shadow-deboss focus-visible:outline-none"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-sans text-[14px] font-medium text-ink">{entry.name}</span>
+                    <span className="lp-link-text block truncate font-sans text-[14px] text-ink">{entry.name}</span>
                     <span className="block truncate font-sans text-[12px] text-ink">
                       {entryKindLine(entry)}
                     </span>
                   </span>
                   {schedule && (
-                    <span className="lp-raised rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
+                    <span className="lp-label rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
                       {schedule}
                     </span>
                   )}
@@ -141,7 +142,8 @@ function Hero() {
             })}
             <Link
               to={`/browse?q=${encodeURIComponent(query.trim())}`}
-              className="lp-option lp-rule-t flex min-h-[48px] items-center rounded-md px-4 py-2.5 font-sans text-[13px] text-ink hover:shadow-emboss focus-visible:shadow-emboss focus-visible:outline-none"
+              data-autocomplete
+              className="lp-option lp-link-text flex min-h-[48px] items-center rounded-md px-4 py-2.5 font-sans text-[13px] text-ink focus-visible:shadow-deboss focus-visible:outline-none"
             >
               See every match for “{query.trim()}”
             </Link>
@@ -151,7 +153,7 @@ function Hero() {
 
       <p className="mt-5 font-sans text-[13px] text-ink sm:text-[13.5px]">
         Or{' '}
-        <Link to="/browse" className="font-medium text-ink underline-offset-2 hover:underline">
+        <Link to="/browse" className="lp-press ml-0.5 inline-block rounded-md px-2 py-0.5 text-ink">
           {catalogSize !== null
             ? `browse all ${catalogSize.toLocaleString()} entries, A to Z`
             : 'browse the full catalog, A to Z'}
@@ -185,11 +187,11 @@ function WhatsNew() {
         <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-ink">
           New tools, features, and writing from the Community Commons Blog, as they ship.
         </p>
-        <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-sans text-[13.5px] font-medium">
-          <Link to="/tools" className="text-ink underline-offset-2 hover:underline">
+        <p className="mt-4 flex flex-wrap gap-2 font-sans text-[13.5px]">
+          <Link to="/tools" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
             All tools
           </Link>
-          <Link to="/blog" className="text-ink underline-offset-2 hover:underline">
+          <Link to="/blog" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
             All posts
           </Link>
         </p>
@@ -209,7 +211,7 @@ function WhatsNew() {
               >
                 <Link
                   to={item.to}
-                  className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+                  className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
                 >
                   {item.title}
                 </Link>
@@ -224,7 +226,7 @@ function WhatsNew() {
               <Link
                 to={item.to}
                 aria-label={`${ctaFor(item)}: ${item.title}`}
-                className="mt-2 inline-block font-sans text-[13.5px] font-medium text-ink underline-offset-2 hover:underline"
+                className="lp-press mt-2 inline-block rounded-md px-2 py-0.5 font-sans text-[13.5px] text-ink"
               >
                 {ctaFor(item)}
               </Link>

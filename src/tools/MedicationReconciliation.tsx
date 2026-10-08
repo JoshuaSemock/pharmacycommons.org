@@ -196,7 +196,7 @@ export default function MedicationReconciliation() {
     <main data-print-page className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <header className="grid gap-5 pt-10 pb-8 sm:pt-14 print:hidden">
         <div>
-          <Link to="/tools" className="mb-4 inline-block font-sans text-[13px] text-ink transition-colors">
+          <Link to="/tools" className="lp-press mb-4 inline-block rounded-md px-2.5 py-1 font-sans text-[13px] text-ink">
             All tools
           </Link>
           <PageTitle
@@ -238,7 +238,7 @@ export default function MedicationReconciliation() {
             Print or save as PDF
           </button>
           {confirmClear ? (
-            <span className="lp-raised inline-flex flex-wrap items-center gap-1.5 rounded-md bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-ink">
+            <span className="lp-label inline-flex flex-wrap items-center gap-1.5 rounded-md bg-rose-50 py-1 pr-1 pl-3 font-sans text-[13px] text-ink">
               Clear the whole list?
               <button type="button" className={dangerQuietButton} onClick={clearAll}>
                 Yes, clear it
@@ -288,7 +288,7 @@ export default function MedicationReconciliation() {
             ['substances', 'Substance use', null],
             ['printable', 'Printable list', null],
           ].map(([id, label, n]) => (
-            <a key={String(id)} href={`#${id}`} className="text-ink hover:underline">
+            <a key={String(id)} href={`#${id}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
               {label}
               {n != null && <span className="ml-1 font-mono text-[11.5px] text-ink">{n}</span>}
             </a>

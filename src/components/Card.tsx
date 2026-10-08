@@ -28,8 +28,10 @@ export default function Card({
   return (
     <div
       className={[
-        'rounded-md border-0 bg-transparent transition-shadow duration-200 motion-reduce:transition-none',
-        sunken ? 'shadow-deboss' : 'shadow-emboss',
+        'rounded-md border-0 bg-transparent',
+        // Static relief: a panel never reacts to the pointer. Links inside a
+        // raised panel are bold (.lp-raised a in src/index.css).
+        sunken ? 'lp-sunken' : 'lp-raised',
         padded ? 'p-6' : '',
         className,
       ].join(' ')}
