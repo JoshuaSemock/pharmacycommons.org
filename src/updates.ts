@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'brand-name-edits',
+    date: '2026-10-07',
+    kind: 'Feature',
+    title: 'Fix a drug’s brand names, with a source',
+    summary:
+      'NPI-verified providers can add a brand the FDA and RxNorm lists miss, such as an international brand, or flag one that doesn’t belong. A removed brand stays visible, struck through with the reason, so nothing disappears silently.',
+    to: '/drugs/metformin',
+    cta: 'See a drug page',
+  },
+  {
     id: 'my-contributions',
     date: '2026-10-05',
     kind: 'Feature',

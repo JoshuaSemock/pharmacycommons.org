@@ -359,8 +359,19 @@ tables via `CONCEPT_TABLE` in `src/api.ts`.
 (Account → My contributions, `src/components/MyContributions.tsx`), `new_pages_queue()` +
 `patrol_new_page()` (New pages in `/review`), `admin_contributors()` +
 `unblock_contributor()` (`/admin`, `src/pages/Admin.tsx`; client calls in
-`src/contributions.ts`). **Not applied live yet** — the `apply_migration` approval was
-cancelled; Joshua runs it in the SQL editor, then record it in `schema_migrations`.
+`src/contributions.ts`). Applied by Joshua in the SQL editor 2026-10-07 (checked: all five
+functions, SECURITY DEFINER, only `new_pages_queue` executable by anon). Its
+`my_contributions()` misses a person's first Overview text on an existing page; 15h fixes it.
+**Phase 15h (`db/phase15h_brand_edits.sql`, 2026-10-07, run after 15g; tests
+`db/phase15_test/tests_15h.sql`, 17 checks):** `brand_edits` (community brand overlay;
+`entity_brand_names` untouched), `edit_brand()`, `patrol_brand_edit()`, `review_brand_edit()`,
+`brand_history()`; redefines 15g's `my_contributions()`/`admin_contributors()` to count brand
+changes, and fixes the 15g `my_contributions()` gap. Header brand line is
+`src/components/BrandNames.tsx`. Applied by Joshua 2026-10-07; 15g and 15h recorded in
+`schema_migrations` (20261007230001/2). Checked live: RLS on, read policy only, no table
+grants, `created_by`/`patrolled_by` withheld; `edit_brand` refusals (already_listed,
+not_a_source_brand, citation_required) write nothing; advisor shows only the expected
+public-RPC findings for the new functions.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /

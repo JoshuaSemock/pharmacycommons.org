@@ -233,6 +233,9 @@ counts checked against live data 2026-10-04):
 | `my_contributions(limit?)` (15g) | signed in | the caller's own page edits, Quick Facts values and created pages, with status and reviewer note |
 | `new_pages_queue(limit?, unpatrolled_only?)` (15g) | public | created pages with handle + badge |
 | `patrol_new_page(pcid)` (15g) | patroller | mark a created page reviewed (not own) |
+| `edit_brand(pcid, brand, action, citation, summary)` (15h) | verified | add a brand, hide a source brand, or clear a change (pending on `reviewed`) |
+| `patrol_brand_edit(id)` / `review_brand_edit(id, accept, note?)` (15h) | patroller | review brand changes |
+| `brand_history(pcid?, queue_only?, limit?)` (15h) | public | brand changes with handle + badge (all pages for the queue) |
 | `admin_contributors(query?, limit?)` / `unblock_contributor(user)` (15g) | admin | find contributors by handle (roles, NPI state, block, activity; never NPI/email/name); lift a block |
 
 ## 11. Build order
@@ -252,8 +255,10 @@ counts checked against live data 2026-10-04):
    (`src/components/MyContributions.tsx`, phase 15g).
 4. **Infobox editing** — ✅ 2026-10-05 (`src/InfoboxFact.tsx`, phase 15f): per-row edit
    with citation, community value shown first with the source value one tap away,
-   per-row history and review. Brand-name edits are not built (brands are RxNorm rows
-   and would need their own overlay).
+   per-row history and review. Brand names ✅ 2026-10-07 (phase 15h, `brand_edits`,
+   `src/components/BrandNames.tsx`, `src/brands.ts`): add a brand the sources lack,
+   remove a wrong source brand (it stays listed, struck through, with the reason) or undo
+   a change; source required; held on `reviewed` pages; in `/review` and My contributions.
 5. **New pages** — ✅ 2026-10-05: `/new` (`src/pages/CreatePage.tsx`) with the §7
    type picker (plus a measurement-type picker for labs), "Is it one of these?" name
    matches while typing, optional UNII/CAS for drug kinds, and links to the existing

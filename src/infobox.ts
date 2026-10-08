@@ -80,7 +80,7 @@ export async function getInfobox(pcid: number, signal?: AbortSignal): Promise<In
 
 export type Protection = 'open' | 'reviewed' | 'patrollers'
 
-async function getProtection(pcid: number, signal?: AbortSignal): Promise<Protection> {
+export async function getProtection(pcid: number, signal?: AbortSignal): Promise<Protection> {
   const q = supabase.from('page_content').select('protection').eq('pcid', pcid)
   const { data, error } = await (signal ? q.abortSignal(signal) : q).maybeSingle()
   if (error) throw new Error(error.message)

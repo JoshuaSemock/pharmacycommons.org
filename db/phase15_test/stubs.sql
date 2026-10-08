@@ -83,3 +83,11 @@ insert into public.moiety_hierarchy values (1002962,3000900,'precise_form');
 insert into public.lists values (10000034,'anticholinergic-burden','ACB'),(10000001,'most-used-drugs-us','MEPS');
 insert into public.list_items (list_pcid, position, member_pcid, value, rank) values
  (10000034,1,1000500,3,null),(10000001,1,1001900,9876543,4);
+
+-- Brand names (matview live; a plain table here) for phase 15h.
+create table public.entity_brand_names (pcid bigint, brand_key text, brand_display text, marketed boolean,
+  appl_nos text[], brand_rxcui text, sources text[]);
+insert into public.entity_brand_names (pcid, brand_key, brand_display, sources) values
+ (1001900, 'GLUCOPHAGE', 'Glucophage', '{drugsfda,rxnorm}'),
+ (1001900, 'FORTAMET', null, '{drugsfda}'),
+ (1002962, 'COUMADIN', 'Coumadin', '{drugsfda,rxnorm}');

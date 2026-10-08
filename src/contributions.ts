@@ -18,7 +18,7 @@ async function call<T>(fn: string, args: Record<string, unknown> = {}): Promise<
 // ─── My contributions ─────────────────────────────────────────────────────────
 
 export type Contribution = {
-  kind: 'page' | 'fact' | 'new_page'
+  kind: 'page' | 'fact' | 'brand' | 'new_page'
   item_id: number
   pcid: number
   slug: string

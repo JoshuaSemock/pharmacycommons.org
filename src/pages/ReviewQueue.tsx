@@ -12,7 +12,9 @@ import type { InfoboxQueueItem } from '../infobox'
 import type { ContributorStatus } from '../contribute'
 import { adminErrorMessage, getNewPagesQueue, patrolNewPage } from '../contributions'
 import type { NewPage } from '../contributions'
-import { formatDrugName } from '../names'
+import { brandActionText, getBrandQueue, patrolBrandEdit, reviewBrandEdit } from '../brands'
+import type { BrandEdit } from '../brands'
+import { formatBrandName, formatDrugName } from '../names'
 import { entityHref } from '../wiki'
 
 /**
@@ -34,6 +36,7 @@ export default function ReviewQueue() {
   const [items, setItems] = useState<QueueItem[] | 'loading' | 'failed'>('loading')
   const [facts, setFacts] = useState<InfoboxQueueItem[]>([])
   const [newPages, setNewPages] = useState<NewPage[]>([])
+  const [brandEdits, setBrandEdits] = useState<BrandEdit[]>([])
   const [open, setOpen] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
@@ -52,6 +55,13 @@ export default function ReviewQueue() {
       })
       .catch(() => {
         if (!cancelled) setItems('failed')
+      })
+    getBrandQueue()
+      .then(rows => {
+        if (!cancelled) setBrandEdits(rows)
+      })
+      .catch(() => {
+        if (!cancelled) setBrandEdits([])
       })
     getNewPagesQueue()
       .then(rows => {
@@ -184,6 +194,14 @@ export default function ReviewQueue() {
           />
           <FactsQueue
             items={facts}
+            status={status}
+            onDone={message => {
+              setNotice(message)
+              setVersion(v => v + 1)
+            }}
+          />
+          <BrandQueue
+            items={brandEdits}
             status={status}
             onDone={message => {
               setNotice(message)
@@ -395,6 +413,134 @@ function NewPagesQueue({
                       Mark reviewed
                     </Button>
                   ))}
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </section>
+  )
+}
+
+/** Brand-name changes: held ones (accept/reject) and unreviewed live ones (mark reviewed). */
+function BrandQueue({
+  items,
+  status,
+  onDone,
+}: {
+  items: BrandEdit[]
+  status: ContributorStatus
+  onDone: (message: string) => void
+}) {
+  const [busy, setBusy] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [rejecting, setRejecting] = useState<number | null>(null)
+  const [note, setNote] = useState('')
+  const me = status.kind === 'ready' ? status : null
+
+  async function run(id: number, action: () => Promise<unknown>, message: string) {
+    setBusy(id)
+    setError(null)
+    try {
+      await action()
+      setRejecting(null)
+      setNote('')
+      onDone(message)
+    } catch (err) {
+      setError(reviewErrorMessage(err))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="font-semibold text-ink" style={H2}>
+        Brand-name changes <span className="font-normal">({items.length})</span>
+      </h2>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-ink">
+        Brands contributors added to or removed from a page. Removed source brands stay visible on the page, struck
+        through, with the reason.
+      </p>
+      {error && (
+        <p role="alert" className="max-w-2xl rounded-md border border-rose-300 bg-rose-100/40 px-3 py-2 font-sans text-sm text-ink">
+          {error}
+        </p>
+      )}
+      {items.length === 0 ? (
+        <p className="font-sans text-base text-ink">Nothing here.</p>
+      ) : (
+        <ol className="lp-divide-y max-w-4xl">
+          {items.map(e => {
+            const own = me?.handle !== null && me?.handle === e.handle
+            const href = citationHref(e.citation)
+            return (
+              <li key={e.id} className="space-y-1.5 py-3 font-sans text-sm text-ink">
+                <span className="block text-base font-medium">
+                  <Link to={entityHref(e.entity_type, e.slug)} className="hover:underline">
+                    {formatDrugName(e.name)}
+                  </Link>{' '}
+                  · {brandActionText(e.action, formatBrandName(e.brand_display))}
+                </span>
+                <span className="block">
+                  Source:{' '}
+                  {href ? (
+                    <a href={href} target="_blank" rel="nofollow ugc noopener noreferrer" className="underline underline-offset-2">
+                      {e.citation}
+                    </a>
+                  ) : (
+                    e.citation
+                  )}{' '}
+                  · {e.summary} · @{e.handle}
+                  {e.credential ? ` · ${e.credential}` : ''} · {STATUS_LABEL[e.patrol_status]}
+                </span>
+                {me?.patroller && !own && (
+                  <span className="flex flex-wrap gap-2 pt-1">
+                    {e.patrol_status === 'pending' ? (
+                      <>
+                        <Button size="sm" disabled={busy !== null} onClick={() => run(e.id, () => reviewBrandEdit(e.id, true, ''), 'Accepted.')}>
+                          Accept
+                        </Button>
+                        <Button size="sm" onClick={() => setRejecting(e.id)}>
+                          Reject
+                        </Button>
+                      </>
+                    ) : (
+                      <Button size="sm" disabled={busy !== null} onClick={() => run(e.id, () => patrolBrandEdit(e.id), 'Marked reviewed.')}>
+                        Mark reviewed
+                      </Button>
+                    )}
+                  </span>
+                )}
+                {me?.patroller && own && <span className="block">Your change: another reviewer has to check it.</span>}
+                {rejecting === e.id && (
+                  <form
+                    className="max-w-xl space-y-2 pt-1"
+                    onSubmit={ev => {
+                      ev.preventDefault()
+                      if (note.trim()) void run(e.id, () => reviewBrandEdit(e.id, false, note.trim()), 'Rejected.')
+                    }}
+                  >
+                    <label htmlFor={`brej-${e.id}`} className="block text-sm font-semibold">
+                      Why? (the author sees this)
+                    </label>
+                    <input
+                      id={`brej-${e.id}`}
+                      type="text"
+                      value={note}
+                      onChange={ev => setNote(ev.target.value)}
+                      className="lp-field block w-full rounded-md px-3 py-1.5 text-sm text-ink"
+                    />
+                    <span className="flex gap-2">
+                      <Button size="sm" type="submit" disabled={!note.trim() || busy !== null}>
+                        Reject
+                      </Button>
+                      <Button size="sm" onClick={() => setRejecting(null)}>
+                        Cancel
+                      </Button>
+                    </span>
+                  </form>
+                )}
               </li>
             )
           })}
