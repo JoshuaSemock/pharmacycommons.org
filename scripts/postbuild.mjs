@@ -68,6 +68,11 @@ const STATIC_ROUTES = [
     sitemap: false,
   },
   {
+    path: '/topics',
+    title: 'Topics',
+    description: 'Browse everything in Pharmacy Commons that is not a drug: indications, symptoms, adverse effects, lab tests, biological targets and herbal sources, by kind and A to Z.',
+  },
+  {
     path: '/lists',
     title: 'Lists',
     description: 'Compendium lists of drugs, such as the most-used drugs in the US, MPJE testable drugs and do-not-crush lists, linked to Pharmacy Commons records.',

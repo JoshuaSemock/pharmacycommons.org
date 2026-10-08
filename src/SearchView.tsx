@@ -192,7 +192,11 @@ export default function SearchView() {
           Browse the catalog
         </h1>
         <p className="mt-4 max-w-[42rem] font-sans text-[16px] leading-relaxed text-pretty text-ink">
-          Every drug in the Commons, from A onward. Search by name, brand, combination or drug class (or a condition, lab, target or herbal), or jump to a letter.
+          Every drug in the Commons, from A onward. Search by name, brand, combination or drug class, or jump to a letter. Conditions, labs, targets and herbals turn up in search too, and have their own A to Z under{' '}
+          <Link to="/topics" className="underline underline-offset-2">
+            Topics
+          </Link>
+          .
         </p>
 
         <div className="mt-6 max-w-lg">

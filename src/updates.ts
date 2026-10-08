@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'topics-index',
+    date: '2026-10-07',
+    kind: 'Feature',
+    title: 'Browse topics: conditions, labs, targets and herbals',
+    summary:
+      'A new A to Z of everything that isn’t a drug. Narrow by kind and type (indications, symptoms, CYP450 enzymes, lab panels…), filter by name, or sort by how many drugs connect to each topic.',
+    to: '/topics',
+    cta: 'Browse topics',
+  },
+  {
     id: 'concept-search',
     date: '2026-10-07',
     kind: 'Feature',

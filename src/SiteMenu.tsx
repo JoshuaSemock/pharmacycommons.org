@@ -30,7 +30,8 @@ export const BAR_LINKS = [
 ]
 
 const EXPLORE_LINKS = [
-  { to: '/browse', label: 'Browse A to Z' },
+  { to: '/browse', label: 'Drugs A to Z' },
+  { to: '/topics', label: 'Topics: conditions, labs, targets, herbals' },
   { to: '/lists', label: 'Lists' },
   { to: '/classifications', label: 'Classifications' },
   { to: '/tools', label: 'All tools' },
