@@ -397,6 +397,12 @@ Dosage Form, Route of Administration, Term — all `concept_type` on block 6). P
 starts from the Topics "Create a page" panel (`/new?type=`); Account no longer links `/new`.
 Class pages (`src/pages/ClassDetail.tsx`) now carry the Overview.
 
+**Phase 16 — full-page editor (spec `docs/page-editor.md`; step 1 built 2026-10-10, not merged):**
+`src/pageSource/` parses and serializes page source (lead, `## sections`, `:::blocks`,
+`::embeds`, `[@citations]`, `[NONE]`, HTML rejection). `src/pageSource/registry.json` is the
+single registry; `db/phase16a_block_schemas.sql` seeds the same JSON (a test fails on drift) —
+**change both together**. Not applied to production yet.
+
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
 `dictionary_words()` / `dictionary_buckets()`. `list_items.member_pcid` is now nullable with
