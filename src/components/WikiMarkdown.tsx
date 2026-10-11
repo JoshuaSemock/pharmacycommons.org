@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeSlug from 'rehype-slug'
 import { entityHref, linkKey, newPageHref, propertyKey, remarkWiki } from '../wiki'
 import type { LinkedPage, PropertyValue } from '../pageContent'
 
@@ -13,6 +14,9 @@ import type { LinkedPage, PropertyValue } from '../pageContent'
  *   [[target]] / [[target|text]]  → a link to the page the database resolved,
  *                                   or a "no page yet" red link
  *   {{key}} / {{key:target}}      → a live value chip from resolve_property()
+ *
+ * Headings get anchor ids (rehype-slug, prefixed section-) so sections can be
+ * linked: /drugs/metformin#section-renal-dosing.
  *
  * Safety: no raw HTML (no rehype-raw), images render as their alt text only
  * (images are off in v1), and outside links open with rel="nofollow ugc
@@ -26,6 +30,9 @@ import type { LinkedPage, PropertyValue } from '../pageContent'
  */
 
 const BODY = 'font-sans text-base leading-[1.7] text-ink'
+
+/** Contributor headings get ids like #section-renal-dosing, so a section can be linked to. */
+export const SECTION_ID_PREFIX = 'section-'
 const LINK =
   'text-ink underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
 const HEADING = { fontFamily: 'var(--font-sans)', lineHeight: 1.3 } as const
@@ -40,28 +47,28 @@ type Props = {
 
 export default function WikiMarkdown({ source, links, properties, labelAnchor }: Props) {
   const components: Components = {
-    h1: ({ children }) => (
-      <h3 className="pt-4 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-lg)' }}>
+    h1: ({ id, children }) => (
+      <h3 id={id} className="pt-4 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-lg)' }}>
         {children}
       </h3>
     ),
-    h2: ({ children }) => (
-      <h3 className="pt-4 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-lg)' }}>
+    h2: ({ id, children }) => (
+      <h3 id={id} className="pt-4 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-lg)' }}>
         {children}
       </h3>
     ),
-    h3: ({ children }) => (
-      <h4 className="pt-3 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-base)' }}>
+    h3: ({ id, children }) => (
+      <h4 id={id} className="pt-3 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-base)' }}>
         {children}
       </h4>
     ),
-    h4: ({ children }) => (
-      <h5 className="pt-2 font-sans font-medium text-ink" style={{ ...HEADING, fontSize: 'var(--text-base)' }}>
+    h4: ({ id, children }) => (
+      <h5 id={id} className="pt-2 font-sans font-medium text-ink" style={{ ...HEADING, fontSize: 'var(--text-base)' }}>
         {children}
       </h5>
     ),
-    h5: ({ children }) => <p className={`${BODY} font-medium`}>{children}</p>,
-    h6: ({ children }) => <p className={`${BODY} font-medium`}>{children}</p>,
+    h5: ({ id, children }) => <p id={id} className={`${BODY} font-medium`}>{children}</p>,
+    h6: ({ id, children }) => <p id={id} className={`${BODY} font-medium`}>{children}</p>,
     p: ({ children }) => <p className={BODY}>{children}</p>,
     a: ({ href, children }) => <OutsideOrInternalLink href={href}>{children}</OutsideOrInternalLink>,
     strong: ({ children }) => <strong className="font-semibold text-ink">{children}</strong>,
@@ -103,7 +110,7 @@ export default function WikiMarkdown({ source, links, properties, labelAnchor }:
 
   return (
     <div className="space-y-4">
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkWiki]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkWiki]} rehypePlugins={[[rehypeSlug, { prefix: SECTION_ID_PREFIX }]]} components={components}>
         {source}
       </ReactMarkdown>
     </div>

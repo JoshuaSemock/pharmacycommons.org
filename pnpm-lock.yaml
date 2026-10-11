@@ -11,6 +11,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.116.0
         version: 2.116.0
+      mdast-util-from-markdown:
+        specifier: 2.0.3
+        version: 2.0.3
       react:
         specifier: ^19.0.0
         version: 19.2.4

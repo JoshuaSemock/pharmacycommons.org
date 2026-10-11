@@ -102,3 +102,13 @@ describe('newPageHref', () => {
     expect(newPageHref('  ')).toBe('/new')
   })
 })
+
+describe('heading anchors', () => {
+  it('gives contributor headings a prefixed id so sections can be linked', () => {
+    const html = renderToStaticMarkup(
+      createElement(MemoryRouter, null, createElement(WikiMarkdown, { source: '## Renal dosing\n\nText.\n\n### Contrast', links: new Map(), properties: new Map() })),
+    )
+    expect(html).toContain('<h3 id="section-renal-dosing"')
+    expect(html).toContain('<h4 id="section-contrast"')
+  })
+})
