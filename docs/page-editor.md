@@ -204,6 +204,25 @@ Rules shared by all blocks:
 - Blocks are validated against their table's types and ranges before anything is
   written.
 
+### 5a. `:::interactions` (designed 2026-10-11, not built)
+
+On drug and herbal pages, under `## Safety` (herbal) or a drug template section to be
+added with it. One interaction per line, the other party as a page link, then what
+happens and what to do, always cited:
+
+```
+:::interactions
+[[warfarin]]: increased INR; monitor INR when starting or stopping [@pmid:…]
+[[strong CYP3A4 inhibitors]]: avoid [@dailymed:…]
+:::
+```
+
+Stored in `community_statements` (§9 Q3) with predicate `interacts_with` (added to
+`predicates` first) and the action text as the `effect` qualifier; the target resolves
+like a `[[link]]` (`resolve_page_target`), an unresolved target is kept as
+`object_label`. The page shows community rows beside the FDA-sourced interactions,
+marked as contributed and cited.
+
 ## 6. References and citations
 
 - New `references` table: `ref_id`, `key` (`pmid:28776081`), type, title, authors,
@@ -310,22 +329,58 @@ currently creates a `page_links` row).
 
 The phase-15 tables, RPCs, roles, protection, rate limits and NPI gate all stay.
 
-## 9. Open questions
+## 9. Decisions on the open questions (2026-10-11)
 
-1. **Short description.** Keep a separate one-line short description (used under the
-   title, in search results and in the API), or take the lead's first sentence?
-   Separate is more reliable: sentence splitting trips on "e.g." and doses.
-2. **Contributor sections.** "Template sections can't be deleted" is read as applying
-   to the type's default sections. Sections a contributor added can be removed by a
-   later edit, so a vandal's heading isn't permanent. Confirm.
-3. **Interactions.** Should community interactions become `clinical_statements` rows
-   (`source_agency = 'community'`, with a revision id), or go in a separate table until
-   reviewed? The first makes them first-class in the API and the triple store; the
-   second keeps the triple store ingest-only.
-4. **Empty template sections** (e.g. a new page's `## Patient education`). Hide them on
-   the read view, or show "Nothing here yet — edit"? Wikipedia hides them.
-5. **Default templates per type.** The drug template is §3. Concept, class and
-   herbal templates: start from their current layouts plus `## Patient education`?
+Joshua handed these to Claude on 2026-10-11. Each follows a decision he had
+already made; the reason is given so it can be revisited.
+
+1. **Short description: no separate field.** The lead *is* the description (the
+   one-liner moved into the Overview on 2026-10-04, and `moieties.description_text`
+   is empty for all 15,679 moieties). Where a one-liner is needed — link previews
+   now, the API with §10 item 7 — it is `leadSummary()` (`src/pageSource/citations.ts`):
+   the lead's first paragraph as plain text, cut at a word boundary (200 characters by
+   default). It never splits on sentences ("e.g.", "1,000 mg." break that). A
+   non-blank `description_text` still wins, so a curated one-liner loaded from
+   Joshua's spreadsheet overrides it.
+2. **Contributor sections can be removed; template sections can't.** Joshua's rule
+   (2026-10-10) "contributors cannot delete sections, but reordering is fine" applies
+   to the type's template sections and locked embeds, which the parser enforces.
+   A section a contributor *added* can be removed by any verified editor, so a
+   vandal's heading isn't permanent. This is publish-then-patrol: the removal is an
+   unreviewed edit in the queue, shows in the history diff, and Restore brings it back.
+3. **Community interactions get their own table, not `clinical_statements`.** Every
+   community layer so far is an overlay beside the ingested data, never rows in it:
+   `infobox_edits`, `brand_edits`, `threshold_rules`. Interactions follow suit in
+   `community_statements`, shaped like `clinical_statements` (subject PCID, predicate
+   from `predicates`, object PCID or label, qualifiers, citations) plus `block_name`,
+   `revision_id`, `is_current`, `position`. `apply_page_revision()` writes it from an
+   `:::interactions` block. The triple store stays ingest-only (its unique-triple guard,
+   `entity_changes` trigger and API snapshots are untouched), and a contributor's
+   interaction is shown *beside* the FDA-sourced one with its citation, not merged
+   into it ("show the disagreement"). Moving a well-cited community row into
+   `clinical_statements` is a maintainer batch through `revisions` /
+   `approve_revision()`, never automatic. Design for the block: §5a.
+4. **Empty template sections: hidden from readers, an invitation for editors.**
+   Readers see only sections with text, as on Wikipedia. Verified editors see the
+   empty section with its [edit] link and the template's help line ("Nothing here
+   yet. Plain-language counselling points for patients."). One view for everyone
+   still holds: the page content is the same; only the edit affordances differ.
+5. **Templates per type** (`registry.json`, seeded by `db/phase16c_page_templates.sql`;
+   `pageTypeFor()` picks one from `entities.entity_type`):
+   - **drug** (blocks 1–4): unchanged (§3).
+   - **concept** (clinical, measurement, target): unchanged — lead, `::knowledge-base`,
+     `## Patient education`, `::references`, `::metadata`.
+   - **herbal** (block 9, `functional`): lead, `## Uses and evidence`, `## Safety`
+     (adverse effects, interactions, pregnancy and lactation, product quality),
+     `## Patient education`, `::knowledge-base`, `::references`, `::metadata`.
+     Herbals are where evidence and product quality matter most, so they get their own
+     sections rather than the generic concept layout.
+   - **class** (block 5): rail `::subclasses`, `::machine-readable`; main: lead,
+     `## Class effects` (shared effects, adverse effects, interactions, monitoring),
+     `::class-members`, `::references`. Class pages leave the phase-15 Overview for the
+     model layout, so the same editor, history and citations work there.
+   - Pages saved before their template gained a section get it (empty) on the fly
+     (`fillTemplate()`), so a template can grow without breaking existing pages.
 
 ## 10. Build order
 
@@ -408,7 +463,9 @@ The phase-15 tables, RPCs, roles, protection, rate limits and NPI gate all stay.
 6. Smoke test on metformin: open **Edit page**, change one sentence, publish; check the
    history diff, the references list, and that a second browser editing another section
    merges cleanly.
-7. Publish the guide (`src/content/posts/2026-10-11-how-to-edit-a-page.md`: set
+7. (2026-10-11) Apply `db/phase16c_page_templates.sql` as `phase16c_page_templates` and
+   redeploy `publish-page` (herbal and class templates, §9 Q5). Done; registry md5 checked.
+8. Publish the guide (`src/content/posts/2026-10-11-how-to-edit-a-page.md`: set
    `draft: false`) and add a `src/updates.ts` entry.
 
 Rollback: the frontend falls back to the Overview if the phase-16 columns are missing, so

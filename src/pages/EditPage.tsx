@@ -3,13 +3,15 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getDrugBySlug } from '../api'
 import type { DrugDetail } from '../api.generated'
-import { isConceptKind } from '../concepts'
 import { formatDrugName } from '../names'
+import { pageTypeFor } from '../pageSource'
+import { entityHref } from '../wiki'
 import PageEditor from '../pageEditor/PageEditor'
 import { publishedNotice, useEditAccess } from '../pageEditor/access'
 
 /**
- * /drugs/:slug/edit — the whole page in the full-page editor
+ * /drugs/:slug/edit — the whole page in the full-page editor, for every page
+ * type (drug, concept, herbal, class)
  * (docs/page-editor.md §4: "Edit page"). Section edits open in place on the
  * page itself; this route is for adding, removing and reordering sections.
  */
@@ -32,7 +34,8 @@ export default function EditPage() {
     return () => controller.abort()
   }, [slug])
 
-  const name = drug && drug !== 'missing' ? (isConceptKind(drug.block_kind) ? drug.name.trim() : formatDrugName(drug.name)) : ''
+  // Drug names display lower-cased; concept, herbal and class names keep their case (as publish-page titles them).
+  const name = drug && drug !== 'missing' ? (pageTypeFor(drug.block_kind) === 'drug' ? formatDrugName(drug.name) : drug.name.trim()) : ''
   useEffect(() => {
     document.title = name ? `Editing ${name} · Pharmacy Commons` : 'Pharmacy Commons'
   }, [name])
@@ -40,7 +43,7 @@ export default function EditPage() {
   if (drug === null || access.status.kind === 'loading') return <div className="flex justify-center py-32 font-sans text-ink">Loading…</div>
   if (drug === 'missing') return <Message>That page doesn’t exist.</Message>
 
-  const back = `/drugs/${drug.slug}`
+  const back = entityHref(drug.block_kind, drug.slug)
   const s = access.status
   if (s.kind === 'signed-out') return <Message>
       <Link to="/account" className={LINK}>Sign in</Link> with a verified NPI to edit pages.
@@ -66,7 +69,7 @@ export default function EditPage() {
         status={s}
         onHandleSet={access.refresh}
         onClose={() => navigate(back)}
-        onPublished={r => navigate(back, { state: { notice: publishedNotice(r.status) } })}
+        onPublished={r => navigate(back, { state: { notice: publishedNotice(r.status, s.patroller) } })}
       />
     </div>
   )

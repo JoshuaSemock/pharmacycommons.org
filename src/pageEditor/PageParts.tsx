@@ -61,9 +61,10 @@ export function CommunitySection({
   numbers,
   labelAnchor,
   onEdit,
+  help,
   className = '',
   style,
-}: Shared & { item: Extract<MainItem, { kind: 'section' }>; onEdit?: () => void; className?: string; style?: CSSProperties }) {
+}: Shared & { item: Extract<MainItem, { kind: 'section' }>; onEdit?: () => void; help?: string; className?: string; style?: CSSProperties }) {
   const id = sectionAnchor(item)
   const empty = isEmptySection(item)
   // Empty sections are hidden from readers; contributors see where to start (docs/page-editor.md §9 Q4).
@@ -77,7 +78,9 @@ export function CommunitySection({
         {onEdit && <EditLink onClick={onEdit} label={`Edit ${item.heading}`} />}
       </div>
       {empty ? (
-        <p className="font-sans text-base text-ink">Nothing here yet.</p>
+        <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
+          Nothing here yet.{help ? ` ${help}` : ''}
+        </p>
       ) : (
         <div className="space-y-4">
           {item.parts.map((p, i) =>

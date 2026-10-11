@@ -409,6 +409,14 @@ runs the same parser from `_shared/pageSource` — **after editing `src/pageSour
 `node scripts/sync-page-source.mjs`** (a test fails otherwise). UI in `src/pageEditor/`
 and `/drugs/:slug/edit`; pages fall back to the phase-15 Overview if the columns are
 missing (rollback = revert the merge). SQL tests: `db/phase15_test/tests_16b.sql` (+ `contract_16b.sql`).
+**§9 decided 2026-10-11** (`docs/page-editor.md` §9): no separate short description (`leadSummary()`
+from the lead; `description_text` overrides when set); contributor-added sections removable, template
+sections not; community interactions go in a future `community_statements` overlay (design §5a), never
+`clinical_statements`; empty sections hidden from readers, shown with the template help to editors.
+Templates per type via `pageTypeFor()`: drug, concept, **herbal** (`functional`) and **class** (class
+pages now use the model layout via `src/pageEditor/CommunityPage.tsx`). `db/phase16c_page_templates.sql`
+(applied 2026-10-11) seeds them; the registry test reads the newest phase16 seed. `fillTemplate()` adds
+template sections a saved page lacks, so templates can grow. `publish-page` v2 deployed the same day.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /

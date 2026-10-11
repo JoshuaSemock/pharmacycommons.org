@@ -34,6 +34,7 @@ import type {
   PageContext,
   PageModel,
   PageTemplate,
+  PageType,
   ParseResult,
   TemplateItem,
 } from './types'
@@ -50,6 +51,23 @@ export type ParseOptions = {
   target?: FragmentTarget
   /** Ids of contributor sections in the base revision, keyed by lower-cased heading. */
   sectionIds?: Record<string, string>
+}
+
+const DRUG_ENTITY_TYPES = new Set(['moiety', 'precise_form', 'combination', 'formulation'])
+const CONCEPT_ENTITY_TYPES = new Set(['clinical', 'measurement', 'target'])
+
+/**
+ * The template an entity's page uses (docs/page-editor.md §9 Q5), or null for
+ * entities without a community page (lists). Shared by the page, the editor and
+ * publish-page so all three pick the same template.
+ */
+export function pageTypeFor(entityType: string | null | undefined): PageType | null {
+  if (!entityType) return null
+  if (DRUG_ENTITY_TYPES.has(entityType)) return 'drug'
+  if (CONCEPT_ENTITY_TYPES.has(entityType)) return 'concept'
+  if (entityType === 'functional') return 'herbal'
+  if (entityType === 'class') return 'class'
+  return null
 }
 
 export function templateFor(ctx: PageContext): PageTemplate {

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { METFORMIN, METFORMIN_SOURCE } from './fixtures/metformin'
 import { contextAt, panelFor, parsePageSource, REGISTRY, serializeFragment, serializePage, templateModel } from './index'
@@ -393,10 +393,17 @@ describe('section edit links', () => {
 // ─── The registry and its database copy stay identical ─────────────────────────
 
 describe('registry', () => {
-  it('matches the seed in db/phase16a_block_schemas.sql', () => {
-    const sql = readFileSync(new URL('../../db/phase16a_block_schemas.sql', import.meta.url), 'utf8')
-    const m = /\$registry\$(\{[\s\S]*?\})\$registry\$/.exec(sql)
-    expect(m).not.toBeNull()
-    expect(JSON.parse(m ? m[1] : '{}')).toEqual(REGISTRY)
+  it('matches the newest registry seed in db/ (phase16a, then later phase16* migrations)', () => {
+    const dir = new URL('../../db/', import.meta.url)
+    const seeds = readdirSync(dir)
+      .filter(f => /^phase16[a-z]?_.*\.sql$/.test(f))
+      .sort()
+      .map(f => readFileSync(new URL(f, dir), 'utf8'))
+      .filter(sql => sql.includes('$registry$'))
+    const sql = seeds[seeds.length - 1] ?? ''
+    // Every copy inside one migration must be the same JSON.
+    const copies = [...sql.matchAll(/\$registry\$(\{[\s\S]*?\})\$registry\$/g)].map(m => JSON.parse(m[1]))
+    expect(copies.length).toBeGreaterThan(0)
+    for (const c of copies) expect(c).toEqual(REGISTRY)
   })
 })

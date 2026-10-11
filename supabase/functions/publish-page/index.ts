@@ -32,9 +32,9 @@
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2'
-import { parsePageSource } from '../_shared/pageSource/parse.ts'
+import { pageTypeFor, parsePageSource } from '../_shared/pageSource/parse.ts'
 import type { FragmentTarget } from '../_shared/pageSource/parse.ts'
-import { serializeFragment, serializePage, templateModel } from '../_shared/pageSource/serialize.ts'
+import { fillTemplate, serializeFragment, serializePage, templateModel } from '../_shared/pageSource/serialize.ts'
 import { assignSectionIds, mergeModels, sectionIdsOf, spliceFragment } from '../_shared/pageSource/merge.ts'
 import { fromLegacy } from '../_shared/pageSource/legacy.ts'
 import { buildPayload, citationOrder, overlayStructured } from '../_shared/pageSource/publish.ts'
@@ -49,9 +49,6 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
-
-const DRUG_TYPES = new Set(['moiety', 'precise_form', 'combination', 'formulation'])
-const CONCEPT_TYPES = new Set(['clinical', 'measurement', 'target', 'functional'])
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
@@ -87,8 +84,9 @@ async function loadPage(db: SupabaseClient, pcid: number): Promise<Loaded> {
     'entity',
   )
   if (!entity) throw new HttpError(404, { error: 'no_such_page' })
-  const pageType: PageType | null = DRUG_TYPES.has(entity.entity_type) ? 'drug' : CONCEPT_TYPES.has(entity.entity_type) ? 'concept' : null
-  if (!pageType) throw new HttpError(400, { error: 'unsupported_page', message: 'Class and list pages still use the Overview editor.' })
+  // Drug, concept, herbal and class pages each have a template (docs/page-editor.md §9 Q5).
+  const pageType: PageType | null = pageTypeFor(entity.entity_type)
+  if (!pageType) throw new HttpError(400, { error: 'unsupported_page', message: 'List pages are edited from the list itself.' })
 
   const [registry, keys, brandNames, content, infobox, brands, thresholds] = await Promise.all([
     must<Registry>(db.rpc('page_source_registry'), 'registry'),
@@ -174,7 +172,8 @@ async function revisionModel(db: SupabaseClient, ctx: PageContext, id: number | 
     'revision',
   )
   if (!rev) throw new HttpError(404, { error: 'no_such_revision' })
-  if (rev.format === 2 && rev.model) return { model: rev.model, format: 2 }
+  // A template that gained a section since this revision was saved gets it, empty.
+  if (rev.format === 2 && rev.model) return { model: fillTemplate(rev.model, ctx), format: 2 }
   return { model: fromLegacy(rev.description, rev.body_md, ctx), format: 1 }
 }
 

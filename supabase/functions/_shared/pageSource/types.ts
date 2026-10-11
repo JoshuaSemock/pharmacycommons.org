@@ -10,7 +10,12 @@
 
 // ─── Registry (src/pageSource/registry.json, mirrored in public.block_schemas) ──
 
-export type PageType = 'drug' | 'concept'
+/**
+ * Which template a page uses (docs/page-editor.md §3, §9 Q5). Set by entity type:
+ * drug blocks 1–4 → drug, clinical/measurement/target → concept, functional
+ * (herbals and other biological sources) → herbal, class → class.
+ */
+export type PageType = 'drug' | 'concept' | 'herbal' | 'class'
 
 export type Grammar = 'keyed' | 'brands' | 'threshold'
 

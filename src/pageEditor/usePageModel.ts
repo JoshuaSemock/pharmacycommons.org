@@ -11,7 +11,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { isAbort } from '../drugPageData'
-import { REGISTRY, citationOrder, fromLegacy, templateModel } from '../pageSource'
+import { REGISTRY, citationOrder, fillTemplate, fromLegacy, templateModel } from '../pageSource'
 import type { PageContext, PageModel, PageType } from '../pageSource'
 
 export type Reference = {
@@ -66,7 +66,8 @@ export async function loadPageModel(pcid: number, ctx: PageContext, signal?: Abo
   }
   const row = rev.data as RevisionRow | null
   if (!row) return { status: 'ready', model: templateModel(ctx), references: [], numbers: new Map(), revisionId }
-  const model = row.format === 2 && row.model ? row.model : fromLegacy(row.description, row.body_md, ctx)
+  // fillTemplate: a template that gained a section since this revision shows it (empty) too.
+  const model = row.format === 2 && row.model ? fillTemplate(row.model, ctx) : fromLegacy(row.description, row.body_md, ctx)
 
   let references: Reference[] = []
   if (row.format === 2) {

@@ -5,12 +5,14 @@ import { getEntityClasses } from '@/api'
 import type { EntityClass } from '@/api.generated'
 import { supabase } from '@/supabaseClient'
 import { formatDrugName } from '@/names'
+import { leadSummary } from '@/pageSource/citations'
 import { usePopoverPlacement } from './popover'
 
 /**
  * A link to a drug record that shows a small preview card on hover or keyboard
- * focus: the record's name and type, its PCID, the one-line description
- * (moieties.description_text) and its pharmacologic classes, FDA EPC and MOA
+ * focus: the record's name and type, its PCID, a one-line description
+ * (moieties.description_text if set, else the start of the page's lead;
+ * docs/page-editor.md §9 Q1) and its pharmacologic classes, FDA EPC and MOA
  * first. Used by the dictionary (/tools/dictionary) for drug and brand names.
  *
  * The link goes to the permanent address /id/PCID-n, which forwards to the
@@ -44,14 +46,17 @@ const MAX_CLASSES = 5
 const cache = new Map<number, Promise<Preview>>()
 
 async function fetchPreview(pcid: number): Promise<Preview> {
-  const [entity, moiety, classes] = await Promise.all([
+  const [entity, moiety, content, classes] = await Promise.all([
     supabase.from('entities').select('pcid, name, entity_type').eq('pcid', pcid).maybeSingle(),
     supabase.from('moieties').select('description_text').eq('pcid', pcid).maybeSingle(),
+    supabase.from('page_content').select('description').eq('pcid', pcid).maybeSingle(),
     getEntityClasses(pcid).catch(() => [] as EntityClass[]),
   ])
   if (entity.error || !entity.data) throw new Error(`No record for PCID-${pcid}`)
   const row = entity.data as { pcid: number; name: string; entity_type: string }
-  const desc = (moiety.data as { description_text: string | null } | null)?.description_text?.trim() ?? null
+  const curated = (moiety.data as { description_text: string | null } | null)?.description_text?.trim() ?? null
+  const lead = leadSummary((content.data as { description: string | null } | null)?.description, 160)
+  const desc = curated && curated.toLowerCase() !== 'unassigned' ? curated : lead
   const direct = classes
     .filter(c => c.is_direct)
     .sort((a, b) => CLASS_ORDER.indexOf(a.class_type) - CLASS_ORDER.indexOf(b.class_type))
@@ -59,7 +64,7 @@ async function fetchPreview(pcid: number): Promise<Preview> {
     pcid: row.pcid,
     name: row.name,
     entityType: row.entity_type,
-    description: desc && desc.toLowerCase() !== 'unassigned' ? desc : null,
+    description: desc,
     classes: direct.slice(0, MAX_CLASSES),
   }
 }
