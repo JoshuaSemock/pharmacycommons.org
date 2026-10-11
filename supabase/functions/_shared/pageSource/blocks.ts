@@ -1,3 +1,4 @@
+// GENERATED from src/pageSource/blocks.ts by scripts/sync-page-source.mjs — do not edit here.
 /**
  * Line grammars for structured blocks (docs/page-editor.md §5). Each grammar
  * turns the lines between `:::name` and `:::` into typed rows, or explains on
@@ -11,9 +12,9 @@
  * serializer writes source values there.
  */
 
-import { splitCitations } from './citations'
-import { htmlInValue } from './prose'
-import { blockByHint, nearest } from './suggest'
+import { splitCitations } from './citations.ts'
+import { htmlInValue } from './prose.ts'
+import { blockByHint, nearest } from './suggest.ts'
 import type {
   BlockSchema,
   BrandLine,
@@ -25,7 +26,7 @@ import type {
   PageContext,
   ThresholdBlock,
   ThresholdLine,
-} from './types'
+} from './types.ts'
 
 export type RawLine = { text: string; line: number }
 
