@@ -19,7 +19,15 @@
 -- whose format-1 behaviour is unchanged. Run after phase16a. Then
 -- get_advisors(type: security): publish_page and apply_page_revision must NOT
 -- be executable by anon or authenticated.
+--
+-- Apply as three migrations (constraint adds go on their own, per CLAUDE.md):
+--   phase16b_1_tables       §1–§4  new tables, new columns, read access
+--   phase16b_2_constraints  the two CHECK constraints below §4
+--   phase16b_3_functions    §5–§9  functions and grants
+-- Each part is wrapped in its own begin/commit so the file also runs top to
+-- bottom in psql (db/phase15_test).
 
+-- ═══ phase16b_1_tables ═══════════════════════════════════════════════════════
 begin;
 
 -- ── 1. Citations ──────────────────────────────────────────────────────────────
@@ -67,15 +75,11 @@ comment on column public.page_revisions.model is 'Parsed page model (src/pageSou
 comment on column public.page_revisions.source_md is 'Community layer as page source, for history diffs (no ingested values).';
 comment on column public.page_revisions.extracted is '{links:[{target}], properties:[{key,target}], citations:[{key,location}]} for format 2.';
 comment on column public.page_revisions.changed_sections is 'Units this revision changed: lead, section ids, infobox:<key>, brands:<KEY>, order.';
-alter table public.page_revisions
-  add constraint page_revisions_format2_model check (format = 1 or (model is not null and source_md is not null and extracted is not null));
 
 alter table public.infobox_edits
   add column is_null_override boolean not null default false,
   add column revision_id bigint references public.page_revisions (id);
 comment on column public.infobox_edits.is_null_override is 'true = [NONE]: the source is wrong and there is no value. value is null.';
-alter table public.infobox_edits
-  add constraint infobox_edits_null_override check (not is_null_override or value is null);
 
 alter table public.brand_edits add column revision_id bigint references public.page_revisions (id);
 
@@ -114,6 +118,23 @@ grant select on public.citation_sources, public.page_citations, public.threshold
 grant select (format, model, source_md, extracted, changed_sections) on public.page_revisions to anon, authenticated;
 grant select (is_null_override, revision_id) on public.infobox_edits to anon, authenticated;
 grant select (revision_id) on public.brand_edits to anon, authenticated;
+
+commit;
+
+-- ═══ phase16b_2_constraints ══════════════════════════════════════════════════
+begin;
+
+-- Every full-page revision carries its model, community source and extracted refs.
+alter table public.page_revisions
+  add constraint page_revisions_format2_model check (format = 1 or (model is not null and source_md is not null and extracted is not null));
+-- [NONE] is a null value with the flag set; a flagged row never has a value.
+alter table public.infobox_edits
+  add constraint infobox_edits_null_override check (not is_null_override or value is null);
+
+commit;
+
+-- ═══ phase16b_3_functions ════════════════════════════════════════════════════
+begin;
 
 -- ── 5. Helpers that take the person explicitly (the Edge Function runs as service_role) ──
 create or replace function public.pc_is_verified(p_user uuid)

@@ -38,6 +38,7 @@ const Licensing = lazy(() => import('./pages/Licensing'))
 const Privacy = lazy(() => import('./pages/Privacy'))
 // Community editing (phase 15): page history and the reviewers' queue.
 const PageHistory = lazy(() => import('./pages/PageHistory'))
+const EditPage = lazy(() => import('./pages/EditPage'))
 const ReviewQueue = lazy(() => import('./pages/ReviewQueue'))
 const CreatePage = lazy(() => import('./pages/CreatePage'))
 const Admin = lazy(() => import('./pages/Admin'))
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/browse" element={<SearchView />} />
           <Route path="/drugs/:slug" element={<DrugDetail />} />
           <Route path="/drugs/:slug/history" element={<PageHistory />} />
+          <Route path="/drugs/:slug/edit" element={<EditPage />} />
           <Route path="/review" element={<ReviewQueue />} />
           <Route path="/new" element={<CreatePage />} />
           <Route path="/admin" element={<Admin />} />

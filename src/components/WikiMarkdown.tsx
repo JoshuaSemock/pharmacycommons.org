@@ -5,6 +5,7 @@ import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import { entityHref, linkKey, newPageHref, propertyKey, remarkWiki } from '../wiki'
+import { remarkCite } from '../pageEditor/remarkCite'
 import type { LinkedPage, PropertyValue } from '../pageContent'
 
 /**
@@ -43,9 +44,15 @@ type Props = {
   properties: Map<string, PropertyValue>
   /** Opens the FDA label on this page (for {{dosing}} and other label-derived values). */
   labelAnchor?: string
+  /**
+   * Reference number of each cited key (full-page editor pages). When given,
+   * `[@key]` renders as a numbered mark linking to the References section;
+   * without it, citation text is shown as written (phase-15 Overview text).
+   */
+  citations?: Map<string, number>
 }
 
-export default function WikiMarkdown({ source, links, properties, labelAnchor }: Props) {
+export default function WikiMarkdown({ source, links, properties, labelAnchor, citations }: Props) {
   const components: Components = {
     h1: ({ id, children }) => (
       <h3 id={id} className="pt-4 font-sans font-semibold text-ink" style={{ ...HEADING, fontSize: 'var(--text-lg)' }}>
@@ -98,6 +105,8 @@ export default function WikiMarkdown({ source, links, properties, labelAnchor }:
       const data = props as Record<string, unknown>
       const link = data['data-pc-link']
       if (typeof link === 'string') return <WikiLink target={link} links={links}>{children}</WikiLink>
+      const cite = data['data-pc-cite']
+      if (typeof cite === 'string' && citations) return <CiteMark keys={cite.split(' ').filter(Boolean)} numbers={citations} />
       const prop = data['data-pc-prop']
       if (typeof prop === 'string') {
         const target = typeof data['data-pc-target'] === 'string' ? (data['data-pc-target'] as string) : ''
@@ -110,10 +119,30 @@ export default function WikiMarkdown({ source, links, properties, labelAnchor }:
 
   return (
     <div className="space-y-4">
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkWiki]} rehypePlugins={[[rehypeSlug, { prefix: SECTION_ID_PREFIX }]]} components={components}>
+      <ReactMarkdown remarkPlugins={citations ? [remarkGfm, remarkWiki, remarkCite] : [remarkGfm, remarkWiki]} rehypePlugins={[[rehypeSlug, { prefix: SECTION_ID_PREFIX }]]} components={components}>
         {source}
       </ReactMarkdown>
     </div>
+  )
+}
+
+/** [1] or [1, 3]: superscript links into the References section (#ref-N). */
+export function CiteMark({ keys, numbers }: { keys: string[]; numbers: Map<string, number> }) {
+  const nums = [...new Set(keys.map(k => numbers.get(k)).filter((n): n is number => n !== undefined))].sort((a, b) => a - b)
+  if (!nums.length) return <sup className="font-sans text-[0.72em]" title={keys.join(', ')}>[?]</sup>
+  return (
+    <sup className="font-sans text-[0.72em]">
+      [
+      {nums.map((n, i) => (
+        <span key={n}>
+          {i > 0 && ', '}
+          <a href={`#ref-${n}`} className={LINK} title={`Reference ${n}`}>
+            {n}
+          </a>
+        </span>
+      ))}
+      ]
+    </sup>
   )
 }
 

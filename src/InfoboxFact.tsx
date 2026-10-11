@@ -37,6 +37,11 @@ export type InfoboxContext = {
   status: ContributorStatus
   reload: () => void
   onHandleSet: () => void
+  /**
+   * false when the page editor owns Quick Facts (docs/page-editor.md §8): the
+   * per-row Edit button is hidden; history and review stay.
+   */
+  rowEditing?: boolean
 }
 
 type Props = {
@@ -55,7 +60,7 @@ export default function InfoboxFact({ term, propertyKey, ctx, children }: Props)
   const current = ctx.data?.current(propertyKey) ?? null
   const pending = ctx.data?.pending(propertyKey) ?? []
   const history = ctx.data?.history(propertyKey) ?? []
-  const ready = ctx.status.kind === 'ready'
+  const ready = ctx.status.kind === 'ready' && ctx.rowEditing !== false
 
   return (
     <div className="px-4 py-2.5">

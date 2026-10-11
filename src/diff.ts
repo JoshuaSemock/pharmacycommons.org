@@ -72,6 +72,8 @@ export function diffStats(lines: DiffLine[]): { added: number; removed: number }
 }
 
 /** The text a revision is compared on: description, a blank line, then the body. */
-export function revisionText(r: { description: string; body_md: string }): string {
+export function revisionText(r: { description: string; body_md: string; source_md?: string | null }): string {
+  // Full-page editor revisions diff their community source (no ingested values).
+  if (r.source_md) return r.source_md.trimEnd()
   return [r.description.trim() ? `${r.description.trim()}` : '', r.body_md].filter(Boolean).join('\n\n')
 }
