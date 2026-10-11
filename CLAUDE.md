@@ -397,9 +397,9 @@ Dosage Form, Route of Administration, Term — all `concept_type` on block 6). P
 starts from the Topics "Create a page" panel (`/new?type=`); Account no longer links `/new`.
 Class pages (`src/pages/ClassDetail.tsx`) now carry the Overview.
 
-**Phase 16 — full-page editor (spec and go-live steps: `docs/page-editor.md`; built
-2026-10-10 on `feat/page-source-parser`, not merged, migrations not applied, `publish-page`
-not deployed):** `src/pageSource/` parses/serializes/merges page source (lead, `## sections`,
+**Phase 16 — full-page editor (spec and go-live steps: `docs/page-editor.md`; live
+2026-10-11: PR #59 merged, phase16a + 16b_1/2/3 in `schema_migrations` (16b_3 run in the SQL
+editor, recorded by hand), `publish-page` v1 deployed with verify_jwt):** `src/pageSource/` parses/serializes/merges page source (lead, `## sections`,
 `:::blocks`, `::embeds`, `[@citations]`, `[NONE]`, HTML rejection). `registry.json` is the
 single registry; `db/phase16a_block_schemas.sql` seeds the same JSON (a test fails on
 drift) — **change both together**. `db/phase16b_publish.sql` (three migrations): bundled
@@ -407,8 +407,8 @@ format-2 revisions, `citation_sources`/`page_citations`, `threshold_rules`,
 `publish_page()`/`apply_page_revision()` (service_role only). `supabase/functions/publish-page`
 runs the same parser from `_shared/pageSource` — **after editing `src/pageSource`, run
 `node scripts/sync-page-source.mjs`** (a test fails otherwise). UI in `src/pageEditor/`
-and `/drugs/:slug/edit`; pages fall back to the phase-15 Overview while the columns are
-missing. SQL tests: `db/phase15_test/tests_16b.sql` (+ `contract_16b.sql`).
+and `/drugs/:slug/edit`; pages fall back to the phase-15 Overview if the columns are
+missing (rollback = revert the merge). SQL tests: `db/phase15_test/tests_16b.sql` (+ `contract_16b.sql`).
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
@@ -428,7 +428,7 @@ Lists (Phase 9, `db/phase9-lists.md`): 38 published lists (checked 2026-10-07) �
 "Also listed by" `sources` for every entry. Read RPCs: `list_lists`,
 `get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
-Deployed Edge Functions (8): `api` (public), `label-text`, `drugsfda-ingest`,
+Deployed Edge Functions (9): `api` (public), `publish-page` (phase 16), `label-text`, `drugsfda-ingest`,
 `rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`.
 64 migrations applied, latest `phase10e_fda_ingredients_form_idx` (phase 10a–10e: FDA product → PCID linking).
 

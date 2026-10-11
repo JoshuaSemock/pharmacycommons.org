@@ -4,7 +4,7 @@ author: Joshua Semock, PharmD
 date: 2026-10-11
 summary: "A complete guide to the page editor: sections, links, live values, citations, Quick Facts, brand names, renal dosing, review, history and the rules that keep pages safe."
 tags: [Pharmacy Commons, Guide, Editing]
-draft: true
+draft: false
 ---
 
 Every page on Pharmacy Commons can be edited by a verified healthcare professional. This guide covers everything the editor can do, from fixing a typo to adding a cited renal dosing table, with examples you can copy.
@@ -210,7 +210,7 @@ To cite several sources at once, write `[@pmid:111; @pmid:222]` or put brackets 
 
 You never need to set up a reference first. Pharmacy Commons looks up the PMID, DOI or DailyMed label when you publish and fills in the title, authors and journal. Every citation becomes a numbered note, collected in the **References** section at the bottom of the page.
 
-**Finding the DailyMed set id.** Open the label on [DailyMed](https://dailymed.nlm.nih.gov/). The set id is the `setid=` part of the address. Type `[@` in the editor to search PubMed and DailyMed without leaving the page.
+**Finding the DailyMed set id.** Open the label on [DailyMed](https://dailymed.nlm.nih.gov/). The set id is the `setid=` part of the address. Typing `[@` in the editor suggests the citation types and the sources already cited on the page; searching PubMed and DailyMed from inside the editor is coming next.
 
 **When a citation is required:**
 
@@ -302,7 +302,7 @@ dialysis: not removed by hemodialysis; give after the session [@pmid:…]
 - You can mix measures, for example eGFR lines from the label and CrCl lines from a dosing reference, as long as each measure's own ranges don't overlap.
 - Put anything that isn't a simple range, such as contrast instructions or dialysis timing details, as text under the block, with its own citation.
 
-Because these lines are stored as data rather than text, they can be searched across every drug ("what's contraindicated below eGFR 30?") and served through the API.
+Because these lines are stored as data rather than text, they can be queried across every drug ("what's contraindicated below eGFR 30?"), and they will be served through the public API.
 
 ## Patient education
 
@@ -383,8 +383,8 @@ As you type the name, the form shows existing pages that match, so you don't cre
 
 ## History, reverting and review
 
-- **History** (the tab beside Edit page) lists every change, with author, summary and size. Click any two versions to see exactly what changed, including each structured line ("acb_score: blank → 2").
-- **Restore** puts back an earlier version of the page, or of a single section. Anyone verified can restore. Restoring a version marks the undone edits as reverted.
+- **History** (the tab beside Edit page) lists every change, with author, summary and size. Open any version to see what it changed compared with the version before it. A per-line list of structured changes ("acb_score: blank → 2") is coming next.
+- **Restore** puts back an earlier version of the whole page (restoring a single section is coming next). Anyone verified can restore. Restoring a version marks the undone edits as reverted.
 - **Reviewers** check new edits and new pages from the review queue. On reviewed pages they accept or reject held edits. A rejection always comes with a note, which you can see under **My contributions** on your Account page.
 - **Limits:** 60 publishes an hour and 20 new pages a day, to slow down vandalism. Reviewers are exempt.
 

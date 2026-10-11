@@ -1,9 +1,10 @@
 # Full-page editor — spec
 
 > Drafted 2026-10-10 from Joshua's decisions in session; revised the same day with
-> HTML rejection, the key panel, `[NONE]` and section-level merge. **Steps 1–5 built
-> on branch `feat/page-source-parser` (2026-10-10); not merged, migrations not
-> applied, `publish-page` not deployed.** Going-live steps: §11. Extends `docs/user-edits.md` (phase 15). It supersedes §2 (page
+> HTML rejection, the key panel, `[NONE]` and section-level merge. **Live since 2026-10-11:**
+> PR #59 merged; `phase16a_block_schemas` and `phase16b_1_tables`/`_2_constraints`/`_3_functions`
+> applied (16b_3 via the SQL editor, recorded by hand); `publish-page` v1 deployed (verify_jwt on);
+> smoke-tested on metformin (revisions 7–9).** Going-live steps: §11. Extends `docs/user-edits.md` (phase 15). It supersedes §2 (page
 > anatomy) and §11 step 3 (the Overview editor) there, and changes how §4–§6
 > (links, Quick Facts, property values) are written, though not what they store.
 > Layout references are to `src/DrugDetail.tsx` at commit `86f42af`.
