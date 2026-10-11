@@ -201,7 +201,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-function StatusLine({ data, hasText }: { data: PageContent; hasText: boolean }) {
+export function StatusLine({ data, hasText }: { data: PageContent; hasText: boolean }) {
   const parts: string[] = []
   if (hasText) {
     parts.push('Written and edited by NPI-verified providers.')
@@ -232,7 +232,7 @@ function StatusLine({ data, hasText }: { data: PageContent; hasText: boolean }) 
   )
 }
 
-function Backlinks({ pages }: { pages: PageContent['backlinks'] }) {
+export function Backlinks({ pages }: { pages: PageContent['backlinks'] }) {
   const [showAll, setShowAll] = useState(false)
   const visible = showAll ? pages : pages.slice(0, BACKLINK_PREVIEW)
   return (

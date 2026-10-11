@@ -44,7 +44,16 @@ function credit(e: BrandEdit): string {
   return `@${e.handle}${e.credential ? ` · ${e.credential}` : ''}`
 }
 
-export default function BrandNames({ pcidCode, brands }: { pcidCode: string; brands: BrandName[] }) {
+export default function BrandNames({
+  pcidCode,
+  brands,
+  onEdit,
+}: {
+  pcidCode: string
+  brands: BrandName[]
+  /** Opens the brands block in the page editor instead of the phase-15 brand editor. */
+  onEdit?: () => void
+}) {
   const pcid = Number(pcidCode.replace(/^PCID-/, ''))
   const { edits, reload } = useBrandEdits(pcidCode)
   const { user, loading } = useSession()
@@ -98,7 +107,8 @@ export default function BrandNames({ pcidCode, brands }: { pcidCode: string; bra
             type="button"
             onClick={() => {
               setNotice(null)
-              setEditing(true)
+              if (onEdit) onEdit()
+              else setEditing(true)
             }}
             className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
           >

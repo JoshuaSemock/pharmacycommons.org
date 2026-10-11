@@ -1,3 +1,4 @@
+// GENERATED from src/pageSource/serialize.ts by scripts/sync-page-source.mjs — do not edit here.
 /**
  * PageModel → page source (docs/page-editor.md §4).
  *
@@ -10,10 +11,10 @@
  * editor and publishing without changes is a no-op.
  */
 
-import { formatCitations } from './citations'
-import { infoboxKeysFor } from './blocks'
-import { templateFor } from './parse'
-import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, ThresholdLine } from './types'
+import { formatCitations } from './citations.ts'
+import { infoboxKeysFor } from './blocks.ts'
+import { templateFor } from './parse.ts'
+import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, ThresholdLine } from './types.ts'
 
 const COMMENT_COL = 24
 const MAX_COMMENT = 90

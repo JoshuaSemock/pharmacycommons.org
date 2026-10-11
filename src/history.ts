@@ -33,10 +33,26 @@ export type Revision = {
   patrol_status: HistoryEntry['patrol_status']
   patrolled_at: string | null
   review_note: string | null
+  /** Phase 16 (full-page editor): 2 = bundled revision with a community source text. */
+  format?: number
+  source_md?: string | null
+  changed_sections?: string[]
 }
 
-const REVISION_COLUMNS =
-  'id, pcid, parent_id, description, body_md, summary, kind, created_at, patrol_status, patrolled_at, review_note'
+const BASE_COLUMNS = 'id, pcid, parent_id, description, body_md, summary, kind, created_at, patrol_status, patrolled_at, review_note'
+const PAGE_EDITOR_COLUMNS = `${BASE_COLUMNS}, format, source_md, changed_sections`
+
+/**
+ * Columns to read: the phase-16 ones once the migration is applied. Checked
+ * once per session, so the history pages keep working against an older schema.
+ */
+let columns: Promise<string> | null = null
+function revisionColumns(): Promise<string> {
+  columns ??= Promise.resolve(supabase.from('page_revisions').select('format').limit(1)).then(({ error }) =>
+    error ? BASE_COLUMNS : PAGE_EDITOR_COLUMNS,
+  )
+  return columns
+}
 
 export type PageRef = { pcid: number; slug: string; name: string; entityType: string }
 
@@ -59,7 +75,7 @@ export async function getCurrentRevisionId(pcid: number): Promise<number | null>
 }
 
 export async function getRevision(id: number): Promise<Revision | null> {
-  const { data, error } = await supabase.from('page_revisions').select(REVISION_COLUMNS).eq('id', id).maybeSingle()
+  const { data, error } = await supabase.from('page_revisions').select(await revisionColumns()).eq('id', id).maybeSingle()
   if (error) throw new Error(error.message)
   return (data as Revision | null) ?? null
 }
@@ -73,7 +89,7 @@ export type QueueItem = Revision & { page: PageRef | null; handle: string; crede
 export async function getReviewQueue(limit = 100): Promise<QueueItem[]> {
   const { data, error } = await supabase
     .from('page_revisions')
-    .select(`${REVISION_COLUMNS}, page:entities!page_revisions_pcid_fkey(pcid, slug, name, entity_type)`)
+    .select(`${await revisionColumns()}, page:entities!page_revisions_pcid_fkey(pcid, slug, name, entity_type)`)
     .in('patrol_status', ['pending', 'unpatrolled'])
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -115,7 +131,20 @@ export async function patrolRevision(id: number): Promise<void> {
 }
 
 export async function acceptRevision(id: number, note: string): Promise<void> {
-  await call('accept_revision', { p_revision_id: id, p_note: note || null })
+  try {
+    await call('accept_revision', { p_revision_id: id, p_note: note || null })
+  } catch (err) {
+    // A held full-page edit written before someone else's change: publish-page
+    // merges it onto the live page section by section, then accepts it.
+    if (!(err instanceof ContributeError) || err.reason !== 'stale_revision') throw err
+    const { acceptRebased, PublishError } = await import('./pageEditor/api')
+    try {
+      await acceptRebased(id, note || null)
+    } catch (e) {
+      if (e instanceof PublishError && e.problem.kind === 'message' && e.problem.code === 'not_pending') throw err
+      throw e instanceof PublishError && e.problem.kind === 'message' ? new Error(e.problem.message) : e
+    }
+  }
 }
 
 export async function rejectRevision(id: number, note: string): Promise<void> {
