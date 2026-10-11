@@ -21,7 +21,7 @@
  */
 
 import { analyzeProse } from './prose'
-import { parseBrands, parseKeyed, parseThreshold } from './blocks'
+import { parseBrands, parseKeyed, parseStatements, parseThreshold } from './blocks'
 import type { RawLine } from './blocks'
 import { blockByHint, nearest } from './suggest'
 import type {
@@ -271,9 +271,21 @@ export function parsePageSource(source: string, ctx: PageContext, options: Parse
       return
     }
     flushSectionProse(st.current)
+    const location = `block:${name}`
+    if (schema.grammar === 'statement') {
+      const parsed = parseStatements(body, schema)
+      diagnostics.push(...parsed.diagnostics)
+      // The other party is a page link like any [[link]], so it shows under "What links here".
+      for (const line of parsed.block.lines) {
+        extracted.links.push({ target: line.target, location })
+        for (const c of line.citations) extracted.citations.push({ ...c, location })
+      }
+      st.current.item.parts.push({ kind: 'block', block: parsed.block })
+      return
+    }
     const parsed = parseThreshold(body, schema, ctx)
     diagnostics.push(...parsed.diagnostics)
-    for (const line of parsed.block.lines) for (const c of line.citations) extracted.citations.push({ ...c, location: `block:${name}` })
+    for (const line of parsed.block.lines) for (const c of line.citations) extracted.citations.push({ ...c, location })
     st.current.item.parts.push({ kind: 'block', block: parsed.block })
   }
 

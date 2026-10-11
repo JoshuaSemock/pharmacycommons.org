@@ -48,8 +48,8 @@ describe('metformin, fully filled out', () => {
       '::metadata',
     ])
     const sections = r.model.main.filter(m => m.kind === 'section')
-    expect(sections.filter(s => s.kind === 'section' && s.template).map(s => s.id)).toEqual(['renal-dosing', 'patient-education'])
-    expect(sections.filter(s => s.kind === 'section' && !s.template).map(s => s.id)).toEqual([null, null, null, null, null])
+    expect(sections.filter(s => s.kind === 'section' && s.template).map(s => s.id)).toEqual(['renal-dosing', 'interactions', 'patient-education'])
+    expect(sections.filter(s => s.kind === 'section' && !s.template).map(s => s.id)).toEqual([null, null, null, null])
   })
 
   it('stores only the community layer of Quick Facts: one cited override', () => {
@@ -76,7 +76,7 @@ describe('metformin, fully filled out', () => {
   it('turns the renal dosing block into three non-overlapping, cited thresholds', () => {
     const renal = r.model.main.find(m => m.kind === 'section' && m.id === 'renal-dosing')
     const block = renal?.kind === 'section' ? renal.parts.find(p => p.kind === 'block') : undefined
-    expect(block?.kind === 'block' ? block.block.lines.map(l => [l.measure, l.comparator, l.low, l.high, l.citations.length]) : null).toEqual([
+    expect(block?.kind === 'block' && block.block.grammar === 'threshold' ? block.block.lines.map(l => [l.measure, l.comparator, l.low, l.high, l.citations.length]) : null).toEqual([
       ['egfr', '<', 30, null, 2],
       ['egfr', 'range', 30, 45, 2],
       ['egfr', '>=', 45, null, 1],
@@ -87,7 +87,10 @@ describe('metformin, fully filled out', () => {
     const targets = r.extracted.links.map(l => l.target)
     expect(targets).toContain('type 2 diabetes')
     expect(targets).toContain('topiramate')
-    expect(new Set(targets).size).toBe(14)
+    expect(new Set(targets).size).toBe(11)
+    // :::interactions targets count as page links (What links here) and their citations are extracted.
+    expect(r.extracted.links.filter(l => l.location === 'block:interactions').map(l => l.target)).toEqual(['topiramate', 'ranolazine', 'dolutegravir', 'alcohol'])
+    expect(r.extracted.citations.filter(c => c.location === 'block:interactions')).toHaveLength(4)
     expect(r.extracted.properties).toEqual([{ key: 'do_not_crush', target: '', location: 'heading:Dosing' }])
     const keys = new Set(r.extracted.citations.map(c => c.key))
     expect([...keys].sort()).toEqual([
@@ -273,8 +276,8 @@ describe('sections', () => {
   })
 
   it('contributor sections can be removed', () => {
-    const start = METFORMIN_SOURCE.indexOf('## Interactions')
-    const end = METFORMIN_SOURCE.indexOf('## Pregnancy and lactation')
+    const start = METFORMIN_SOURCE.indexOf('## Pregnancy and lactation')
+    const end = METFORMIN_SOURCE.indexOf('## Patient education')
     const r = parse(METFORMIN_SOURCE.slice(0, start) + METFORMIN_SOURCE.slice(end))
     expect(r.ok).toBe(true)
   })

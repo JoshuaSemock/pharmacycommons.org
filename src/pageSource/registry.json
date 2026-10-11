@@ -66,6 +66,27 @@
       },
       "enabled": true,
       "sort_order": 30
+    },
+    {
+      "name": "interactions",
+      "label": "Interactions",
+      "grammar": "statement",
+      "region": "section",
+      "owner_section": "interactions",
+      "page_types": ["drug", "herbal"],
+      "citation": "always",
+      "help": "One interaction per line: the other drug, class or herbal as a [[link]], a colon, then what happens and what to do. Every line needs a citation. Stored as data, shown beside the FDA-sourced interactions, never merged into them.",
+      "example": "[[warfarin]]: increased INR; monitor INR when starting or stopping [@pmid:…]\n[[strong CYP3A4 inhibitors]]: avoid [@dailymed:…]",
+      "hints": ["interaction", "interactions", "interacts", "inhibitor", "inducer", "ddi"],
+      "grammar_spec": {
+        "predicate": "interacts_with",
+        "forms": [
+          { "form": "[[other page]]: effect [@key]", "meaning": "What happens with the other drug, class or herbal, and what to do. Citation required." }
+        ],
+        "max_effect_length": 1000
+      },
+      "enabled": true,
+      "sort_order": 40
     }
   ],
   "embeds": [
@@ -92,6 +113,7 @@
         { "kind": "embed", "name": "hierarchy" },
         { "kind": "embed", "name": "fda-label" },
         { "kind": "section", "id": "renal-dosing", "heading": "Renal dosing", "block": "renal-dosing", "help": "Kidney-function thresholds (in the block) and any notes around them." },
+        { "kind": "section", "id": "interactions", "heading": "Interactions", "block": "interactions", "help": "Interactions with other drugs, classes or herbals (in the block), each cited, and any notes around them." },
         { "kind": "section", "id": "patient-education", "heading": "Patient education", "block": null, "help": "Plain-language counselling points for patients." },
         { "kind": "embed", "name": "guidelines" },
         { "kind": "embed", "name": "classifications" },
@@ -117,7 +139,8 @@
       "main": [
         { "kind": "lead" },
         { "kind": "section", "id": "uses-and-evidence", "heading": "Uses and evidence", "block": null, "help": "What it is taken for and how strong the evidence is for each use, with citations." },
-        { "kind": "section", "id": "safety", "heading": "Safety", "block": null, "help": "Adverse effects, drug interactions, pregnancy and lactation, and product quality concerns, with citations." },
+        { "kind": "section", "id": "safety", "heading": "Safety", "block": null, "help": "Adverse effects, pregnancy and lactation, and product quality concerns, with citations." },
+        { "kind": "section", "id": "interactions", "heading": "Interactions", "block": "interactions", "help": "Interactions with drugs, classes or other herbals (in the block), each cited, and any notes around them." },
         { "kind": "section", "id": "patient-education", "heading": "Patient education", "block": null, "help": "Plain-language points for patients." },
         { "kind": "embed", "name": "knowledge-base" },
         { "kind": "embed", "name": "references" },

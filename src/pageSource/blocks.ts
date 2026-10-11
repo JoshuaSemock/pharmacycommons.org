@@ -6,6 +6,7 @@
  *   keyed      key: value [@cite]        Quick Facts (keys from infobox_properties)
  *   brands     Name / Name [@cite] / ~~Name~~ [@cite] reason
  *   threshold  egfr < 30: action [@cite] Renal dosing and future range tables
+ *   statement  [[page]]: effect [@cite]  Interactions (community_statements)
  *
  * A `#` with a space before it starts a comment to the end of the line; the
  * serializer writes source values there.
@@ -23,6 +24,8 @@ import type {
   InfoboxBlock,
   InfoboxLine,
   PageContext,
+  StatementBlock,
+  StatementLine,
   ThresholdBlock,
   ThresholdLine,
 } from './types'
@@ -359,4 +362,66 @@ export function parseThreshold(lines: RawLine[], schema: BlockSchema, ctx: PageC
     out.push(entry)
   }
   return { block: { name: schema.name, grammar: 'threshold', lines: out }, diagnostics }
+}
+
+// ─── statement (interactions) ──────────────────────────────────────────────────
+
+/** `[[target]]` or `[[target|label]]` at the start of a line, then a colon. */
+const STATEMENT_LINE = /^\[\[([^[\]\n|]{1,200})(?:\|[^[\]\n]{1,200})?\]\]\s*:(.*)$/
+
+/**
+ * Lines of a statement block (docs/page-editor.md §5a):
+ *
+ *   [[warfarin]]: increased INR; monitor INR when starting or stopping [@pmid:…]
+ *
+ * The other party must be a [[page link]] so the row can point at a PCID; the
+ * effect (what happens and what to do) and a citation are required. One line
+ * per other party.
+ */
+export function parseStatements(lines: RawLine[], schema: BlockSchema): { block: StatementBlock; diagnostics: Diagnostic[] } {
+  const diagnostics: Diagnostic[] = []
+  const maxLen = schema.grammar_spec.max_effect_length ?? 1000
+  const seen = new Map<string, number>()
+  const out: StatementLine[] = []
+  const example = schema.example.split('\n')[0]
+
+  for (const { text, line } of lines) {
+    const body = stripComment(text).trim()
+    if (!body) continue
+    const m = STATEMENT_LINE.exec(body)
+    if (!m) {
+      const hint = /^[^:[\]]+:/.test(body) ? ' Put the other drug or class in [[double brackets]] so it links to its page.' : ''
+      diagnostics.push(err('bad_line', `Write the other drug or class as a [[link]], a colon, then what happens and what to do, e.g. \`${example}\`.${hint}`, line))
+      continue
+    }
+    const target = m[1].trim()
+    const key = normal(target)
+    if (seen.has(key)) {
+      diagnostics.push(err('duplicate_target', `${target} already has a line (line ${seen.get(key)}). Put everything about it on one line.`, line))
+      continue
+    }
+    seen.set(key, line)
+
+    const { text: effect, citations, problems } = splitCitations(m[2])
+    for (const p of problems) diagnostics.push(err('bad_citation', p.message, line))
+    const html = htmlInValue(effect)
+    if (html) {
+      diagnostics.push(err('raw_html', html, line))
+      continue
+    }
+    if (!effect) {
+      diagnostics.push(err('effect_required', `Say what happens with ${target} and what to do, after the colon.`, line))
+      continue
+    }
+    if (effect.length > maxLen) {
+      diagnostics.push(err('too_long', `This line is ${effect.length} characters; the limit is ${maxLen}.`, line))
+      continue
+    }
+    if (citations.length === 0) {
+      if (problems.length === 0) diagnostics.push(err('citation_required', `Every ${schema.label.toLowerCase()} line needs a citation: add [@pmid:…], [@dailymed:…] or [@url:…].`, line))
+      continue
+    }
+    out.push({ target, effect, citations })
+  }
+  return { block: { name: schema.name, grammar: 'statement', lines: out }, diagnostics }
 }

@@ -38,7 +38,7 @@ import { fillTemplate, serializeFragment, serializePage, templateModel } from '.
 import { assignSectionIds, mergeModels, sectionIdsOf, spliceFragment } from '../_shared/pageSource/merge.ts'
 import { fromLegacy } from '../_shared/pageSource/legacy.ts'
 import { buildPayload, citationOrder, overlayStructured } from '../_shared/pageSource/publish.ts'
-import type { BrandRow, InfoboxRow, ThresholdRow } from '../_shared/pageSource/publish.ts'
+import type { BrandRow, InfoboxRow, StatementRow, ThresholdRow } from '../_shared/pageSource/publish.ts'
 import { resolveCitation } from '../_shared/pageSource/resolve.ts'
 import type { SourceMeta } from '../_shared/pageSource/resolve.ts'
 import { formatDrugName } from '../_shared/pageSource/names.ts'
@@ -69,7 +69,7 @@ type Loaded = {
   ctx: PageContext
   protection: string
   currentRevisionId: number | null
-  rows: { infobox: InfoboxRow[]; brands: BrandRow[]; thresholds: ThresholdRow[] }
+  rows: { infobox: InfoboxRow[]; brands: BrandRow[]; thresholds: ThresholdRow[]; statements: StatementRow[] }
 }
 
 async function must<T>(p: PromiseLike<{ data: T | null; error: { message: string } | null }>, what: string): Promise<T> {
@@ -88,7 +88,7 @@ async function loadPage(db: SupabaseClient, pcid: number): Promise<Loaded> {
   const pageType: PageType | null = pageTypeFor(entity.entity_type)
   if (!pageType) throw new HttpError(400, { error: 'unsupported_page', message: 'List pages are edited from the list itself.' })
 
-  const [registry, keys, brandNames, content, infobox, brands, thresholds] = await Promise.all([
+  const [registry, keys, brandNames, content, infobox, brands, thresholds, statements] = await Promise.all([
     must<Registry>(db.rpc('page_source_registry'), 'registry'),
     must<{ key: string; label: string; source_kind: string; entity_types: string[]; sort_order: number }[]>(
       db.from('infobox_properties').select('key, label, source_kind, entity_types, sort_order').order('sort_order'),
@@ -114,6 +114,10 @@ async function loadPage(db: SupabaseClient, pcid: number): Promise<Loaded> {
       db.from('threshold_rules').select('block_name, measure, comparator, low, high, action, citations').eq('pcid', pcid).eq('is_current', true).order('position'),
       'threshold_rules',
     ),
+    must<StatementRow[]>(
+      db.from('community_statements').select('block_name, object_text, effect, citations').eq('subject_pcid', pcid).eq('is_current', true).order('position'),
+      'community_statements',
+    ),
   ])
 
   const infoboxKeys: InfoboxKey[] = keys.map(k => ({ key: k.key, label: k.label, source_kind: k.source_kind, entity_types: k.entity_types }))
@@ -130,7 +134,7 @@ async function loadPage(db: SupabaseClient, pcid: number): Promise<Loaded> {
     ctx,
     protection: content?.protection ?? 'open',
     currentRevisionId: content?.current_revision_id ?? null,
-    rows: { infobox, brands, thresholds },
+    rows: { infobox, brands, thresholds, statements },
   }
 }
 

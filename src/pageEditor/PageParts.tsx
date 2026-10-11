@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from 'react'
 import WikiMarkdown from '../components/WikiMarkdown'
 import { CiteMark } from '../components/WikiMarkdown'
 import type { PageContent } from '../pageContent'
-import type { MainItem, ThresholdBlock, ThresholdLine } from '../pageSource'
+import { formatCitations } from '../pageSource'
+import type { MainItem, StatementBlock, ThresholdBlock, ThresholdLine } from '../pageSource'
 import type { Reference } from './usePageModel'
 
 /**
@@ -62,13 +63,23 @@ export function CommunitySection({
   labelAnchor,
   onEdit,
   help,
+  footer,
   className = '',
   style,
-}: Shared & { item: Extract<MainItem, { kind: 'section' }>; onEdit?: () => void; help?: string; className?: string; style?: CSSProperties }) {
+}: Shared & {
+  item: Extract<MainItem, { kind: 'section' }>
+  onEdit?: () => void
+  help?: string
+  /** Shown under the section's text, e.g. where the official data on the same topic is. */
+  footer?: ReactNode
+  className?: string
+  style?: CSSProperties
+}) {
   const id = sectionAnchor(item)
   const empty = isEmptySection(item)
   // Empty sections are hidden from readers; contributors see where to start (docs/page-editor.md §9 Q4).
-  if (empty && !onEdit) return null
+  // A section with a footer still shows it (the Interactions section points at the FDA label).
+  if (empty && !onEdit && !footer) return null
   return (
     <section id={id} aria-labelledby={`${id}-heading`} className={`${className} ${ANCHOR_OFFSET} min-w-0`} style={style}>
       <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -78,9 +89,11 @@ export function CommunitySection({
         {onEdit && <EditLink onClick={onEdit} label={`Edit ${item.heading}`} />}
       </div>
       {empty ? (
-        <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
-          Nothing here yet.{help ? ` ${help}` : ''}
-        </p>
+        onEdit && (
+          <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
+            Nothing here yet.{help ? ` ${help}` : ''}
+          </p>
+        )
       ) : (
         <div className="space-y-4">
           {item.parts.map((p, i) =>
@@ -93,12 +106,15 @@ export function CommunitySection({
                 labelAnchor={labelAnchor}
                 citations={numbers}
               />
+            ) : p.block.grammar === 'statement' ? (
+              <StatementList key={i} block={p.block} content={content} numbers={numbers} labelAnchor={labelAnchor} />
             ) : (
               <ThresholdTable key={i} block={p.block} numbers={numbers} />
             ),
           )}
         </div>
       )}
+      {footer && <div className="mt-4">{footer}</div>}
     </section>
   )
 }
@@ -156,6 +172,39 @@ export function ThresholdTable({ block, numbers }: { block: ThresholdBlock; numb
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+/**
+ * A statement block (:::interactions) as a list: the other page as a link, what
+ * happens and what to do, and its reference numbers. Rendered through the same
+ * Markdown path as prose, so links resolve and citations number the same way.
+ */
+export function StatementList({
+  block,
+  content,
+  numbers,
+  labelAnchor,
+}: {
+  block: StatementBlock
+  content: PageContent | null | undefined
+  numbers: Map<string, number>
+  labelAnchor?: string
+}) {
+  if (!block.lines.length) return null
+  const source = block.lines.map(l => `- [[${l.target}]]: ${l.effect} ${formatCitations(l.citations)}`).join('\n')
+  return (
+    <div className="space-y-2">
+      <WikiMarkdown
+        source={source}
+        links={content?.links ?? new Map()}
+        properties={content?.properties ?? new Map()}
+        labelAnchor={labelAnchor}
+        citations={numbers}
+      />
+      {/* Marked as contributed: these rows sit beside the ingested data, never in it (docs/page-editor.md §9 Q3). */}
+      <p className="font-sans text-sm text-ink">Contributed by NPI-verified providers; every line is cited.</p>
     </div>
   )
 }

@@ -98,6 +98,14 @@ export function panelFor(cursor: CursorContext, ctx: PageContext): Panel {
         ],
       }
     }
+    if (schema.grammar === 'statement') {
+      // Start each line with [[ so page autocomplete picks the other drug, class or herbal.
+      return {
+        title: schema.label,
+        help: schema.help,
+        entries: (schema.grammar_spec.forms ?? []).map(f => ({ label: f.form, insert: '[[', help: f.meaning, citation: 'required' as const })),
+      }
+    }
     return {
       title: schema.label,
       help: schema.help,

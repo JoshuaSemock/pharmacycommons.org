@@ -17,7 +17,7 @@
  */
 export type PageType = 'drug' | 'concept' | 'herbal' | 'class'
 
-export type Grammar = 'keyed' | 'brands' | 'threshold'
+export type Grammar = 'keyed' | 'brands' | 'threshold' | 'statement'
 
 export type LineForm = { form: string; meaning: string }
 
@@ -30,6 +30,9 @@ export type GrammarSpec = {
   measures?: Record<string, Measure>
   forms?: LineForm[]
   max_action_length?: number
+  /** statement grammar: the predicate rows are stored under (public.predicates). */
+  predicate?: string
+  max_effect_length?: number
 }
 
 export type BlockSchema = {
@@ -124,12 +127,26 @@ export type ThresholdLine = {
   citations: Citation[]
 }
 
+/**
+ * One line of a statement block (:::interactions): another page, then what
+ * happens and what to do. Stored in community_statements (docs/page-editor.md §5a).
+ */
+export type StatementLine = {
+  /** The [[link]] target as written (slug, name or PCID-n). */
+  target: string
+  effect: string
+  citations: Citation[]
+}
+
 export type InfoboxBlock = { name: 'infobox'; lines: InfoboxLine[] }
 export type BrandsBlock = { name: 'brands'; lines: BrandLine[] }
 export type ThresholdBlock = { name: string; grammar: 'threshold'; lines: ThresholdLine[] }
-export type Block = InfoboxBlock | BrandsBlock | ThresholdBlock
+export type StatementBlock = { name: string; grammar: 'statement'; lines: StatementLine[] }
+/** A structured block that lives inside a section (renal dosing, interactions). */
+export type SectionBlock = ThresholdBlock | StatementBlock
+export type Block = InfoboxBlock | BrandsBlock | SectionBlock
 
-export type SectionPart = { kind: 'prose'; markdown: string } | { kind: 'block'; block: ThresholdBlock }
+export type SectionPart = { kind: 'prose'; markdown: string } | { kind: 'block'; block: SectionBlock }
 
 export type MainItem =
   | { kind: 'lead'; id: 'lead'; markdown: string }
