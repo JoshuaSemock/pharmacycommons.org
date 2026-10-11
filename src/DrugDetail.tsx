@@ -1,6 +1,6 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getDrugBySlug } from './api'
 import type {
   BrandName,
@@ -21,14 +21,10 @@ import type { Segment } from './identifiers'
 import type { LabelSection } from './labels'
 import { formatBrandName, formatDrugName } from './names'
 import MachinePanels from './MachinePanels'
-import OpenSection, { Backlinks, OPEN_SECTION_ID, StatusLine } from './OpenSection'
-import { usePageContent } from './pageContent'
-import { templateModel } from './pageSource'
-import type { FragmentTarget, MainItem, PageType } from './pageSource'
-import { displayContext, usePageModel } from './pageEditor/usePageModel'
-import { publishedNotice, useEditAccess } from './pageEditor/access'
-import type { PublishResult } from './pageEditor/api'
-import { CommunitySection, EditLink, Frame, LeadText, ReferencesList, isEmptySection } from './pageEditor/PageParts'
+import OpenSection from './OpenSection'
+import { pageTypeFor } from './pageSource'
+import { EditLink } from './pageEditor/PageParts'
+import { LeadArea, PageTools, ReferencesFrame, SectionArea, SectionSkeleton, mainItems, useCommunityPage } from './pageEditor/CommunityPage'
 import BrandNames from './components/BrandNames'
 import InfoboxFact from './InfoboxFact'
 import type { InfoboxContext } from './InfoboxFact'
@@ -40,9 +36,6 @@ import { entityHref } from './wiki'
 import { abbreviationSuffix, useAbbreviations } from './abbreviations'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
-
-// The editor (and its live checks) loads only when someone opens it.
-const PageEditor = lazy(() => import('./pageEditor/PageEditor'))
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
 //
@@ -203,7 +196,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
   }, [])
 
   const name = formatDrugName(drug.name)
-  const page = useCommunityPage(drug, 'drug', name)
+  const page = useCommunityPage(drug.pcid_code, drug.block_kind ?? 'moiety', 'drug', name)
   const modelMode = page.state.status === 'ready' || page.state.status === 'loading'
 
   // Locked sections, by their ::name in the page source.
@@ -312,218 +305,6 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
   )
 }
 
-// ─── Community layer (full-page editor, docs/page-editor.md) ──────────────────
-//
-// The page model sets the main column's order and holds the lead and sections.
-// Each section, the lead, Quick Facts and the brand line have an [edit] link
-// that opens that part in the page editor in place; "Edit page" opens the whole
-// page at /drugs/:slug/edit. Until the phase-16 migration is applied the model
-// reports `legacy` and the page keeps the phase-15 Overview.
-
-type CommunityPage = ReturnType<typeof useCommunityPage>
-
-function useCommunityPage(drug: DrugDetailType, pageType: PageType, title: string) {
-  const pcid = Number(drug.pcid_code.replace(/^PCID-/, ''))
-  const entityType = drug.entity_type ?? drug.block_kind ?? 'moiety'
-  const ctx = useMemo(() => displayContext(pageType, title, entityType), [pageType, title, entityType])
-  const { state, reload } = usePageModel(pcid, ctx)
-  const content = usePageContent(drug.pcid_code)
-  const access = useEditAccess()
-  const [editing, setEditing] = useState<FragmentTarget | null>(null)
-  // "Published" notice when returning from /drugs/:slug/edit.
-  const location = useLocation()
-  const [notice, setNotice] = useState<string | null>(() => (location.state as { notice?: string } | null)?.notice ?? null)
-  const [version, setVersion] = useState(0)
-  const canEdit = state.status === 'ready' && access.status.kind === 'ready'
-  return {
-    pcid,
-    ctx,
-    state,
-    content,
-    access,
-    editing,
-    notice,
-    version,
-    canEdit,
-    edit: (target: FragmentTarget) => {
-      setNotice(null)
-      setEditing(target)
-    },
-    close: () => setEditing(null),
-    onPublished: (r: PublishResult) => {
-      setEditing(null)
-      setNotice(publishedNotice(r.status))
-      reload()
-      content.reload()
-      setVersion(v => v + 1)
-    },
-  }
-}
-
-/** The main column in page order: the saved model, or the template while it loads. */
-function mainItems(page: CommunityPage): MainItem[] {
-  return page.state.status === 'ready' ? page.state.model.main : templateModel(page.ctx).main
-}
-
-function sameTarget(a: FragmentTarget | null, b: FragmentTarget): boolean {
-  if (!a || a.kind !== b.kind) return false
-  if (a.kind === 'section' && b.kind === 'section') return a.heading.toLowerCase() === b.heading.toLowerCase()
-  if (a.kind === 'rail' && b.kind === 'rail') return a.name === b.name
-  return true
-}
-
-function InlineEditor({ page, name, target }: { page: CommunityPage; name: string; target: FragmentTarget }) {
-  if (page.access.status.kind !== 'ready') return null
-  return (
-    <div className="lp-raised rounded-md p-4">
-      <Suspense fallback={<SectionSkeleton />}>
-        <PageEditor
-          pcid={page.pcid}
-          name={name}
-          target={target}
-          status={page.access.status}
-          onHandleSet={page.access.refresh}
-          onClose={page.close}
-          onPublished={page.onPublished}
-        />
-      </Suspense>
-    </div>
-  )
-}
-
-/** Edit page · History · Review queue, under the page title. */
-function PageTools({ page, slug }: { page: CommunityPage; slug: string }) {
-  const status = page.access.status
-  const hasHistory = (page.content.data?.currentRevisionId ?? null) !== null || (page.content.data?.pendingCount ?? 0) > 0
-  if (page.state.status !== 'ready' && !hasHistory) return null
-  return (
-    <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-sans text-sm text-ink">
-      {page.canEdit && (
-        <Link to={`/drugs/${slug}/edit`} className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
-          Edit page
-        </Link>
-      )}
-      {hasHistory && (
-        <Link to={`/drugs/${slug}/history`} className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
-          History
-        </Link>
-      )}
-      {status.kind === 'ready' && status.patroller && (
-        <Link to="/review" className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
-          Review queue
-        </Link>
-      )}
-      {status.kind === 'signed-out' && page.state.status === 'ready' && (
-        <Link to="/account" className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
-          Sign in to edit
-        </Link>
-      )}
-      {status.kind === 'unverified' && page.state.status === 'ready' && (
-        <Link to="/account" className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
-          Verify your NPI to edit
-        </Link>
-      )}
-    </p>
-  )
-}
-
-/** The lead, plus the notices and editors that belong at the top of the main column. */
-function LeadArea({
-  page,
-  name,
-  labelAnchor,
-  fallback,
-  style,
-}: {
-  page: CommunityPage
-  name: string
-  labelAnchor: string
-  fallback: string | null
-  style: CSSProperties
-}) {
-  const ready = page.state.status === 'ready' ? page.state : null
-  const lead = ready?.model.main.find((m): m is Extract<MainItem, { kind: 'lead' }> => m.kind === 'lead')
-  const text = lead?.markdown.trim() || fallback?.trim() || ''
-  const rail = page.editing?.kind === 'rail' ? page.editing : null
-  return (
-    <section id={OPEN_SECTION_ID} aria-label="Overview" className={`${ANCHOR_OFFSET} min-w-0 space-y-4`} style={style}>
-      {page.notice && (
-        <p role="status" className="rounded-md border border-sky-300 bg-sky-100/40 px-3 py-2 font-sans text-sm text-ink">
-          {page.notice}
-        </p>
-      )}
-      {rail && <InlineEditor page={page} name={name} target={rail} />}
-      {sameTarget(page.editing, { kind: 'lead' }) ? (
-        <InlineEditor page={page} name={name} target={{ kind: 'lead' }} />
-      ) : !ready ? (
-        <SectionSkeleton />
-      ) : (
-        <>
-          {text ? (
-            <LeadText markdown={text} content={page.content.data} numbers={ready.numbers} labelAnchor={labelAnchor} />
-          ) : (
-            <p className="max-w-2xl font-sans text-base leading-relaxed text-ink">
-              No overview has been written for {name} yet.
-              {page.canEdit ? ' Start with a few sentences on what it is and how it’s used.' : ' NPI-verified providers can write one.'}
-            </p>
-          )}
-          {page.canEdit && (
-            <div>
-              <EditLink onClick={() => page.edit({ kind: 'lead' })} label="Edit the lead" />
-            </div>
-          )}
-        </>
-      )}
-      {page.content.data && <StatusLine data={page.content.data} hasText={Boolean(text) || ready?.model.main.some(m => m.kind === 'section' && !isEmptySection(m)) === true} />}
-      {page.content.data && page.content.data.backlinks.length > 0 && <Backlinks pages={page.content.data.backlinks} />}
-    </section>
-  )
-}
-
-function SectionArea({
-  page,
-  item,
-  name,
-  labelAnchor,
-  style,
-}: {
-  page: CommunityPage
-  item: Extract<MainItem, { kind: 'section' }>
-  name: string
-  labelAnchor: string
-  style: CSSProperties
-}) {
-  const target: FragmentTarget = { kind: 'section', heading: item.heading }
-  if (sameTarget(page.editing, target)) {
-    return (
-      <div className="min-w-0" style={style}>
-        <InlineEditor page={page} name={name} target={target} />
-      </div>
-    )
-  }
-  const numbers = page.state.status === 'ready' ? page.state.numbers : new Map<string, number>()
-  return (
-    <CommunitySection
-      item={item}
-      content={page.content.data}
-      numbers={numbers}
-      labelAnchor={labelAnchor}
-      onEdit={page.canEdit ? () => page.edit(target) : undefined}
-      style={style}
-    />
-  )
-}
-
-function ReferencesFrame({ page, style }: { page: CommunityPage; style: CSSProperties }) {
-  const refs = page.state.status === 'ready' ? page.state.references : []
-  if (!refs.length) return null
-  return (
-    <Frame id="references" title="References" style={style}>
-      <ReferencesList references={refs} />
-    </Frame>
-  )
-}
-
 // ─── Concept pages ────────────────────────────────────────────────────────────
 //
 // Clinical concepts, labs, targets and herbals: name and kind, the lead and
@@ -539,7 +320,7 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
   const facts = CONCEPT_ATTRS.map(label => ({ label, value: attr(drug, label) })).filter(
     (r): r is { label: (typeof CONCEPT_ATTRS)[number]; value: string } => r.value !== null,
   )
-  const page = useCommunityPage(drug, 'concept', name)
+  const page = useCommunityPage(drug.pcid_code, drug.block_kind ?? 'clinical', pageTypeFor(drug.block_kind) ?? 'concept', name)
   const modelMode = page.state.status === 'ready' || page.state.status === 'loading'
 
   const embed = (embedName: string): ReactNode => {
@@ -1706,17 +1487,6 @@ function PageSection({
       </h2>
       {children}
     </section>
-  )
-}
-
-/** Holds a loading section's space with the same quiet pulse used across the page (no layout jump on resolve). */
-function SectionSkeleton() {
-  return (
-    <div className="space-y-2" aria-busy="true" aria-label="Loading">
-      <div className="h-4 w-4/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
-      <div className="h-4 w-3/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
-      <div className="h-4 w-2/5 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" />
-    </div>
   )
 }
 

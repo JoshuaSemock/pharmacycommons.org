@@ -70,15 +70,18 @@
   ],
   "embeds": [
     { "name": "fda-label-link", "label": "Jump to FDA prescribing information", "region": "rail", "page_types": ["drug"], "help": "Link to the FDA label further down. Fixed in the left rail." },
-    { "name": "identifiers", "label": "Identifiers", "region": "rail", "page_types": ["drug", "concept"], "help": "PCID, CAS, UNII, InChIKey and other codes. Ingested; corrections come later as cited overrides." },
+    { "name": "identifiers", "label": "Identifiers", "region": "rail", "page_types": ["drug", "concept", "herbal"], "help": "PCID, CAS, UNII, InChIKey and other codes. Ingested; corrections come later as cited overrides." },
     { "name": "hierarchy", "label": "Drug hierarchy", "region": "main", "page_types": ["drug"], "help": "Moiety, precise forms, brand formulations and combinations. Built from FDA data." },
     { "name": "fda-label", "label": "FDA prescribing information", "region": "main", "page_types": ["drug"], "help": "The manufacturer's FDA label, unchanged. It can never be edited." },
     { "name": "guidelines", "label": "Clinical guidelines", "region": "main", "page_types": ["drug"], "help": "Linked clinical guidelines." },
     { "name": "classifications", "label": "Classifications", "region": "main", "page_types": ["drug"], "help": "FDA, ATC, ChemOnt and other class memberships." },
     { "name": "lists", "label": "Lists", "region": "main", "page_types": ["drug"], "help": "Lists this page belongs to (Do Not Crush, Beers, MPJE…)." },
-    { "name": "knowledge-base", "label": "In the knowledge base", "region": "main", "page_types": ["concept"], "help": "Statements in the knowledge base that point at this page." },
-    { "name": "references", "label": "References", "region": "main", "page_types": ["drug", "concept"], "help": "Numbered list built from every [@citation] on the page." },
-    { "name": "metadata", "label": "Additional metadata", "region": "main", "page_types": ["drug", "concept"], "help": "Record metadata and the machine-readable record." }
+    { "name": "knowledge-base", "label": "In the knowledge base", "region": "main", "page_types": ["concept", "herbal"], "help": "Statements in the knowledge base that point at this page." },
+    { "name": "subclasses", "label": "Sub-classes", "region": "rail", "page_types": ["class"], "help": "Narrower classes inside this one, from the class system. Fixed in the side column." },
+    { "name": "machine-readable", "label": "Sources and machine-readable record", "region": "rail", "page_types": ["class"], "help": "Where the class comes from, its PCID, JSON record and API links. Fixed in the side column." },
+    { "name": "class-members", "label": "Members", "region": "main", "page_types": ["class"], "help": "Every drug in the class, from its class system (FDA, ATC, VA, ChemOnt…). Contributor classifications start empty." },
+    { "name": "references", "label": "References", "region": "main", "page_types": ["drug", "concept", "herbal", "class"], "help": "Numbered list built from every [@citation] on the page." },
+    { "name": "metadata", "label": "Additional metadata", "region": "main", "page_types": ["drug", "concept", "herbal"], "help": "Record metadata and the machine-readable record." }
   ],
   "templates": [
     {
@@ -106,6 +109,29 @@
         { "kind": "section", "id": "patient-education", "heading": "Patient education", "block": null, "help": "Plain-language points for patients." },
         { "kind": "embed", "name": "references" },
         { "kind": "embed", "name": "metadata" }
+      ]
+    },
+    {
+      "page_type": "herbal",
+      "rail": ["identifiers"],
+      "main": [
+        { "kind": "lead" },
+        { "kind": "section", "id": "uses-and-evidence", "heading": "Uses and evidence", "block": null, "help": "What it is taken for and how strong the evidence is for each use, with citations." },
+        { "kind": "section", "id": "safety", "heading": "Safety", "block": null, "help": "Adverse effects, drug interactions, pregnancy and lactation, and product quality concerns, with citations." },
+        { "kind": "section", "id": "patient-education", "heading": "Patient education", "block": null, "help": "Plain-language points for patients." },
+        { "kind": "embed", "name": "knowledge-base" },
+        { "kind": "embed", "name": "references" },
+        { "kind": "embed", "name": "metadata" }
+      ]
+    },
+    {
+      "page_type": "class",
+      "rail": ["subclasses", "machine-readable"],
+      "main": [
+        { "kind": "lead" },
+        { "kind": "section", "id": "class-effects", "heading": "Class effects", "block": null, "help": "Effects, adverse effects, interactions and monitoring shared by drugs in this class, with citations." },
+        { "kind": "embed", "name": "class-members" },
+        { "kind": "embed", "name": "references" }
       ]
     }
   ]

@@ -13,7 +13,7 @@
 import { formatCitations } from './citations'
 import { infoboxKeysFor } from './blocks'
 import { templateFor } from './parse'
-import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, ThresholdLine } from './types'
+import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, TemplateItem, ThresholdLine } from './types'
 
 const COMMENT_COL = 24
 const MAX_COMMENT = 90
@@ -105,6 +105,37 @@ export function serializeFragment(model: PageModel, ctx: PageContext, target: { 
   }
   const section = model.main.find(m => m.kind === 'section' && m.heading.toLowerCase() === target.heading.toLowerCase())
   return `${section ? serializeMain(section) : `## ${target.heading}`}\n`
+}
+
+/**
+ * Adds any template section or embed a saved model lacks, so a page written
+ * before its template gained a section (or before it had a template at all)
+ * still opens and publishes: the parser refuses a page with a template section
+ * missing. Each missing item goes after the nearest earlier template item the
+ * page has, or after the lead. Returns the model unchanged when nothing is missing.
+ */
+export function fillTemplate(model: PageModel, ctx: PageContext): PageModel {
+  const template = templateFor(ctx)
+  const idOf = (m: MainItem) => (m.kind === 'lead' ? 'lead' : m.kind === 'embed' ? `::${m.name}` : (m.id ?? ''))
+  const tplId = (t: TemplateItem) => (t.kind === 'lead' ? 'lead' : t.kind === 'embed' ? `::${t.name}` : t.id)
+  const present = new Set(model.main.map(idOf))
+  if (template.main.every(t => present.has(tplId(t)))) return model
+  const blank = templateModel(ctx).main
+  const main = [...model.main]
+  if (!present.has('lead')) main.unshift({ kind: 'lead', id: 'lead', markdown: '' })
+  template.main.forEach((t, k) => {
+    const id = tplId(t)
+    if (main.some(m => idOf(m) === id)) return
+    const item = blank[k]
+    const before = template.main
+      .slice(0, k)
+      .reverse()
+      .map(tplId)
+      .find(prev => main.some(m => idOf(m) === prev))
+    const at = before ? main.findIndex(m => idOf(m) === before) + 1 : 1
+    main.splice(at, 0, item)
+  })
+  return { ...model, main }
 }
 
 /** The model of a page nobody has edited: the type's template, empty. */

@@ -10,7 +10,7 @@ import { formatDrugName } from '../names'
 import { entityHref } from '../wiki'
 
 /**
- * /drugs/:slug/history — every saved version of a page's Overview
+ * /drugs/:slug/history — every saved version of a page's community text
  * (phase 15, docs/user-edits.md §3).
  *
  * Newest first, each with author (@handle · credential), summary, size
@@ -79,10 +79,10 @@ export default function PageHistory() {
 
       <header className="mb-8 border-b border-ink/15 pb-6">
         <h1 className="font-semibold text-ink" style={H1}>
-          Overview history: {name}
+          History: {name}
         </h1>
         <p className="mt-2 max-w-2xl font-sans text-base leading-relaxed text-ink">
-          Every saved version of this page’s community-written Overview, newest first. Open a version to see what it
+          Every published version of this page’s community-written text, newest first. Open a version to see what it
           changed.
           {status.kind === 'ready' && status.patroller && (
             <>
@@ -110,7 +110,7 @@ export default function PageHistory() {
         <p className="font-sans text-base text-ink">The history couldn’t be loaded right now.</p>
       ) : state.entries.length === 0 ? (
         <p className="font-sans text-base text-ink">
-          Nobody has written this page’s Overview yet.{' '}
+          Nobody has edited this page yet.{' '}
           <Link to={entityHref(state.page.entityType, state.page.slug)} className="font-medium underline underline-offset-2">
             Back to {name}
           </Link>

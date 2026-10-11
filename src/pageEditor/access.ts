@@ -11,8 +11,9 @@ export function useEditAccess(): { status: ContributorStatus; refresh: () => voi
   return { status, refresh: () => setTick(t => t + 1) }
 }
 
-export function publishedNotice(status: 'live' | 'pending' | 'unchanged'): string {
+/** `patroller`: reviewers' own edits are marked reviewed when published, so nobody checks them later. */
+export function publishedNotice(status: 'live' | 'pending' | 'unchanged', patroller = false): string {
   if (status === 'pending') return 'Sent for review. Your edit will appear once a reviewer accepts it.'
   if (status === 'unchanged') return 'Nothing changed, so nothing was published.'
-  return 'Published. Your change is live and will be checked by a reviewer.'
+  return patroller ? 'Published. Your change is live.' : 'Published. Your change is live and will be checked by a reviewer.'
 }

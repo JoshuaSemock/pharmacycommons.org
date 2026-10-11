@@ -8,9 +8,10 @@
  * several thousand members, so the list renders in batches with a filter.
  *
  * The rail carries the same Sources / Machine-readable cards as drug pages —
- * a class is a PCID record like any other. Every class has the community
- * Overview (phase 15i), and contributor classifications (class_type
- * 'community', created on /new) start with no members.
+ * a class is a PCID record like any other. The main column follows the class
+ * page template (lead, Class effects, members, references; docs/page-editor.md
+ * §9 Q5), and contributor classifications (class_type 'community', created on
+ * /new) start with no members.
  *
  * Destination: src/pages/ClassDetail.tsx
  */
@@ -22,6 +23,7 @@ import { supabase } from '../supabaseClient'
 import MachinePanels from '../MachinePanels'
 import { formatDrugName } from '../names'
 import OpenSection from '../OpenSection'
+import { LeadArea, PageTools, ReferencesFrame, SectionArea, mainItems, useCommunityPage } from '../pageEditor/CommunityPage'
 import { abbreviationSuffix, useAbbreviations } from '../abbreviations'
 
 type ClassRef = { slug: string; name: string; source_code: string | null }
@@ -48,7 +50,6 @@ export default function ClassDetail() {
   const { slug = '' } = useParams<{ slug: string }>()
   const [cls, setCls] = useState<ClassRecord | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
-  const abbreviations = useAbbreviations(cls?.name)
 
   useEffect(() => {
     let cancelled = false
@@ -116,6 +117,32 @@ export default function ClassDetail() {
         <span className="min-w-0 break-words font-medium text-ink">{cls.name}</span>
       </nav>
 
+
+      <ClassBody cls={cls} pcidCode={pcidCode} />
+    </main>
+  )
+}
+
+/**
+ * Rail and main column. Class pages use the class template (docs/page-editor.md
+ * §9 Q5): the lead, ## Class effects and any contributor sections, then the
+ * members and references, in the order the page model gives; sub-classes and
+ * the machine-readable record stay in the rail. Before the phase-16 columns
+ * exist the page keeps the phase-15 Overview.
+ */
+function ClassBody({ cls, pcidCode }: { cls: ClassRecord; pcidCode: string }) {
+  const page = useCommunityPage(pcidCode, 'class', 'class', cls.name)
+  const abbreviations = useAbbreviations(cls.name)
+  const modelMode = page.state.status === 'ready' || page.state.status === 'loading'
+  const subclasses = cls.children.length > 0 && <SubclassesCard items={cls.children} showCodes={cls.class_type === 'atc' || cls.class_type === 'va'} />
+  const members = (
+    <section key="class-members" id="members" aria-label="Members" className="min-w-0">
+      <MemberList members={cls.members} community={cls.class_type === 'community'} />
+    </section>
+  )
+
+  return (
+    <>
       <header className="mb-8 border-b border-ink/15 pb-6">
         <p className="mb-1 font-sans text-md text-ink">
           {cls.class_type_label ?? 'Drug class'}
@@ -147,22 +174,32 @@ export default function ClassDetail() {
         {cls.description && (
           <p className="mt-3 max-w-2xl font-sans text-md leading-relaxed text-ink">{cls.description}</p>
         )}
+        {modelMode && <PageTools page={page} slug={cls.slug} />}
       </header>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-4">
-          {cls.children.length > 0 && <SubclassesCard items={cls.children} showCodes={cls.class_type === 'atc' || cls.class_type === 'va'} />}
+          {subclasses}
           <MachinePanels pcidCode={pcidCode} slug={cls.slug} />
         </aside>
 
         <div className="min-w-0 space-y-12">
-          <OpenSection pcidCode={pcidCode} slug={cls.slug} name={cls.name} fallbackDescription={null} labelAnchor="" />
-          <section aria-label="Members" className="min-w-0">
-            <MemberList members={cls.members} community={cls.class_type === 'community'} />
-          </section>
+          {modelMode ? (
+            mainItems(page).map(item => {
+              if (item.kind === 'lead') return <LeadArea key="lead" page={page} name={cls.name} labelAnchor="" fallback={null} style={{}} />
+              if (item.kind === 'section') return <SectionArea key={item.id ?? item.heading} page={page} item={item} name={cls.name} labelAnchor="" style={{}} />
+              if (item.name === 'class-members') return members
+              if (item.name === 'references') return <ReferencesFrame key="references" page={page} style={{}} />
+              return null
+            })
+          ) : (
+            <>
+              <OpenSection pcidCode={pcidCode} slug={cls.slug} name={cls.name} fallbackDescription={null} labelAnchor="" />
+              {members}
+            </>
+          )}
         </div>
       </div>
-    </main>
+    </>
   )
 }
 

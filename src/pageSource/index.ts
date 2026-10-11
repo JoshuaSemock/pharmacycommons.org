@@ -10,9 +10,9 @@ import type { Registry } from './types'
 
 export const REGISTRY = registryJson as Registry
 
-export { parsePageSource, templateFor, MAX_SOURCE_LENGTH } from './parse'
+export { parsePageSource, templateFor, pageTypeFor, MAX_SOURCE_LENGTH } from './parse'
 export type { FragmentTarget, ParseOptions } from './parse'
-export { serializePage, serializeFragment, serializeMain, templateModel, formatThreshold } from './serialize'
+export { serializePage, serializeFragment, serializeMain, templateModel, fillTemplate, formatThreshold } from './serialize'
 export { mergeModels, assignSectionIds, sectionIdsOf, spliceFragment, itemId } from './merge'
 export type { Conflict, MergeResult } from './merge'
 export { fromLegacy } from './legacy'
@@ -22,7 +22,7 @@ export { resolveCitation, fromEsummary, fromCrossref, fromDailyMed } from './res
 export type { SourceMeta, Lookup, FetchJson } from './resolve'
 export { contextAt, panelFor } from './assist'
 export type { CursorContext, Panel, PanelEntry } from './assist'
-export { parseCitationKey, findCitations, formatCitations } from './citations'
+export { parseCitationKey, findCitations, formatCitations, leadSummary } from './citations'
 export { NULL_TOKEN, stripComment, infoboxKeysFor } from './blocks'
 export { htmlMessage } from './prose'
 export type * from './types'

@@ -97,3 +97,35 @@ export function splitCitations(text: string): { text: string; citations: Citatio
 export function formatCitations(citations: Citation[]): string {
   return citations.map(c => `[@${c.key}]`).join('')
 }
+
+// ─── Lead summary ─────────────────────────────────────────────────────────────
+// Kept here (no Markdown parser import) so link previews can use it cheaply.
+
+/**
+ * A one-line plain-text summary of a page from its lead (docs/page-editor.md
+ * §9 Q1): the first paragraph with links, values, citations and Markdown
+ * marks removed, cut at a word boundary. Used where a short description is
+ * shown (link previews, and later the API). Never splits on sentences:
+ * "e.g." and "1,000 mg." make that unreliable.
+ */
+export function leadSummary(markdown: string | null | undefined, max = 200): string | null {
+  const para = (markdown ?? '').replace(/\r\n?/g, '\n').split(/\n\s*\n/).map(p => p.trim()).find(p => p && !/^(#|:::|::|```|~~~|\||>)/.test(p))
+  if (!para) return null
+  const text = para
+    .replace(CITATION_PATTERN, '')
+    .replace(/\[\[([^[\]\n|]+)\|([^[\]\n]+)\]\]/g, '$2')
+    .replace(/\[\[([^[\]\n]+)\]\]/g, '$1')
+    .replace(/\{\{[^{}\n]*\}\}/g, '')
+    .replace(/!?\[([^\]\n]*)\]\([^)\n]*\)/g, '$1')
+    .replace(/<(https?:[^>\s]+)>/g, '$1')
+    .replace(/(\*\*|__|\*|_|`|~~)(?=\S)([\s\S]*?\S)\1/g, '$2')
+    .replace(/^\s*(?:[-*+]|\d+[.)])\s+/gm, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;:!?])/g, '$1')
+    .trim()
+  if (!text) return null
+  if (text.length <= max) return text
+  const cut = text.slice(0, max - 1)
+  const space = cut.lastIndexOf(' ')
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,;:(–—-]+$/, '')}…`
+}
