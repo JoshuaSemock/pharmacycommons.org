@@ -97,7 +97,7 @@ export default function SiteMenu() {
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        className="lp-toggle flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[3.4px] rounded-md max-[359px]:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+        className="lp-toggle flex h-8 w-8 shrink-0 flex-col items-center justify-center gap-[3.4px] rounded-md md:h-9 md:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
       >
         <MenuBars open={isOpen} />
       </button>

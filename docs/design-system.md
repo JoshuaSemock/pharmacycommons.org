@@ -300,7 +300,7 @@ line beside it, scored into the paper.
 | Nav: Browse · Lists · Classifications · Tools | `.lp-toggle`: embossed, debossed on their page and under the pointer. Below 600px "Classifications" reads "Classes" (`BAR_LINKS.short`) and the wordmark is hidden (logo tile only) so the four buttons fit at 320px; from md to lg the wordmark is hidden too |
 | Nav: "Log in / Register" | `.lp-raised .lp-press` |
 | Nav: "Signed In" | `.lp-sunken` (a status stamp, not a button to press) |
-| Hamburger | `.lp-toggle`: embossed, debossed while open; three bars fold into an X |
+| Hamburger | `.lp-toggle`: embossed, debossed while open; three bars fold into an X. Same height as the bar links: 32px square below md, 36px from md (matching the account button) |
 | Site menu links, tool links | `.lp-toggle`, debossed on the current page, stacked with a 6px gap |
 | Appearance switch | `.lp-toggle` radios, the chosen one debossed |
 | Buttons (`Button.tsx`) | `.lp-toggle`: embossed; `selected` makes a toggle, debossed when pressed |
