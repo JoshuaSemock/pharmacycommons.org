@@ -417,6 +417,15 @@ Templates per type via `pageTypeFor()`: drug, concept, **herbal** (`functional`)
 pages now use the model layout via `src/pageEditor/CommunityPage.tsx`). `db/phase16c_page_templates.sql`
 (applied 2026-10-11) seeds them; the registry test reads the newest phase16 seed. `fillTemplate()` adds
 template sections a saved page lacks, so templates can grow. `publish-page` v2 deployed the same day.
+**Phase 16d — interactions (`db/phase16d_interactions.sql`, five parts, live 2026-10-12):** `:::interactions`
+block (grammar `statement`: `[[target]]: effect [@cite]`, citation always) in an Interactions section on the
+drug and herbal templates; rows land in `community_statements` (overlay, never `clinical_statements`) via
+`apply_page_revision()`. Drug pages show the FDA-label interactions beside it (`InteractionSources` in
+`DrugDetail.tsx`). Parts 1–3 and 5 via `apply_migration`; part 4 (functions) run by Joshua in the SQL
+editor and recorded by hand as `phase16d_4_functions`. Checked: registry md5 = `registry.json`,
+`publish_page`/`apply_page_revision`/`accept_rebased_revision` not executable by anon/authenticated,
+no new advisor findings. `publish-page` v3 (with statement support) deployed. Tests: `interactions.test.ts`,
+`db/phase15_test/tests_16d.sql`.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
