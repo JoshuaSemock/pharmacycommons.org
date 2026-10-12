@@ -763,7 +763,8 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   pointer-events: none;
   z-index: 0;
   /* WebP in public/textures (stable URL, so index.html can preload it). Made
-     from assets/textures/lichen_bg.jpg by scripts/lichen-images.py. */
+     from assets/textures/lichen_bg.jpg by scripts/lichen-images.py, which
+     shifts the photo to the brand mint (2026-10-12). */
   background-image: url("/textures/lichen_bg.webp");
   background-repeat: no-repeat;
   background-position: center center;
@@ -777,7 +778,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    the photo's average color. index.html adds .pc-bg-ready on window load. */
 @media (width <= 780px) {
   .page-background::before {
-    background-color: #878a6e;
+    background-color: #698e82;   /* the mint lichen's average color */
     background-image: none;
   }
   .pc-bg-ready .page-background::before {
