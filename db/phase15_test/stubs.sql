@@ -91,3 +91,7 @@ insert into public.entity_brand_names (pcid, brand_key, brand_display, sources) 
  (1001900, 'GLUCOPHAGE', 'Glucophage', '{drugsfda,rxnorm}'),
  (1001900, 'FORTAMET', null, '{drugsfda}'),
  (1002962, 'COUMADIN', 'Coumadin', '{drugsfda,rxnorm}');
+
+-- Phase 16d (community_statements.predicate references it).
+create table public.predicates (predicate text primary key, note text);
+insert into public.predicates values ('has_contraindication', null), ('has_component', null);

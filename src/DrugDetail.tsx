@@ -277,7 +277,17 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
               const style: CSSProperties = { order: (i + 1) * 10 }
               if (item.kind === 'lead') return <LeadArea key="lead" page={page} name={name} labelAnchor={LABEL_ANCHOR} fallback={drug.description ?? null} style={style} />
               if (item.kind === 'embed') return embed(item.name, style)
-              return <SectionArea key={item.id ?? item.heading} page={page} item={item} name={name} labelAnchor={LABEL_ANCHOR} style={style} />
+              return (
+                <SectionArea
+                  key={item.id ?? item.heading}
+                  page={page}
+                  item={item}
+                  name={name}
+                  labelAnchor={LABEL_ANCHOR}
+                  footer={item.id === 'interactions' ? <InteractionSources drug={drug} onOpenLabel={() => openLabelSection('drug_interactions')} /> : undefined}
+                  style={style}
+                />
+              )
             })
           ) : (
             <>
@@ -301,6 +311,46 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Under the Interactions section: where the official interaction data is, so
+ * contributed lines sit beside it rather than standing in for it
+ * (docs/page-editor.md §5a, §9 Q3). The FDA label's own list, and any
+ * interactions already in the knowledge base (clinical_statements).
+ */
+function InteractionSources({ drug, onOpenLabel }: { drug: DrugDetailType; onOpenLabel: () => void }) {
+  const known = drug.interactions ?? []
+  return (
+    <div className="space-y-3 font-sans text-sm text-ink">
+      <p>
+        The manufacturer’s list is in the FDA label:{' '}
+        <button type="button" onClick={onOpenLabel} className={`underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600 ${FOCUS}`}>
+          Drug interactions ↓
+        </button>
+      </p>
+      {known.length > 0 && (
+        <div>
+          <p className="mb-1 font-medium">In the knowledge base</p>
+          <ul className="list-disc space-y-1 pl-5">
+            {known.map((k, i) => (
+              <li key={`${k.interacting_drug_pcid ?? k.interacting_drug_name}-${i}`}>
+                {k.interacting_drug_slug ? (
+                  <Link to={`/drugs/${k.interacting_drug_slug}`} className="underline decoration-hepatica-300 underline-offset-2 hover:decoration-hepatica-600">
+                    {k.interacting_drug_name}
+                  </Link>
+                ) : (
+                  k.interacting_drug_name
+                )}
+                {k.mechanism ? `: ${k.mechanism}` : ''}
+                {k.severity ? ` (${k.severity})` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

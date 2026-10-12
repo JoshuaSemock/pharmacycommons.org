@@ -11,7 +11,7 @@
  */
 
 import { Suspense, lazy, useMemo, useState } from 'react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Backlinks, OPEN_SECTION_ID, StatusLine } from '../OpenSection'
 import { usePageContent } from '../pageContent'
@@ -196,12 +196,14 @@ export function SectionArea({
   item,
   name,
   labelAnchor,
+  footer,
   style,
 }: {
   page: CommunityPage
   item: Extract<MainItem, { kind: 'section' }>
   name: string
   labelAnchor: string
+  footer?: ReactNode
   style: CSSProperties
 }) {
   const target: FragmentTarget = { kind: 'section', heading: item.heading }
@@ -221,6 +223,7 @@ export function SectionArea({
       labelAnchor={labelAnchor}
       onEdit={page.canEdit ? () => page.edit(target) : undefined}
       help={sectionHelp(page, item)}
+      footer={footer}
       style={style}
     />
   )

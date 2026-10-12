@@ -71,11 +71,14 @@ egfr >= 45: no labelled dose adjustment; keep monitoring eGFR at least annually 
 
 ## Interactions
 
-- **Carbonic anhydrase inhibitors** ([[topiramate]], [[zonisamide]], [[acetazolamide]]) may increase the risk of lactic acidosis; consider more frequent monitoring.
-- **Drugs that reduce metformin clearance** ([[ranolazine]], [[vandetanib]], [[dolutegravir]], [[cimetidine]]) may increase metformin accumulation; weigh benefits and risks.
-- **Alcohol** potentiates metformin's effect on lactate metabolism; warn against excessive intake.
+:::interactions
+[[topiramate]]: carbonic anhydrase inhibitor; may increase the risk of lactic acidosis, so consider more frequent monitoring [@dailymed:1ed9dde4-339c-486f-a346-dde33a5e493f]
+[[ranolazine]]: may reduce metformin clearance and increase accumulation; weigh benefits and risks [@dailymed:1ed9dde4-339c-486f-a346-dde33a5e493f]
+[[dolutegravir]]: may reduce metformin clearance and increase accumulation; weigh benefits and risks [@dailymed:1ed9dde4-339c-486f-a346-dde33a5e493f]
+[[alcohol]]: potentiates metformin's effect on lactate metabolism; warn against excessive intake [@dailymed:1ed9dde4-339c-486f-a346-dde33a5e493f]
+:::
 
-All three from the drug interactions section of the label.[@dailymed:1ed9dde4-339c-486f-a346-dde33a5e493f]
+Zonisamide, acetazolamide, vandetanib and cimetidine act the same way; the label lists them in the same section.
 
 ## Pregnancy and lactation
 

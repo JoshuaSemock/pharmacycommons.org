@@ -84,7 +84,7 @@ describe('fillTemplate', () => {
   it('adds missing template sections and embeds after their template neighbours, keeping what was written', () => {
     const filled = fillTemplate(written, HERBAL)
     const ids = filled.main.map(m => (m.kind === 'embed' ? `::${m.name}` : m.id))
-    expect(ids).toEqual(['lead', 'uses-and-evidence', 'safety', 'patient-education', '::knowledge-base', 's-1', '::references', '::metadata'])
+    expect(ids).toEqual(['lead', 'uses-and-evidence', 'safety', 'interactions', 'patient-education', '::knowledge-base', 's-1', '::references', '::metadata'])
     expect(filled.main[0]).toEqual(written.main[0])
     const source = serializePage(filled, HERBAL)
     expect(parsePageSource(source, HERBAL, { sectionIds: { history: 's-1' } }).ok).toBe(true)

@@ -204,7 +204,7 @@ Rules shared by all blocks:
 - Blocks are validated against their table's types and ranges before anything is
   written.
 
-### 5a. `:::interactions` (designed 2026-10-11, not built)
+### 5a. `:::interactions` (designed 2026-10-11, live 2026-10-12 as phase 16d)
 
 On drug and herbal pages, under `## Safety` (herbal) or a drug template section to be
 added with it. One interaction per line, the other party as a page link, then what
@@ -467,6 +467,13 @@ already made; the reason is given so it can be revisited.
    redeploy `publish-page` (herbal and class templates, §9 Q5). Done; registry md5 checked.
 8. Publish the guide (`src/content/posts/2026-10-11-how-to-edit-a-page.md`: set
    `draft: false`) and add a `src/updates.ts` entry.
+9. (2026-10-12) Phase 16d, interactions (§5a): apply `db/phase16d_interactions.sql` as five
+   migrations, `phase16d_1_drop_grammar_check` … `phase16d_5_registry`, tables (part 3) before
+   deploying `publish-page` v3 (it reads `community_statements` on open) and the registry (part 5)
+   last. Part 4 is cancelled by the `apply_migration` prompt (DELETE inside function bodies); run
+   it in the SQL editor and record it by hand. Done; registry md5 checked. **Merge the frontend
+   right after part 5:** until it deploys, the old client parser rejects a filled
+   `:::interactions` line (Publish stays disabled; nothing bad is stored).
 
 Rollback: the frontend falls back to the Overview if the phase-16 columns are missing, so
 reverting the merge commit is enough to hide the editor; the new tables and columns can

@@ -14,7 +14,7 @@
 import { formatCitations } from './citations.ts'
 import { infoboxKeysFor } from './blocks.ts'
 import { templateFor } from './parse.ts'
-import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, TemplateItem, ThresholdLine } from './types.ts'
+import type { BrandsBlock, InfoboxBlock, MainItem, PageContext, PageModel, SectionPart, StatementLine, TemplateItem, ThresholdLine } from './types.ts'
 
 const COMMENT_COL = 24
 const MAX_COMMENT = 90
@@ -66,9 +66,14 @@ export function formatThreshold(l: ThresholdLine): string {
   return `${l.measure}${cond}: ${l.action} ${formatCitations(l.citations)}`
 }
 
+export function formatStatement(l: StatementLine): string {
+  return `[[${l.target}]]: ${l.effect} ${formatCitations(l.citations)}`
+}
+
 function serializePart(part: SectionPart): string {
   if (part.kind === 'prose') return part.markdown
-  return [`:::${part.block.name}`, ...part.block.lines.map(formatThreshold), ':::'].join('\n')
+  const lines = part.block.grammar === 'statement' ? part.block.lines.map(formatStatement) : part.block.lines.map(formatThreshold)
+  return [`:::${part.block.name}`, ...lines, ':::'].join('\n')
 }
 
 export function serializeMain(item: MainItem): string | null {
@@ -145,7 +150,12 @@ export function templateModel(ctx: PageContext): PageModel {
   const main: MainItem[] = template.main.map((t): MainItem => {
     if (t.kind === 'lead') return { kind: 'lead', id: 'lead', markdown: '' }
     if (t.kind === 'embed') return { kind: 'embed', id: t.name, name: t.name }
-    const parts: SectionPart[] = t.block ? [{ kind: 'block', block: { name: t.block, grammar: 'threshold', lines: [] } }] : []
+    const grammar = ctx.registry.blocks.find(b => b.name === t.block)?.grammar
+    const parts: SectionPart[] = !t.block
+      ? []
+      : grammar === 'statement'
+        ? [{ kind: 'block', block: { name: t.block, grammar: 'statement', lines: [] } }]
+        : [{ kind: 'block', block: { name: t.block, grammar: 'threshold', lines: [] } }]
     return { kind: 'section', id: t.id, heading: t.heading, template: true, parts }
   })
   return {

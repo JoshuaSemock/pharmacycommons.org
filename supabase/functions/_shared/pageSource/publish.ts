@@ -133,6 +133,8 @@ export type ThresholdRow = {
   action: string
   citations: string[]
 }
+/** A live community_statements row (docs/page-editor.md §5a). */
+export type StatementRow = { block_name: string; object_text: string; effect: string; citations: string[] }
 
 /**
  * Lays the live community rows over a revision's model, so the editor opens on
@@ -140,7 +142,7 @@ export type ThresholdRow = {
  */
 export function overlayStructured(
   model: PageModel,
-  rows: { infobox: InfoboxRow[]; brands: BrandRow[]; thresholds: ThresholdRow[] },
+  rows: { infobox: InfoboxRow[]; brands: BrandRow[]; thresholds: ThresholdRow[]; statements?: StatementRow[] },
   sourceBrands: string[],
   infoboxOrder: string[],
 ): PageModel {
@@ -166,6 +168,12 @@ export function overlayStructured(
       ...item,
       parts: item.parts.map(p => {
         if (p.kind !== 'block') return p
+        if (p.block.grammar === 'statement') {
+          const statements = (rows.statements ?? [])
+            .filter(r => r.block_name === p.block.name)
+            .map(r => ({ target: r.object_text, effect: r.effect, citations: r.citations.flatMap(citationsFromText) }))
+          return { ...p, block: { ...p.block, lines: statements } }
+        }
         const lines = rows.thresholds
           .filter(t => t.block_name === p.block.name)
           .map(t => ({
