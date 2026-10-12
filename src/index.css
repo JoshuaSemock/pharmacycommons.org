@@ -707,9 +707,9 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    textures 2026-10-01b).
 
    Back to front:
-     1. .page-background::before — the lichen photograph, fixed and still
-        behind the viewport, at full strength, so it shows in its true color
-        wherever the paper doesn't cover it.
+     1. .page-background::before / ::after — the lichen, two fixed strips
+        down the left and right of the viewport, at full strength, so it
+        shows in its true color wherever the paper doesn't cover it.
      2. .page-content — the page column, i.e. the sheet: centered, a little
         narrower than the viewport, so lichen shows down both sides.
      3. .page-content::before — the shadow the sheet casts on the lichen.
@@ -743,10 +743,21 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 }
 
 /* The lichen holds still behind the sheet (the scroll parallax was removed
-   2026-10-01: the paper moving over it is motion enough). One image for every
-   screen size: the full-resolution photo, which stays sharp even where a tall
-   phone screen makes `cover` enlarge it. */
-.page-background::before {
+   2026-10-01: the paper moving over it is motion enough).
+
+   Flank strips (2026-10-12): the lichen only ever shows beside the sheet, so
+   ::before (left) and ::after (right) each paint one full-height strip cut
+   from the photo's most vibrant mint band at native resolution, instead of
+   the whole 2400 x 1601 photo with `cover` (which showed its duller edges).
+   Made by scripts/lichen-images.py from assets/textures/lichen_bg.jpg (it
+   also shifts the photo to the brand mint). The two strips meet at the same
+   source column on the outer viewport edges, so they never repeat each other.
+   Each box is at least as wide as the lichen that shows beside the sheet
+   (sheet max 88.25rem + tear bites), and `cover` draws the strip at screen
+   height, the same scale the full photo had; only very wide screens
+   (> ~2560px at 1440 tall) enlarge it a little to fill. */
+.page-background::before,
+.page-background::after {
   content: "";
   position: fixed;
   /* Sized to the *large* viewport (browser toolbars hidden), not inset: 0.
@@ -756,33 +767,42 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
      the toolbar is showing, the bottom sliver just sits under it.
      100vh first for browsers without lvh (it means the same on mobile). */
   top: 0;
-  left: 0;
-  right: 0;
+  width: max(5rem, calc(50vw - 40rem));
   height: 100vh;
   height: 100lvh;
   pointer-events: none;
   z-index: 0;
-  /* WebP in public/textures (stable URL, so index.html can preload it). Made
-     from assets/textures/lichen_bg.jpg by scripts/lichen-images.py, which
-     shifts the photo to the brand mint (2026-10-12). */
-  background-image: url("/textures/lichen_bg.webp");
   background-repeat: no-repeat;
-  background-position: center center;
   background-size: cover;
 }
+/* WebP in public/textures (stable URLs, so index.html can preload them). */
+.page-background::before {
+  left: 0;
+  background-image: url("/textures/lichen-flank-l.webp");
+  background-position: left center;
+}
+.page-background::after {
+  right: 0;
+  background-image: url("/textures/lichen-flank-r.webp");
+  background-position: right center;
+}
 
-/* Phones: the same photo, fetched only after the page has finished loading.
-   On a phone the lichen shows only in the thin strips beside the sheet, yet at
-   745 KB it was most of the bytes on the first visit and slowed every other
-   download (mobile LCP 8 s on slow 4G). Until it arrives, the strips show
-   the photo's average color. index.html adds .pc-bg-ready on window load. */
+/* Phones: narrow strips (180px, ~60 KB each), fetched only after the page
+   has finished loading. The full photo was 745 KB and most of the bytes on
+   the first visit (mobile LCP 8 s on slow 4G). Until the strips arrive, the
+   flanks show their average color. index.html adds .pc-bg-ready on window
+   load. */
 @media (width <= 780px) {
-  .page-background::before {
-    background-color: #698e82;   /* the mint lichen's average color */
+  .page-background::before,
+  .page-background::after {
+    background-color: #709b8c;   /* the mint strips' average color */
     background-image: none;
   }
   .pc-bg-ready .page-background::before {
-    background-image: url("/textures/lichen_bg.webp");
+    background-image: url("/textures/lichen-flank-l-sm.webp");
+  }
+  .pc-bg-ready .page-background::after {
+    background-image: url("/textures/lichen-flank-r-sm.webp");
   }
 }
 
@@ -954,6 +974,7 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   }
   /* Every page: print on plain paper — no lichen, no torn edge, full width. */
   .page-background::before,
+  .page-background::after,
   .page-content::before,
   .paper-sheet::before,
   .paper-sheet::after {
