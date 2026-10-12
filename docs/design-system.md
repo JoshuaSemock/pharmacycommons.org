@@ -42,7 +42,7 @@ Back to front:
 
 | Layer | Element | What it paints |
 | --- | --- | --- |
-| Lichen | `.page-background::before` | `public/textures/lichen_bg.webp`, fixed, still (no parallax), full strength, `cover` |
+| Lichen | `.page-background::before` | `public/textures/lichen_bg.webp` (the photo hue-shifted to mint, 2026-10-12), fixed, still (no parallax), full strength, `cover` |
 | Sheet shadow | `.page-content::before` | `--paper-shadow` through the shadow tiles |
 | Paper | `.paper-sheet` (first child of `.page-content`) | `--color-paper`, cut to the torn outline by the edge tiles plus a solid middle |
 | Grain | `.paper-sheet::before` | `paper-grain.webp` tile, `mix-blend-mode: hard-light`, `--grain-strength` |
@@ -68,11 +68,15 @@ Back to front:
 (fibre scan) into `public/textures/paper-grain.webp` (1200px tile, shown at 600px),
 `paper-grain-sm.webp` (900px, phones), `paper-edge-l/r.webp` and
 `paper-shadow-l/r.webp`. `scripts/lichen-images.py` makes `lichen_bg.webp` at the
-source's full resolution. Rerun the script after replacing a source and copy the
+source's full resolution (2400 x 1601). Since 2026-10-12 it also rotates every hue by
++57° in CIE LCh (`HUE_SHIFT_DEG`), which moves the lichen from yellow-green (~112°) onto
+the brand mint `#62d6b2` (~169°) with lightness and chroma unchanged; the original photo
+stays untouched in `assets/textures/lichen_bg.jpg`, and `lichen_bg_mint.jpg` beside it is
+a q95 reference copy of the shifted photo. Set the shift to 0 to go back. Rerun the script after replacing a source and copy the
 numbers it prints into `src/index.css`.
 
 **Phones (≤ 780px).** The lichen is fetched only after load (`.pc-bg-ready`, added by
-`index.html`); until then the strips show `#878a6e`, the photo's average color.
+`index.html`); until then the strips show `#698e82`, the mint photo's average color (was `#878a6e`).
 Phones get the lighter grain tile, which is the mobile LCP image. Wider screens
 preload the lichen.
 
