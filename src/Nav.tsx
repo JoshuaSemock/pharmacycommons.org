@@ -137,7 +137,7 @@ function HeaderSearch() {
     <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
       <form onSubmit={handleSubmit} role="search">
         <div
-          className="lp-field flex h-10 items-center gap-2 rounded-md px-3 md:h-9"
+          className="lp-field lp-foil flex h-10 items-center gap-2 rounded-md px-3 md:h-9"
         >
           <SearchIcon />
           <input

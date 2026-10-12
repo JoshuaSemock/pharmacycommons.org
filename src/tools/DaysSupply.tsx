@@ -109,7 +109,7 @@ function Group({ title, children, hint }: { title: string; children: ReactNode; 
 function Check({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: ReactNode }) {
   return (
     <label className="flex cursor-pointer items-start gap-2 font-sans text-[13.5px] text-ink">
-      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="mt-1 accent-mint-700" />
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="mt-1 accent-foil" />
       <span>{children}</span>
     </label>
   )
@@ -467,7 +467,7 @@ export default function DaysSupply() {
         or a state’s limits. Check the package and the plan before you dispense. Design notes are in the project’s{' '}
         <a
           href="https://github.com/JoshuaSemock/pharmacycommons.org/blob/main/docs/days-supply.md"
-          className="text-ink underline decoration-mint-300 underline-offset-2 hover:decoration-mint-600"
+          className="text-ink underline decoration-foil underline-offset-2 hover:decoration-2"
         >
           days supply document
         </a>

@@ -93,6 +93,24 @@ preload the lichen.
 Code panels (`.pc-code`, `CODE_SURFACE` in `src/developers/Console.tsx`) are the one
 exception: a dark well in both themes with floral-white ink.
 
+**Foil (2026-10-12):** `--color-foil` = `#62d6b2` (= mint-400, the brand mark) is the
+one mint for accents. Unlike the ramps it does **not** flip in dark mode. Utilities:
+`bg-foil`, `decoration-foil`, `accent-foil`, `border-l-foil`, … Used for:
+
+- the foil-debossed search bars (`.lp-foil`, §6);
+- text selection (`::selection`);
+- the global scrollbar thumb (was `mint-200`, which dark mode turned into deep mint-800);
+- checkbox ticks (`accent-foil`, was `accent-mint-700`);
+- mint link underlines in the footer, legal pages, Days Supply and the JSON viewer (was
+  mint-300; hover now thickens the underline instead of darkening it to mint-600);
+- small marks: the "Signed In" dot, list-rank bars, `~~strikethrough~~` lines, the
+  Developers 200/GET badges (`bg-foil/25`) and the "added" gutter in version diffs.
+
+Text that sits on solid foil (search bar, selection) is dark ink (`--lp-foil-ink`,
+`#3a3a3a`) in both themes: floral-white ink on mint is ~1.6:1. Pale mint **washes**
+(`bg-mint-50/100`, the `bg-mint-200` count badge on Account) stay on the ramp, because
+they carry ink text that must flip with the theme.
+
 ### The palette
 
 Seven OKLCH ramps, steps 50–950, base 400. Lightness is locked across hues, so a step
@@ -119,12 +137,12 @@ never uses color.
 **Still colored today** (known, per the rule above or awaiting Joshua's call, §11):
 
 - Link underlines: `underline decoration-hepatica-300 underline-offset-2
-  hover:decoration-hepatica-600` (some footer/legal/markdown links use mint-300).
+  hover:decoration-hepatica-600` (footer/legal/Days Supply links use `decoration-foil`).
 - Washes: `bg-mint-50/100` behind a few list, class, label and developer rows;
   `bg-rose/marigold/sky-50…100` callouts and badges; `data.ts` eco-risk levels.
-- Small marks: the mint "Signed In" dot, list-rank bars, the Developers endpoint list
+- Small marks: the foil "Signed In" dot, foil list-rank bars, the Developers endpoint list
   (`bg-hepatica-100` when selected, `hover:bg-mint-50`), diff gutters.
-- The global scrollbar thumb is `mint-200` (dropdown panels override it to neutral).
+- The global scrollbar thumb is foil (dropdown panels override it to neutral).
 - The creatinine clearance widget (`src/tools/crcl/*.css`) still has its own mint
   borders, segmented buttons and hepatica focus ring. Only its dropdowns and date
   field are letterpress.
@@ -277,6 +295,7 @@ stuck pressed in. A disabled control lies flat and doesn't react.
 | `.lp-press` | embossed | hover, `:active`, `:focus-visible` (buttons and standalone links) | regular |
 | `.lp-toggle` | embossed | hover, `:active`, `:focus-visible`, and while `aria-pressed/expanded/selected/checked="true"`, `aria-current="page"/"true"/"location"`, `.lp-on`, or (on a `<summary>`) while its `<details>` is open | regular |
 | `.lp-field` | embossed | hover and `:focus-within` (clicked into / typing). On the wrapper round the input. No outline. | |
+| `.lp-field.lp-foil` | embossed | as `.lp-field`; while clicked into, the deboss fills with mint foil and the paper grain shows through it (veil `--lp-foil-veil`, 0.35 = more grain, 1 = flat color). Search bars only so far. | |
 | `.lp-card` | embossed | hover, `:active`, `:focus-visible`, `aria-expanded="true"` (a whole card that is one link or button) | regular, title included |
 | `.lp-chip` | embossed | hover, and while its radio/checkbox is checked (`<label><input class="peer sr-only"><span class="lp-chip">`) | regular |
 | `.lp-option` | embossed | hover, active row (`data-active="true"`), chosen value (`aria-selected="true"`; autocomplete rows set `data-autocomplete` so only `data-active` counts) | regular |
@@ -295,7 +314,8 @@ line beside it, scored into the paper.
 
 | Thing | Treatment |
 | --- | --- |
-| Search bars (header, home, browse, classifications, list filter) | `.lp-field`: embossed, debossed under the pointer and while clicked into |
+| Search bars (header, home, browse, classifications, dictionary) | `.lp-field lp-foil`: embossed, debossed under the pointer, foil-debossed (mint) while clicked into |
+| Filter boxes (list, class, compare, topics) | `.lp-field`: embossed, debossed under the pointer and while clicked into (no foil yet) |
 | Nav: home button (logo tile + wordmark, one button) | `.lp-toggle` (a `NavLink end`): debossed on `/` and under the pointer |
 | Nav: Browse · Lists · Classifications · Tools | `.lp-toggle`: embossed, debossed on their page and under the pointer. Below 600px "Classifications" reads "Classes" (`BAR_LINKS.short`) and the wordmark is hidden (logo tile only) so the four buttons fit at 320px; from md to lg the wordmark is hidden too |
 | Nav: "Log in / Register" | `.lp-raised .lp-press` |
@@ -400,7 +420,7 @@ list), with nav and footer removed; that page sets landscape itself.
 ## 11. Open design questions (Joshua's call)
 
 - **Remaining color** listed in §3: link underlines, mint/hepatica row washes, the
-  Developers endpoint list, the mint scrollbar, the "Signed In" dot, the CrCl widget.
+  Developers endpoint list, the foil scrollbar, the "Signed In" dot, the CrCl widget.
   Keep each as meaning, or take it colorless.
 - **Heading sizes:** move the h1–h6 rules into `@layer base` (§4).
 - **`font-display`:** retire the alias and its uses, now that there is one typeface.

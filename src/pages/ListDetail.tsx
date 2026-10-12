@@ -491,7 +491,7 @@ function Row({
               </span>
               {valueWidth !== null && (
                 <span className="mt-1 block h-1 rounded-sm bg-mint-50" aria-hidden="true">
-                  <span className="block h-1 rounded-sm bg-mint-500" style={{ width: `${valueWidth}%` }} />
+                  <span className="block h-1 rounded-sm bg-foil" style={{ width: `${valueWidth}%` }} />
                 </span>
               )}
             </>

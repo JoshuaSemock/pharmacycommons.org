@@ -17,7 +17,7 @@ const fmtDate = (iso: string) => new Date(iso).toLocaleString('en-US', { dateSty
 const show = (v: unknown) => (v === undefined ? '' : typeof v === 'string' ? v : JSON.stringify(v))
 
 const KIND_STYLE: Record<DiffRow['kind'], string> = {
-  added: 'border-l-mint-500 bg-mint-50',
+  added: 'border-l-foil bg-mint-50',
   removed: 'border-l-rose-500 bg-rose-50',
   changed: 'border-l-marigold-500 bg-marigold-50',
 }

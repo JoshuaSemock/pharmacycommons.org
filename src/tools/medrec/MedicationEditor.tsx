@@ -195,7 +195,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                 )}
               </div>
               <label className="flex items-center gap-1.5 font-sans text-[12px] text-ink">
-                <input type="checkbox" checked={m.range} onChange={e => onPatch({ range: e.target.checked })} className="accent-mint-700" />A range, such as one
+                <input type="checkbox" checked={m.range} onChange={e => onPatch({ range: e.target.checked })} className="accent-foil" />A range, such as one
                 to two
               </label>
             </div>
@@ -316,7 +316,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
                     instr: e.target.checked ? [...m.instr, k] : m.instr.filter(x => x !== k),
                   })
                 }
-                className="mt-1 accent-mint-700"
+                className="mt-1 accent-foil"
               />
               {t}
             </label>
@@ -328,7 +328,7 @@ export default function MedicationEditor({ med: m, onPatch, onFormChange, onDone
         {unit && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <label className="flex cursor-pointer items-center gap-2 font-sans text-[13.5px] text-ink">
-              <input type="checkbox" checked={showsMax(m)} onChange={e => onPatch({ showMax: e.target.checked })} className="accent-mint-700" />
+              <input type="checkbox" checked={showsMax(m)} onChange={e => onPatch({ showMax: e.target.checked })} className="accent-foil" />
               Include a maximum per 24 hours
             </label>
             {showsMax(m) && (
