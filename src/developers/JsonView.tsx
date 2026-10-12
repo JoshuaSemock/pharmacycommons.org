@@ -72,7 +72,7 @@ function Scalar({ value, onPcid }: { value: unknown; onPcid?: (p: string) => voi
         type="button"
         onClick={() => onPcid(s)}
         title={`Load ${s} in the console`}
-        className="rounded-sm text-ink underline decoration-mint-300/40 underline-offset-2 hover:bg-white/10 hover:decoration-mint-300"
+        className="rounded-sm text-ink underline decoration-foil/40 underline-offset-2 hover:bg-white/10 hover:decoration-foil"
       >
         "{s}"
       </button>
@@ -80,7 +80,7 @@ function Scalar({ value, onPcid }: { value: unknown; onPcid?: (p: string) => voi
   }
   if (/^https?:\/\/\S+$/.test(s)) {
     return (
-      <a href={s} target="_blank" rel="noreferrer" className="break-all text-ink underline decoration-mint-300/40 underline-offset-2 hover:decoration-mint-300">
+      <a href={s} target="_blank" rel="noreferrer" className="break-all text-ink underline decoration-foil/40 underline-offset-2 hover:decoration-foil">
         "{s}"
       </a>
     )

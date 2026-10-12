@@ -37,7 +37,7 @@ export default function Allergies({ allergies, nkda, onNkda, onAdd, onPatch, onR
       />
 
       <label className="flex cursor-pointer items-start gap-2 font-sans text-[14px] text-ink">
-        <input type="checkbox" checked={nkda} onChange={e => onNkda(e.target.checked)} className="mt-1 accent-mint-700" />
+        <input type="checkbox" checked={nkda} onChange={e => onNkda(e.target.checked)} className="mt-1 accent-foil" />
         <span>
           <b className="font-semibold">No known drug allergies.</b> Checking this records that the question was asked.
         </span>

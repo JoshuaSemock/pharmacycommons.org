@@ -188,7 +188,7 @@ export function AccountButton({ block = false }: { block?: boolean }) {
         title={user.email ?? undefined}
         className={`${base} lp-sunken gap-1.5`}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-mint-600" aria-hidden="true" />
+        <span className="h-1.5 w-1.5 rounded-full bg-foil" aria-hidden="true" />
         Signed In
       </Link>
     )

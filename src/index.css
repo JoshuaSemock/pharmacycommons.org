@@ -148,6 +148,13 @@
      white …) as a text utility. The palette ramps are for fills, borders, rings and
      underlines only. */
   --color-paper: #faf9f5;             /* floral white */
+  /* Foil (2026-10-12): the one mint used for accents — the foil-debossed
+     search bars, text selection, scrollbars, checkbox ticks, link
+     underlines, small marks. = mint-400 (#62d6b2, the brand mark), but a
+     fixed material color: unlike the ramps it does NOT flip in dark mode.
+     Utilities: bg-foil, decoration-foil, accent-foil, … Text sitting ON
+     foil is dark ink (--lp-foil-ink) in both themes. */
+  --color-foil: #62d6b2;
   --color-ink: oklch(34.8% 0 0);      /* = neutral-800, #3a3a3a */
 
   /* ---------------------------------------------------------------
@@ -357,6 +364,70 @@ button.lp-raised {
   a.lp-raised,
   button.lp-raised {
     transition: none;
+  }
+}
+
+/* Foil deboss (2026-10-12). Like a foil-stamped die: when a search bar is
+   clicked into, the debossed recess fills with mint foil (#62d6b2,
+   mint-400, the brand mark) and the paper fibres still show through it.
+   Only the site's search bars carry it so far (Nav, Home, Browse,
+   Classifications, Dictionary); add .lp-foil next to .lp-field to opt a
+   field in. At rest and on hover it is the plain colorless relief.
+   Built from the element's own background layers, so the deboss shading
+   (inset box-shadows) still paints on top of the foil. Layers, top down:
+     1. a veil of foil that sets how strongly the grain shows
+        (--lp-foil-veil: 0 = full grain, 1 = flat color)
+     2. the paper-grain tile, hard-light blended (the same tile and blend
+        the sheet uses; it is mid-gray, so it only shades the color)
+     3. the foil itself
+   The foil is a material, not a theme color, so it does not flip in dark
+   mode, and text on it stays dark ink in both themes for contrast
+   (#3a3a3a on #62d6b2 is 6.4:1; the light dark-mode ink would be ~1.6:1). */
+:root {
+  --lp-foil: var(--color-foil);
+  --lp-foil-veil: color-mix(in srgb, var(--color-foil) 35%, transparent);
+  --lp-foil-ink: #3a3a3a;
+}
+.lp-field.lp-foil:focus-within {
+  background:
+    linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+    url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
+    var(--lp-foil);
+  background-blend-mode: normal, hard-light, normal;
+  color: var(--lp-foil-ink);
+}
+/* The deboss on foil: same four layers as --shadow-deboss, a touch deeper
+   on the shaded walls and softer on the lit floor, since the foil is darker
+   than the sheet. (--shadow-deboss can't be retuned per element: its
+   --lp-* vars resolve on :root.) The class is doubled so this outranks the
+   generic hover deboss rule while the pointer is over a focused bar. */
+.lp-field.lp-foil.lp-foil:focus-within {
+  box-shadow:
+    inset 1px 1px 1px rgb(0 0 0 / 0.24), inset 2px 2px 3px rgb(0 0 0 / 0.12),
+    inset 0 0 0 1px rgb(0 0 0 / 0.08), inset -1px -1px 0 rgb(255 255 255 / 0.55);
+}
+:root[data-theme="dark"] .lp-field.lp-foil.lp-foil:focus-within {
+  box-shadow:
+    inset 1px 1px 1px rgb(0 0 0 / 0.5), inset 2px 2px 3px rgb(0 0 0 / 0.25),
+    inset 0 0 0 1px rgb(0 0 0 / 0.2), inset -1px -1px 0 rgb(255 255 255 / 0.3);
+}
+@media (width <= 780px) {
+  .lp-field.lp-foil:focus-within {
+    background-image:
+      linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+      url("/textures/paper-grain-sm.webp");
+  }
+}
+.lp-field.lp-foil:focus-within :is(input, button, svg),
+.lp-field.lp-foil:focus-within input::placeholder {
+  color: var(--lp-foil-ink);
+}
+.lp-field.lp-foil:focus-within input {
+  caret-color: var(--lp-foil-ink);
+}
+@media print {
+  .lp-field.lp-foil:focus-within {
+    background: none;
   }
 }
 
@@ -616,13 +687,20 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   text-shadow: none !important;
 }
 
+/* Scrollbars and text selection are foil (2026-10-12; scrollbars were
+   mint-200, which dark mode flipped to the deep mint-800). Selected text
+   turns dark ink in both themes, as on the foil search bars. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-mint-200) transparent;
+  scrollbar-color: var(--color-foil) transparent;
 }
 *::-webkit-scrollbar { width: 5px; height: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: var(--color-mint-200); border-radius: 3px; }
+*::-webkit-scrollbar-thumb { background: var(--color-foil); border-radius: 3px; }
+::selection {
+  background-color: var(--color-foil);
+  color: var(--lp-foil-ink);
+}
 
 /* ---------------------------------------------------------------------------
    Background: a sheet of torn paper on lichen (2026-10-01; real paper

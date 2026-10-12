@@ -141,7 +141,7 @@ const components: Components = {
   strong: ({ children }) => <strong className="font-medium text-ink">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => (
-    <del className="text-ink line-through decoration-mint-500">{children}</del>
+    <del className="text-ink line-through decoration-foil">{children}</del>
   ),
 
   ul: ({ children }) => (

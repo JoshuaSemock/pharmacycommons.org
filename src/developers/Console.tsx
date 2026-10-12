@@ -43,7 +43,7 @@ export const EXAMPLES: ConsoleExample[] = [
 ]
 
 const STATUS_TONE = (s: number) =>
-  s >= 200 && s < 300 ? 'bg-mint-400/25 text-ink' : s === 304 ? 'bg-sky-300/25 text-ink' : s >= 400 && s < 500 ? 'bg-marigold-400/25 text-ink' : 'bg-rose-400/25 text-ink'
+  s >= 200 && s < 300 ? 'bg-foil/25 text-ink' : s === 304 ? 'bg-sky-300/25 text-ink' : s >= 400 && s < 500 ? 'bg-marigold-400/25 text-ink' : 'bg-rose-400/25 text-ink'
 
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -252,7 +252,7 @@ export default function Console({ apiBase }: { apiBase: string }) {
           {/* URL bar */}
           <div className="flex min-w-0 flex-wrap items-stretch gap-2">
             <div className={`${CODE_SURFACE} flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2`}>
-              <span className="shrink-0 rounded bg-mint-400/25 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
+              <span className="shrink-0 rounded bg-foil/25 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">GET</span>
               <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12.5px] text-ink" aria-label="Request URL">
                 {url}
               </code>
