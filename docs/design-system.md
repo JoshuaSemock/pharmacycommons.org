@@ -42,7 +42,7 @@ Back to front:
 
 | Layer | Element | What it paints |
 | --- | --- | --- |
-| Lichen | `.page-background::before` | `public/textures/lichen_bg.webp` (the photo hue-shifted to mint, 2026-10-12), fixed, still (no parallax), full strength, `cover` |
+| Lichen | `.page-background::before` (left), `::after` (right) | two full-height flank strips, `public/textures/lichen-flank-l/r.webp` (phones `-sm`), cut from the mint-shifted photo; fixed, still (no parallax), full strength, `cover` |
 | Sheet shadow | `.page-content::before` | `--paper-shadow` through the shadow tiles |
 | Paper | `.paper-sheet` (first child of `.page-content`) | `--color-paper`, cut to the torn outline by the edge tiles plus a solid middle |
 | Grain | `.paper-sheet::before` | `paper-grain.webp` tile, `mix-blend-mode: hard-light`, `--grain-strength` |
@@ -67,18 +67,25 @@ Back to front:
 `scripts/paper-textures.py` turns `paper.png` (torn sheet) and `paper-texture.png`
 (fibre scan) into `public/textures/paper-grain.webp` (1200px tile, shown at 600px),
 `paper-grain-sm.webp` (900px, phones), `paper-edge-l/r.webp` and
-`paper-shadow-l/r.webp`. `scripts/lichen-images.py` makes `lichen_bg.webp` at the
-source's full resolution (2400 x 1601). Since 2026-10-12 it also rotates every hue by
-+57° in CIE LCh (`HUE_SHIFT_DEG`), which moves the lichen from yellow-green (~112°) onto
-the brand mint `#62d6b2` (~169°) with lightness and chroma unchanged; the original photo
-stays untouched in `assets/textures/lichen_bg.jpg`, and `lichen_bg_mint.jpg` beside it is
-a q95 reference copy of the shifted photo. Set the shift to 0 to go back. Rerun the script after replacing a source and copy the
+`paper-shadow-l/r.webp`. `scripts/lichen-images.py` rotates every hue of the lichen photo by +57° in CIE LCh
+(`HUE_SHIFT_DEG`), moving it from yellow-green (~112°) onto the brand mint `#62d6b2`
+(~169°) with lightness and chroma unchanged (2026-10-12; the original stays untouched in
+`assets/textures/lichen_bg.jpg`, `lichen_bg_mint.jpg` is a q95 reference copy). It then
+cuts **flank strips** instead of serving the whole photo, since the lichen only ever shows
+beside the sheet: full-height columns at native resolution from the most vibrant mint band,
+meeting at source column `SEAM` (1220) on the outer viewport edges, so the two flanks never
+repeat each other. Desktop strips are 720 × 1601 (238 + 259 KB), phone strips 180 × 1601
+(61 + 63 KB); the full photo was 765 KB on every device. Each pseudo-element is
+`max(5rem, 50vw − 40rem)` wide, always wider than the lichen beside the sheet (checked
+390 px to 5120 px), and `cover` draws the strip at screen height, the same scale the full
+photo had; only screens wider than ~2560 px at 1440 tall enlarge it slightly.
+Set the shift to 0 to go back. Rerun the script after replacing a source and copy the
 numbers it prints into `src/index.css`.
 
 **Phones (≤ 780px).** The lichen is fetched only after load (`.pc-bg-ready`, added by
-`index.html`); until then the strips show `#698e82`, the mint photo's average color (was `#878a6e`).
+`index.html`); until then the strips show `#709b8c`, the phone strips' average color.
 Phones get the lighter grain tile, which is the mobile LCP image. Wider screens
-preload the lichen.
+preload both flank strips.
 
 ---
 
