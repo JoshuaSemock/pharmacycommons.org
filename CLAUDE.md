@@ -204,6 +204,8 @@ only when nothing matches or the query is one character. Dictionary terms are
 not indexed (the `/tools/dictionary` page has its own search). Keep the placeholder in `index.html`'s static
 header in step with `Nav.tsx`.
 
+**Haptics (2026-10-13, `src/haptics.ts`, installed in `main.tsx`):** an 8 ms `navigator.vibrate` tick on touch taps of buttons, links and non-text controls. Android Chrome/Firefox only (iOS Safari has no web haptics API); skipped for reduced motion, disabled controls, mouse and pen.
+
 **index.html** is the single entry point (`index-updated.html` removed
 2026-09-25). `#root` holds a static shell (hero + About summary) that paints
 before JS and that React replaces on mount; its hero mirrors `Home.tsx`, keep
