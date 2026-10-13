@@ -161,10 +161,44 @@ Decided with Joshua 2026-10-12, from a three-part plan for a "dual-mode calendar
   on the in-use-limit note and "Still needed" were removed (design-system rules 1–2).
 - Tests: `parse.test.ts` (13) and the refill-calendar block in `dayssupply.test.ts`.
 
-## Second phase
+## Version 3 (2026-10-13)
 
-- Tapers and alternating doses (prednisone steps, warfarin by weekday).
-- Topicals by fingertip units × body area, labeled as an estimate.
+Two more cards below the refill calendar, chosen by Joshua 2026-10-13 from the second-phase list. Each has its own engine (pure, tested) and a card that only renders it. The Supply and Refill calendar cards are untouched.
+
+### Step schedules (tapers, weekday doses, dose step-ups)
+
+Code: `src/tools/dayssupply/schedule.ts` (engine, `schedule.test.ts`), `Schedule.tsx` (card).
+
+- **Steps run one after another.** Each lasts a whole number of days and is either *the same amount each time* (amount per dose, then every day / every other day / weekly / every 2 weeks / every 4 weeks, and doses per day when given daily) or *different on each weekday* (total on Sunday to Saturday, counted from the weekday the step starts on; the next step carries on from where the last one ended).
+- **Dose counts, not division.** The first dose is on day 1 of a step, so a weekly dose for 28 days is 4 doses (days 1, 8, 15, 22) and for 21 days is 3. The count is `ceil(days / every)`.
+- **One product or one per step.** Default: use units are added across steps and the total is rounded up to whole packages once (prednisone 10 mg tablets: 30 tablets, 28 per bottle, 2 bottles). Tick *each step is a different product* (a separate pen for each GLP-1 strength) and every step is rounded up to whole packages by itself, then the package counts are added; a step can have its own package size. A partly used pen is never carried into the next strength.
+- **Output:** dispense, days supply (the sum of the steps), left over, a line per step ("Days 4 to 6: 3 tablets once a day for 3 days"), the arithmetic open, and a copyable line.
+- **Use-within limit (2026-10-13).** A shared "use within (days after opening)" field, and in different-product mode one per step. A package used continuously for a step lasts at most that many days, so the packages for a step are the larger of `ceil(units / package size)` and `ceil(step days / limit)`; in one-product mode the same test runs over the whole course. When the limit raises the count, the work and a note say so (the limit sets the quantity). A limit with loose units (no package size) does nothing, because there is no package to throw away.
+- **Not included:** a fill date with an end date per step. A schedule gives a fixed course, so there is no "days for a quantity" direction.
+- The three examples (prednisone taper, warfarin by weekday, weekly GLP-1 step-up) show how steps are entered; they are not dosing recommendations.
+
+### Cream or ointment (fingertip units), an estimate
+
+Code: `src/tools/dayssupply/topical.ts` (engine, `topical.test.ts`), `Topical.tsx` (card).
+
+- One fingertip unit is about 0.5 g, and one application's amount is the sum of units for the areas treated. Grams per application × applications per day × days = grams; with a package size it rounds up to whole tubes and says how many days one tube lasts.
+- **Two published tables, shown, not merged** (project principle: show disagreement). FPnotebook: face and neck 2.5, each side of trunk 3.5, arm 3, hand 1, leg 6, foot 2. GPnotebook: scalp 3, face and neck 2.5, trunk front 8 and back 8, buttocks 4, whole arm with hand 4, hand 1, whole leg with foot 8, foot 2, genitalia 0.5. They differ most on the trunk (7 vs 16 units for front plus back), so a chip picks which one is used and the source is linked beside it. Checked 2026-10-13 against both pages. The unit itself: Long and Finlay, Clin Exp Dermatol 1991;16:444-7.
+- Grams per unit defaults to 0.5 and is editable (GPnotebook quotes about 0.43 g for women and 0.49 g for men).
+- **Adults only.** Children's amounts depend on age and are not in the tool.
+- Every result carries a flat ink "Estimate" stamp and the line "Real use varies with skin, thickness and the product."
+
+### Package facts table (`product_packaging`)
+
+`db/phase18_product_packaging.sql` defines `product_packaging`: one row per product per source for drops per mL, bottle volume, priming, use-within days, doses per pen, units per pen and pens per box, keyed to a PCID (moiety or formulation). `value_source` is `manufacturer`, `payer` (needs `payer_name`) or `general_default`, with `source_name`, `source_url` and `source_checked` on every row, so a 20 vs 16 drops per mL disagreement is two rows. `container` (pen or vial) is recorded for insulin and injectables. Public read, no client writes.
+
+**Status: written, not applied** (the `apply_migration` call was cancelled 2026-10-13; apply it, then confirm in `schema_migrations`). First seed rows are in `db/phase18b_product_packaging_seed.sql`, each read from the FDA label on 2026-10-13: Lantus SoloStar (300 units, 2-unit safety test, 5 pens per carton, 28 days after first use), ProAir HFA (200 actuations, 3 priming sprays) and Xalatan (2.5 mL, 6 weeks after opening; drops per mL is not stated, so it is left out and the row's note says the label's 1.5 mcg per drop implies about 33 per mL).
+
+**On the page.** `src/tools/dayssupply/packaging.ts` reads the rows for the medication picked in the name field (the moiety plus everything under it in `moiety_hierarchy`); `PackagingPicker.tsx` shows a "Package facts on file" box above the Package fields when rows exist for the chosen form. "Fill in the package" sets the fields, and the box then lists every value with its source and check date. A manufacturer value wins over a general default; a payer drops-per-mL figure goes to the payer field so both results show. If the table does not exist yet, or has no rows for the medication, nothing appears and the fields are typed in as before. Tests: `packaging.test.ts`.
+
+## Second phase (what is left)
+
+- ~~Tapers and alternating doses (prednisone steps, warfarin by weekday).~~ Done in version 3.
+- ~~Topicals by fingertip units × body area, labeled as an estimate.~~ Done in version 3, adults.
 - Package lookup: pick a product and fill in package size from FDA NDC Directory
   package descriptions (for example "200 AEROSOL, METERED in 1 INHALER"), with the
   source shown. Checked 2026-10-12: `fda_products.pcid` is set on 10,631 of 12,261 rows
@@ -173,9 +207,7 @@ Decided with Joshua 2026-10-12, from a three-part plan for a "dual-mode calendar
   ingest joined on application number. Search stays moiety-only: pick the moiety, then
   a product under it. Drops per mL, priming, in-use days and doses per pen are not in
   the NDC Directory; they need the curated table below.
-- Drops per mL and in-use limits stored per product in Supabase, with the source
-  on each row (manufacturer, a named payer, general default), so disagreements are
-  stored and shown.
+- ~~Drops per mL and in-use limits stored per product in Supabase, with the source on each row~~ Table and reader are built (version 3); the table is not applied yet and needs rows loaded beyond the first three.
 
 ## What version 1 does differently from the plan above
 
@@ -194,5 +226,6 @@ Decided with Joshua 2026-10-12, from a three-part plan for a "dual-mode calendar
 
 ## Open
 
-- "81" was in the original list of target days. Is it a real standard length, or
-  did it mean 84? Free entry covers it for now.
+- ~~"81" in the original list of target days~~ meant 84 (Joshua, 2026-10-13); the presets already have 84.
+- A taper that also uses the directions builder and package fields (the schedule card counts in simple units).
+- Children's fingertip unit amounts.
