@@ -474,9 +474,16 @@ formulations in the moiety hierarchy (phase 10).
 
 ## Known drift & gaps (fix or confirm — don't build on top of them)
 **Repo ↔ Supabase ↔ claude.ai Project out of sync:**
-- `db/` lacks `01_core_schema_v2.sql`, `phase4_fda_ingestion_tables.sql`,
-  `phase4_physiochemical_table.sql` (exist in the Project docs) and the class /
-  RxNorm / label migrations that were applied only via `apply_migration`.
+- **Reconstructed db/ files (2026-10-13):** the lost originals were rebuilt from the live catalog,
+  not recovered: `01_core_schema_v2.sql`, `phase4_fda_ingestion_tables.sql` (also the label tables and
+  `entity_labels`), `phase4_physiochemical_table.sql`, `phase8_class_system.sql` (class tables,
+  `rebuild_classes`, `search_classes`, `class_catalog`), `phase9_guidelines.sql`,
+  `phase9_lists_staging_and_resolver.sql`. They hold the *current* shape (later columns folded in), every
+  function body is byte-identical to live (md5 of `prosrc` checked), and they are idempotent. They carry
+  no data: `class_rules` (64 rows), `class_search_aliases` (51) and the rxclass/chemont staging exist only
+  in Supabase — export them before relying on a rebuild. Not rebuilt on purpose: the superseded
+  `moiety_hierarchy` v1–v3 and brand-view iterations (phase10d is current), RxNorm tables (already in
+  `phase7_brand_names.sql`).
 - Scripts named in `docs/project-history.md` (`02_transform.py`, `04_validate.py`,
   `04b`–`04f`) are not in `scripts/`.
 - Stray/dead files removed 2026-10-13 (Joshua confirmed): root `drug.html`/`index.css`, `public/drug.html`, `src/ClassIndex.tsx`, `src/ClassPage.tsx`, the two 207 KB logo SVGs, `public/drug-catalog.json` (`scripts/build-catalog.mjs` can regenerate it), `docs/schema-updates.sql`, `.md/` and the stale `db/CLAUDE.md`. Kept: `assets/textures/` (source images for `scripts/paper-textures.py` and `scripts/lichen-images.py`) and `docs/data-model-decisions.md` §4 (legacy API/PIN/FRM).
