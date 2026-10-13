@@ -109,6 +109,7 @@ one mint for accents. Unlike the ramps it does **not** flip in dark mode. Utilit
 `bg-foil`, `decoration-foil`, `accent-foil`, `border-l-foil`, … Used for:
 
 - the foil-debossed search bars (`.lp-foil`, §6);
+- selected dates in the Days Supply calendar (`.lp-foil-set`: the same foil and grain, always on; pressed-in days between two dates, raised ends);
 - text selection (`::selection`);
 - the global scrollbar thumb (was `mint-200`, which dark mode turned into deep mint-800);
 - checkbox ticks (`accent-foil`, was `accent-mint-700`);
