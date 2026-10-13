@@ -9,8 +9,9 @@
 -- This is the CURRENT definition, not the history: later edits (class_type 'community' from phase15i,
 -- the search_classes alias-wins rule) are folded in. Function bodies are copied verbatim from pg_get_functiondef.
 -- Design notes: db/phase8-drug-classes.md. Run after 01_core_schema_v2.sql and phase8a_history.sql. Idempotent.
--- Data (class_rules seed, class_search_aliases rows, rxclass_*/chemont_* staging) is NOT reproduced except
--- class_rules, which is configuration (see the INSERT at the end).
+-- Data is NOT reproduced: class_rules (64 rows of INN-stem / nomenclature patterns that rebuild_classes() reads),
+-- class_search_aliases (51 rows) and the rxclass_*/chemont_* staging live only in Supabase. Export them
+-- (e.g. \copy or a CSV from the SQL editor) before any rebuild of a fresh database.
 
 -- ─── Classes and membership ──────────────────────────────────────────────────
 create table if not exists public.drug_classes (

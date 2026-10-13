@@ -112,3 +112,21 @@ begin
     end if;
   end loop;
 end $$;
+
+-- Label view used by the drug page and API (security_invoker; SELECT only).
+create or replace view public.entity_labels with (security_invoker = true) as
+ SELECT e.pcid,
+    e.slug,
+    e.entity_type,
+    e.name AS entity_name,
+    ldf.match_basis,
+    ld.setid,
+    ld.title AS label_title,
+    ld.labeler,
+    ld.document_type_display,
+    ld.effective_time,
+    ld.n_products
+   FROM label_document_formulations ldf
+     JOIN entities e ON e.pcid = ldf.pcid
+     JOIN label_documents ld ON ld.setid = ldf.setid;
+grant select on public.entity_labels to anon, authenticated;
