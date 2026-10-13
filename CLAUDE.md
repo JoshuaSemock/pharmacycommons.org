@@ -192,6 +192,17 @@ or tool (date, kind, title, summary, link); blog posts join the feed
 automatically. **When you ship something user-facing, add an entry there** — the
 home page shows the newest five.
 
+**Header search is site-wide (2026-10-13, `src/siteSearch.ts`, `HeaderSearch` in `src/Nav.tsx`):** drugs, brands
+and concept pages still come from `searchCatalog`; everything else comes from one entry list: live tools
+(from `TOOLS` in `src/tools.ts` — **give a new tool `keywords`**, the other names people use, e.g. "dosing
+calculator" → Days supply), `SITE_PAGES` (add a line for any page worth finding), every published list
+(`listLists`), every class with members (`loadAllClasses`) and every non-draft post (`listPosts`), the last
+three loaded lazily on focus. Results are grouped (Tools, Pages, Lists, Classifications, Blog, Drugs and
+topics) by best score; arrow keys and Enter work; Enter on an exact title/keyword (score >= `STRONG_SCORE`)
+jumps straight there unless a drug matches as well, otherwise it opens `/browse?q=`. Dictionary terms are
+not indexed (the `/tools/dictionary` page has its own search). Keep the placeholder in `index.html`'s static
+header in step with `Nav.tsx`.
+
 **index.html** is the single entry point (`index-updated.html` removed
 2026-09-25). `#root` holds a static shell (hero + About summary) that paints
 before JS and that React replaces on mount; its hero mirrors `Home.tsx`, keep

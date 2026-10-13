@@ -1,8 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
 import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
+import { STRONG_SCORE, drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
+import type { SiteEntry } from './siteSearch'
 
 /**
  * The site header: one bar, always in this order — logo, "Pharmacy Commons",
@@ -100,45 +102,111 @@ const barLinkClass = [
 // Header search
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** One selectable row in the dropdown. */
+type Option = { key: string; to: string }
+
 function HeaderSearch() {
   const navigate = useNavigate()
   const [focused, setFocused] = useState(false)
   const [query, setQuery] = useState('')
   const [catalogReady, setCatalogReady] = useState(false)
+  const [entries, setEntries] = useState<SiteEntry[]>(staticEntries)
+  const [active, setActive] = useState(-1)
 
-  // The catalog is fetched once and cached; start as soon as the field is used.
+  // The catalog and the site index (lists, classes, posts) are fetched once and
+  // cached; start as soon as the field is used. Tools and pages need no fetch.
   useEffect(() => {
-    if (!focused || catalogReady) return
-    loadCatalog()
-      .then(() => setCatalogReady(true))
-      .catch(err => console.error('[catalog] load failed:', err))
+    if (!focused) return
+    if (!catalogReady)
+      loadCatalog()
+        .then(() => setCatalogReady(true))
+        .catch(err => console.error('[catalog] load failed:', err))
+    loadSiteEntries().then(setEntries, err => console.error('[site search] load failed:', err))
   }, [focused, catalogReady])
 
-  const suggestions = catalogReady && query.trim().length > 1 ? searchCatalog(query, 6) : []
+  const q = query.trim()
+  const drugs = catalogReady && q.length > 1 ? searchCatalog(q, 6) : []
+  const siteHits = useMemo(() => searchSite(entries, q), [entries, q])
+  const drugBest = drugs.length ? drugScore(drugs[0].name, drugs[0].matchedBrand, q) : 0
+  const { site, drugsFirst } = groupHits(siteHits, drugBest)
+
+  // Groups in the order shown, and the flat list the arrow keys walk.
+  const groups: { key: string; label: string; rows: { option: Option; node: ReactNode }[] }[] = []
+  const drugGroup = {
+    key: 'drug',
+    label: 'Drugs and topics',
+    rows: drugs.map(entry => {
+      const schedule = toDrug(entry).schedule
+      return {
+        option: { key: `drug-${entry.n}`, to: `/drugs/${entry.slug}` },
+        node: (
+          <>
+            <span className="min-w-0 flex-1">
+              <span className="lp-link-text block truncate font-sans text-[13.5px] text-ink">{entry.name}</span>
+              <span className="block truncate font-sans text-[12px] text-ink">{entryKindLine(entry)}</span>
+            </span>
+            {schedule && (
+              <span className="lp-label rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">{schedule}</span>
+            )}
+            <span className="shrink-0 font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
+          </>
+        ),
+      }
+    }),
+  }
+  const siteGroups = site.map(g => ({
+    key: g.key,
+    label: g.label,
+    rows: g.items.map(h => ({
+      option: { key: h.id, to: h.to },
+      node: (
+        <span className="min-w-0 flex-1">
+          <span className="lp-link-text block truncate font-sans text-[13.5px] text-ink">{h.title}</span>
+          <span className="block truncate font-sans text-[12px] text-ink">{h.hint}</span>
+        </span>
+      ),
+    })),
+  }))
+  groups.push(...(drugsFirst ? [drugGroup, ...siteGroups] : [...siteGroups, drugGroup]).filter(g => g.rows.length > 0))
+
+  const seeAll: Option = { key: 'all', to: `/browse?q=${encodeURIComponent(q)}` }
+  const options: Option[] = [...groups.flatMap(g => g.rows.map(r => r.option)), ...(groups.length ? [seeAll] : [])]
+  const open = focused && q.length > 1 && groups.length > 0
+
+  useEffect(() => setActive(-1), [q])
+
+  function go(to: string) {
+    navigate(to)
+    setQuery('')
+    setFocused(false)
+  }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    const q = query.trim()
     if (!q) return
-    navigate(`/browse?q=${encodeURIComponent(q)}`)
-    setQuery('')
-    setFocused(false)
+    if (open && active >= 0 && options[active]) return go(options[active].to)
+    // An exact tool, page or list name (and no drug named the same) is a jump, not a search.
+    const best = site[0]?.items[0]
+    if (best && best.score >= STRONG_SCORE && !drugsFirst) return go(best.to)
+    go(seeAll.to)
   }
 
-  function handleSuggestion(slug: string) {
-    navigate(`/drugs/${slug}`)
-    setQuery('')
-    setFocused(false)
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Escape') return setFocused(false)
+    if (!open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return
+    e.preventDefault()
+    const n = options.length
+    setActive(a => (e.key === 'ArrowDown' ? (a + 1) % n : (a - 1 + n) % n))
   }
+
+  const listId = 'header-search-results'
 
   return (
     // Below md the bar is a 3-column grid and this spans row 2 on its own; from
     // md the bar is a flex row and this sits between the name and the links.
     <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
       <form onSubmit={handleSubmit} role="search">
-        <div
-          className="lp-field lp-foil flex h-10 items-center gap-2 rounded-md px-3 md:h-9"
-        >
+        <div className="lp-field lp-foil flex h-10 items-center gap-2 rounded-md px-3 md:h-9">
           <SearchIcon />
           <input
             type="search"
@@ -146,8 +214,14 @@ function HeaderSearch() {
             onChange={e => setQuery(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
-            placeholder="Search drugs, brands, classes"
+            onKeyDown={handleKeyDown}
+            placeholder="Search drugs, tools, lists, classes"
             aria-label="Search the commons"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-autocomplete="list"
+            aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
             enterKeyHint="search"
             className="min-w-0 flex-1 bg-transparent font-sans text-[13.5px] text-ink placeholder:text-ink outline-none [&::-webkit-search-cancel-button]:hidden"
           />
@@ -164,35 +238,52 @@ function HeaderSearch() {
         </div>
       </form>
 
-      {focused && suggestions.length > 0 && (
-        <div className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid w-full gap-1.5 overflow-hidden rounded-lg bg-paper p-1.5">
-          {suggestions.map(entry => {
-            const schedule = toDrug(entry).schedule
-            return (
-              <button
-                key={entry.n}
-                onMouseDown={() => handleSuggestion(entry.slug)}
-                data-autocomplete
-                className="lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 py-2 text-left focus-visible:shadow-deboss focus-visible:outline-none"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="lp-link-text block truncate font-sans text-[13.5px] text-ink">{entry.name}</span>
-                  <span className="block truncate font-sans text-[12px] text-ink">
-                    {entryKindLine(entry)}
-                  </span>
-                </span>
-                {schedule && (
-                  <span className="lp-label rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink">
-                    {schedule}
-                  </span>
-                )}
-                <span className="shrink-0 font-mono text-[10.5px] text-ink">{pcidOf(entry)}</span>
-              </button>
-            )
-          })}
+      {open && (
+        <div
+          id={listId}
+          role="listbox"
+          aria-label="Search results"
+          className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid max-h-[70vh] w-full gap-1.5 md:min-w-[24rem] overflow-y-auto rounded-lg bg-paper p-1.5"
+        >
+          {groups.map(group => (
+            <div key={group.key} role="group" aria-label={group.label} className="grid gap-1.5">
+              <p className="px-3 pt-1 font-sans text-[12px] text-ink">{group.label}</p>
+              {group.rows.map(({ option, node }) => {
+                const i = options.indexOf(option)
+                return (
+                  <OptionRow key={option.key} id={`${listId}-${i}`} selected={i === active} onPick={() => go(option.to)}>
+                    {node}
+                  </OptionRow>
+                )
+              })}
+            </div>
+          ))}
+          <OptionRow id={`${listId}-${options.length - 1}`} selected={active === options.length - 1} onPick={() => go(seeAll.to)}>
+            <span className="min-w-0 flex-1 truncate font-sans text-[13.5px] text-ink">See all results for “{q}”</span>
+          </OptionRow>
         </div>
       )}
     </div>
+  )
+}
+
+function OptionRow({ id, selected, onPick, children }: { id: string; selected: boolean; onPick: () => void; children: ReactNode }) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="option"
+      aria-selected={selected}
+      tabIndex={-1}
+      onMouseDown={e => {
+        e.preventDefault()
+        onPick()
+      }}
+      data-autocomplete
+      className={`lp-option flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 py-2 text-left focus-visible:shadow-deboss focus-visible:outline-none ${selected ? 'shadow-deboss' : ''}`}
+    >
+      {children}
+    </button>
   )
 }
 
