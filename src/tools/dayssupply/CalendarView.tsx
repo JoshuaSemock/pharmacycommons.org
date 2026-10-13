@@ -4,7 +4,7 @@
  * is today unless changed; clicking another date highlights the dates between
  * and counts the days. "Count days" runs the other way: N days before or after
  * the start date, drawn on the calendar. Date logic is in calendar.ts.
- * Colorless like the rest of the site: ends are raised, dates between pressed in.
+ * Selected dates are foil mint like the search bars (.lp-foil-set): ends raised, dates between pressed in.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -33,9 +33,9 @@ function Cell({ iso, role, isToday, onPick }: { iso: string; role: CellRole; isT
   const m = Number(iso.slice(5, 7))
   const tone =
     role === 'start' || role === 'end'
-      ? 'lp-raised font-semibold'
+      ? 'lp-raised lp-foil-set font-semibold'
       : role === 'between'
-        ? 'lp-sunken'
+        ? 'lp-sunken lp-foil-set'
         : 'lp-press'
   return (
     <button

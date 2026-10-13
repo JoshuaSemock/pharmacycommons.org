@@ -202,7 +202,7 @@ Asked for by Joshua 2026-10-13. The *Refill calendar* card now comes **first** o
 - **Scrollable calendar** (`dayssupply/CalendarView.tsx`, date logic and tests in `calendar.ts` / `calendar.test.ts`). Sunday-first weeks, opens centred on today with 5 weeks before, the current week and 6 after; scrolling to either edge adds 8 more weeks, so it has no end. Today is underlined and dotted.
 - **Start date** is today by default (change it with the date field; "Back to today" resets). Clicking a date sets the end: the dates between are pressed in, the ends are raised and labelled, and the result gives the days between. The start day is not counted (Oct 13 → Oct 20 = 7 days). Clicking another date moves the end; a date before the start counts backwards.
 - **Count days from the start**: a number of days *before* or *after* the start date, with presets 28, 30, 60, 84, 90 and the calculated days supply. The date is drawn on the calendar. Before: "a fill dated after Jul 15 is less than 90 days before Oct 13" (so early for a 90-day supply); after: the next fill is due that day. The note states days only; the refill threshold and payer rules are not applied here.
-- Colorless, as everywhere (see `design-system.md`): raised ends, pressed-in range, no palette colors.
+- Selected dates use the foil mint of the search bars (`.lp-foil-set`, see `design-system.md`): raised ends, pressed-in range.
 
 ## Second phase (what is left)
 

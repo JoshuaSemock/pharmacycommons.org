@@ -411,6 +411,25 @@ button.lp-raised {
     inset 1px 1px 1px rgb(0 0 0 / 0.5), inset 2px 2px 3px rgb(0 0 0 / 0.25),
     inset 0 0 0 1px rgb(0 0 0 / 0.2), inset -1px -1px 0 rgb(255 255 255 / 0.3);
 }
+/* Foil fill, always on (2026-10-13): the same foil and grain as a focused
+   search bar, for a selection that should read as stamped in mint (the days
+   between two dates in the Days Supply calendar). Add it to .lp-sunken (or
+   .lp-raised) elements; their relief shading stays on top. Dark ink, as above. */
+.lp-foil-set {
+  background:
+    linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+    url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
+    var(--lp-foil);
+  background-blend-mode: normal, hard-light, normal;
+  color: var(--lp-foil-ink);
+}
+@media (width <= 780px) {
+  .lp-foil-set {
+    background-image:
+      linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+      url("/textures/paper-grain-sm.webp");
+  }
+}
 @media (width <= 780px) {
   .lp-field.lp-foil:focus-within {
     background-image:
