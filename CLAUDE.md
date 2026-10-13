@@ -198,8 +198,9 @@ and concept pages still come from `searchCatalog`; everything else comes from on
 calculator" → Days supply), `SITE_PAGES` (add a line for any page worth finding), every published list
 (`listLists`), every class with members (`loadAllClasses`) and every non-draft post (`listPosts`), the last
 three loaded lazily on focus. Results are grouped (Tools, Pages, Lists, Classifications, Blog, Drugs and
-topics) by best score; arrow keys and Enter work; Enter on an exact title/keyword (score >= `STRONG_SCORE`)
-jumps straight there unless a drug matches as well, otherwise it opens `/browse?q=`. Dictionary terms are
+topics) by best score; arrow keys and Enter work; Enter opens the highlighted row, else the first row shown (best match), and if
+the catalog hasn't loaded yet it awaits `loadCatalog()` and picks the best of drug vs site match; `/browse?q=`
+only when nothing matches or the query is one character. Dictionary terms are
 not indexed (the `/tools/dictionary` page has its own search). Keep the placeholder in `index.html`'s static
 header in step with `Nav.tsx`.
 

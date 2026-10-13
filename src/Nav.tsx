@@ -3,7 +3,7 @@ import type { FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
 import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
-import { STRONG_SCORE, drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
+import { drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
 import type { SiteEntry } from './siteSearch'
 
 /**
@@ -181,13 +181,25 @@ function HeaderSearch() {
     setFocused(false)
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!q) return
+    if (q.length < 2) return go(seeAll.to)
+    // Highlighted row wins; otherwise the first row shown (the best match) opens directly.
     if (open && active >= 0 && options[active]) return go(options[active].to)
-    // An exact tool, page or list name (and no drug named the same) is a jump, not a search.
-    const best = site[0]?.items[0]
-    if (best && best.score >= STRONG_SCORE && !drugsFirst) return go(best.to)
+    if (open && options[0] && options[0] !== seeAll) return go(options[0].to)
+    // Dropdown not showing yet (catalog still loading): resolve the best match now.
+    try {
+      await loadCatalog()
+      setCatalogReady(true)
+    } catch (err) {
+      console.error('[catalog] load failed:', err)
+    }
+    const d = searchCatalog(q, 1)[0]
+    const s = searchSite(entries, q)[0]
+    const dScore = d ? drugScore(d.name, d.matchedBrand, q) : 0
+    if (d && dScore >= (s?.score ?? 0)) return go(`/drugs/${d.slug}`)
+    if (s) return go(s.to)
     go(seeAll.to)
   }
 
