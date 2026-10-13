@@ -170,7 +170,7 @@ and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
-`/tools/days-supply` (browser-only; see `docs/days-supply.md`), `/tools/dictionary` (Word `.dic`
+`/tools/days-supply` (browser-only; see `docs/days-supply.md`; version 3, 2026-10-13, adds the step-schedule card `src/tools/dayssupply/Schedule.tsx` + `schedule.ts` and the fingertip-unit cream estimate `Topical.tsx` + `topical.ts`; `product_packaging` (`db/phase18_product_packaging.sql` + seed `phase18b`, read by `dayssupply/packaging.ts` and `PackagingPicker.tsx`) is written but **not applied** — apply_migration was cancelled 2026-10-13; the page works without it), `/tools/dictionary` (Word `.dic`
 download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/admin` (admins only) · `/drugs/:slug/history` · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,

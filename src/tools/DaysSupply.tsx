@@ -29,11 +29,16 @@ import {
 } from '@/tools/dayssupply/calc'
 import { applyProposal, readDirections, type Proposal } from '@/tools/dayssupply/parse'
 import Results, { type Column } from '@/tools/dayssupply/Results'
+import PackagingPicker from '@/tools/dayssupply/PackagingPicker'
+import ScheduleCard from '@/tools/dayssupply/Schedule'
+import TopicalCard from '@/tools/dayssupply/Topical'
 
 /**
  * /tools/days-supply
  *
- * Two cards on one sheet:
+ * Two cards on one sheet, then two more below them: a step schedule card
+ * (tapers, weekday doses, dose step-ups: dayssupply/Schedule.tsx) and a cream
+ * or ointment estimate (dayssupply/Topical.tsx):
  *
  *   ┌ Supply ─────────────────────────────────────────────────────────────┐
  *   │ Medication · Paste directions → builder · Package   │ Result (work  │
@@ -541,6 +546,11 @@ export default function DaysSupply() {
               </Group>
 
               <Group title="Package">
+                <PackagingPicker
+                  pcid={m.pcid}
+                  basis={basis}
+                  onApply={p => setPack(x => ({ ...x, ...p, ...(p.container === 'pen' && p.perBox ? { wholeBox: true } : {}) }))}
+                />
                 <PackageFields basis={basis} pack={pack} patchPack={patchPack} setContainer={setContainer} unitPl={unit?.pl ?? 'units'} />
               </Group>
 
@@ -717,6 +727,12 @@ export default function DaysSupply() {
             </div>
           </div>
         </Card>
+
+        {/* ── Card 3: tapers and step-ups ─────────────────────────────────── */}
+        <ScheduleCard onCopy={copy} />
+
+        {/* ── Card 4: creams and ointments ────────────────────────────────── */}
+        <TopicalCard onCopy={copy} />
       </div>
 
       <p className="mt-12 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-ink">
