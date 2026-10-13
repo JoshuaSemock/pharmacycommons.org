@@ -462,6 +462,88 @@ export function refillDate(fill: string, daysSupply: number, thresholdPct: numbe
   return { date: d.toISOString().slice(0, 10), after }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Refill calendar (dates are yyyy-mm-dd, worked in UTC so daylight saving can't move a day)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ISO = /^(\d{4})-(\d{2})-(\d{2})$/
+const DAY_MS = 86_400_000
+
+function utc(iso: string): number | null {
+  const m = ISO.exec(iso)
+  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : null
+}
+
+/** Today on the viewer's own calendar, as yyyy-mm-dd. */
+export function todayIso(now: Date = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+}
+
+export function addDays(iso: string, n: number): string | null {
+  const t = utc(iso)
+  return t == null ? null : new Date(t + n * DAY_MS).toISOString().slice(0, 10)
+}
+
+/** Whole days from `from` to `to` (negative when `to` is earlier). */
+export function daysBetween(from: string, to: string): number | null {
+  const a = utc(from)
+  const b = utc(to)
+  return a == null || b == null ? null : Math.round((b - a) / DAY_MS)
+}
+
+/** "Today", "In 14 days", "3 days ago". */
+export function relativeText(n: number): string {
+  if (n === 0) return 'Today'
+  const d = Math.abs(n) === 1 ? 'day' : 'days'
+  return n > 0 ? `In ${fmt(n)} ${d}` : `${fmt(-n)} ${d} ago`
+}
+
+export type NextFill = {
+  /** Fill date + days supply: the first day not covered, when the next fill is due. */
+  due: string
+  /** The last day the supply covers. */
+  lastCovered: string
+  /** Days from today to `due` (negative when it has passed). */
+  fromToday: number
+}
+
+/** Mode A: when a supply runs out. Fill on October 1 with 30 days → covers through October 30, next fill due October 31. */
+export function nextFill(fill: string, daysSupply: number, today: string): NextFill | null {
+  if (!(daysSupply > 0) || !Number.isInteger(daysSupply)) return null
+  const due = addDays(fill, daysSupply)
+  const lastCovered = addDays(fill, daysSupply - 1)
+  const fromToday = due ? daysBetween(today, due) : null
+  if (!due || !lastCovered || fromToday == null) return null
+  return { due, lastCovered, fromToday }
+}
+
+export type SinceFill =
+  | { ok: true; passed: number; daysSupply: number | null; remaining: number | null; pct: number | null }
+  | { ok: false; reason: string }
+
+/** Mode B: days since the fill, and where that leaves the supply. */
+export function sinceFill(fill: string, today: string, daysSupply: number | null): SinceFill {
+  const passed = daysBetween(fill, today)
+  if (passed == null) return { ok: false, reason: 'Choose the fill date and today’s date.' }
+  if (passed < 0) return { ok: false, reason: 'Today’s date is before the fill date.' }
+  const ds = daysSupply && daysSupply > 0 ? daysSupply : null
+  return {
+    ok: true,
+    passed,
+    daysSupply: ds,
+    remaining: ds == null ? null : ds - passed,
+    pct: ds == null ? null : Math.round((passed / ds) * 100),
+  }
+}
+
+/** A fill today, against the supply: "7 days early", "Due today", "3 days late". */
+export function timingText(remaining: number): string {
+  if (remaining === 0) return 'Due today'
+  const n = Math.abs(remaining)
+  return `${fmt(n)} ${n === 1 ? 'day' : 'days'} ${remaining > 0 ? 'early' : 'late'}`
+}
+
 /** "2026-10-19" → "October 19, 2026". */
 export function longDate(iso: string): string {
   const [y, mo, d] = iso.split('-').map(Number)

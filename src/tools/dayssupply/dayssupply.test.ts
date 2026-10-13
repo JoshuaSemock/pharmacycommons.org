@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { applyFormDefaults, newMedication, type Medication } from '@/tools/medrec/model'
 import { sigText } from '@/tools/medrec/sig'
-import { buildPlan, daysForQuantity, newPack, quantityForDays, rateText, refillDate, type Pack, type Plan } from './calc'
+import { addDays, buildPlan, daysBetween, daysForQuantity, newPack, nextFill, quantityForDays, rateText, refillDate, relativeText, sinceFill, timingText, todayIso, type Pack, type Plan } from './calc'
 
 const med = (o: Partial<Medication>): Medication => {
   const base = newMedication()
@@ -184,5 +184,35 @@ describe('wording', () => {
         expect(t).not.toMatch(/(^|[^\d])\.\d/)
       }
     }
+  })
+})
+
+describe('refill calendar', () => {
+  it('next fill: 30 days from October 1 covers through October 30, due October 31', () => {
+    const n = nextFill('2026-10-01', 30, '2026-10-17')
+    expect(n).toEqual({ due: '2026-10-31', lastCovered: '2026-10-30', fromToday: 14 })
+    expect(relativeText(14)).toBe('In 14 days')
+    expect(relativeText(0)).toBe('Today')
+    expect(relativeText(-1)).toBe('1 day ago')
+  })
+
+  it('crosses daylight saving and month ends without drifting', () => {
+    expect(addDays('2026-10-31', 2)).toBe('2026-11-02')
+    expect(daysBetween('2026-03-07', '2026-03-09')).toBe(2)
+    expect(nextFill('2026-01-31', 28, '2026-01-31')?.due).toBe('2026-02-28')
+  })
+
+  it('days since fill, against the supply', () => {
+    const r = sinceFill('2026-10-01', '2026-10-24', 30)
+    expect(r).toEqual({ ok: true, passed: 23, daysSupply: 30, remaining: 7, pct: 77 })
+    expect(timingText(7)).toBe('7 days early')
+    expect(timingText(0)).toBe('Due today')
+    expect(timingText(-3)).toBe('3 days late')
+    expect(sinceFill('2026-10-01', '2026-09-30', 30).ok).toBe(false)
+    expect(sinceFill('2026-10-01', '2026-10-05', null)).toEqual({ ok: true, passed: 4, daysSupply: null, remaining: null, pct: null })
+  })
+
+  it('today on the local calendar', () => {
+    expect(todayIso(new Date(2026, 9, 12, 23, 30))).toBe('2026-10-12')
   })
 })

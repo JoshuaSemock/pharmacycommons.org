@@ -1,7 +1,8 @@
 # Days supply and quantity calculator
 
 Route: `/tools/days-supply` · Code: `src/tools/DaysSupply.tsx`, `src/tools/dayssupply/`
-Decided with Joshua 2026-09-28. Reference example: scriptcalc.com. Status: live (version 1, 2026-09-28).
+Decided with Joshua 2026-09-28. Reference example: scriptcalc.com. Status: live (version 1, 2026-09-28;
+version 2, refill calendar and pasted directions, 2026-10-13).
 
 ## What it is
 
@@ -120,13 +121,58 @@ Worked examples from the planning discussion become unit tests
   Both shown, each checked against any discard-after-opening limit.
 - A directions line from every form passes the ISMP do-not-use check med rec already runs.
 
+## Version 2 (2026-10-13)
+
+Decided with Joshua 2026-10-12, from a three-part plan for a "dual-mode calendar and sig parser".
+
+- **Two cards on one sheet.** *Supply* (medication, directions, package, days or
+  quantity, result) above *Refill calendar*. Two columns on wide screens, stacked on
+  phones.
+- **Paste directions, builder stays the source of truth.** A text box reads typed or
+  pasted directions (`dayssupply/parse.ts`) and *proposes* builder values: form (from
+  the dosing unit), amount or range, how often, as needed and what for, a stated
+  24-hour maximum, route. The person sees what was read and what wasn't, then chooses
+  "Fill in the builder"; nothing is calculated from raw text.
+  - Common abbreviations are accepted as input (tab, cap, gtt, po, prn, bid, tid, qid,
+    q4h, q4–6h) and the builder writes full words.
+  - ISMP error-prone abbreviations (qd, qod, qhs, hs, u, IU, OD/OS/OU, AD/AS/AU, SC/SQ/
+    sub q, cc) are never interpreted; the person is told which part to choose by hand.
+  - "Every 4 to 6 hours" is counted at every 4 hours (the most it allows), and says so.
+  - Teaspoons and tablespoons become 5 and 15 mL, with a note to check the device.
+  - mg is read as the dose only for injections; elsewhere it is the strength and skipped.
+  - Tapers ("… then …") are recognised; only the first step is read, with a note.
+- **Work shown open.** The result's steps are always visible in the debossed result
+  well, not folded away (e.g. "200 puffs − 4 to prime = 196 … 1 inhaler × 196 ÷ 16 a
+  day = 12.25 days → 12 days by use").
+- **Refill calendar**, two modes:
+  - *Next fill date:* fill date + days supply = the date the next fill is due (the
+    first day not covered), with a flat ink stamp relative to today ("In 14 days",
+    "Today", "3 days ago") and the covered range. Run-out date only (Joshua,
+    2026-10-12); the earlier "earliest refill at 75%" line and its threshold field
+    were removed.
+  - *Days since fill:* fill date and today's date (today by default, editable) → days
+    passed, percent of the supply passed, and a stamp for a fill on that date ("7 days
+    early", "Due today", "3 days late"). This is refill timing for one fill, not
+    adherence (that needs several fills).
+  - The days supply flows down from the Supply card and can be overridden; "Use the
+    calculated N days" puts it back. With manufacturer and payer drops-per-mL results,
+    the person picks which one feeds the calendar.
+- **Colorless.** Stamps are flat ink (`Stamp`), not colored text; the marigold fills
+  on the in-use-limit note and "Still needed" were removed (design-system rules 1–2).
+- Tests: `parse.test.ts` (13) and the refill-calendar block in `dayssupply.test.ts`.
+
 ## Second phase
 
 - Tapers and alternating doses (prednisone steps, warfarin by weekday).
 - Topicals by fingertip units × body area, labeled as an estimate.
 - Package lookup: pick a product and fill in package size from FDA NDC Directory
   package descriptions (for example "200 AEROSOL, METERED in 1 INHALER"), with the
-  source shown. Needs `fda_products` linked to moieties first.
+  source shown. Checked 2026-10-12: `fda_products.pcid` is set on 10,631 of 12,261 rows
+  (formulation PCIDs, e.g. ProAir HFA → PCID-4004649), but `fda_products.ndc` is empty
+  and Drugs@FDA carries no package sizes, so this needs a new NDC Directory package
+  ingest joined on application number. Search stays moiety-only: pick the moiety, then
+  a product under it. Drops per mL, priming, in-use days and doses per pen are not in
+  the NDC Directory; they need the curated table below.
 - Drops per mL and in-use limits stored per product in Supabase, with the source
   on each row (manufacturer, a named payer, general default), so disagreements are
   stored and shown.
@@ -142,7 +188,7 @@ Worked examples from the planning discussion become unit tests
 - **Dose escalation** (GLP-1 starting dose, then step up) is not in version 1. It
   moves to the second phase with tapers. Each step can be calculated on its own
   meanwhile, since each step is usually a separate product and fill.
-- **Refill threshold** defaults to 75% of the days supply and is editable.
+- **Refill threshold** defaulted to 75% of the days supply and was editable (removed in version 2).
 - The engine is `src/tools/dayssupply/calc.ts`, tested in `dayssupply.test.ts`;
   the page is `src/tools/DaysSupply.tsx` with `src/tools/dayssupply/Results.tsx`.
 

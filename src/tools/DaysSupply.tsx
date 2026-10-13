@@ -7,6 +7,7 @@ import NameSearch from '@/tools/medrec/NameSearch'
 import { ChipRadio, Field, SectionHeading, SigText, inputClass, numberClass, quietButton, secondaryButton, selectClass } from '@/tools/medrec/ui'
 import PaperSelect from '@/components/PaperSelect'
 import PaperDatePicker from '@/components/PaperDatePicker'
+import Stamp from '@/components/Stamp'
 import {
   INSULIN_DEFAULTS,
   SUPPORTED_GROUPS,
@@ -14,31 +15,42 @@ import {
   buildPlan,
   daysForQuantity,
   dispenseNounFor,
+  longDate,
   newPack,
+  nextFill,
   quantityForDays,
+  relativeText,
+  sinceFill,
+  timingText,
+  todayIso,
   type Basis,
   type Container,
   type Pack,
 } from '@/tools/dayssupply/calc'
+import { applyProposal, readDirections, type Proposal } from '@/tools/dayssupply/parse'
 import Results, { type Column } from '@/tools/dayssupply/Results'
 
 /**
  * /tools/days-supply
  *
- * Quantity from directions and a number of days, or days supply from a
- * quantity, with package size, priming, drops per mL and in-use limits
- * counted in. Design and decisions: docs/days-supply.md.
+ * Two cards on one sheet:
+ *
+ *   ┌ Supply ─────────────────────────────────────────────────────────────┐
+ *   │ Medication · Paste directions → builder · Package   │ Result (work  │
+ *   │ Days or quantity                                    │ shown open)   │
+ *   └─────────────────────────────────────────────────────────────────────┘
+ *   ┌ Refill calendar ────────────────────────────────────────────────────┐
+ *   │ Next fill date  |  Days since fill                                  │
+ *   │ Days supply (flows down from the card above; can be overridden)     │
+ *   │ Fill date · Today's date                                            │
+ *   └─────────────────────────────────────────────────────────────────────┘
  *
  * Directions are entered with the same vocabularies and sentence engine as
  * the medication reconciliation builder (medrec/model.ts, medrec/sig.ts), so
- * the wording rules are shared. The calculation lives in dayssupply/calc.ts
- * (tested in dayssupply.test.ts); this page only renders it.
- *
- *   ┌──────────────────────────────────────┬────────────────────────────┐
- *   │ Directions (live sentence)           │ Result (sticky on wide     │
- *   │ Package                              │ screens; manufacturer and  │
- *   │ Days or quantity · fill date         │ payer side by side)        │
- *   └──────────────────────────────────────┴────────────────────────────┘
+ * the wording rules are shared. "Paste directions" (dayssupply/parse.ts)
+ * only proposes builder values; nothing is calculated from raw text. The
+ * calculation lives in dayssupply/calc.ts (tested in dayssupply.test.ts and
+ * parse.test.ts); this page only renders it. Design: docs/days-supply.md.
  *
  * Nothing is saved or sent anywhere; the calculation runs in the browser.
  *
@@ -50,7 +62,7 @@ const TITLE = 'Days supply and quantity'
 type Mode = 'quantity' | 'days'
 const PRESETS = ['28', '30', '34', '60', '84', '90', '100'] as const
 
-type Example = { id: string; label: string; med: Partial<Medication>; pack: Partial<Pack>; mode: Mode; target: string; quantity: string }
+type Example = { id: string; label: string; med: Partial<Medication>; pack: Partial<Pack>; mode: Mode; target: string; quantity: string; pasted?: string }
 
 /** Worked examples. Package values are typical, not a specific product's; the note under the buttons says so. */
 const EXAMPLES: Example[] = [
@@ -62,6 +74,7 @@ const EXAMPLES: Example[] = [
     mode: 'days',
     target: '30',
     quantity: '1',
+    pasted: 'Inhale 2 puffs by mouth every 4 to 6 hours as needed for wheezing or shortness of breath',
   },
   {
     id: 'drops',
@@ -99,7 +112,7 @@ function startMed(): Medication {
 function Group({ title, children, hint }: { title: string; children: ReactNode; hint?: ReactNode }) {
   return (
     <fieldset className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 border-t border-dashed border-ink/15 pt-4">
-      <legend className="float-left mb-1 w-full font-sans text-[12.5px] font-medium text-ink">{title}</legend>
+      <legend className="float-left mb-1 w-full font-sans text-[15px] text-ink">{title}</legend>
       {hint && <p className="font-sans text-[13px] leading-snug text-ink">{hint}</p>}
       {children}
     </fieldset>
@@ -141,15 +154,52 @@ const BASIS_NOTE: Record<Basis, string> = {
   injection: 'Counted in doses. A pen labeled for four doses gives four doses, whatever drug is left in it.',
 }
 
+
+type CalendarMode = 'next' | 'since'
+
+function Card({ id, title, lede, children }: { id: string; title: string; lede?: string; children: ReactNode }) {
+  return (
+    <section aria-labelledby={id} className="lp-raised grid min-w-0 gap-6 rounded-lg p-4 sm:p-6">
+      <SectionHeading id={id} title={title} lede={lede} />
+      {children}
+    </section>
+  )
+}
+
+function Big({ label, value, stamp, note }: { label: string; value: string; stamp?: string; note?: ReactNode }) {
+  return (
+    <div className="grid min-w-0 content-start gap-1">
+      <span className="font-sans text-[12.5px] text-ink">{label}</span>
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
+        <span className="[overflow-wrap:anywhere] font-display text-[22px] leading-tight text-ink" style={{ fontFamily: 'var(--font-display)' }}>
+          {value}
+        </span>
+        {stamp && <Stamp>{stamp}</Stamp>}
+      </span>
+      {note && <span className="font-sans text-[12.5px] leading-snug text-ink">{note}</span>}
+    </div>
+  )
+}
+
 export default function DaysSupply() {
   const [m, setM] = useState<Medication>(startMed)
   const [pack, setPack] = useState<Pack>(newPack)
   const [mode, setMode] = useState<Mode>('quantity')
   const [target, setTarget] = useState('30')
   const [quantity, setQuantity] = useState('1')
-  const [fill, setFill] = useState('')
-  const [threshold, setThreshold] = useState('75')
   const [notice, setNotice] = useState<string | null>(null)
+
+  // Paste directions
+  const [pasted, setPasted] = useState('')
+  const [proposal, setProposal] = useState<Proposal | null>(null)
+  const [applied, setApplied] = useState<string[]>([])
+
+  // Refill calendar
+  const [calMode, setCalMode] = useState<CalendarMode>('next')
+  const [fill, setFill] = useState('')
+  const [today, setToday] = useState(todayIso)
+  const [daysOverride, setDaysOverride] = useState<string | null>(null)
+  const [source, setSource] = useState('0')
 
   useEffect(() => {
     document.title = `${TITLE} · Pharmacy Commons`
@@ -169,6 +219,11 @@ export default function DaysSupply() {
     setTarget(e.target)
     setQuantity(e.quantity)
     setNotice(null)
+    setPasted(e.pasted ?? '')
+    setProposal(null)
+    setApplied([])
+    setDaysOverride(null)
+    setSource('0')
   }
 
   const setContainer = (c: Container) =>
@@ -179,6 +234,15 @@ export default function DaysSupply() {
       () => setNotice('Copied.'),
       () => setNotice('This browser blocked copying. Select the line and copy it instead.'),
     )
+  }
+
+  const read = () => setProposal(readDirections(pasted, m.form))
+  const useProposal = () => {
+    if (!proposal) return
+    const r = applyProposal(m, proposal)
+    setM(r.med)
+    setApplied([...proposal.notes, ...r.notes])
+    setProposal(null)
   }
 
   // ── Calculation ────────────────────────────────────────────────────────────
@@ -220,7 +284,15 @@ export default function DaysSupply() {
       columns.push({ label: v.label, plan: pr.plan, result: daysForQuantity(pr.plan, qtyN) })
     }
   }
-  const thresholdN = num(threshold)
+
+  // ── Calendar ───────────────────────────────────────────────────────────────
+  const fromCalc = columns[Math.min(+source, columns.length - 1)]?.result.days ?? null
+  const daysText = daysOverride ?? (fromCalc != null ? String(fromCalc) : '')
+  const daysN = num(daysText)
+  const daysWhole = daysN != null && Number.isInteger(daysN) ? daysN : null
+  const overridden = daysOverride != null && fromCalc != null && daysOverride !== String(fromCalc)
+  const next = calMode === 'next' && fill && daysWhole ? nextFill(fill, daysWhole, today) : null
+  const since = calMode === 'since' && fill ? sinceFill(fill, today, daysWhole) : null
 
   const perOptions: [StrengthPer, string][] = [
     ['each', unit ? `per ${unit.sg}` : 'per dose'],
@@ -239,11 +311,11 @@ export default function DaysSupply() {
           </Link>
           <PageTitle
             title={TITLE}
-            lede="How much to dispense for a number of days, or how many days a quantity lasts. Package size, priming, drops per mL and in-use limits are counted in, and every step is shown."
+            lede="How much to dispense for a number of days, or how many days a quantity lasts, and when the next fill is due. Package size, priming, drops per mL and in-use limits are counted in, and every step is shown."
           />
         </div>
         <div className="grid gap-2">
-          <p className="font-sans text-[13px] font-medium text-ink">Try an example</p>
+          <p className="font-sans text-[13px] text-ink">Try an example</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLES.map(e => (
               <button key={e.id} type="button" className={secondaryButton} onClick={() => loadExample(e)}>
@@ -255,211 +327,396 @@ export default function DaysSupply() {
         </div>
       </header>
 
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 border-t border-ink/15 pt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
-        {/* ── Inputs ─────────────────────────────────────────────────────── */}
-        <div className="grid min-w-0 content-start gap-6">
-          <SectionHeading id="directions" title="Directions" lede="Built the same way as in medication reconciliation: the form decides which actions, units and routes are offered." />
-
-          <div aria-live="polite" className="lp-sunken grid gap-1.5 rounded-md px-4 py-3">
-            <span className="font-sans text-[12.5px] font-medium text-ink">Directions as written</span>
-            <p className="[overflow-wrap:anywhere] font-display text-[19px] leading-snug text-ink" style={{ fontFamily: 'var(--font-display)' }}>
-              <SigText segments={sigSegments(m)} />
-            </p>
-            <div>
-              <button type="button" className={quietButton} onClick={() => copy(sigText(m))}>
-                Copy directions
-              </button>
-            </div>
-          </div>
-
-          <Group title="What it is">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="grid min-w-0 content-start gap-1">
-                <label htmlFor="ds-drug" className="font-sans text-[12.5px] font-medium text-ink">
-                  Name (optional)
-                </label>
-                <NameSearch id="ds-drug" value={m.drug} pcid={m.pcid} placeholder="Search by generic or brand name" onChange={(drug, pcid) => patch({ drug, pcid })} />
-              </div>
-              <Field label="Form" hint={basis ? BASIS_NOTE[basis] : undefined}>
-                <PaperSelect value={m.form} onChange={v => isFormId(v) && changeForm(v)} className={selectClass}>
-                  {SUPPORTED_GROUPS.map(([group, ids]) => (
-                    <optgroup key={group} label={group}>
-                      {ids.map(id => (
-                        <option key={id} value={id}>
-                          {FORMS[id].label}
-                        </option>
+      <div className="grid min-w-0 gap-8">
+        {/* ── Card 1: supply ──────────────────────────────────────────────── */}
+        <Card id="supply" title="Supply" lede="The medication, its directions and its package give the days supply or the quantity to dispense.">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
+            <div className="grid min-w-0 content-start gap-6">
+              <Group title="Medication">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid min-w-0 content-start gap-1">
+                    <label htmlFor="ds-drug" className="font-sans text-[12.5px] text-ink">
+                      Name (optional)
+                    </label>
+                    <NameSearch id="ds-drug" value={m.drug} pcid={m.pcid} placeholder="Search by generic or brand name" onChange={(drug, pcid) => patch({ drug, pcid })} />
+                  </div>
+                  <Field label="Form" hint={basis ? BASIS_NOTE[basis] : undefined}>
+                    <PaperSelect value={m.form} onChange={v => isFormId(v) && changeForm(v)} className={selectClass}>
+                      {SUPPORTED_GROUPS.map(([group, ids]) => (
+                        <optgroup key={group} label={group}>
+                          {ids.map(id => (
+                            <option key={id} value={id}>
+                              {FORMS[id].label}
+                            </option>
+                          ))}
+                        </optgroup>
                       ))}
-                    </optgroup>
-                  ))}
-                </PaperSelect>
-              </Field>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <Field label="Strength (optional)">
-                <NumberInput value={m.sv} onChange={sv => patch({ sv })} />
-              </Field>
-              <Field label="Strength unit">
-                <PaperSelect value={m.su} onChange={v => patch({ su: v as StrengthUnit })} className={selectClass}>
-                  {STRENGTH_UNITS.map(s => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </PaperSelect>
-              </Field>
-              <Field label="Per" className="col-span-2 sm:col-span-1">
-                <PaperSelect value={m.sper} onChange={v => patch({ sper: v as StrengthPer })} className={selectClass}>
-                  {perOptions.map(([v, l]) => (
-                    <option key={v} value={v}>
-                      {l}
-                    </option>
-                  ))}
-                </PaperSelect>
-              </Field>
-            </div>
-          </Group>
-
-          <Group title="How it is used">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Action">
-                <PaperSelect value={m.verb} onChange={v => patch({ verb: v })} className={selectClass}>
-                  {f.verbs.map(v => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </PaperSelect>
-              </Field>
-              <div className="grid min-w-0 content-start gap-1">
-                <span className="font-sans text-[12.5px] font-medium text-ink">How many</span>
-                <div className="flex min-w-0 items-center gap-2">
-                  <NumberInput label="Quantity per dose" value={m.qty} step={step} onChange={qty => patch({ qty })} />
-                  {m.range && (
-                    <>
-                      <span className="shrink-0 font-sans text-[13px] text-ink">to</span>
-                      <NumberInput label="Upper quantity per dose" value={m.qtyMax} step={step} onChange={qtyMax => patch({ qtyMax })} />
-                    </>
-                  )}
+                    </PaperSelect>
+                  </Field>
                 </div>
-                <Check checked={m.range} onChange={range => patch({ range })}>
-                  A range, such as one to two
-                </Check>
-              </div>
-              {f.units && (
-                <Field label="Unit" hint={basis === 'insulin' ? 'Units: counted as insulin.' : basis === 'injection' ? 'Counted as one dose per injection.' : undefined}>
-                  {f.units.length > 1 ? (
-                    <PaperSelect value={m.unit} onChange={v => patch({ unit: v })} className={selectClass}>
-                      {f.units.map(x => (
-                        <option key={x.sg} value={x.sg}>
-                          {x.pl}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <Field label="Strength (optional)">
+                    <NumberInput value={m.sv} onChange={sv => patch({ sv })} />
+                  </Field>
+                  <Field label="Strength unit">
+                    <PaperSelect value={m.su} onChange={v => patch({ su: v as StrengthUnit })} className={selectClass}>
+                      {STRENGTH_UNITS.map(s => (
+                        <option key={s} value={s}>
+                          {s}
                         </option>
                       ))}
                     </PaperSelect>
-                  ) : (
-                    <input value={f.units[0].pl} disabled className={inputClass} />
-                  )}
-                </Field>
-              )}
-              <Field label="Route">
-                <PaperSelect value={m.route} onChange={v => patch({ route: v })} className={selectClass}>
-                  {f.routes.map(r => (
-                    <option key={r} value={r}>
-                      {r || 'No route needed'}
-                    </option>
-                  ))}
-                </PaperSelect>
-              </Field>
-              <Field label="How often">
-                <PaperSelect value={m.freq} onChange={v => patch({ freq: v })} className={selectClass}>
-                  {FREQS.map(x => (
-                    <option key={x.id} value={x.id}>
-                      {x.text}
-                    </option>
-                  ))}
-                </PaperSelect>
-              </Field>
-              <div className="grid min-w-0 content-start gap-1">
-                <span className="font-sans text-[12.5px] font-medium text-ink">Scheduled or as needed</span>
-                <ChipRadio
-                  name="ds-prn"
-                  label="Scheduled or as needed"
-                  value={m.prn ? 'yes' : 'no'}
-                  options={[
-                    ['no', 'Scheduled'],
-                    ['yes', 'As needed'],
-                  ]}
-                  onChange={v => patch({ prn: v === 'yes', showMax: null, maxOverride: '' })}
+                  </Field>
+                  <Field label="Per" className="col-span-2 sm:col-span-1">
+                    <PaperSelect value={m.sper} onChange={v => patch({ sper: v as StrengthPer })} className={selectClass}>
+                      {perOptions.map(([v, l]) => (
+                        <option key={v} value={v}>
+                          {l}
+                        </option>
+                      ))}
+                    </PaperSelect>
+                  </Field>
+                </div>
+              </Group>
+
+              <Group
+                title="Paste directions (optional)"
+                hint="Type or paste the directions as written. They fill in the builder below for you to check; nothing is calculated from the text itself."
+              >
+                <textarea
+                  aria-label="Directions as written on the prescription"
+                  value={pasted}
+                  onChange={e => {
+                    setPasted(e.target.value)
+                    setProposal(null)
+                  }}
+                  rows={2}
+                  placeholder="For example: take 4 inhalations by mouth every 6 hours as needed"
+                  className={`${inputClass} resize-y leading-snug`}
                 />
-              </div>
-              <Field label={m.prn ? 'As needed for (optional)' : 'Reason for use (optional)'}>
-                <input value={m.indication} onChange={e => patch({ indication: e.target.value })} className={inputClass} />
-              </Field>
-              {m.prn && unit && (
-                <Field
-                  label={`Most ${unit.pl} in 24 hours`}
-                  hint={mx?.auto ? `Calculated as ${fmt(mx.q)} from the directions. Type a lower number if the label or prescriber sets one.` : 'Set by hand.'}
-                >
-                  <NumberInput value={m.maxOverride} step={step} placeholder={mx?.auto ? fmt(mx.q) : ''} onChange={maxOverride => patch({ maxOverride })} />
-                </Field>
-              )}
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className={secondaryButton} onClick={read} disabled={!pasted.trim()}>
+                    Read directions
+                  </button>
+                </div>
+                {proposal && (
+                  <div aria-live="polite" className="lp-sunken grid gap-2 rounded-md px-4 py-3">
+                    {proposal.read.length > 0 ? (
+                      <>
+                        <span className="font-sans text-[12.5px] text-ink">
+                          Read as{proposal.form ? ` (${FORMS[proposal.form].label.toLowerCase()})` : ''}
+                        </span>
+                        <ul className="grid list-disc gap-0.5 pl-5 font-sans text-[13.5px] text-ink">
+                          {proposal.read.map((r, i) => (
+                            <li key={i}>{r}</li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <span className="font-sans text-[13.5px] text-ink">Nothing could be read with confidence.</span>
+                    )}
+                    {proposal.notes.length > 0 && (
+                      <ul className="grid gap-1 font-sans text-[13px] leading-snug text-ink">
+                        {proposal.notes.map((n, i) => (
+                          <li key={i}>{n}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {proposal.read.length > 0 && (
+                        <button type="button" className={secondaryButton} onClick={useProposal}>
+                          Fill in the builder
+                        </button>
+                      )}
+                      <button type="button" className={quietButton} onClick={() => setProposal(null)}>
+                        Discard
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!proposal && applied.length > 0 && (
+                  <ul aria-live="polite" className="grid gap-1 font-sans text-[13px] leading-snug text-ink">
+                    {applied.map((n, i) => (
+                      <li key={i}>{n}</li>
+                    ))}
+                  </ul>
+                )}
+              </Group>
+
+              <Group title="Directions">
+                <div aria-live="polite" className="lp-sunken grid gap-1.5 rounded-md px-4 py-3">
+                  <span className="font-sans text-[12.5px] text-ink">Directions as written</span>
+                  <p className="[overflow-wrap:anywhere] font-display text-[19px] leading-snug text-ink" style={{ fontFamily: 'var(--font-display)' }}>
+                    <SigText segments={sigSegments(m)} />
+                  </p>
+                  <div>
+                    <button type="button" className={quietButton} onClick={() => copy(sigText(m))}>
+                      Copy directions
+                    </button>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field label="Action">
+                    <PaperSelect value={m.verb} onChange={v => patch({ verb: v })} className={selectClass}>
+                      {f.verbs.map(v => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </PaperSelect>
+                  </Field>
+                  <div className="grid min-w-0 content-start gap-1">
+                    <span className="font-sans text-[12.5px] text-ink">How many</span>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <NumberInput label="Quantity per dose" value={m.qty} step={step} onChange={qty => patch({ qty })} />
+                      {m.range && (
+                        <>
+                          <span className="shrink-0 font-sans text-[13px] text-ink">to</span>
+                          <NumberInput label="Upper quantity per dose" value={m.qtyMax} step={step} onChange={qtyMax => patch({ qtyMax })} />
+                        </>
+                      )}
+                    </div>
+                    <Check checked={m.range} onChange={range => patch({ range })}>
+                      A range, such as one to two
+                    </Check>
+                  </div>
+                  {f.units && (
+                    <Field label="Unit" hint={basis === 'insulin' ? 'Units: counted as insulin.' : basis === 'injection' ? 'Counted as one dose per injection.' : undefined}>
+                      {f.units.length > 1 ? (
+                        <PaperSelect value={m.unit} onChange={v => patch({ unit: v })} className={selectClass}>
+                          {f.units.map(x => (
+                            <option key={x.sg} value={x.sg}>
+                              {x.pl}
+                            </option>
+                          ))}
+                        </PaperSelect>
+                      ) : (
+                        <input value={f.units[0].pl} disabled className={inputClass} />
+                      )}
+                    </Field>
+                  )}
+                  <Field label="Route">
+                    <PaperSelect value={m.route} onChange={v => patch({ route: v })} className={selectClass}>
+                      {f.routes.map(r => (
+                        <option key={r} value={r}>
+                          {r || 'No route needed'}
+                        </option>
+                      ))}
+                    </PaperSelect>
+                  </Field>
+                  <Field label="How often">
+                    <PaperSelect value={m.freq} onChange={v => patch({ freq: v })} className={selectClass}>
+                      {FREQS.map(x => (
+                        <option key={x.id} value={x.id}>
+                          {x.text}
+                        </option>
+                      ))}
+                    </PaperSelect>
+                  </Field>
+                  <div className="grid min-w-0 content-start gap-1">
+                    <span className="font-sans text-[12.5px] text-ink">Scheduled or as needed</span>
+                    <ChipRadio
+                      name="ds-prn"
+                      label="Scheduled or as needed"
+                      value={m.prn ? 'yes' : 'no'}
+                      options={[
+                        ['no', 'Scheduled'],
+                        ['yes', 'As needed'],
+                      ]}
+                      onChange={v => patch({ prn: v === 'yes', showMax: null, maxOverride: '' })}
+                    />
+                  </div>
+                  <Field label={m.prn ? 'As needed for (optional)' : 'Reason for use (optional)'}>
+                    <input value={m.indication} onChange={e => patch({ indication: e.target.value })} className={inputClass} />
+                  </Field>
+                  {m.prn && unit && (
+                    <Field
+                      label={`Most ${unit.pl} in 24 hours`}
+                      hint={mx?.auto ? `Calculated as ${fmt(mx.q)} from the directions. Type a lower number if the label or prescriber sets one.` : 'Set by hand.'}
+                    >
+                      <NumberInput value={m.maxOverride} step={step} placeholder={mx?.auto ? fmt(mx.q) : ''} onChange={maxOverride => patch({ maxOverride })} />
+                    </Field>
+                  )}
+                </div>
+              </Group>
+
+              <Group title="Package">
+                <PackageFields basis={basis} pack={pack} patchPack={patchPack} setContainer={setContainer} unitPl={unit?.pl ?? 'units'} />
+              </Group>
+
+              <Group title="Days or quantity">
+                <ChipRadio
+                  name="ds-mode"
+                  label="What to work out"
+                  value={mode}
+                  options={[
+                    ['quantity', 'Quantity for a number of days'],
+                    ['days', 'Days supply for a quantity'],
+                  ]}
+                  onChange={setMode}
+                />
+                {mode === 'quantity' ? (
+                  <div className="grid gap-2">
+                    <span className="font-sans text-[12.5px] text-ink">Number of days</span>
+                    <ChipRadio
+                      name="ds-days"
+                      label="Number of days"
+                      value={(PRESETS as readonly string[]).includes(target) ? target : ''}
+                      options={PRESETS.map(p => [p, p] as const)}
+                      onChange={setTarget}
+                    />
+                    <div className="max-w-[10rem]">
+                      <NumberInput label="Number of days" value={target} step="1" onChange={setTarget} />
+                    </div>
+                  </div>
+                ) : (
+                  <Field label={`How many ${dn.pl}`}>
+                    <div className="max-w-[10rem]">
+                      <NumberInput
+                        label={`How many ${dn.pl}`}
+                        value={quantity}
+                        step={basis === 'count' || basis === 'liquid' ? 'any' : '1'}
+                        onChange={setQuantity}
+                      />
+                    </div>
+                  </Field>
+                )}
+              </Group>
             </div>
-          </Group>
 
-          <SectionHeading id="package" title="Package" />
-          <PackageFields basis={basis} pack={pack} patchPack={patchPack} setContainer={setContainer} unitPl={unit?.pl ?? 'units'} />
-
-          <SectionHeading id="calculate" title="Days or quantity" />
-          <div className="grid gap-4">
-            <ChipRadio
-              name="ds-mode"
-              label="What to work out"
-              value={mode}
-              options={[
-                ['quantity', 'Quantity for a number of days'],
-                ['days', 'Days supply for a quantity'],
-              ]}
-              onChange={setMode}
-            />
-            {mode === 'quantity' ? (
-              <div className="grid gap-2">
-                <span className="font-sans text-[12.5px] font-medium text-ink">Number of days</span>
-                <ChipRadio name="ds-days" label="Number of days" value={(PRESETS as readonly string[]).includes(target) ? target : ''} options={PRESETS.map(p => [p, p] as const)} onChange={setTarget} />
-                <div className="max-w-[10rem]">
-                  <NumberInput label="Number of days" value={target} step="1" onChange={setTarget} />
-                </div>
-              </div>
-            ) : (
-              <Field label={`How many ${dn.pl}`}>
-                <div className="max-w-[10rem]">
-                  <NumberInput label={`How many ${dn.pl}`} value={quantity} step={basis === 'count' || basis === 'liquid' ? 'any' : '1'} onChange={setQuantity} />
-                </div>
-              </Field>
-            )}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Fill date (optional)" hint="For the earliest refill date.">
-                <PaperDatePicker value={fill} onChange={setFill} placeholder="No fill date" className={selectClass} />
-              </Field>
-              <Field label="Refill allowed at (% of days supply)" hint="Payers and controlled-substance rules differ. Set the one that applies.">
-                <NumberInput value={threshold} step="1" onChange={setThreshold} />
-              </Field>
+            {/* Result */}
+            <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+              <section aria-labelledby="result" aria-live="polite" className="grid min-w-0 gap-4">
+                <h3 id="result" className="font-sans leading-snug text-ink" style={{ fontSize: '17px' }}>
+                  Result
+                </h3>
+                {columns.length ? (
+                  <Results columns={columns} onCopy={copy} />
+                ) : (
+                  <p className="lp-sunken rounded-md px-3.5 py-2.5 font-sans text-[14px] text-ink">Still needed: {missing.join(', ')}.</p>
+                )}
+                {notice && <p className="font-sans text-[13px] text-ink">{notice}</p>}
+              </section>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* ── Result ─────────────────────────────────────────────────────── */}
-        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-          <section aria-labelledby="result" aria-live="polite" className="grid min-w-0 gap-4">
-            <SectionHeading id="result" title="Result" />
-            {columns.length ? (
-              <Results columns={columns} fill={fill} threshold={thresholdN} onCopy={copy} />
-            ) : (
-              <p className="lp-sunken rounded-md bg-marigold-100 px-3.5 py-2.5 font-sans text-[14px] text-ink">
-                Still needed: {missing.join(', ')}.
+        {/* ── Card 2: refill calendar ─────────────────────────────────────── */}
+        <Card id="calendar" title="Refill calendar" lede="When the next fill is due, or how far into the supply a patient is today.">
+          <ChipRadio
+            name="ds-cal"
+            label="What to work out"
+            value={calMode}
+            options={[
+              ['next', 'Next fill date'],
+              ['since', 'Days since fill'],
+            ]}
+            onChange={setCalMode}
+          />
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
+            <div className="grid min-w-0 content-start gap-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field
+                  label="Days supply"
+                  hint={
+                    fromCalc == null
+                      ? 'Type it, or complete the card above to fill it in.'
+                      : overridden
+                        ? `Typed by hand. The card above gives ${fmt(fromCalc)} days.`
+                        : 'From the card above. Type a different number to override it.'
+                  }
+                >
+                  <NumberInput label="Days supply" value={daysText} step="1" onChange={v => setDaysOverride(v)} />
+                </Field>
+                <Field label="Fill date">
+                  <PaperDatePicker aria-label="Fill date" value={fill} onChange={setFill} placeholder="Choose the fill date" className={selectClass} />
+                </Field>
+                {calMode === 'since' && (
+                  <Field label="Today’s date" hint="Today by default. Change it to check a past or future date.">
+                    <PaperDatePicker aria-label="Today’s date" value={today} onChange={v => setToday(v || todayIso())} clearable={false} className={selectClass} />
+                  </Field>
+                )}
+              </div>
+              {columns.length > 1 && daysOverride == null && (
+                <div className="grid gap-1.5">
+                  <span className="font-sans text-[12.5px] text-ink">Which result to use</span>
+                  <ChipRadio
+                    name="ds-source"
+                    label="Which result to use"
+                    value={source}
+                    options={columns.map((c, i) => [String(i), `${c.label?.split(':')[0] ?? 'Result'}: ${fmt(c.result.days)} days`] as const)}
+                    onChange={setSource}
+                  />
+                </div>
+              )}
+              {overridden && (
+                <div>
+                  <button type="button" className={quietButton} onClick={() => setDaysOverride(null)}>
+                    Use the calculated {fmt(fromCalc ?? 0)} days
+                  </button>
+                </div>
+              )}
+              {daysN != null && daysWhole == null && <p className="font-sans text-[13px] text-ink">Days supply must be a whole number of days.</p>}
+            </div>
+
+            <div aria-live="polite" className="lp-sunken grid min-w-0 content-start gap-4 rounded-md p-4 sm:p-5">
+              {calMode === 'next' ? (
+                next && daysWhole ? (
+                  <>
+                    <Big
+                      label="Next fill due"
+                      value={longDate(next.due)}
+                      stamp={relativeText(next.fromToday)}
+                      note={`The supply covers ${longDate(fill)} through ${longDate(next.lastCovered)}.`}
+                    />
+                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
+                      {longDate(fill)} + {fmt(daysWhole)} days = {longDate(next.due)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-sans text-[14px] text-ink">
+                    Still needed: {[!fill && 'the fill date', !daysWhole && 'the days supply'].filter(Boolean).join(', ')}.
+                  </p>
+                )
+              ) : since ? (
+                since.ok ? (
+                  <>
+                    <Big
+                      label="Days since fill"
+                      value={`${fmt(since.passed)} ${since.passed === 1 ? 'day' : 'days'}`}
+                      stamp={since.remaining != null ? timingText(since.remaining) : undefined}
+                      note={
+                        since.daysSupply != null && since.remaining != null
+                          ? since.remaining > 0
+                            ? `Day ${fmt(since.passed)} of a ${fmt(since.daysSupply)}-day supply: ${fmt(since.pct ?? 0)}% has passed. A fill on ${longDate(today)} would be ${timingText(since.remaining)}.`
+                            : since.remaining === 0
+                              ? `The ${fmt(since.daysSupply)}-day supply ends the day before, so a fill on ${longDate(today)} is on time.`
+                              : `The ${fmt(since.daysSupply)}-day supply ran out ${fmt(-since.remaining)} ${since.remaining === -1 ? 'day' : 'days'} before ${longDate(today)}.`
+                          : 'Add the days supply to compare.'
+                      }
+                    />
+                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
+                      {longDate(today)} − {longDate(fill)} = {fmt(since.passed)} days
+                      {since.remaining != null && since.daysSupply != null && (
+                        <>
+                          <br />
+                          {fmt(since.daysSupply)} − {fmt(since.passed)} = {fmt(since.remaining)} {Math.abs(since.remaining) === 1 ? 'day' : 'days'} {since.remaining >= 0 ? 'left' : 'over'}
+                        </>
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-sans text-[14px] text-ink">{since.reason}</p>
+                )
+              ) : (
+                <p className="font-sans text-[14px] text-ink">Still needed: the fill date.</p>
+              )}
+              <p className="border-t border-dashed border-ink/15 pt-3 font-sans text-[12.5px] leading-snug text-ink">
+                When a refill is allowed depends on the payer and, for controlled substances, on state and federal rules. Check the plan before you fill.
               </p>
-            )}
-            {notice && <p className="font-sans text-[13px] text-ink">{notice}</p>}
-          </section>
-        </div>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <p className="mt-12 max-w-[48rem] font-sans text-[12.5px] leading-relaxed text-ink">
