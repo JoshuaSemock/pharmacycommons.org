@@ -32,6 +32,8 @@ export type Tool = {
   blurb: string
   /** One line under the name in the nav menu. */
   summary?: string
+  /** Other names people use for it. The header search matches these, so "dosing calculator" finds Days supply. */
+  keywords?: string[]
   status: ToolStatus
   section: ToolSectionId
   /** A page on this site. */
@@ -49,6 +51,7 @@ export const TOOLS: Tool[] = [
       'One complete list of prescriptions, over-the-counter products, supplements, herbals and alternative medicines, plus allergies and caffeine, nicotine, alcohol and recreational substance use. Directions are written out in full with no abbreviations, with the dose and 24-hour maximum calculated so they always agree. The list stays in your browser: save it as CSV, reopen it later, or print it.',
     summary: 'Medication list, allergies, and directions builder',
     status: 'live',
+    keywords: ['med rec', 'medrec', 'medication list', 'reconcile medications', 'home medications', 'allergy list', 'sig builder', 'directions builder', 'patient medication list'],
     section: 'workup',
     to: '/tools/medication-reconciliation',
   },
@@ -61,6 +64,7 @@ export const TOOLS: Tool[] = [
       'Cockcroft-Gault with actual, ideal, adjusted, and lean body weight side by side, so the weight choice is explicit rather than buried. Adds CKD-EPI 2021 eGFR, CKD and AKI staging, amputation correction, and a renal dose check.',
     summary: 'Cockcroft-Gault by body weight, plus eGFR',
     status: 'live',
+    keywords: ['crcl', 'clcr', 'cockcroft gault', 'egfr', 'gfr', 'ckd-epi', 'renal dosing', 'renal function', 'kidney function', 'creatinine', 'aki', 'ckd staging'],
     section: 'calculators',
     to: '/tools/creatinine-clearance',
   },
@@ -78,6 +82,7 @@ export const TOOLS: Tool[] = [
       'Quantity from directions and days, or days from quantity, with package size, priming, drops per mL, and in-use limits counted in. Covers tablets, liquids, eye and ear drops, inhalers, insulin, and injectables including GLP-1 pens. Where the manufacturer and the payer disagree, both results are shown.',
     summary: 'Quantity to dispense, or days a quantity lasts',
     status: 'live',
+    keywords: ['dosing calculator', 'dose calculator', 'quantity calculator', 'quantity dispense', 'quantity to dispense', 'day supply', 'days supply', 'how many tablets', 'qty', 'dispense quantity', 'refill too soon', 'insulin pen', 'eye drops', 'inhaler', 'glp-1 pen', 'taper', 'fingertip unit'],
     section: 'calculators',
     to: '/tools/days-supply',
   },
@@ -104,6 +109,7 @@ export const TOOLS: Tool[] = [
       'Oral dosage forms that should not be crushed or chewed, grouped by reason: modified release, transmucosal, irritant, unpleasant taste, and hazardous or teratogenic.',
     summary: 'Oral forms not to crush or chew, by reason',
     status: 'live',
+    keywords: ['crush', 'chew', 'extended release', 'sustained release', 'enteric coated', 'feeding tube', 'swallow whole', 'modified release', 'oral dosage form'],
     section: 'lists',
     to: '/lists/do-not-crush',
   },
@@ -114,6 +120,7 @@ export const TOOLS: Tool[] = [
       'Medications that prolong the QT interval, with the level of risk for each. Part of the wider list of drugs that affect the risk of arrhythmias, which also covers Brugada syndrome.',
     summary: 'Drugs that prolong the QT interval, with risk',
     status: 'live',
+    keywords: ['qt', 'qtc', 'long qt', 'torsades', 'arrhythmia', 'brugada', 'ecg', 'ekg', 'qt prolongation'],
     section: 'lists',
     to: '/lists/arrhythmia-risk-long-qt',
   },
@@ -126,6 +133,7 @@ export const TOOLS: Tool[] = [
       'A custom dictionary file for Microsoft Word with about 43,000 drug names, brand names, biologics, medical terms and abbreviations, so correct spellings stop being underlined and Word can suggest them. Step-by-step instructions for Windows and Mac, the full dictionary with definitions, and The Joint Commission "Do Not Use" abbreviations.',
     summary: 'Spell-check drug names and medical terms in Word',
     status: 'live',
+    keywords: ['spell check', 'spellcheck', 'word dictionary', 'custom dictionary', '.dic', 'abbreviations', 'medical terms', 'do not use', 'microsoft word', 'glossary'],
     section: 'reference',
     to: '/tools/dictionary',
   },
@@ -155,6 +163,7 @@ export const TOOLS: Tool[] = [
       'The live, read-only API index: record types, counts, data sources and every endpoint, as JSON. No key needed.',
     summary: 'Live API index, as JSON',
     status: 'live',
+    keywords: ['json', 'rest api', 'open data', 'endpoints'],
     section: 'research',
     href: `${CURRENT_API_BASE}/v1`,
   },
@@ -165,6 +174,7 @@ export const TOOLS: Tool[] = [
       'How to use the API: a quickstart, a console that runs requests against the live data, every endpoint with examples, and the OpenAPI, JSON Schema and JSON-LD files.',
     summary: 'API guide, console, and endpoint reference',
     status: 'live',
+    keywords: ['api docs', 'api documentation', 'openapi', 'json schema', 'json-ld', 'console', 'quickstart', 'machine readable'],
     section: 'research',
     to: '/developers',
   },
