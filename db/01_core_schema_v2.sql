@@ -420,6 +420,6 @@ do $$ begin
     with check (((auth.uid() = submitted_by) AND (EXISTS ( SELECT 1
       FROM provider_verifications pv
       WHERE ((pv.user_id = auth.uid()) AND (pv.status = 'active'::text))))));
-exception when duplicate_object then null; end $$;
+exception when duplicate_object or undefined_table then null; end $$;
 -- NOTE: the submit_own policy references provider_verifications (phase5_provider_verification.sql); on a blank
 -- database run phase5 first or create that policy afterwards.
