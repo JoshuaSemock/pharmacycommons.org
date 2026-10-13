@@ -479,13 +479,7 @@ formulations in the moiety hierarchy (phase 10).
   RxNorm / label migrations that were applied only via `apply_migration`.
 - Scripts named in `docs/project-history.md` (`02_transform.py`, `04_validate.py`,
   `04b`–`04f`) are not in `scripts/`.
-- Stray/dead files: `drug.html`, root `index.css`; `src/ClassIndex.tsx` and
-  `src/ClassPage.tsx` (old class pages, imported nowhere; the live ones are in `src/pages/`); `public/favicon.svg` and
-  `public/Pharmacy_Commons_Logo_Canva_144.svg` (207 KB each, no longer linked);
-  `assets/textures/*.jpg` (source files; the site serves `public/textures/*.webp`); `public/drug-catalog.json` (~31k lines, nothing reads it);
-  `public/drug.html`; `docs/schema-updates.sql` and `docs/data-model-decisions.md` §4
-  (legacy API/PIN/FRM); `.md/*` (Figma-Make/Agent-3 era, wrong numbers).
-  Confirm with Joshua before deleting.
+- Stray/dead files removed 2026-10-13 (Joshua confirmed): root `drug.html`/`index.css`, `public/drug.html`, `src/ClassIndex.tsx`, `src/ClassPage.tsx`, the two 207 KB logo SVGs, `public/drug-catalog.json` (`scripts/build-catalog.mjs` can regenerate it), `docs/schema-updates.sql`, `.md/` and the stale `db/CLAUDE.md`. Kept: `assets/textures/` (source images for `scripts/paper-textures.py` and `scripts/lichen-images.py`) and `docs/data-model-decisions.md` §4 (legacy API/PIN/FRM).
 
 **Data gaps:**
 - 137 `moieties` rows have `term_type` ≠ 'Core moiety' (salts/brands/combos) yet
@@ -516,8 +510,6 @@ formulations in the moiety hierarchy (phase 10).
   `public_read` policies and `entity_labels` is SELECT-only. `api_snapshot_all()` was run
   for every type afterwards and recorded 15,688 versions. **Lesson: after any migration,
   confirm it in `supabase_migrations.schema_migrations` before writing "applied" in a file.**
-- `db/CLAUDE.md` is a stale copy of this file from 2026-09-24; the root `CLAUDE.md` is
-  authoritative.
 - Duplicate combination records exist under different name orders, e.g. "hydrochlorothiazide;
   lisinopril" and "LISINOPRIL AND HYDROCHLOROTHIAZIDE" (both surfaced by `/v1/search`).
   Merge calls are Joshua's.
