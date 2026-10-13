@@ -30,6 +30,7 @@ import {
 import { applyProposal, readDirections, type Proposal } from '@/tools/dayssupply/parse'
 import Results, { type Column } from '@/tools/dayssupply/Results'
 import PackagingPicker from '@/tools/dayssupply/PackagingPicker'
+import CalendarView from '@/tools/dayssupply/CalendarView'
 import ScheduleCard from '@/tools/dayssupply/Schedule'
 import TopicalCard from '@/tools/dayssupply/Topical'
 
@@ -40,14 +41,16 @@ import TopicalCard from '@/tools/dayssupply/Topical'
  * (tapers, weekday doses, dose step-ups: dayssupply/Schedule.tsx) and a cream
  * or ointment estimate (dayssupply/Topical.tsx):
  *
+ *   ┌ Refill calendar ────────────────────────────────────────────────────┐
+ *   │ Scrollable calendar (calendar view)  |  days between / N days from  │
+ *   │ ───────────────────────────────────────────────────────────────────│
+ *   │ Next fill date  |  Days since fill                                  │
+ *   │ Days supply (flows up from the Supply card; can be overridden)      │
+ *   │ Fill date · Today's date                                            │
+ *   └─────────────────────────────────────────────────────────────────────┘
  *   ┌ Supply ─────────────────────────────────────────────────────────────┐
  *   │ Medication · Paste directions → builder · Package   │ Result (work  │
  *   │ Days or quantity                                    │ shown open)   │
- *   └─────────────────────────────────────────────────────────────────────┘
- *   ┌ Refill calendar ────────────────────────────────────────────────────┐
- *   │ Next fill date  |  Days since fill                                  │
- *   │ Days supply (flows down from the card above; can be overridden)     │
- *   │ Fill date · Today's date                                            │
  *   └─────────────────────────────────────────────────────────────────────┘
  *
  * Directions are entered with the same vocabularies and sentence engine as
@@ -203,6 +206,7 @@ export default function DaysSupply() {
   const [calMode, setCalMode] = useState<CalendarMode>('next')
   const [fill, setFill] = useState('')
   const [today, setToday] = useState(todayIso)
+  const [realToday] = useState(todayIso)
   const [daysOverride, setDaysOverride] = useState<string | null>(null)
   const [source, setSource] = useState('0')
 
@@ -333,7 +337,126 @@ export default function DaysSupply() {
       </header>
 
       <div className="grid min-w-0 gap-8">
-        {/* ── Card 1: supply ──────────────────────────────────────────────── */}
+        {/* ── Card 1: refill calendar (first on the page since 2026-10-13) ─────────────────────────────────────── */}
+        <Card id="calendar" title="Refill calendar" lede="Count days on a calendar, find when a refill is due, or see how far into the supply a patient is.">
+          <CalendarView today={realToday} daysSupply={daysWhole} />
+          <hr className="border-0 border-t border-dashed border-ink/15" />
+          <ChipRadio
+            name="ds-cal"
+            label="What to work out"
+            value={calMode}
+            options={[
+              ['next', 'Next fill date'],
+              ['since', 'Days since fill'],
+            ]}
+            onChange={setCalMode}
+          />
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
+            <div className="grid min-w-0 content-start gap-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field
+                  label="Days supply"
+                  hint={
+                    fromCalc == null
+                      ? 'Type it, or complete the Supply card below to fill it in.'
+                      : overridden
+                        ? `Typed by hand. The Supply card below gives ${fmt(fromCalc)} days.`
+                        : 'From the Supply card below. Type a different number to override it.'
+                  }
+                >
+                  <NumberInput label="Days supply" value={daysText} step="1" onChange={v => setDaysOverride(v)} />
+                </Field>
+                <Field label="Fill date">
+                  <PaperDatePicker aria-label="Fill date" value={fill} onChange={setFill} placeholder="Choose the fill date" className={selectClass} />
+                </Field>
+                {calMode === 'since' && (
+                  <Field label="Today’s date" hint="Today by default. Change it to check a past or future date.">
+                    <PaperDatePicker aria-label="Today’s date" value={today} onChange={v => setToday(v || todayIso())} clearable={false} className={selectClass} />
+                  </Field>
+                )}
+              </div>
+              {columns.length > 1 && daysOverride == null && (
+                <div className="grid gap-1.5">
+                  <span className="font-sans text-[12.5px] text-ink">Which result to use</span>
+                  <ChipRadio
+                    name="ds-source"
+                    label="Which result to use"
+                    value={source}
+                    options={columns.map((c, i) => [String(i), `${c.label?.split(':')[0] ?? 'Result'}: ${fmt(c.result.days)} days`] as const)}
+                    onChange={setSource}
+                  />
+                </div>
+              )}
+              {overridden && (
+                <div>
+                  <button type="button" className={quietButton} onClick={() => setDaysOverride(null)}>
+                    Use the calculated {fmt(fromCalc ?? 0)} days
+                  </button>
+                </div>
+              )}
+              {daysN != null && daysWhole == null && <p className="font-sans text-[13px] text-ink">Days supply must be a whole number of days.</p>}
+            </div>
+
+            <div aria-live="polite" className="lp-sunken grid min-w-0 content-start gap-4 rounded-md p-4 sm:p-5">
+              {calMode === 'next' ? (
+                next && daysWhole ? (
+                  <>
+                    <Big
+                      label="Next fill due"
+                      value={longDate(next.due)}
+                      stamp={relativeText(next.fromToday)}
+                      note={`The supply covers ${longDate(fill)} through ${longDate(next.lastCovered)}.`}
+                    />
+                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
+                      {longDate(fill)} + {fmt(daysWhole)} days = {longDate(next.due)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-sans text-[14px] text-ink">
+                    Still needed: {[!fill && 'the fill date', !daysWhole && 'the days supply'].filter(Boolean).join(', ')}.
+                  </p>
+                )
+              ) : since ? (
+                since.ok ? (
+                  <>
+                    <Big
+                      label="Days since fill"
+                      value={`${fmt(since.passed)} ${since.passed === 1 ? 'day' : 'days'}`}
+                      stamp={since.remaining != null ? timingText(since.remaining) : undefined}
+                      note={
+                        since.daysSupply != null && since.remaining != null
+                          ? since.remaining > 0
+                            ? `Day ${fmt(since.passed)} of a ${fmt(since.daysSupply)}-day supply: ${fmt(since.pct ?? 0)}% has passed. A fill on ${longDate(today)} would be ${timingText(since.remaining)}.`
+                            : since.remaining === 0
+                              ? `The ${fmt(since.daysSupply)}-day supply ends the day before, so a fill on ${longDate(today)} is on time.`
+                              : `The ${fmt(since.daysSupply)}-day supply ran out ${fmt(-since.remaining)} ${since.remaining === -1 ? 'day' : 'days'} before ${longDate(today)}.`
+                          : 'Add the days supply to compare.'
+                      }
+                    />
+                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
+                      {longDate(today)} − {longDate(fill)} = {fmt(since.passed)} days
+                      {since.remaining != null && since.daysSupply != null && (
+                        <>
+                          <br />
+                          {fmt(since.daysSupply)} − {fmt(since.passed)} = {fmt(since.remaining)} {Math.abs(since.remaining) === 1 ? 'day' : 'days'} {since.remaining >= 0 ? 'left' : 'over'}
+                        </>
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-sans text-[14px] text-ink">{since.reason}</p>
+                )
+              ) : (
+                <p className="font-sans text-[14px] text-ink">Still needed: the fill date.</p>
+              )}
+              <p className="border-t border-dashed border-ink/15 pt-3 font-sans text-[12.5px] leading-snug text-ink">
+                When a refill is allowed depends on the payer and, for controlled substances, on state and federal rules. Check the plan before you fill.
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* ── Card 2: supply ──────────────────────────────────────────────── */}
         <Card id="supply" title="Supply" lede="The medication, its directions and its package give the days supply or the quantity to dispense.">
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
             <div className="grid min-w-0 content-start gap-6">
@@ -607,123 +730,6 @@ export default function DaysSupply() {
                 )}
                 {notice && <p className="font-sans text-[13px] text-ink">{notice}</p>}
               </section>
-            </div>
-          </div>
-        </Card>
-
-        {/* ── Card 2: refill calendar ─────────────────────────────────────── */}
-        <Card id="calendar" title="Refill calendar" lede="When the next fill is due, or how far into the supply a patient is today.">
-          <ChipRadio
-            name="ds-cal"
-            label="What to work out"
-            value={calMode}
-            options={[
-              ['next', 'Next fill date'],
-              ['since', 'Days since fill'],
-            ]}
-            onChange={setCalMode}
-          />
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
-            <div className="grid min-w-0 content-start gap-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Field
-                  label="Days supply"
-                  hint={
-                    fromCalc == null
-                      ? 'Type it, or complete the card above to fill it in.'
-                      : overridden
-                        ? `Typed by hand. The card above gives ${fmt(fromCalc)} days.`
-                        : 'From the card above. Type a different number to override it.'
-                  }
-                >
-                  <NumberInput label="Days supply" value={daysText} step="1" onChange={v => setDaysOverride(v)} />
-                </Field>
-                <Field label="Fill date">
-                  <PaperDatePicker aria-label="Fill date" value={fill} onChange={setFill} placeholder="Choose the fill date" className={selectClass} />
-                </Field>
-                {calMode === 'since' && (
-                  <Field label="Today’s date" hint="Today by default. Change it to check a past or future date.">
-                    <PaperDatePicker aria-label="Today’s date" value={today} onChange={v => setToday(v || todayIso())} clearable={false} className={selectClass} />
-                  </Field>
-                )}
-              </div>
-              {columns.length > 1 && daysOverride == null && (
-                <div className="grid gap-1.5">
-                  <span className="font-sans text-[12.5px] text-ink">Which result to use</span>
-                  <ChipRadio
-                    name="ds-source"
-                    label="Which result to use"
-                    value={source}
-                    options={columns.map((c, i) => [String(i), `${c.label?.split(':')[0] ?? 'Result'}: ${fmt(c.result.days)} days`] as const)}
-                    onChange={setSource}
-                  />
-                </div>
-              )}
-              {overridden && (
-                <div>
-                  <button type="button" className={quietButton} onClick={() => setDaysOverride(null)}>
-                    Use the calculated {fmt(fromCalc ?? 0)} days
-                  </button>
-                </div>
-              )}
-              {daysN != null && daysWhole == null && <p className="font-sans text-[13px] text-ink">Days supply must be a whole number of days.</p>}
-            </div>
-
-            <div aria-live="polite" className="lp-sunken grid min-w-0 content-start gap-4 rounded-md p-4 sm:p-5">
-              {calMode === 'next' ? (
-                next && daysWhole ? (
-                  <>
-                    <Big
-                      label="Next fill due"
-                      value={longDate(next.due)}
-                      stamp={relativeText(next.fromToday)}
-                      note={`The supply covers ${longDate(fill)} through ${longDate(next.lastCovered)}.`}
-                    />
-                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
-                      {longDate(fill)} + {fmt(daysWhole)} days = {longDate(next.due)}
-                    </p>
-                  </>
-                ) : (
-                  <p className="font-sans text-[14px] text-ink">
-                    Still needed: {[!fill && 'the fill date', !daysWhole && 'the days supply'].filter(Boolean).join(', ')}.
-                  </p>
-                )
-              ) : since ? (
-                since.ok ? (
-                  <>
-                    <Big
-                      label="Days since fill"
-                      value={`${fmt(since.passed)} ${since.passed === 1 ? 'day' : 'days'}`}
-                      stamp={since.remaining != null ? timingText(since.remaining) : undefined}
-                      note={
-                        since.daysSupply != null && since.remaining != null
-                          ? since.remaining > 0
-                            ? `Day ${fmt(since.passed)} of a ${fmt(since.daysSupply)}-day supply: ${fmt(since.pct ?? 0)}% has passed. A fill on ${longDate(today)} would be ${timingText(since.remaining)}.`
-                            : since.remaining === 0
-                              ? `The ${fmt(since.daysSupply)}-day supply ends the day before, so a fill on ${longDate(today)} is on time.`
-                              : `The ${fmt(since.daysSupply)}-day supply ran out ${fmt(-since.remaining)} ${since.remaining === -1 ? 'day' : 'days'} before ${longDate(today)}.`
-                          : 'Add the days supply to compare.'
-                      }
-                    />
-                    <p className="border-t border-dashed border-ink/15 pt-3 font-mono text-[12.5px] leading-snug text-ink">
-                      {longDate(today)} − {longDate(fill)} = {fmt(since.passed)} days
-                      {since.remaining != null && since.daysSupply != null && (
-                        <>
-                          <br />
-                          {fmt(since.daysSupply)} − {fmt(since.passed)} = {fmt(since.remaining)} {Math.abs(since.remaining) === 1 ? 'day' : 'days'} {since.remaining >= 0 ? 'left' : 'over'}
-                        </>
-                      )}
-                    </p>
-                  </>
-                ) : (
-                  <p className="font-sans text-[14px] text-ink">{since.reason}</p>
-                )
-              ) : (
-                <p className="font-sans text-[14px] text-ink">Still needed: the fill date.</p>
-              )}
-              <p className="border-t border-dashed border-ink/15 pt-3 font-sans text-[12.5px] leading-snug text-ink">
-                When a refill is allowed depends on the payer and, for controlled substances, on state and federal rules. Check the plan before you fill.
-              </p>
             </div>
           </div>
         </Card>

@@ -195,6 +195,15 @@ Code: `src/tools/dayssupply/topical.ts` (engine, `topical.test.ts`), `Topical.ts
 
 **On the page.** `src/tools/dayssupply/packaging.ts` reads the rows for the medication picked in the name field (the moiety plus everything under it in `moiety_hierarchy`); `PackagingPicker.tsx` shows a "Package facts on file" box above the Package fields when rows exist for the chosen form. "Fill in the package" sets the fields, and the box then lists every value with its source and check date. A manufacturer value wins over a general default; a payer drops-per-mL figure goes to the payer field so both results show. If the table does not exist yet, or has no rows for the medication, nothing appears and the fields are typed in as before. Tests: `packaging.test.ts`.
 
+## Calendar view (2026-10-13)
+
+Asked for by Joshua 2026-10-13. The *Refill calendar* card now comes **first** on the page, above *Supply*; the days supply still flows into it from the Supply card (override unchanged).
+
+- **Scrollable calendar** (`dayssupply/CalendarView.tsx`, date logic and tests in `calendar.ts` / `calendar.test.ts`). Sunday-first weeks, opens centred on today with 5 weeks before, the current week and 6 after; scrolling to either edge adds 8 more weeks, so it has no end. Today is underlined and dotted.
+- **Start date** is today by default (change it with the date field; "Back to today" resets). Clicking a date sets the end: the dates between are pressed in, the ends are raised and labelled, and the result gives the days between. The start day is not counted (Oct 13 → Oct 20 = 7 days). Clicking another date moves the end; a date before the start counts backwards.
+- **Count days from the start**: a number of days *before* or *after* the start date, with presets 28, 30, 60, 84, 90 and the calculated days supply. The date is drawn on the calendar. Before: "a fill dated after Jul 15 is less than 90 days before Oct 13" (so early for a 90-day supply); after: the next fill is due that day. The note states days only; the refill threshold and payer rules are not applied here.
+- Colorless, as everywhere (see `design-system.md`): raised ends, pressed-in range, no palette colors.
+
 ## Second phase (what is left)
 
 - ~~Tapers and alternating doses (prednisone steps, warfarin by weekday).~~ Done in version 3.
