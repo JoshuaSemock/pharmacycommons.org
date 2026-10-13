@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'blog-comments',
+    date: '2026-10-12',
+    kind: 'Feature',
+    title: 'Comment on blog posts',
+    summary:
+      'Blog posts now have comments. Any signed-in account can join in under a public handle, and reply to other comments; verified providers show their credential beside their name.',
+    to: '/blog',
+    cta: 'Go to the blog',
+  },
+  {
     id: 'community-interactions',
     date: '2026-10-12',
     kind: 'Feature',

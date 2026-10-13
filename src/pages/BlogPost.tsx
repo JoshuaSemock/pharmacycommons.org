@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Markdown from './Markdown'
+import BlogComments from '../components/BlogComments'
 import PageShell, { PageFrame, PageTitle, RailHeading } from './PageShell'
 import { getPost, listPosts, formatDate } from '../blog'
 
@@ -127,6 +128,8 @@ export default function BlogPost() {
           )}
         </nav>
       )}
+
+      {!post.draft && <BlogComments slug={post.slug} />}
     </PageFrame>
   )
 }

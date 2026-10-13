@@ -16,6 +16,9 @@ import { brandActionText, getBrandQueue, patrolBrandEdit, reviewBrandEdit } from
 import type { BrandEdit } from '../brands'
 import { formatBrandName, formatDrugName } from '../names'
 import { entityHref } from '../wiki'
+import { commentError, getCommentQueue, moderateComment } from '../blogComments'
+import type { QueuedComment } from '../blogComments'
+import { getPost } from '../blog'
 
 /**
  * /review — the reviewers' queue (phase 15, docs/user-edits.md §9).
@@ -37,6 +40,7 @@ export default function ReviewQueue() {
   const [facts, setFacts] = useState<InfoboxQueueItem[]>([])
   const [newPages, setNewPages] = useState<NewPage[]>([])
   const [brandEdits, setBrandEdits] = useState<BrandEdit[]>([])
+  const [comments, setComments] = useState<QueuedComment[]>([])
   const [open, setOpen] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
@@ -69,6 +73,13 @@ export default function ReviewQueue() {
       })
       .catch(() => {
         if (!cancelled) setNewPages([])
+      })
+    getCommentQueue()
+      .then(rows => {
+        if (!cancelled) setComments(rows)
+      })
+      .catch(() => {
+        if (!cancelled) setComments([])
       })
     getInfoboxQueue()
       .then(rows => {
@@ -202,6 +213,14 @@ export default function ReviewQueue() {
           />
           <BrandQueue
             items={brandEdits}
+            status={status}
+            onDone={message => {
+              setNotice(message)
+              setVersion(v => v + 1)
+            }}
+          />
+          <CommentQueue
+            items={comments}
             status={status}
             onDone={message => {
               setNotice(message)
@@ -536,6 +555,128 @@ function BrandQueue({
                         Reject
                       </Button>
                       <Button size="sm" onClick={() => setRejecting(null)}>
+                        Cancel
+                      </Button>
+                    </span>
+                  </form>
+                )}
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </section>
+  )
+}
+
+/** Blog comments (phase 17): live and unreviewed. Mark reviewed, or hide with a reason. */
+function CommentQueue({
+  items,
+  status,
+  onDone,
+}: {
+  items: QueuedComment[]
+  status: ContributorStatus
+  onDone: (message: string) => void
+}) {
+  const [busy, setBusy] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [hiding, setHiding] = useState<number | null>(null)
+  const [note, setNote] = useState('')
+  const me = status.kind === 'ready' ? status : null
+
+  async function run(id: number, action: () => Promise<unknown>, message: string) {
+    setBusy(id)
+    setError(null)
+    try {
+      await action()
+      setHiding(null)
+      setNote('')
+      onDone(message)
+    } catch (err) {
+      setError(commentError(err))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="font-semibold text-ink" style={H2}>
+        Blog comments <span className="font-normal">({items.length})</span>
+      </h2>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-ink">
+        Already on the post. Mark reviewed once read, or hide it with a reason (spam, patient information, abuse).
+        Edited comments come back here.
+      </p>
+      {error && (
+        <p role="alert" className="max-w-2xl rounded-md border border-rose-300 bg-rose-100/40 px-3 py-2 font-sans text-sm text-ink">
+          {error}
+        </p>
+      )}
+      {items.length === 0 ? (
+        <p className="font-sans text-base text-ink">Nothing here.</p>
+      ) : (
+        <ol className="lp-divide-y max-w-4xl">
+          {items.map(c => {
+            const post = getPost(c.post_slug)
+            return (
+              <li key={c.id} className="space-y-1.5 py-3 font-sans text-sm text-ink">
+                <span className="block text-base font-medium">
+                  <Link
+                    to={`/blog/${c.post_slug}#comment-${c.id}`}
+                    className="lp-press inline-flex items-center rounded-md px-2 py-0.5"
+                  >
+                    {post ? post.title : `${c.post_slug} (no such post)`}
+                  </Link>
+                  {c.parent_id !== null && <span className="font-normal"> · reply</span>}
+                </span>
+                <span className="block">
+                  @{c.handle}
+                  {c.credential ? ` · ${c.credential}` : ''} · {new Date(c.created_at).toLocaleString()}
+                  {c.edited_at ? ' · edited' : ''}
+                </span>
+                <span className="block max-w-2xl whitespace-pre-line [overflow-wrap:anywhere]">
+                  {c.body.length > 600 ? `${c.body.slice(0, 600)}…` : c.body}
+                </span>
+                {me?.patroller && (
+                  <span className="flex flex-wrap gap-2 pt-1">
+                    <Button
+                      size="sm"
+                      disabled={busy !== null}
+                      onClick={() => run(c.id, () => moderateComment(c.id, 'patrol'), 'Marked reviewed.')}
+                    >
+                      Mark reviewed
+                    </Button>
+                    <Button size="sm" onClick={() => setHiding(c.id)}>
+                      Hide
+                    </Button>
+                  </span>
+                )}
+                {hiding === c.id && (
+                  <form
+                    className="max-w-xl space-y-2 pt-1"
+                    onSubmit={ev => {
+                      ev.preventDefault()
+                      if (note.trim()) void run(c.id, () => moderateComment(c.id, 'hide', note.trim()), 'Comment hidden.')
+                    }}
+                  >
+                    <label htmlFor={`chide-${c.id}`} className="block text-sm font-semibold">
+                      Why hide it? (kept for reviewers)
+                    </label>
+                    <input
+                      id={`chide-${c.id}`}
+                      type="text"
+                      value={note}
+                      maxLength={500}
+                      onChange={ev => setNote(ev.target.value)}
+                      className="lp-field block w-full rounded-md px-3 py-1.5 text-sm text-ink"
+                    />
+                    <span className="flex gap-2">
+                      <Button size="sm" type="submit" disabled={!note.trim() || busy !== null}>
+                        Hide
+                      </Button>
+                      <Button size="sm" onClick={() => setHiding(null)}>
                         Cancel
                       </Button>
                     </span>

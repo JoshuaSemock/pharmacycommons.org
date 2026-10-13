@@ -177,7 +177,7 @@ and reference; `src/developers/`) · `/resources` (outside links, grouped by
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read
 `public.references_resources` through `src/references.ts` (phase 12, 2026-09-30; replaced
 `src/sources.ts` and `src/resources.ts`). Edit those rows in Supabase, not in code
-· `/blog`, `/blog/:slug` · `/about` · `/account` · `/terms`, `/disclaimer`,
+· `/blog`, `/blog/:slug` (with comments, phase 17) · `/about` · `/account` · `/terms`, `/disclaimer`,
 `/licensing`, `/privacy` (legal pages; see Legal & governance context). GitHub Pages deep links work via
 `public/404.html` → sessionStorage → `index.html` restore, but known routes no
 longer need it: `scripts/postbuild.mjs` (runs after `vite build`) writes
@@ -426,6 +426,21 @@ editor and recorded by hand as `phase16d_4_functions`. Checked: registry md5 = `
 `publish_page`/`apply_page_revision`/`accept_rebased_revision` not executable by anon/authenticated,
 no new advisor findings. `publish-page` v3 (with statement support) deployed. Tests: `interactions.test.ts`,
 `db/phase15_test/tests_16d.sql`.
+
+**Phase 17 — blog comments (`db/phase17_blog_comments.sql`, live 2026-10-12 as 17a table / 17b functions):**
+Joshua's calls: any signed-in account may comment (not NPI-gated), publish-then-patrol, one level of replies.
+`blog_comments` is keyed by `post_slug` (posts are repo markdown, not rows); RLS on, no policies, no grants —
+reads only via `blog_comments(slug)` (anon; @handle + badge, never author ids; hidden/deleted rows appear as
+textless placeholders only while they have live replies), writes via `post_blog_comment` / `edit_blog_comment` /
+`delete_blog_comment` (author; delete erases the text) and `moderate_blog_comment` (patroller: patrol / hide
+with note / restore). `set_public_handle()` + `my_public_handle()` let unverified accounts pick a handle in
+`contributor_profiles` (`set_contributor_handle` stays verified-only). Rate limit 5 per 10 min / 30 per day,
+4,000 characters, patrollers' comments start reviewed, edits re-enter the queue. `blog_comment_queue()` (anon)
+feeds the Blog comments section of `/review`. Frontend: `src/blogComments.ts` (uses `getSupabase()` so the SDK
+stays out of the blog chunk), `src/components/BlogComments.tsx` (plain text, no links rendered; anchors
+`#comment-<id>`), mounted at the foot of `BlogPost.tsx` (not on drafts). Tests: `src/blogComments.test.ts`,
+`db/phase15_test/tests_17.sql` (36 checks; stubs → phase15 → phase17 → tests). Advisor: only the expected
+public-RPC findings for the new functions.
 
 **Phase 14 — dictionary (2026-10-03, `db/phase14_dictionary.sql`, `docs/dictionary.md`):**
 `dictionary_terms` (53,928 rows; 34,017 linked by `member_pcid`), RPCs `dictionary_dic()` /
