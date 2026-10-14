@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 // packaging.ts imports the lazy Supabase client; the pure functions don't touch it.
 vi.mock('@/db', () => ({ getSupabase: () => Promise.reject(new Error('no client in tests')) }))
 
-import { groupProducts, loadPackaging, packFromRows, type PackagingRow } from './packaging'
+import { groupProducts, loadAllPackaging, loadPackaging, packFromRows, type PackagingRow } from './packaging'
 
 const row = (o: Partial<PackagingRow>): PackagingRow => ({
   id: 1,
@@ -42,6 +42,13 @@ describe('groupProducts', () => {
       ['Example Drops', 2],
       ['Other Drops', 1],
     ])
+  })
+})
+
+describe('groupProducts order', () => {
+  it('lists products A to Z for the dropdown', () => {
+    const g = groupProducts([row({ id: 1, product_name: 'Zeta' }), row({ id: 2, product_name: 'alpha' })])
+    expect(g.map(x => x.label)).toEqual(['alpha', 'Zeta'])
   })
 })
 
@@ -92,5 +99,11 @@ describe('packFromRows', () => {
 describe('loadPackaging', () => {
   it('resolves to no rows, not an error, when the table or client is unavailable', async () => {
     await expect(loadPackaging(1000208)).resolves.toEqual([])
+  })
+})
+
+describe('loadAllPackaging', () => {
+  it('resolves to no rows, not an error, when the table or client is unavailable', async () => {
+    await expect(loadAllPackaging()).resolves.toEqual([])
   })
 })

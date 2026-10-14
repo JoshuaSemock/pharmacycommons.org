@@ -63,6 +63,35 @@ export function loadPackaging(moietyPcid: number): Promise<PackagingRow[]> {
   return p
 }
 
+let allCache: Promise<PackagingRow[]> | null = null
+
+/**
+ * Every curated packaging row, for the dropdown of products with known package
+ * facts. Loaded once; resolves to [] on any failure (and is then retried next time).
+ */
+export function loadAllPackaging(): Promise<PackagingRow[]> {
+  if (!allCache) {
+    allCache = fetchAll().then(
+      r => {
+        if (!r.length) allCache = null
+        return r
+      },
+      () => {
+        allCache = null
+        return []
+      },
+    )
+  }
+  return allCache
+}
+
+async function fetchAll(): Promise<PackagingRow[]> {
+  const sb = await getSupabase()
+  const { data, error } = await sb.from('product_packaging').select(COLUMNS).order('product_name').limit(5000)
+  if (error || !data) return []
+  return data as unknown as PackagingRow[]
+}
+
 async function fetchPackaging(moietyPcid: number): Promise<PackagingRow[]> {
   const sb = await getSupabase()
   const members = await sb.from('moiety_hierarchy').select('member_pcid').eq('moiety_pcid', moietyPcid)
@@ -86,7 +115,7 @@ export function groupProducts(rows: PackagingRow[]): ProductGroup[] {
     }
     g.rows.push(r)
   }
-  return [...map.values()]
+  return [...map.values()].sort((a, b) => a.label.localeCompare(b.label, 'en', { sensitivity: 'base' }))
 }
 
 const sourceText = (r: PackagingRow): string =>
