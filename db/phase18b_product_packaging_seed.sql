@@ -1,6 +1,7 @@
 -- db/phase18b_product_packaging_seed.sql
 -- Phase 18b: first three curated rows for public.product_packaging (2026-10-13).
--- STATUS: written, NOT applied. Run after db/phase18_product_packaging.sql is applied.
+-- STATUS: applied 2026-10-13 by Joshua in the SQL editor after phase 18; recorded by hand as
+-- 20261014003501 phase18b_product_packaging_seed. Live: 3 rows (Lantus SoloStar, ProAir HFA, Xalatan).
 --
 -- Every figure below was read from the FDA-approved label on 2026-10-13 and the
 -- page quoted in source_name / source_url. Nothing is inferred. Where a label does
