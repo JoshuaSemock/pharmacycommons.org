@@ -191,7 +191,7 @@ Code: `src/tools/dayssupply/topical.ts` (engine, `topical.test.ts`), `Topical.ts
 
 `db/phase18_product_packaging.sql` defines `product_packaging`: one row per product per source for drops per mL, bottle volume, priming, use-within days, doses per pen, units per pen and pens per box, keyed to a PCID (moiety or formulation). `value_source` is `manufacturer`, `payer` (needs `payer_name`) or `general_default`, with `source_name`, `source_url` and `source_checked` on every row, so a 20 vs 16 drops per mL disagreement is two rows. `container` (pen or vial) is recorded for insulin and injectables. Public read, no client writes.
 
-**Status: written, not applied** (the `apply_migration` call was cancelled 2026-10-13; apply it, then confirm in `schema_migrations`). First seed rows are in `db/phase18b_product_packaging_seed.sql`, each read from the FDA label on 2026-10-13: Lantus SoloStar (300 units, 2-unit safety test, 5 pens per carton, 28 days after first use), ProAir HFA (200 actuations, 3 priming sprays) and Xalatan (2.5 mL, 6 weeks after opening; drops per mL is not stated, so it is left out and the row's note says the label's 1.5 mcg per drop implies about 33 per mL).
+**Status: applied 2026-10-13** by Joshua in the SQL editor (`apply_migration` was cancelled twice; recorded by hand in `schema_migrations` as 20261014003500 and 20261014003501; 3 rows, RLS on, public read only). First seed rows are in `db/phase18b_product_packaging_seed.sql`, each read from the FDA label on 2026-10-13: Lantus SoloStar (300 units, 2-unit safety test, 5 pens per carton, 28 days after first use), ProAir HFA (200 actuations, 3 priming sprays) and Xalatan (2.5 mL, 6 weeks after opening; drops per mL is not stated, so it is left out and the row's note says the label's 1.5 mcg per drop implies about 33 per mL).
 
 **On the page.** `src/tools/dayssupply/packaging.ts` reads the rows for the medication picked in the name field (the moiety plus everything under it in `moiety_hierarchy`); `PackagingPicker.tsx` shows a "Package facts on file" box above the Package fields when rows exist for the chosen form. "Fill in the package" sets the fields, and the box then lists every value with its source and check date. A manufacturer value wins over a general default; a payer drops-per-mL figure goes to the payer field so both results show. If the table does not exist yet, or has no rows for the medication, nothing appears and the fields are typed in as before. Tests: `packaging.test.ts`.
 
@@ -216,7 +216,7 @@ Asked for by Joshua 2026-10-13. The *Refill calendar* card now comes **first** o
   ingest joined on application number. Search stays moiety-only: pick the moiety, then
   a product under it. Drops per mL, priming, in-use days and doses per pen are not in
   the NDC Directory; they need the curated table below.
-- ~~Drops per mL and in-use limits stored per product in Supabase, with the source on each row~~ Table and reader are built (version 3); the table is not applied yet and needs rows loaded beyond the first three.
+- ~~Drops per mL and in-use limits stored per product in Supabase, with the source on each row~~ Table and reader are built and applied (version 3); it holds three rows so far and needs more.
 
 ## What version 1 does differently from the plan above
 

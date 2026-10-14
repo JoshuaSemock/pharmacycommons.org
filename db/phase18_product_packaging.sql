@@ -1,9 +1,10 @@
 -- db/phase18_product_packaging.sql
 -- Phase 18: curated packaging facts for the days supply calculator (2026-10-13).
 --
--- STATUS: written, NOT applied (the apply_migration call was cancelled 2026-10-13).
--- Apply with apply_migration, then confirm it in supabase_migrations.schema_migrations
--- before changing this line. Seed rows: db/phase18b_product_packaging_seed.sql.
+-- STATUS: applied 2026-10-13 by Joshua in the SQL editor (apply_migration was cancelled twice), recorded
+-- by hand in supabase_migrations.schema_migrations as 20261014003500 phase18_product_packaging.
+-- Checked live: 3 rows, RLS on, one public read policy, SELECT only for anon/authenticated, no new
+-- advisor findings. Seed rows: db/phase18b_product_packaging_seed.sql.
 --
 -- Why: the calculator needs facts the FDA NDC Directory does not carry: drops per
 -- mL, priming, use-within days after opening, doses per pen. These are curated
