@@ -670,7 +670,6 @@ export default function DaysSupply() {
 
               <Group title="Package">
                 <PackagingPicker
-                  pcid={m.pcid}
                   basis={basis}
                   onApply={p => setPack(x => ({ ...x, ...p, ...(p.container === 'pen' && p.perBox ? { wholeBox: true } : {}) }))}
                 />
