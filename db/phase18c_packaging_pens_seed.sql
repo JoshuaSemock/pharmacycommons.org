@@ -1,6 +1,6 @@
 -- db/phase18c_packaging_pens_seed.sql
 -- Phase 18c: insulin and GLP-1/GIP pen rows for public.product_packaging (2026-10-13).
--- STATUS: NOT APPLIED. Joshua runs it in the SQL editor, then records it in schema_migrations.
+-- STATUS: applied 2026-10-13 by Joshua in the SQL editor; recorded by hand in schema_migrations (see docs/days-supply.md).
 --
 -- Source: the FDA label text cached in public.label_section_text (How Supplied section and
 -- its tables, from openFDA via the label-text function), read 2026-10-13. Each source_url is

@@ -1,6 +1,6 @@
 -- db/phase18d_packaging_inhalers_seed.sql
 -- Phase 18d: inhaler rows for public.product_packaging (2026-10-13).
--- STATUS: NOT APPLIED. Joshua runs it in the SQL editor, then records it in schema_migrations.
+-- STATUS: applied 2026-10-13 by Joshua in the SQL editor; recorded by hand in schema_migrations (see docs/days-supply.md).
 --
 -- Source: the FDA label text cached in public.label_section_text (How Supplied section, from
 -- openFDA via the label-text function), read 2026-10-13. Each source_url is the DailyMed page
