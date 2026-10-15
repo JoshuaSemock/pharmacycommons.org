@@ -10,7 +10,7 @@
 const TAPPABLE = 'a[href], button, summary, label, select, [role="button"], [role="tab"], [role="option"], [role="menuitem"], input:not([type="text"]):not([type="search"]):not([type="number"]):not([type="email"]):not([type="password"])'
 const TICK_MS = 8
 
-export function isTappable(target: EventTarget | null): boolean {
+function isTappable(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false
   const el = target.closest(TAPPABLE)
   if (!el) return false

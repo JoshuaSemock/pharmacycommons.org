@@ -130,7 +130,8 @@ export function unblockContributor(userId: string): Promise<void> {
   return call<null>('unblock_contributor', { p_user_id: userId }).then(() => undefined)
 }
 
-export type Protection = 'open' | 'reviewed' | 'patrollers'
+import type { Protection } from './pageContent'
+export type { Protection }
 
 export const PROTECTION_LABEL: Record<Protection, string> = {
   open: 'Open: edits go live, then get reviewed',

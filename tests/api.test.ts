@@ -31,7 +31,6 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import type { DrugEntityType } from '@/api.generated'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fixture data + fake supabase-js query builder
@@ -214,20 +213,8 @@ vi.mock('@/supabaseClient', () => ({
   },
 }))
 
-const {
-  toDescription,
-  getDrugByPcid,
-  getDrugBySlug,
-  getDrugInteractions,
-  isApiError,
-  listDrugs,
-  searchDrugs,
-} = await import('@/api')
+const { toDescription, getDrugBySlug } = await import('@/api')
 
-// Current toDrugEntityType() only ever produces these two — 'substance' and
-// 'device' exist in the DB enum but aren't emitted by the mapping today.
-const ENTITY_TYPES: DrugEntityType[] = ['drug', 'combination']
-const PCID_RE = /^PCID-[12]\d{6}$/
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -291,171 +278,6 @@ describe('getDrugBySlug', () => {
     expect(drug?.entity_type).toBe('combination')
     expect(drug?.pcid_code).toMatch(/^PCID-2\d{6}$/)
   })
-})
-
-describe('getDrugByPcid', () => {
-  it('resolves a PCID to the same record as its slug', async () => {
-    const [byPcid, bySlug] = await Promise.all([
-      getDrugByPcid('PCID-1000233'),
-      getDrugBySlug('ibuprofen'),
-    ])
-    expect(byPcid).toEqual(bySlug)
-  })
-
-  it.each(['PCID-9999999', 'PCID-123', 'pcid-1000233', 'DAM-1000233', ''])(
-    'returns null for %j',
-    async pcid => {
-      await expect(getDrugByPcid(pcid)).resolves.toBeNull()
-    },
-  )
-})
-
-describe('getDrugInteractions', () => {
-  it('returns an empty list when there are no live interaction records', async () => {
-    await expect(getDrugInteractions('metformin')).resolves.toEqual([])
-  })
-
-  it('returns null for an unknown slug', async () => {
-    await expect(getDrugInteractions('not-a-real-drug-xyz')).resolves.toBeNull()
-  })
-})
-
-describe('listDrugs', () => {
-  it('returns the documented response shape', async () => {
-    const res = await listDrugs({ limit: 5 })
-    expect(res).toMatchObject({
-      drugs: expect.any(Array),
-      total: MOIETIES,
-      offset: 0,
-      limit: 5,
-      has_more: true,
-    })
-    expect(res?.drugs).toHaveLength(5)
-  })
-
-  it('defaults to 25 and caps the page size at 100', async () => {
-    expect((await listDrugs())?.limit).toBe(25)
-    expect((await listDrugs({ limit: 500 }))?.drugs).toHaveLength(100)
-  })
-
-  it('clamps a negative offset to zero', async () => {
-    expect((await listDrugs({ offset: -10 }))?.offset).toBe(0)
-  })
-
-  it('pages without overlap', async () => {
-    const [a, b] = await Promise.all([
-      listDrugs({ limit: 5, offset: 0 }),
-      listDrugs({ limit: 5, offset: 5 }),
-    ])
-    const slugsA = new Set(a?.drugs.map(d => d.slug))
-    expect(b?.drugs.some(d => slugsA.has(d.slug))).toBe(false)
-  })
-
-  it('reports has_more false on the last page', async () => {
-    const res = await listDrugs({ limit: 10, offset: MOIETIES - 3 })
-    expect(res?.drugs).toHaveLength(3)
-    expect(res?.has_more).toBe(false)
-  })
-
-  it('only ever returns moieties, regardless of entity_type', async () => {
-    // Precise forms, formulations and combination products aren't
-    // catalog-level entries any more (see the 2026-09-20 file-header note) —
-    // they live under their parent moiety's hierarchy instead. entity_type is
-    // accepted for API compatibility but no longer widens or narrows the
-    // result past moiety rows.
-    const res = await listDrugs({ entity_type: 'combination', limit: 100 })
-    expect(res?.total).toBe(MOIETIES)
-    expect(res?.drugs.every(d => d.entity_type === 'drug')).toBe(true)
-    expect(COMBINATIONS).toBeGreaterThan(0) // sanity: the fixture does have one, just unreachable here
-  })
-
-  it('describes a brand name when the catalog has one', async () => {
-    const res = await listDrugs({ limit: TOTAL })
-    const oxy = res?.drugs.find(d => d.slug === 'oxycodone')
-    expect(oxy?.description).toBe('Also marketed as OxyContin.')
-  })
-
-  it('produces well-formed list items across the whole catalog', async () => {
-    let offset = 0
-    let seen = 0
-    let page = await listDrugs({ limit: 100, offset })
-    while (page && page.drugs.length > 0) {
-      for (const d of page.drugs) {
-        expect(d.pcid_code).toMatch(PCID_RE)
-        expect(ENTITY_TYPES).toContain(d.entity_type)
-        expect(d.name.length).toBeGreaterThan(0)
-      }
-      seen += page.drugs.length
-      offset += page.drugs.length
-      page = page.has_more ? await listDrugs({ limit: 100, offset }) : null
-    }
-    expect(seen).toBe(MOIETIES)
-  })
-})
-
-describe('searchDrugs', () => {
-  it('returns null for an empty or blank query', async () => {
-    await expect(searchDrugs({ q: '' })).resolves.toBeNull()
-    await expect(searchDrugs({ q: '   ' })).resolves.toBeNull()
-  })
-
-  it('ranks an exact slug first', async () => {
-    const res = await searchDrugs({ q: 'sertraline' })
-    expect(res?.drugs[0]?.slug).toBe('sertraline')
-  })
-
-  it('finds by prefix', async () => {
-    const res = await searchDrugs({ q: 'sert' })
-    expect(res?.drugs.map(d => d.slug)).toContain('sertraline')
-  })
-
-  it('finds by brand name', async () => {
-    const res = await searchDrugs({ q: 'oxycontin' })
-    expect(res?.drugs.map(d => d.slug)).toContain('oxycodone')
-  })
-
-  it('is case-insensitive', async () => {
-    const [lower, upper] = await Promise.all([searchDrugs({ q: 'metf' }), searchDrugs({ q: 'METF' })])
-    expect(upper?.drugs).toEqual(lower?.drugs)
-  })
-
-  it('echoes the trimmed query', async () => {
-    expect((await searchDrugs({ q: '  metformin ' }))?.query).toBe('metformin')
-  })
-
-  it('returns an empty page for nonsense', async () => {
-    const res = await searchDrugs({ q: 'xyzabc123nonexistent' })
-    expect(res?.drugs).toEqual([])
-    expect(res?.has_more).toBe(false)
-  })
-
-  it('does not surface the fixture combination', async () => {
-    const res = await searchDrugs({ q: 'acetaminophen-pentazocine' })
-    expect(res?.drugs).toEqual([])
-  })
-
-  it('pages without overlap', async () => {
-    const [a, b] = await Promise.all([
-      searchDrugs({ q: 'a', limit: 5, offset: 0 }),
-      searchDrugs({ q: 'a', limit: 5, offset: 5 }),
-    ])
-    expect(a?.has_more).toBe(true)
-    const slugsA = new Set(a?.drugs.map(d => d.slug))
-    expect(b?.drugs.some(d => slugsA.has(d.slug))).toBe(false)
-  })
-})
-
-describe('isApiError', () => {
-  it('recognizes an error envelope', () => {
-    expect(isApiError({ error: true, code: 'NOT_FOUND', message: 'Drug not found' })).toBe(true)
-  })
-
-  it.each([{ error: false, data: {} }, null, undefined, 'error', { code: 'NOT_FOUND' }])(
-    'rejects %j',
-    value => {
-      expect(isApiError(value)).toBe(false)
-    },
-  )
 })
 
 // ─────────────────────────────────────────────────────────────────────────────

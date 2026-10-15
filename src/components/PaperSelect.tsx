@@ -367,7 +367,7 @@ function firstEnabled(list: SelectOption[], from: number, step: 1 | -1): number 
 }
 
 /** Flattens <option> and <optgroup> elements (as written inside a native select). */
-export function optionsFromChildren(children: ReactNode, group?: string): SelectOption[] {
+function optionsFromChildren(children: ReactNode, group?: string): SelectOption[] {
   const out: SelectOption[] = []
   Children.forEach(children, child => {
     if (!isValidElement(child)) return

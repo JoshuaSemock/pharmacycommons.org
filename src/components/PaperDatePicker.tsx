@@ -347,7 +347,7 @@ function Chevron({ dir }: { dir: 'left' | 'right' }) {
 /* Plain calendar arithmetic on {y, m (0-11), d}; never a Date in UTC, so a
    date can't slip a day across a time-zone boundary. */
 
-export function parseIso(s: string): Ymd | null {
+function parseIso(s: string): Ymd | null {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
   if (!m) return null
   const y = Number(m[1])
@@ -357,7 +357,7 @@ export function parseIso(s: string): Ymd | null {
   return { y, m: mo, d }
 }
 
-export function toIso({ y, m, d }: Ymd): string {
+function toIso({ y, m, d }: Ymd): string {
   return `${String(y).padStart(4, '0')}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
 
@@ -389,7 +389,7 @@ export function addDays({ y, m, d }: Ymd, n: number): Ymd {
   return { y: t.getFullYear(), m: t.getMonth(), d: t.getDate() }
 }
 
-export function addMonths({ y, m, d }: Ymd, n: number): Ymd {
+function addMonths({ y, m, d }: Ymd, n: number): Ymd {
   const total = y * 12 + m + n
   const ny = Math.floor(total / 12)
   const nm = total - ny * 12
@@ -397,7 +397,7 @@ export function addMonths({ y, m, d }: Ymd, n: number): Ymd {
 }
 
 /** Whole weeks (Sunday first) covering the month: 4 to 6 rows of 7. */
-export function monthGrid(y: number, m: number): Ymd[][] {
+function monthGrid(y: number, m: number): Ymd[][] {
   const first = { y, m, d: 1 }
   let day = addDays(first, -weekday(first))
   const weeks: Ymd[][] = []

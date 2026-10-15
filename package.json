@@ -23,6 +23,8 @@
     "build": "vite build && node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs",
     "preview": "vite preview",
     "sitemap": "node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "sync:edge": "node scripts/sync-page-source.mjs",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
@@ -40,8 +42,6 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
-    "@testing-library/dom": "^10.4.2",
-    "@testing-library/react": "^16.3.3",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

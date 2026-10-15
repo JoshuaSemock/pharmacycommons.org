@@ -51,7 +51,7 @@ type Props = {
   onPublished: (result: PublishResult) => void
 }
 
-export function targetLabel(target?: FragmentTarget): string {
+function targetLabel(target?: FragmentTarget): string {
   if (!target) return 'the whole page'
   if (target.kind === 'lead') return 'the lead'
   if (target.kind === 'rail') return target.name === 'infobox' ? 'Quick Facts' : 'brand names'

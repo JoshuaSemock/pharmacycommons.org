@@ -741,10 +741,6 @@ export function searchCatalog(query: string, limit = 25, opts: { concepts?: bool
   return scored.slice(0, limit).map(x => x.e)
 }
 
-export function getBySlug(slug: string): CatalogEntry | null {
-  return _bySlug?.get(slug) ?? null
-}
-
 export function getByPcid(pcid: string): CatalogEntry | null {
   const m = /^PCID-(\d+)$/.exec(pcid)
   return m ? _byNum?.get(Number(m[1])) ?? null : null
