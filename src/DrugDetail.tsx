@@ -3,15 +3,13 @@ import type { CSSProperties, ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getDrugBySlug } from './api'
 import type {
-  BrandName,
   DrugComponent,
   DrugDetail as DrugDetailType,
+  EcoRisk,
   EntityClass,
   EntityList,
   HierarchyMember,
 } from './api.generated'
-import { ECO_RISK_COLORS } from './data'
-import type { EcoRisk } from './data'
 import { authErrorMessage, isEntitySaved, saveEntity, unsaveEntity, useSession } from './auth'
 import LabelSections, { labelSectionId } from './LabelSections'
 import { getGuidelines } from './guidelines'
@@ -96,7 +94,13 @@ type EcoLike = {
   primary_concern?: string | null
 }
 
-const ECO_RISK_KEYS: readonly string[] = ['negligible', 'low', 'moderate', 'high']
+const ECO_RISK_COLORS: Record<EcoRisk, { bg: string; text: string; border: string; label: string }> = {
+  negligible: { bg: '', text: 'text-ink', border: '', label: 'Negligible' },
+  low: { bg: 'bg-sky-50', text: 'text-ink', border: '', label: 'Low' },
+  moderate: { bg: 'bg-marigold-100', text: 'text-ink', border: '', label: 'Moderate' },
+  high: { bg: 'bg-rose-100', text: 'text-ink', border: '', label: 'High' },
+}
+const ECO_RISK_KEYS: readonly string[] = Object.keys(ECO_RISK_COLORS)
 
 function toRiskKey(value: unknown): EcoRisk | null {
   return typeof value === 'string' && ECO_RISK_KEYS.includes(value) ? (value as EcoRisk) : null

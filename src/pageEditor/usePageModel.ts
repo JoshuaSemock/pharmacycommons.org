@@ -48,7 +48,7 @@ type CitationRow = { ordinal: number; ref_key: string; source: Omit<Reference, '
 /** Column missing → the phase-16 migration hasn't been applied. */
 const missingSchema = (message: string) => /column .* does not exist|relation .* does not exist|Could not find/.test(message)
 
-export async function loadPageModel(pcid: number, ctx: PageContext, signal?: AbortSignal): Promise<Exclude<PageModelState, { status: 'loading' }>> {
+async function loadPageModel(pcid: number, ctx: PageContext, signal?: AbortSignal): Promise<Exclude<PageModelState, { status: 'loading' }>> {
   const content = await supabase.from('page_content').select('current_revision_id').eq('pcid', pcid).abortSignal(signal ?? new AbortController().signal).maybeSingle()
   if (content.error) throw new Error(content.error.message)
   const revisionId = (content.data as { current_revision_id: number | null } | null)?.current_revision_id ?? null

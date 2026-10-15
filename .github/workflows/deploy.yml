@@ -41,7 +41,7 @@ jobs:
       # vite build uses esbuild, which strips types without checking them.
       # Without this step a type error ships silently instead of failing.
       - name: Type check
-        run: pnpm exec tsc --noEmit
+        run: pnpm typecheck
 
       # Offline suites only. tests/integration.test.ts stays skipped unless
       # RUN_INTEGRATION=1 is set, so this never depends on the live backend.

@@ -8,7 +8,7 @@ import type { LegalPageLink } from '../legal'
 /**
  * Shared layout for /terms, /disclaimer, /licensing and /privacy.
  *
- * Renders a canonical docs/*.md file (passed in raw by the route page) inside
+ * Renders a canonical docs/*.md file (loaded raw via import.meta.glob) inside
  * the standard text-page frame: title and Effective Date in the header, the
  * numbered sections in the reading column with "On this page" in the rail, then
  * a contact callout and links to the other three policies.
@@ -16,18 +16,22 @@ import type { LegalPageLink } from '../legal'
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+// The four policies are small; load them eagerly into this one lazy chunk.
+const DOCS = import.meta.glob<string>(
+  '../../docs/{terms-of-use,medical-disclaimer,privacy-policy,data-provenance-and-licensing}.md',
+  { query: '?raw', import: 'default', eager: true },
+)
+
 type LegalPageProps = {
-  /** Raw markdown of the canonical document. */
-  source: string
   /** Which of LEGAL_PAGES this is; the others are listed as related. */
   current: LegalPageLink['to']
-  /** One plain-language sentence under the title. */
-  lede: string
 }
 
-export default function LegalPage({ source, current, lede }: LegalPageProps) {
-  const doc = useMemo(() => parseLegalDoc(source), [source])
+export default function LegalPage({ current }: LegalPageProps) {
   const page = LEGAL_PAGES.find(p => p.to === current)
+  const source = page ? (DOCS[`../../${page.file}`] ?? '') : ''
+  const doc = useMemo(() => parseLegalDoc(source), [source])
+  const lede = page?.lede ?? ''
   const title = page?.title ?? doc.title
   const related = LEGAL_PAGES.filter(p => p.to !== current)
 

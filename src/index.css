@@ -388,7 +388,8 @@ button.lp-raised {
   --lp-foil-veil: color-mix(in srgb, var(--color-foil) 35%, transparent);
   --lp-foil-ink: #3a3a3a;
 }
-.lp-field.lp-foil:focus-within {
+.lp-field.lp-foil:focus-within,
+.lp-foil-set {
   background:
     linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
     url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
@@ -414,24 +415,11 @@ button.lp-raised {
 /* Foil fill, always on (2026-10-13): the same foil and grain as a focused
    search bar, for a selection that should read as stamped in mint (the days
    between two dates in the Days Supply calendar). Add it to .lp-sunken (or
-   .lp-raised) elements; their relief shading stays on top. Dark ink, as above. */
-.lp-foil-set {
-  background:
-    linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
-    url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
-    var(--lp-foil);
-  background-blend-mode: normal, hard-light, normal;
-  color: var(--lp-foil-ink);
-}
+   .lp-raised) elements; their relief shading stays on top. Dark ink, as above.
+   (Merged into the .lp-field.lp-foil:focus-within rules above and below; same body.) */
 @media (width <= 780px) {
+  .lp-field.lp-foil:focus-within,
   .lp-foil-set {
-    background-image:
-      linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
-      url("/textures/paper-grain-sm.webp");
-  }
-}
-@media (width <= 780px) {
-  .lp-field.lp-foil:focus-within {
     background-image:
       linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
       url("/textures/paper-grain-sm.webp");
@@ -450,7 +438,8 @@ button.lp-raised {
   }
 }
 
-.lp-rule-t { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+.lp-rule-t,
+.lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
 .lp-rule-b { box-shadow: inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim); }
 @media (width < 48rem) {
   .lp-rule-t-until-md { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
@@ -461,7 +450,6 @@ button.lp-raised {
 }
 .lp-score { height: 1px; background: var(--lp-edge); box-shadow: 0 1px 0 var(--lp-rim); }
 .lp-score-v { width: 1px; background: var(--lp-edge); box-shadow: 1px 0 0 var(--lp-rim); }
-.lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
 
 /* Dropdowns (2026-10-02). Every dropdown on the site is colorless: the
    floating panel is a scrap of the same paper (bg-paper + .pc-grain) lifted
@@ -662,7 +650,7 @@ body {
 :root[data-theme="dark"] body {
   background-color: #3a3a3a;   /* behind the lichen in dark mode only */
 }
-h1, h2, h3, .article-body h1 {
+h1, h2, h3 {
   font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { PageTitle } from '@/pages/PageShell'
 import { API_BASE, SITE_BASE } from '@/machine'
 import { ENDPOINTS, buildUrl, exampleValues, type Endpoint } from '@/developers/endpoints'
@@ -389,9 +389,9 @@ export default function Developers() {
               <CodeBlock label="Example">{`Pharmacy Commons. metformin (PCID-1001923), version 2. ${SITE_BASE}/id/PCID-1001923. Accessed ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.`}</CodeBlock>
               <p className="text-[13.5px] text-ink">
                 More citation styles are on the{' '}
-                <a href="/references" className={link}>
+                <Link to="/references" className={link}>
                   References
-                </a>{' '}
+                </Link>{' '}
                 page and on every drug page.
               </p>
             </div>

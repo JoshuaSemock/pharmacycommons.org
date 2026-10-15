@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-do
 import Nav from './Nav'
 import Footer from './Footer'
 import Home from './pages/Home'
+import { LEGAL_PAGES } from './legal'
 
 // Home ships in the entry bundle because it is the landing page. Every other
 // route is split into its own chunk and fetched when first visited, so the
@@ -32,10 +33,8 @@ const DaysSupply = lazy(() => import('./tools/DaysSupply'))
 const Dictionary = lazy(() => import('./tools/Dictionary'))
 const Developers = lazy(() => import('./pages/Developers'))
 // Legal & governance pages; text comes from docs/*.md (see src/legal.ts).
-const Terms = lazy(() => import('./pages/Terms'))
-const Disclaimer = lazy(() => import('./pages/Disclaimer'))
-const Licensing = lazy(() => import('./pages/Licensing'))
-const Privacy = lazy(() => import('./pages/Privacy'))
+const LegalPage = lazy(() => import('./pages/LegalPage'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 // Community editing (phase 15): page history and the reviewers' queue.
 const PageHistory = lazy(() => import('./pages/PageHistory'))
 const EditPage = lazy(() => import('./pages/EditPage'))
@@ -107,11 +106,10 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/licensing" element={<Licensing />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="*" element={<Home />} />
+          {LEGAL_PAGES.map(p => (
+            <Route key={p.to} path={p.to} element={<LegalPage key={p.to} current={p.to} />} />
+          ))}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
         <Footer />

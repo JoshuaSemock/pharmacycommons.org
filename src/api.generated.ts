@@ -8,7 +8,7 @@
 
 export type DrugEntityType = 'drug' | 'substance' | 'combination' | 'device'
 
-export type EcoRisk = 'insignificant' | 'low' | 'moderate' | 'high'
+export type EcoRisk = 'negligible' | 'low' | 'moderate' | 'high'
 
 export type EcoMetrics = {
   rq: number | null

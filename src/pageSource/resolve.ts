@@ -150,7 +150,7 @@ export function fromDailyMed(c: Citation, body: unknown): Lookup {
   }
 }
 
-export function lookupUrl(c: Citation): string | null {
+function lookupUrl(c: Citation): string | null {
   switch (c.kind) {
     case 'pmid':
       return `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${encodeURIComponent(c.id)}&retmode=json`
