@@ -388,8 +388,7 @@ button.lp-raised {
   --lp-foil-veil: color-mix(in srgb, var(--color-foil) 35%, transparent);
   --lp-foil-ink: #3a3a3a;
 }
-.lp-field.lp-foil:focus-within,
-.lp-foil-set {
+.lp-field.lp-foil:focus-within {
   background:
     linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
     url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
@@ -415,11 +414,24 @@ button.lp-raised {
 /* Foil fill, always on (2026-10-13): the same foil and grain as a focused
    search bar, for a selection that should read as stamped in mint (the days
    between two dates in the Days Supply calendar). Add it to .lp-sunken (or
-   .lp-raised) elements; their relief shading stays on top. Dark ink, as above.
-   (Merged into the .lp-field.lp-foil:focus-within rules above and below; same body.) */
+   .lp-raised) elements; their relief shading stays on top. Dark ink, as above. */
+.lp-foil-set {
+  background:
+    linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+    url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
+    var(--lp-foil);
+  background-blend-mode: normal, hard-light, normal;
+  color: var(--lp-foil-ink);
+}
 @media (width <= 780px) {
-  .lp-field.lp-foil:focus-within,
   .lp-foil-set {
+    background-image:
+      linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+      url("/textures/paper-grain-sm.webp");
+  }
+}
+@media (width <= 780px) {
+  .lp-field.lp-foil:focus-within {
     background-image:
       linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
       url("/textures/paper-grain-sm.webp");
@@ -438,8 +450,7 @@ button.lp-raised {
   }
 }
 
-.lp-rule-t,
-.lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
+.lp-rule-t { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
 .lp-rule-b { box-shadow: inset 0 -2px 0 var(--lp-edge), inset 0 -1px 0 var(--lp-rim); }
 @media (width < 48rem) {
   .lp-rule-t-until-md { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
@@ -450,6 +461,7 @@ button.lp-raised {
 }
 .lp-score { height: 1px; background: var(--lp-edge); box-shadow: 0 1px 0 var(--lp-rim); }
 .lp-score-v { width: 1px; background: var(--lp-edge); box-shadow: 1px 0 0 var(--lp-rim); }
+.lp-divide-y > * + * { box-shadow: inset 0 1px 0 var(--lp-edge), inset 0 2px 0 var(--lp-rim); }
 
 /* Dropdowns (2026-10-02). Every dropdown on the site is colorless: the
    floating panel is a scrap of the same paper (bg-paper + .pc-grain) lifted
@@ -650,7 +662,7 @@ body {
 :root[data-theme="dark"] body {
   background-color: #3a3a3a;   /* behind the lichen in dark mode only */
 }
-h1, h2, h3 {
+h1, h2, h3, .article-body h1 {
   font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
 }
 
@@ -684,6 +696,76 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 }
 @media (min-width: 48rem) {
   .pc-hero-title { font-size: var(--text-5xl); }
+}
+
+/* Home bento (src/pages/Home.tsx and the static shell in index.html).
+   Layout only: tiles are ordinary .lp-raised panels and .lp-card links.
+   Columns follow Fibonacci ratios so spans approximate the golden ratio:
+   13 columns from lg (8:5 = 61.5:38.5, and 5:3 inside the 8), 8 columns
+   (5:3) at md, one column below. Placement is by class, so the DOM order
+   (hero, new, browse, tools, classes, lists, sources, contribute) is the
+   reading and tab order at every width. Row minimums are 21 / 13 / 8rem
+   (Fibonacci again; 13 + 8 = 21, so Browse matches the hero row); rows grow
+   with their content. Tiles must not set overflow or an isolating stacking
+   context: the hero hosts the search autocomplete popover. */
+.pc-bento {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+}
+.pc-bento__tile {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.pc-tile-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+/* Titles of the What's new rows. A class because the unlayered h3 rule
+   outranks text-* utilities (the old text-[21px] was being ignored). */
+.pc-update-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+@media (min-width: 64rem) {
+  .pc-update-title { font-size: var(--text-lg); }
+}
+@media (min-width: 48rem) {
+  .pc-bento {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: minmax(8rem, auto);
+  }
+  .pc-bento__hero,
+  .pc-bento__new { grid-column: 1 / -1; }
+  .pc-bento__browse { grid-column: 1 / 6; }
+  .pc-bento__tools { grid-column: 6 / 9; }
+  .pc-bento__classes { grid-column: 1 / 4; }
+  .pc-bento__lists { grid-column: 4 / 9; }
+  .pc-bento__sources { grid-column: 1 / 6; }
+  .pc-bento__contribute { grid-column: 6 / 9; }
+  .pc-bento__browse { min-height: 13rem; }
+  .pc-bento__browse .pc-tile-title { font-size: var(--text-3xl); }
+}
+@media (min-width: 64rem) {
+  .pc-bento {
+    grid-template-columns: repeat(13, minmax(0, 1fr));
+    grid-template-rows: minmax(21rem, auto) minmax(13rem, auto) minmax(8rem, auto);
+  }
+  .pc-bento__hero { grid-column: 1 / 9; grid-row: 1; }
+  .pc-bento__new { grid-column: 9 / 14; grid-row: 1; }
+  .pc-bento__browse { grid-column: 1 / 6; grid-row: 2 / 4; min-height: 0; }
+  .pc-bento__tools { grid-column: 6 / 11; grid-row: 2; }
+  .pc-bento__classes { grid-column: 11 / 14; grid-row: 2; }
+  .pc-bento__lists { grid-column: 6 / 14; grid-row: 3; }
+  .pc-bento__sources { grid-column: 1 / 9; grid-row: 4; }
+  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 4; }
+  .pc-tile-title { font-size: var(--text-2xl); }
+  .pc-bento__classes .pc-tile-title { font-size: var(--text-xl); }
 }
 
 /* No text shadows anywhere (2026-10-01): text renders as plain, crisp ink.

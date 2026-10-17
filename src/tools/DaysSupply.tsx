@@ -31,15 +31,15 @@ import { applyProposal, readDirections, type Proposal } from '@/tools/dayssupply
 import Results, { type Column } from '@/tools/dayssupply/Results'
 import PackagingPicker from '@/tools/dayssupply/PackagingPicker'
 import CalendarView from '@/tools/dayssupply/CalendarView'
-import ScheduleCard from '@/tools/dayssupply/Schedule'
-import TopicalCard from '@/tools/dayssupply/Topical'
+import ScheduleCard from '@/tools/dayssupply/ScheduleCard'
+import TopicalCard from '@/tools/dayssupply/TopicalCard'
 
 /**
  * /tools/days-supply
  *
  * Two cards on one sheet, then two more below them: a step schedule card
- * (tapers, weekday doses, dose step-ups: dayssupply/Schedule.tsx) and a cream
- * or ointment estimate (dayssupply/Topical.tsx):
+ * (tapers, weekday doses, dose step-ups: dayssupply/ScheduleCard.tsx) and a cream
+ * or ointment estimate (dayssupply/TopicalCard.tsx):
  *
  *   ┌ Refill calendar ────────────────────────────────────────────────────┐
  *   │ Scrollable calendar (calendar view)  |  days between / N days from  │

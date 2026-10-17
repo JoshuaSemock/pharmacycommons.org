@@ -167,7 +167,7 @@ Two more cards below the refill calendar, chosen by Joshua 2026-10-13 from the s
 
 ### Step schedules (tapers, weekday doses, dose step-ups)
 
-Code: `src/tools/dayssupply/schedule.ts` (engine, `schedule.test.ts`), `Schedule.tsx` (card).
+Code: `src/tools/dayssupply/schedule.ts` (engine, `schedule.test.ts`), `ScheduleCard.tsx` (card).
 
 - **Steps run one after another.** Each lasts a whole number of days and is either *the same amount each time* (amount per dose, then every day / every other day / weekly / every 2 weeks / every 4 weeks, and doses per day when given daily) or *different on each weekday* (total on Sunday to Saturday, counted from the weekday the step starts on; the next step carries on from where the last one ended).
 - **Dose counts, not division.** The first dose is on day 1 of a step, so a weekly dose for 28 days is 4 doses (days 1, 8, 15, 22) and for 21 days is 3. The count is `ceil(days / every)`.
@@ -179,7 +179,7 @@ Code: `src/tools/dayssupply/schedule.ts` (engine, `schedule.test.ts`), `Schedule
 
 ### Cream or ointment (fingertip units), an estimate
 
-Code: `src/tools/dayssupply/topical.ts` (engine, `topical.test.ts`), `Topical.tsx` (card).
+Code: `src/tools/dayssupply/topical.ts` (engine, `topical.test.ts`), `TopicalCard.tsx` (card).
 
 - One fingertip unit is about 0.5 g, and one application's amount is the sum of units for the areas treated. Grams per application × applications per day × days = grams; with a package size it rounds up to whole tubes and says how many days one tube lasts.
 - **Two published tables, shown, not merged** (project principle: show disagreement). FPnotebook: face and neck 2.5, each side of trunk 3.5, arm 3, hand 1, leg 6, foot 2. GPnotebook: scalp 3, face and neck 2.5, trunk front 8 and back 8, buttocks 4, whole arm with hand 4, hand 1, whole leg with foot 8, foot 2, genitalia 0.5. They differ most on the trunk (7 vs 16 units for front plus back), so a chip picks which one is used and the source is linked beside it. Checked 2026-10-13 against both pages. The unit itself: Long and Finlay, Clin Exp Dermatol 1991;16:444-7.
