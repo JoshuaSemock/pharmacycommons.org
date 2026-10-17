@@ -298,16 +298,18 @@ function AppearanceControl() {
 
 /**
  * Three bars that fold into an X when the menu opens: the top bar drops to the
- * middle and turns 45°, the middle one fades, the bottom one rises and turns
- * -45°. Bars are 1.6px with 3.4px gaps, so each outer bar sits 5px from the
- * centre. The same transition runs both ways; reduced motion skips it.
+ * middle and turns 45°, the middle one rotates -45° while fading out, and the
+ * bottom one rises and turns -45°. Bars are 1.6px with 3.4px gaps, so each
+ * outer bar sits 5px from the centre. The same transition runs both ways;
+ * reduced motion skips it.
  */
 function MenuBars({ open }: { open: boolean }) {
   const bar = 'block h-[1.6px] w-[18px] rounded-full bg-current transition-[translate,rotate,opacity] duration-300 ease-in-out motion-reduce:transition-none'
+
   return (
     <>
       <span aria-hidden="true" className={`${bar} ${open ? 'translate-y-[5px] rotate-45' : ''}`} />
-      <span aria-hidden="true" className={`${bar} ${open ? '-rotate-45' : ''}`} />
+      <span aria-hidden="true" className={`${bar} ${open ? '-rotate-45 opacity-0' : 'rotate-0 opacity-100'}`} />
       <span aria-hidden="true" className={`${bar} ${open ? '-translate-y-[5px] -rotate-45' : ''}`} />
     </>
   )
