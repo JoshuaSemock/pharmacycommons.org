@@ -31,11 +31,11 @@ export const BAR_LINKS: { to: string; label: string; short?: string }[] = [
 ]
 
 const EXPLORE_LINKS = [
-  { to: '/browse', label: 'Drugs A to Z' },
-  { to: '/topics', label: 'Topics: conditions, labs, targets, herbals' },
+  { to: '/browse', label: 'Browse' },
+  { to: '/topics', label: 'Topics' },
   { to: '/lists', label: 'Lists' },
   { to: '/classifications', label: 'Classifications' },
-  { to: '/tools', label: 'All tools' },
+  { to: '/tools', label: 'Tools' },
 ]
 
 const REFERENCE_LINKS = [
@@ -48,7 +48,7 @@ const REFERENCE_LINKS = [
 const LEGAL_LINKS = [
   { to: '/terms', label: 'Terms of use' },
   { to: '/disclaimer', label: 'Medical disclaimer' },
-  { to: '/privacy', label: 'Privacy' },
+  { to: '/privacy', label: 'Privacy policy' },
   { to: '/licensing', label: 'Data licensing' },
 ]
 
@@ -307,7 +307,7 @@ function MenuBars({ open }: { open: boolean }) {
   return (
     <>
       <span aria-hidden="true" className={`${bar} ${open ? 'translate-y-[5px] rotate-45' : ''}`} />
-      <span aria-hidden="true" className={`${bar} ${open ? 'opacity-0' : 'opacity-100'}`} />
+      <span aria-hidden="true" className={`${bar} ${open ? '-rotate-45' : ''}`} />
       <span aria-hidden="true" className={`${bar} ${open ? '-translate-y-[5px] -rotate-45' : ''}`} />
     </>
   )
