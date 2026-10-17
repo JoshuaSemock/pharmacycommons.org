@@ -108,7 +108,7 @@ exception: a dark well in both themes with floral-white ink.
 one mint for accents. Unlike the ramps it does **not** flip in dark mode. Utilities:
 `bg-foil`, `decoration-foil`, `accent-foil`, `border-l-foil`, … Used for:
 
-- the foil-debossed search bars (`.lp-foil`, §6);
+- the foil-debossed search bars (`.lp-foil`, §6), since 2026-10-17 filled with the lighter mint-200 `#a1f6d8` (`--lp-search-foil`) rather than the full foil;
 - selected dates in the Days Supply calendar (`.lp-foil-set`: the same foil and grain, always on; pressed-in days between two dates, raised ends);
 - text selection (`::selection`);
 - the global scrollbar thumb (was `mint-200`, which dark mode turned into deep mint-800);
@@ -430,9 +430,9 @@ there is no new font or shadow, and hierarchy comes from size alone (color: see 
   lists section.
 - **Brand pastels (2026-10-17, Joshua's call).** The seven whole-card links
   (Browse, About, Classifications, Lists, Dictionary, References, Resources) are
-  tinted with `.pc-tint-mint|hepatica|salmon`: ramp step 300 at rest
-  (#6ee6c0, #d6bffc, #fcb9ab), step 400 when pressed in by hover, focus or click
-  (#62d6b2, #cbabfd, #ffa08d), under a veil that lets the paper grain show at about
+  tinted with `.pc-tint-mint|hepatica|salmon`: ramp step 100 at rest
+  (#d8f9ec, #f2edfb, #fbece9), step 200 when pressed in by hover, focus or click
+  (#a1f6d8, #e6dbfa, #fbd8d0), under a veil that lets the paper grain show at about
   a third. Dark mode uses steps 900 and 800. Text stays ink. This is the only place
   the palette fills a surface besides the foil; panels and list tiles stay paper.
 - **md (48rem): 8 columns,** rows pair 5:3 / 3:5 / 4:4 / 3:5 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
