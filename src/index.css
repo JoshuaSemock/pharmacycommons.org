@@ -387,12 +387,16 @@ button.lp-raised {
   --lp-foil: var(--color-foil);
   --lp-foil-veil: color-mix(in srgb, var(--color-foil) 35%, transparent);
   --lp-foil-ink: #3a3a3a;
+  /* Search bars use the lighter mint-200 (#a1f6d8), 2026-10-17; the calendar
+     selection (.lp-foil-set) keeps the full foil. Fixed, like the foil. */
+  --lp-search-foil: #a1f6d8;
+  --lp-search-veil: color-mix(in srgb, var(--lp-search-foil) 35%, transparent);
 }
 .lp-field.lp-foil:focus-within {
   background:
-    linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+    linear-gradient(var(--lp-search-veil), var(--lp-search-veil)),
     url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
-    var(--lp-foil);
+    var(--lp-search-foil);
   background-blend-mode: normal, hard-light, normal;
   color: var(--lp-foil-ink);
 }
@@ -433,7 +437,7 @@ button.lp-raised {
 @media (width <= 780px) {
   .lp-field.lp-foil:focus-within {
     background-image:
-      linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+      linear-gradient(var(--lp-search-veil), var(--lp-search-veil)),
       url("/textures/paper-grain-sm.webp");
   }
 }
@@ -767,13 +771,13 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 .pc-row--more { justify-content: center; }
 
 /* Brand pastels on whole-card links (2026-10-17). At rest each card is the
-   300 step of its ramp, pressed in (hover, focus, click) the 400 step: the
+   100 step of its ramp, pressed in (hover, focus, click) the 200 step: the
    same relief as every other card, with the color deepening as it sinks.
    The paper grain stays on top of the color. Fixed values, so they do not
    flip with the ramps in dark mode; dark uses the 900 and 800 steps. */
-.pc-tint-mint { --tint: #6ee6c0; --tint-deep: #62d6b2; }
-.pc-tint-hepatica { --tint: #d6bffc; --tint-deep: #cbabfd; }
-.pc-tint-salmon { --tint: #fcb9ab; --tint-deep: #ffa08d; }
+.pc-tint-mint { --tint: #d8f9ec; --tint-deep: #a1f6d8; }
+.pc-tint-hepatica { --tint: #f2edfb; --tint-deep: #e6dbfa; }
+.pc-tint-salmon { --tint: #fbece9; --tint-deep: #fbd8d0; }
 :root[data-theme="dark"] .pc-tint-mint { --tint: #134033; --tint-deep: #045d48; }
 :root[data-theme="dark"] .pc-tint-hepatica { --tint: #432f5f; --tint-deep: #61418e; }
 :root[data-theme="dark"] .pc-tint-salmon { --tint: #61271c; --tint-deep: #903121; }
