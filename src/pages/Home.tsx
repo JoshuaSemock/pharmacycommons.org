@@ -37,58 +37,58 @@ export default function Home() {
         <WhatsNew />
         <DestinationTile
           area="browse"
+          tint="mint"
           to="/browse"
           title="Browse drugs"
           blurb="Every drug and active moiety from A to Z, with salts, brand names and combination products nested under each one."
         />
         <DestinationTile
+          area="about"
+          tint="hepatica"
+          to="/about"
+          title="About"
+          blurb="What the Commons is, why it exists and who runs it."
+        />
+        <DestinationTile
           area="classes"
+          tint="salmon"
           to="/classifications"
           title="Classifications"
           blurb="Pharmacologic classes from FDA, RxClass and ClassyFire, searchable and comparable."
         />
         <DestinationTile
           area="lists"
+          tint="mint"
           to="/lists"
           title="Lists"
           blurb="MPJE, do-not-crush, arrhythmia risk, anticholinergic burden and more."
         />
-        <ListTile
-          area="topdrugs"
-          slug="most-used-drugs-us"
-          title="Most-used drugs in the US"
-          count={10}
-          ranked
-          columns
-        />
+        <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked />
         <ToolsTile />
-        <ListTile area="dnc" slug="do-not-crush" title="Do not crush" count={5} />
-        <ListTile area="qtc" slug="arrhythmia-risk-long-qt" title="QTc prolonging medications" count={5} />
         <DestinationTile
           area="dictionary"
+          tint="hepatica"
           to="/tools/dictionary"
           title="Dictionary"
           blurb="Spell-check drug names and medical terms in Word, with about 43,000 words."
         />
-        <BlogTile />
+        <ListTile area="dnc" slug="do-not-crush" title="Do not crush" count={5} />
+        <ListTile area="qtc" slug="arrhythmia-risk-long-qt" title="QTc prolonging medications" count={5} />
         <DestinationTile
           area="references"
+          tint="salmon"
           to="/references"
           title="References"
           blurb="Every source dataset and reference behind the Commons, with its license."
         />
         <DestinationTile
           area="resources"
+          tint="mint"
           to="/resources"
           title="Resources"
           blurb="Outside links, grouped by topic."
         />
-        <DestinationTile
-          area="about"
-          to="/about"
-          title="About"
-          blurb="What the Commons is, why it exists and who runs it."
-        />
+        <BlogTile />
         <Contribute />
       </div>
       <SourcesFooter />
@@ -302,17 +302,20 @@ function WhatsNew() {
 /** A whole-tile link: one .lp-card, the title names the link. */
 function DestinationTile({
   area,
+  tint,
   to,
   title,
   blurb,
 }: {
   area: string
+  /** Brand pastel for the card; it deepens as the card presses in (index.css, .pc-tint-*). */
+  tint?: 'mint' | 'hepatica' | 'salmon'
   to: string
   title: string
   blurb: string
 }) {
   return (
-    <Link to={to} className={`pc-bento__tile pc-bento__${area} lp-card rounded-md p-6`}>
+    <Link to={to} className={`pc-bento__tile pc-bento__${area} lp-card ${tint ? `pc-tint pc-tint-${tint} ` : ''}rounded-md p-6`}>
       <h2 className="pc-tile-title lp-link-text text-ink">{title}</h2>
       <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink">{blurb}</p>
     </Link>
@@ -352,14 +355,12 @@ function ListTile({
   title,
   count,
   ranked = false,
-  columns = false,
 }: {
   area: string
   slug: string
   title: string
   count: number
   ranked?: boolean
-  columns?: boolean
 }) {
   const { ref, near } = useNearViewport<HTMLElement>()
   const [preview, setPreview] = useState<ListPreview | null>(null)
@@ -386,26 +387,27 @@ function ListTile({
         {title}
       </h2>
       {preview && preview.items.length > 0 && (
-        <ol className={`mt-3 grid gap-x-6 ${columns ? 'sm:grid-cols-2' : ''}`}>
+        <ol className="pc-rows mt-3">
           {preview.items.map(item => (
-            <li key={`${item.position}-${item.name}`} className="flex items-baseline gap-2 font-sans text-[14px] text-ink">
-              {ranked && item.rank !== null && <span className="w-6 shrink-0 text-right font-mono text-[12px]">{item.rank}</span>}
+            <li key={`${item.position}-${item.name}`}>
               {item.slug ? (
-                <Link to={`/drugs/${item.slug}`} className="lp-press -mx-2 min-w-0 truncate rounded-md px-2 py-0.5 text-ink">
-                  {formatDrugName(item.name)}
+                <Link to={`/drugs/${item.slug}`} className="pc-row lp-press rounded-md text-ink">
+                  {ranked && <span className="pc-row__rank">{item.rank ?? item.position}</span>}
+                  <span className="pc-row__text">{formatDrugName(item.name)}</span>
                 </Link>
               ) : (
-                <span className="min-w-0 truncate">{formatDrugName(item.name)}</span>
+                <span className="pc-row text-ink">
+                  {ranked && <span className="pc-row__rank">{item.rank ?? item.position}</span>}
+                  <span className="pc-row__text">{formatDrugName(item.name)}</span>
+                </span>
               )}
             </li>
           ))}
         </ol>
       )}
-      <p className="mt-3 font-sans text-[13.5px]">
-        <Link to={`/lists/${slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
-          {preview && preview.total > preview.items.length ? 'See the full list' : 'Open the list'}
-        </Link>
-      </p>
+      <Link to={`/lists/${slug}`} className="pc-row pc-row--more lp-press mt-3 rounded-md text-ink">
+        {preview && preview.total > preview.items.length ? 'See the full list' : 'Open the list'}
+      </Link>
     </section>
   )
 }
@@ -418,26 +420,24 @@ function ToolsTile() {
       <h2 id="home-tools-heading" className="pc-tile-title text-ink">
         Tools
       </h2>
-      <ul className="mt-3 grid gap-0.5 font-sans text-[14px]">
+      <ul className="pc-rows mt-3">
         {tools.map(tool => (
           <li key={tool.id}>
             {tool.to ? (
-              <Link to={tool.to} className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 text-ink">
-                {tool.name}
+              <Link to={tool.to} className="pc-row lp-press rounded-md text-ink">
+                <span className="pc-row__text">{tool.name}</span>
               </Link>
             ) : (
-              <a href={tool.href} target="_blank" rel="noopener noreferrer" className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 text-ink">
-                {tool.name}
+              <a href={tool.href} target="_blank" rel="noopener noreferrer" className="pc-row lp-press rounded-md text-ink">
+                <span className="pc-row__text">{tool.name}</span>
               </a>
             )}
           </li>
         ))}
       </ul>
-      <p className="mt-3 font-sans text-[13.5px]">
-        <Link to="/tools" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
-          All tools
-        </Link>
-      </p>
+      <Link to="/tools" className="pc-row pc-row--more lp-press mt-3 rounded-md text-ink">
+        All tools
+      </Link>
     </section>
   )
 }
@@ -451,24 +451,22 @@ function BlogTile() {
         Blog
       </h2>
       {posts.length > 0 && (
-        <ul className="mt-3 grid gap-1 font-sans text-[14px]">
+        <ul className="pc-rows mt-3">
           {posts.map(post => (
-            <li key={post.slug} className="flex flex-wrap items-baseline gap-x-3">
-              <Link to={`/blog/${post.slug}`} className="lp-press -mx-2 min-w-0 rounded-md px-2 py-0.5 text-ink">
-                {post.title}
+            <li key={post.slug}>
+              <Link to={`/blog/${post.slug}`} className="pc-row lp-press rounded-md text-ink">
+                <span className="pc-row__text">{post.title}</span>
+                <time dateTime={post.date} className="pc-row__date">
+                  {formatDate(post.date)}
+                </time>
               </Link>
-              <time dateTime={post.date} className="text-[12.5px] text-ink">
-                {formatDate(post.date)}
-              </time>
             </li>
           ))}
         </ul>
       )}
-      <p className="mt-3 font-sans text-[13.5px]">
-        <Link to="/blog" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
-          All posts
-        </Link>
-      </p>
+      <Link to="/blog" className="pc-row pc-row--more lp-press mt-3 rounded-md text-ink">
+        All posts
+      </Link>
     </section>
   )
 }

@@ -413,18 +413,29 @@ The home page is an asymmetric golden-ratio bento (`.pc-bento` in `src/index.css
 tiles in `src/pages/Home.tsx`, mirrored by the static shell in `index.html`).
 Layout only: tiles are ordinary `.lp-raised` panels (hero, What's new, Contribute)
 and `.lp-card` links (Browse drugs, Classifications, Lists, Dictionary, References, Resources, About), so
-there is no new color, font or shadow, and hierarchy comes from size alone.
+there is no new font or shadow, and hierarchy comes from size alone (color: see Brand pastels).
 
-- **lg (64rem+): 13 columns, 7 rows.** Hero 13. What's new 5 (rows 2-3) beside
-  Browse 8, then Classifications 3 + Lists 5. Most-used drugs 8 + Tools 5. Do not
-  crush 5 + QTc prolonging 5 + Dictionary 3. Blog 8 + References 5. Resources 3 +
-  About 5 + Contribute 5. Row minimums are Fibonacci (13 / 13 / 8rem); rows grow.
-- **List tiles** (`.pc-bento__list`: Most-used drugs, Do not crush, QTc, Tools, Blog)
-  start at the top and preview entries. The three list tiles fetch `get_list` through
-  `src/homeLists.ts` only once near the viewport (IntersectionObserver); on failure
-  they show just their link. Slugs: `most-used-drugs-us` (10), `do-not-crush` (5),
-  `arrhythmia-risk-long-qt` (5). Tools lists live tools except the Clinical lists section.
-- **md (48rem): 8 columns,** rows pair 5:3 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
+- **lg (64rem+): 13 columns, 9 rows.** Hero 13. Rows 2-4: What's new 5 beside
+  Browse 8, About 3 + Classifications 5, Lists 8. Rows 5-6: Most-used drugs 8
+  beside Tools 5 over Dictionary 5. Rows 7-8: Do not crush 5 + QTc prolonging 5
+  beside References 3 over Resources 3. Row 9: Blog 8 + Contribute 5. Tiles are
+  top-aligned and rows size to content, so no tile has a blank band above its text.
+- **List tiles** (Most-used drugs, Do not crush, QTc, Tools, Blog) hold a column of
+  `.pc-row` buttons: one size, full width, text left, rank or date at the ends,
+  and a centred "See the full list" row. Most-used drugs is a single column with
+  the list's rank (falls back to position). The three list tiles fetch `get_list`
+  through `src/homeLists.ts` only once near the viewport (IntersectionObserver); on
+  failure they show just their link. Slugs: `most-used-drugs-us` (10), `do-not-crush`
+  (5), `arrhythmia-risk-long-qt` (5). Tools lists live tools except the Clinical
+  lists section.
+- **Brand pastels (2026-10-17, Joshua's call).** The seven whole-card links
+  (Browse, About, Classifications, Lists, Dictionary, References, Resources) are
+  tinted with `.pc-tint-mint|hepatica|salmon`: ramp step 300 at rest
+  (#6ee6c0, #d6bffc, #fcb9ab), step 400 when pressed in by hover, focus or click
+  (#62d6b2, #cbabfd, #ffa08d), under a veil that lets the paper grain show at about
+  a third. Dark mode uses steps 900 and 800. Text stays ink. This is the only place
+  the palette fills a surface besides the foil; panels and list tiles stay paper.
+- **md (48rem): 8 columns,** rows pair 5:3 / 3:5 / 4:4 / 3:5 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
 - **Below md: one column,** same DOM order, so reading and tab order never change.
 - Tiles must not set `overflow` or isolate a stacking context: the hero hosts the
   search autocomplete popover (it sits at `relative z-10`).
