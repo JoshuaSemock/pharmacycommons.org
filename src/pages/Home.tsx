@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
-import { formatDate } from '../blog'
+import { formatDate, listPosts } from '../blog'
+import { loadListPreview, type ListPreview } from '../homeLists'
+import { formatDrugName } from '../names'
+import { TOOLS, isActive } from '../tools'
 import { ctaFor, whatsNew } from '../updates'
 import Stamp from '../components/Stamp'
 
@@ -39,12 +42,6 @@ export default function Home() {
           blurb="Every drug and active moiety from A to Z, with salts, brand names and combination products nested under each one."
         />
         <DestinationTile
-          area="tools"
-          to="/tools"
-          title="Tools"
-          blurb="Creatinine clearance, medication reconciliation, days supply and a medical dictionary."
-        />
-        <DestinationTile
           area="classes"
           to="/classifications"
           title="Classifications"
@@ -54,13 +51,43 @@ export default function Home() {
           area="lists"
           to="/lists"
           title="Lists"
-          blurb="Most-used US drugs, Georgia MPJE, do-not-crush, Joint Commission Do Not Use and more."
+          blurb="MPJE, do-not-crush, arrhythmia risk, anticholinergic burden and more."
+        />
+        <ListTile
+          area="topdrugs"
+          slug="most-used-drugs-us"
+          title="Most-used drugs in the US"
+          count={10}
+          ranked
+          columns
+        />
+        <ToolsTile />
+        <ListTile area="dnc" slug="do-not-crush" title="Do not crush" count={5} />
+        <ListTile area="qtc" slug="arrhythmia-risk-long-qt" title="QTc prolonging medications" count={5} />
+        <DestinationTile
+          area="dictionary"
+          to="/tools/dictionary"
+          title="Dictionary"
+          blurb="Spell-check drug names and medical terms in Word, with about 43,000 words."
+        />
+        <BlogTile />
+        <DestinationTile
+          area="references"
+          to="/references"
+          title="References"
+          blurb="Every source dataset and reference behind the Commons, with its license."
         />
         <DestinationTile
-          area="sources"
-          to="/references"
-          title="Sources"
-          blurb="Every source dataset and reference behind the Commons, with its license."
+          area="resources"
+          to="/resources"
+          title="Resources"
+          blurb="Outside links, grouped by topic."
+        />
+        <DestinationTile
+          area="about"
+          to="/about"
+          title="About"
+          blurb="What the Commons is, why it exists and who runs it."
         />
         <Contribute />
       </div>
@@ -289,6 +316,160 @@ function DestinationTile({
       <h2 className="pc-tile-title lp-link-text text-ink">{title}</h2>
       <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink">{blurb}</p>
     </Link>
+  )
+}
+
+/** True once the element has come within ~300px of the viewport (then stays true). */
+function useNearViewport<T extends Element>() {
+  const ref = useRef<T | null>(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || near) return
+    if (typeof IntersectionObserver === 'undefined') {
+      setNear(true)
+      return
+    }
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          setNear(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '300px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
+  return { ref, near }
+}
+
+/** A panel that previews the first entries of a published list. */
+function ListTile({
+  area,
+  slug,
+  title,
+  count,
+  ranked = false,
+  columns = false,
+}: {
+  area: string
+  slug: string
+  title: string
+  count: number
+  ranked?: boolean
+  columns?: boolean
+}) {
+  const { ref, near } = useNearViewport<HTMLElement>()
+  const [preview, setPreview] = useState<ListPreview | null>(null)
+  const headingId = `home-${area}-heading`
+
+  useEffect(() => {
+    if (!near) return
+    let live = true
+    loadListPreview(slug, count).then(p => {
+      if (live) setPreview(p)
+    })
+    return () => {
+      live = false
+    }
+  }, [near, slug, count])
+
+  return (
+    <section
+      ref={ref}
+      aria-labelledby={headingId}
+      className={`pc-bento__tile pc-bento__list pc-bento__${area} lp-raised rounded-md p-6`}
+    >
+      <h2 id={headingId} className="pc-tile-title text-ink">
+        {title}
+      </h2>
+      {preview && preview.items.length > 0 && (
+        <ol className={`mt-3 grid gap-x-6 ${columns ? 'sm:grid-cols-2' : ''}`}>
+          {preview.items.map(item => (
+            <li key={`${item.position}-${item.name}`} className="flex items-baseline gap-2 font-sans text-[14px] text-ink">
+              {ranked && item.rank !== null && <span className="w-6 shrink-0 text-right font-mono text-[12px]">{item.rank}</span>}
+              {item.slug ? (
+                <Link to={`/drugs/${item.slug}`} className="lp-press -mx-2 min-w-0 truncate rounded-md px-2 py-0.5 text-ink">
+                  {formatDrugName(item.name)}
+                </Link>
+              ) : (
+                <span className="min-w-0 truncate">{formatDrugName(item.name)}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
+      <p className="mt-3 font-sans text-[13.5px]">
+        <Link to={`/lists/${slug}`} className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
+          {preview && preview.total > preview.items.length ? 'See the full list' : 'Open the list'}
+        </Link>
+      </p>
+    </section>
+  )
+}
+
+/** Tools: the live ones by name. */
+function ToolsTile() {
+  const tools = TOOLS.filter(t => isActive(t) && t.section !== 'lists')
+  return (
+    <section aria-labelledby="home-tools-heading" className="pc-bento__tile pc-bento__list pc-bento__tools lp-raised rounded-md p-6">
+      <h2 id="home-tools-heading" className="pc-tile-title text-ink">
+        Tools
+      </h2>
+      <ul className="mt-3 grid gap-0.5 font-sans text-[14px]">
+        {tools.map(tool => (
+          <li key={tool.id}>
+            {tool.to ? (
+              <Link to={tool.to} className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 text-ink">
+                {tool.name}
+              </Link>
+            ) : (
+              <a href={tool.href} target="_blank" rel="noopener noreferrer" className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 text-ink">
+                {tool.name}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 font-sans text-[13.5px]">
+        <Link to="/tools" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
+          All tools
+        </Link>
+      </p>
+    </section>
+  )
+}
+
+/** Blog: the newest posts. */
+function BlogTile() {
+  const posts = useMemo(() => listPosts().slice(0, 5), [])
+  return (
+    <section aria-labelledby="home-blog-heading" className="pc-bento__tile pc-bento__list pc-bento__blog lp-raised rounded-md p-6">
+      <h2 id="home-blog-heading" className="pc-tile-title text-ink">
+        Blog
+      </h2>
+      {posts.length > 0 && (
+        <ul className="mt-3 grid gap-1 font-sans text-[14px]">
+          {posts.map(post => (
+            <li key={post.slug} className="flex flex-wrap items-baseline gap-x-3">
+              <Link to={`/blog/${post.slug}`} className="lp-press -mx-2 min-w-0 rounded-md px-2 py-0.5 text-ink">
+                {post.title}
+              </Link>
+              <time dateTime={post.date} className="text-[12.5px] text-ink">
+                {formatDate(post.date)}
+              </time>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-3 font-sans text-[13.5px]">
+        <Link to="/blog" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
+          All posts
+        </Link>
+      </p>
+    </section>
   )
 }
 

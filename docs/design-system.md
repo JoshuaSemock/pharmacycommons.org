@@ -412,15 +412,19 @@ Developers reference panels, account panels, markdown tables, empty-state notes.
 The home page is an asymmetric golden-ratio bento (`.pc-bento` in `src/index.css`,
 tiles in `src/pages/Home.tsx`, mirrored by the static shell in `index.html`).
 Layout only: tiles are ordinary `.lp-raised` panels (hero, What's new, Contribute)
-and `.lp-card` links (Browse drugs, Tools, Classifications, Lists, Sources), so
+and `.lp-card` links (Browse drugs, Classifications, Lists, Dictionary, References, Resources, About), so
 there is no new color, font or shadow, and hierarchy comes from size alone.
 
-- **lg (64rem+): 13 columns.** The hero spans the full width. Under it, What's
-  new (5, rows 2-4) stands beside an 8-column block: Browse 8, Tools 5 +
-  Classifications 3 (5:3 nested in the 8), Lists 8 (8:5 = 61.5 : 38.5 across the
-  row). Sources 8 : Contribute 5 close the page. Row minimums are 13 / 13 / 8 / 8rem
-  (Fibonacci); rows grow with content.
-- **md (48rem): 8 columns,** 5:3 zigzag; hero and What's new take full rows.
+- **lg (64rem+): 13 columns, 7 rows.** Hero 13. What's new 5 (rows 2-3) beside
+  Browse 8, then Classifications 3 + Lists 5. Most-used drugs 8 + Tools 5. Do not
+  crush 5 + QTc prolonging 5 + Dictionary 3. Blog 8 + References 5. Resources 3 +
+  About 5 + Contribute 5. Row minimums are Fibonacci (13 / 13 / 8rem); rows grow.
+- **List tiles** (`.pc-bento__list`: Most-used drugs, Do not crush, QTc, Tools, Blog)
+  start at the top and preview entries. The three list tiles fetch `get_list` through
+  `src/homeLists.ts` only once near the viewport (IntersectionObserver); on failure
+  they show just their link. Slugs: `most-used-drugs-us` (10), `do-not-crush` (5),
+  `arrhythmia-risk-long-qt` (5). Tools lists live tools except the Clinical lists section.
+- **md (48rem): 8 columns,** rows pair 5:3 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
 - **Below md: one column,** same DOM order, so reading and tab order never change.
 - Tiles must not set `overflow` or isolate a stacking context: the hero hosts the
   search autocomplete popover (it sits at `relative z-10`).

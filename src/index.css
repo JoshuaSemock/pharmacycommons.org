@@ -703,7 +703,8 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
    Columns follow Fibonacci ratios so spans approximate the golden ratio:
    13 columns from lg (8:5 = 61.5:38.5, and 5:3 inside the 8), 8 columns
    (5:3) at md, one column below. Placement is by class, so the DOM order
-   (hero, new, browse, tools, classes, lists, sources, contribute) is the
+   (hero, new, browse, classes, lists, top drugs, tools, do not crush, QTc,
+   dictionary, blog, references, resources, about, contribute) is the
    reading and tab order at every width. Row minimums are 21 / 13 / 8rem
    (Fibonacci again; 13 + 8 = 21, so Browse matches the hero row); rows grow
    with their content. Tiles must not set overflow or an isolating stacking
@@ -740,34 +741,57 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
     grid-template-columns: repeat(8, minmax(0, 1fr));
     grid-auto-rows: minmax(8rem, auto);
   }
+  /* Rows pair up 5:3, 4:4, 5:3, 3:5, 5:3, 3:5, then Contribute alone. */
   .pc-bento__hero,
-  .pc-bento__new { grid-column: 1 / -1; }
+  .pc-bento__new,
+  .pc-bento__contribute { grid-column: 1 / -1; }
   .pc-bento__browse { grid-column: 1 / 6; }
-  .pc-bento__tools { grid-column: 6 / 9; }
-  .pc-bento__classes { grid-column: 1 / 4; }
-  .pc-bento__lists { grid-column: 4 / 9; }
-  .pc-bento__sources { grid-column: 1 / 6; }
-  .pc-bento__contribute { grid-column: 6 / 9; }
+  .pc-bento__classes { grid-column: 6 / 9; }
+  .pc-bento__lists { grid-column: 1 / 5; }
+  .pc-bento__tools { grid-column: 5 / 9; }
+  .pc-bento__topdrugs { grid-column: 1 / 6; }
+  .pc-bento__dnc { grid-column: 6 / 9; }
+  .pc-bento__qtc { grid-column: 1 / 4; }
+  .pc-bento__dictionary { grid-column: 4 / 9; }
+  .pc-bento__blog { grid-column: 1 / 6; }
+  .pc-bento__references { grid-column: 6 / 9; }
+  .pc-bento__resources { grid-column: 1 / 4; }
+  .pc-bento__about { grid-column: 4 / 9; }
   .pc-bento__browse { min-height: 13rem; }
   .pc-bento__browse .pc-tile-title { font-size: var(--text-3xl); }
 }
+/* Tiles that hold a list start at the top and let the row grow. */
+.pc-bento__list { justify-content: flex-start; }
 @media (min-width: 64rem) {
   .pc-bento {
     grid-template-columns: repeat(13, minmax(0, 1fr));
-    grid-template-rows: minmax(13rem, auto) minmax(13rem, auto) minmax(8rem, auto) minmax(8rem, auto);
+    grid-template-rows:
+      minmax(13rem, auto) minmax(13rem, auto) minmax(8rem, auto) minmax(8rem, auto)
+      minmax(8rem, auto) minmax(8rem, auto) minmax(8rem, auto);
   }
-  /* Hero spans the full width; What's new (5) stands beside the 8-column
-     destination block (Browse 8; Tools 5 + Classifications 3; Lists 8). */
+  /* Row 1 hero (13). Rows 2-3: What's new (5) beside Browse (8), then
+     Classifications (3) and Lists (5). Row 4: Top drugs (8) + Tools (5).
+     Row 5: Do not crush (5) + QTc (5) + Dictionary (3). Row 6: Blog (8)
+     + References (5). Row 7: Resources (3) + About (5) + Contribute (5). */
   .pc-bento__hero { grid-column: 1 / -1; grid-row: 1; }
-  .pc-bento__new { grid-column: 1 / 6; grid-row: 2 / 5; }
+  .pc-bento__new { grid-column: 1 / 6; grid-row: 2 / 4; }
   .pc-bento__browse { grid-column: 6 / 14; grid-row: 2; min-height: 0; }
-  .pc-bento__tools { grid-column: 6 / 11; grid-row: 3; }
-  .pc-bento__classes { grid-column: 11 / 14; grid-row: 3; }
-  .pc-bento__lists { grid-column: 6 / 14; grid-row: 4; }
-  .pc-bento__sources { grid-column: 1 / 9; grid-row: 5; }
-  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 5; }
+  .pc-bento__classes { grid-column: 6 / 9; grid-row: 3; }
+  .pc-bento__lists { grid-column: 9 / 14; grid-row: 3; }
+  .pc-bento__topdrugs { grid-column: 1 / 9; grid-row: 4; }
+  .pc-bento__tools { grid-column: 9 / 14; grid-row: 4; }
+  .pc-bento__dnc { grid-column: 1 / 6; grid-row: 5; }
+  .pc-bento__qtc { grid-column: 6 / 11; grid-row: 5; }
+  .pc-bento__dictionary { grid-column: 11 / 14; grid-row: 5; }
+  .pc-bento__blog { grid-column: 1 / 9; grid-row: 6; }
+  .pc-bento__references { grid-column: 9 / 14; grid-row: 6; }
+  .pc-bento__resources { grid-column: 1 / 4; grid-row: 7; }
+  .pc-bento__about { grid-column: 4 / 9; grid-row: 7; }
+  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 7; }
   .pc-tile-title { font-size: var(--text-2xl); }
-  .pc-bento__classes .pc-tile-title { font-size: var(--text-xl); }
+  .pc-bento__classes .pc-tile-title,
+  .pc-bento__dictionary .pc-tile-title,
+  .pc-bento__resources .pc-tile-title { font-size: var(--text-xl); }
 }
 
 /* No text shadows anywhere (2026-10-01): text renders as plain, crisp ink.
