@@ -415,10 +415,11 @@ Layout only: tiles are ordinary `.lp-raised` panels (hero, What's new, Contribut
 and `.lp-card` links (Browse drugs, Tools, Classifications, Lists, Sources), so
 there is no new color, font or shadow, and hierarchy comes from size alone.
 
-- **lg (64rem+): 13 columns.** Hero 8 : What's new 5 (61.5 : 38.5). Row 2 mirrors
-  it: Browse 5 (rows 2-3) beside Tools 5 + Classifications 3 (5:3 nested in the 8),
-  Lists 8 under them. Sources 8 : Contribute 5 close the page. Row minimums are
-  21 / 13 / 8rem (Fibonacci); rows grow with content.
+- **lg (64rem+): 13 columns.** The hero spans the full width. Under it, What's
+  new (5, rows 2-4) stands beside an 8-column block: Browse 8, Tools 5 +
+  Classifications 3 (5:3 nested in the 8), Lists 8 (8:5 = 61.5 : 38.5 across the
+  row). Sources 8 : Contribute 5 close the page. Row minimums are 13 / 13 / 8 / 8rem
+  (Fibonacci); rows grow with content.
 - **md (48rem): 8 columns,** 5:3 zigzag; hero and What's new take full rows.
 - **Below md: one column,** same DOM order, so reading and tab order never change.
 - Tiles must not set `overflow` or isolate a stacking context: the hero hosts the

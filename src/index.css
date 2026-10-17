@@ -754,16 +754,18 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 @media (min-width: 64rem) {
   .pc-bento {
     grid-template-columns: repeat(13, minmax(0, 1fr));
-    grid-template-rows: minmax(21rem, auto) minmax(13rem, auto) minmax(8rem, auto);
+    grid-template-rows: minmax(13rem, auto) minmax(13rem, auto) minmax(8rem, auto) minmax(8rem, auto);
   }
-  .pc-bento__hero { grid-column: 1 / 9; grid-row: 1; }
-  .pc-bento__new { grid-column: 9 / 14; grid-row: 1; }
-  .pc-bento__browse { grid-column: 1 / 6; grid-row: 2 / 4; min-height: 0; }
-  .pc-bento__tools { grid-column: 6 / 11; grid-row: 2; }
-  .pc-bento__classes { grid-column: 11 / 14; grid-row: 2; }
-  .pc-bento__lists { grid-column: 6 / 14; grid-row: 3; }
-  .pc-bento__sources { grid-column: 1 / 9; grid-row: 4; }
-  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 4; }
+  /* Hero spans the full width; What's new (5) stands beside the 8-column
+     destination block (Browse 8; Tools 5 + Classifications 3; Lists 8). */
+  .pc-bento__hero { grid-column: 1 / -1; grid-row: 1; }
+  .pc-bento__new { grid-column: 1 / 6; grid-row: 2 / 5; }
+  .pc-bento__browse { grid-column: 6 / 14; grid-row: 2; min-height: 0; }
+  .pc-bento__tools { grid-column: 6 / 11; grid-row: 3; }
+  .pc-bento__classes { grid-column: 11 / 14; grid-row: 3; }
+  .pc-bento__lists { grid-column: 6 / 14; grid-row: 4; }
+  .pc-bento__sources { grid-column: 1 / 9; grid-row: 5; }
+  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 5; }
   .pc-tile-title { font-size: var(--text-2xl); }
   .pc-bento__classes .pc-tile-title { font-size: var(--text-xl); }
 }
