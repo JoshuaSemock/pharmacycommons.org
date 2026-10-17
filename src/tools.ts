@@ -69,13 +69,6 @@ export const TOOLS: Tool[] = [
     to: '/tools/creatinine-clearance',
   },
   {
-    id: 'body-surface-area',
-    name: 'Body surface area',
-    blurb: 'Mosteller and Du Bois, with the divergence between them shown — it matters at the extremes of size.',
-    status: 'planned',
-    section: 'calculators',
-  },
-  {
     id: 'days-supply',
     name: 'Days supply and quantity',
     blurb:
@@ -86,20 +79,8 @@ export const TOOLS: Tool[] = [
     section: 'calculators',
     to: '/tools/days-supply',
   },
-  {
-    id: 'mme',
-    name: 'Morphine milligram equivalents',
-    blurb: 'Opioid conversion with the conversion factor and its source shown for every step, not just the total.',
-    status: 'planned',
-    section: 'calculators',
-  },
-  {
-    id: 'lab-arithmetic',
-    name: 'Corrected calcium, anion gap, osmolal gap',
-    blurb: 'The short arithmetic that gets done wrong under time pressure.',
-    status: 'planned',
-    section: 'calculators',
-  },
+ 
+  
 
   // Clinical lists
   {
@@ -128,9 +109,9 @@ export const TOOLS: Tool[] = [
   // Writing and reference
   {
     id: 'dictionary',
-    name: 'Medical dictionary for Word',
+    name: 'Spell-check dictionary for Word',
     blurb:
-      'A custom dictionary file for Microsoft Word with about 43,000 drug names, brand names, biologics, medical terms and abbreviations, so correct spellings stop being underlined and Word can suggest them. Step-by-step instructions for Windows and Mac, the full dictionary with definitions, and The Joint Commission "Do Not Use" abbreviations.',
+      'A custom dictionary file for Microsoft Word with 43,000 drug names, brand names, biologics, medical terms and abbreviations, so correct spellings stop being underlined and Word can suggest them. Step-by-step instructions for Windows and Mac, the full dictionary with definitions, and The Joint Commission "Do Not Use" abbreviations.',
     summary: 'Spell-check drug names and medical terms in Word',
     status: 'live',
     keywords: ['spell check', 'spellcheck', 'word dictionary', 'custom dictionary', '.dic', 'abbreviations', 'medical terms', 'do not use', 'microsoft word', 'glossary'],
