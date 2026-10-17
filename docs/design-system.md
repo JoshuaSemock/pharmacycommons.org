@@ -436,7 +436,14 @@ there is no new font or shadow, and hierarchy comes from size alone (color: see 
   a third. Dark mode uses steps 900 and 800. Text stays ink. This is the only place
   the palette fills a surface besides the foil; panels and list tiles stay paper.
 - **md (48rem): 8 columns,** rows pair 5:3 / 3:5 / 4:4 / 3:5 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
-- **Below md: one column,** same DOM order, so reading and tab order never change.
+- **Below md (phones): 5 columns, same DOM order.** Most tiles span the row. The short
+  link cards pair 2:3 (About | Classifications) and 3:2 (References | Resources), the
+  5:3 rhythm again, with the short word in the narrow card. Tile padding drops to 1rem
+  and titles to `--text-lg`; blurbs clamp at 5 lines. Most-used drugs shows 5 rows
+  with a "Show all 10" toggle (`collapsible`, `PHONE_ROWS`), Tools is two columns
+  (`.pc-rows--2`), and What's new shows 2 entries. At 360px and below (the grid is only
+  ~245px wide at 320) the pairs become full-width cards so "Classifications" never breaks.
+  Phone height at 375px: about 4,600px, down from 5,565px.
 - Tiles must not set `overflow` or isolate a stacking context: the hero hosts the
   search autocomplete popover (it sits at `relative z-10`).
 - Tile titles use `.pc-tile-title`, What's new row titles `.pc-update-title`
