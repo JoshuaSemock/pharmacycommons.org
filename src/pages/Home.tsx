@@ -9,7 +9,7 @@ import Stamp from '../components/Stamp'
 /** Old links put browse state on `/`; those parameters now belong to /browse. */
 const BROWSE_PARAMS = ['q', 'letter', 'mode', 'per']
 /** Entries shown in What's new; older ones stay on /tools, /lists and /blog. */
-const RECENT_UPDATES = 5
+const RECENT_UPDATES = 3
 
 /** Autofocus the search box only with a mouse or trackpad. On a phone it pops
     the keyboard (Android) or zooms the page (iOS) before the visitor has
@@ -29,8 +29,41 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
-      <Hero />
-      <WhatsNew />
+      <div className="pc-bento">
+        <Hero />
+        <WhatsNew />
+        <DestinationTile
+          area="browse"
+          to="/browse"
+          title="Browse drugs"
+          blurb="Every drug and active moiety from A to Z, with salts, brand names and combination products nested under each one."
+        />
+        <DestinationTile
+          area="tools"
+          to="/tools"
+          title="Tools"
+          blurb="Creatinine clearance, medication reconciliation, days supply and a medical dictionary."
+        />
+        <DestinationTile
+          area="classes"
+          to="/classifications"
+          title="Classifications"
+          blurb="Pharmacologic classes from FDA, RxClass and ClassyFire, searchable and comparable."
+        />
+        <DestinationTile
+          area="lists"
+          to="/lists"
+          title="Lists"
+          blurb="Most-used US drugs, Georgia MPJE, do-not-crush, Joint Commission Do Not Use and more."
+        />
+        <DestinationTile
+          area="sources"
+          to="/references"
+          title="Sources"
+          blurb="Every source dataset and reference behind the Commons, with its license."
+        />
+        <Contribute />
+      </div>
       <SourcesFooter />
     </main>
   )
@@ -67,7 +100,7 @@ function Hero() {
   }
 
   return (
-    <section className="pt-8 pb-6 text-center sm:pt-16 sm:pb-14">
+    <section className="pc-bento__hero lp-raised relative z-10 flex flex-col justify-center rounded-md px-6 py-10 text-center sm:py-14">
       {/* Title. Type specs (size, weight, tracking) come from .pc-hero-title in
           src/index.css, matched to the Nav wordmark: the bare h1 rule there is
           unlayered, so text-* utilities on an h1 are ignored. */}
@@ -174,14 +207,10 @@ function WhatsNew() {
   return (
     <section
       aria-labelledby="whats-new-heading"
-      className="lp-rule-t pt-10 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-x-16"
+      className="pc-bento__new lp-raised min-w-0 rounded-md p-6"
     >
-      <div className="mb-6 lg:mb-0">
-        <h2
-          id="whats-new-heading"
-          className="font-display text-[26px] font-semibold leading-snug text-ink"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+      <div className="mb-6">
+        <h2 id="whats-new-heading" className="pc-tile-title text-ink">
           What's new in the Commons
         </h2>
         <p className="mt-2 font-sans text-[14.5px] leading-relaxed text-ink">
@@ -197,18 +226,15 @@ function WhatsNew() {
         </p>
       </div>
 
-      <ul className="lp-divide-y max-w-[46rem]">
+      <ul className="lp-divide-y">
         {items.map(item => (
-          <li key={item.id} className="py-6 first:pt-0">
+          <li key={item.id} className="py-4 first:pt-0">
             <article>
               <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-ink">
                 <time dateTime={item.date}>{formatDate(item.date)}</time>
                 <Stamp>{item.kind}</Stamp>
               </p>
-              <h3
-                className="font-display text-[21px] font-semibold leading-snug text-balance text-ink"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
+              <h3 className="pc-update-title text-balance text-ink">
                 <Link
                   to={item.to}
                   className="lp-press -mx-2 inline-block rounded-md px-2 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
@@ -217,7 +243,7 @@ function WhatsNew() {
                 </Link>
               </h3>
               {item.summary ? (
-                <p className="mt-2 line-clamp-3 font-sans text-[15px] leading-[1.6] text-pretty text-ink">
+                <p className="mt-2 line-clamp-3 font-sans lg:line-clamp-2 text-[15px] leading-[1.6] text-pretty text-ink">
                   {item.summary}
                 </p>
               ) : (
@@ -226,7 +252,7 @@ function WhatsNew() {
               <Link
                 to={item.to}
                 aria-label={`${ctaFor(item)}: ${item.title}`}
-                className="lp-press mt-2 inline-block rounded-md px-2 py-0.5 font-sans text-[13.5px] text-ink"
+                className="lp-press mt-2 inline-block rounded-md px-2 py-0.5 font-sans text-[13.5px] text-ink lg:hidden"
               >
                 {ctaFor(item)}
               </Link>
@@ -241,6 +267,57 @@ function WhatsNew() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Sources footer
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bento destination tiles (layout classes live in src/index.css, .pc-bento)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** A whole-tile link: one .lp-card, the title names the link. */
+function DestinationTile({
+  area,
+  to,
+  title,
+  blurb,
+}: {
+  area: string
+  to: string
+  title: string
+  blurb: string
+}) {
+  return (
+    <Link to={to} className={`pc-bento__tile pc-bento__${area} lp-card rounded-md p-6`}>
+      <h2 className="pc-tile-title lp-link-text text-ink">{title}</h2>
+      <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink">{blurb}</p>
+    </Link>
+  )
+}
+
+/** Two links, so a panel (not a card): GitHub and the About page. */
+function Contribute() {
+  return (
+    <section aria-labelledby="contribute-heading" className="pc-bento__tile pc-bento__contribute lp-raised rounded-md p-6">
+      <h2 id="contribute-heading" className="pc-tile-title text-ink">
+        Contribute
+      </h2>
+      <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink">
+        Review records, propose corrections, or read the code.
+      </p>
+      <p className="mt-3 flex flex-wrap gap-2 font-sans text-[13.5px]">
+        <a
+          href="https://github.com/JoshuaSemock/pharmacycommons.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink"
+        >
+          GitHub
+        </a>
+        <Link to="/about" className="lp-press inline-flex items-center rounded-md px-2 py-0.5 text-ink">
+          About the project
+        </Link>
+      </p>
+    </section>
+  )
+}
 
 function SourcesFooter() {
   return (

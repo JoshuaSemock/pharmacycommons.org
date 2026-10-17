@@ -407,6 +407,26 @@ Developers reference panels, account panels, markdown tables, empty-state notes.
 
 ---
 
+## 8a. Home bento (2026-10-17)
+
+The home page is an asymmetric golden-ratio bento (`.pc-bento` in `src/index.css`,
+tiles in `src/pages/Home.tsx`, mirrored by the static shell in `index.html`).
+Layout only: tiles are ordinary `.lp-raised` panels (hero, What's new, Contribute)
+and `.lp-card` links (Browse drugs, Tools, Classifications, Lists, Sources), so
+there is no new color, font or shadow, and hierarchy comes from size alone.
+
+- **lg (64rem+): 13 columns.** Hero 8 : What's new 5 (61.5 : 38.5). Row 2 mirrors
+  it: Browse 5 (rows 2-3) beside Tools 5 + Classifications 3 (5:3 nested in the 8),
+  Lists 8 under them. Sources 8 : Contribute 5 close the page. Row minimums are
+  21 / 13 / 8rem (Fibonacci); rows grow with content.
+- **md (48rem): 8 columns,** 5:3 zigzag; hero and What's new take full rows.
+- **Below md: one column,** same DOM order, so reading and tab order never change.
+- Tiles must not set `overflow` or isolate a stacking context: the hero hosts the
+  search autocomplete popover (it sits at `relative z-10`).
+- Tile titles use `.pc-tile-title`, What's new row titles `.pc-update-title`
+  (classes, because the unlayered h1-h6 rules beat `text-*` utilities, §4).
+- What's new shows 3 entries (`RECENT_UPDATES`); older ones stay on /tools and /blog.
+
 ## 9. Print
 
 Plain paper: no lichen, torn edge, grain or shadow; full width. A page whose `<main>`
