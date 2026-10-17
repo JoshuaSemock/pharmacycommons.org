@@ -13,6 +13,8 @@ import Stamp from '../components/Stamp'
 const BROWSE_PARAMS = ['q', 'letter', 'mode', 'per']
 /** Entries shown in What's new; older ones stay on /tools, /lists and /blog. */
 const RECENT_UPDATES = 3
+/** Rows a collapsible list tile shows on phones before "Show all". */
+const PHONE_ROWS = 5
 
 /** Autofocus the search box only with a mouse or trackpad. On a phone it pops
     the keyboard (Android) or zooms the page (iOS) before the visitor has
@@ -63,7 +65,7 @@ export default function Home() {
           title="Lists"
           blurb="MPJE, do-not-crush, arrhythmia risk, anticholinergic burden and more."
         />
-        <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked />
+        <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked collapsible />
         <ToolsTile />
         <DestinationTile
           area="dictionary"
@@ -254,8 +256,8 @@ function WhatsNew() {
       </div>
 
       <ul className="lp-divide-y">
-        {items.map(item => (
-          <li key={item.id} className="py-4 first:pt-0">
+        {items.map((item, i) => (
+          <li key={item.id} className={`py-4 first:pt-0 ${i >= 2 ? 'max-md:hidden' : ''}`}>
             <article>
               <p className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[13px] text-ink">
                 <time dateTime={item.date}>{formatDate(item.date)}</time>
@@ -317,7 +319,7 @@ function DestinationTile({
   return (
     <Link to={to} className={`pc-bento__tile pc-bento__${area} lp-card ${tint ? `pc-tint pc-tint-${tint} ` : ''}rounded-md p-6`}>
       <h2 className="pc-tile-title lp-link-text text-ink">{title}</h2>
-      <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink">{blurb}</p>
+      <p className="mt-2 font-sans text-[14px] leading-relaxed text-pretty text-ink max-md:line-clamp-5">{blurb}</p>
     </Link>
   )
 }
@@ -355,13 +357,17 @@ function ListTile({
   title,
   count,
   ranked = false,
+  collapsible = false,
 }: {
   area: string
   slug: string
   title: string
   count: number
   ranked?: boolean
+  /** On phones show the first PHONE_ROWS entries, with a row to show the rest. */
+  collapsible?: boolean
 }) {
+  const [expanded, setExpanded] = useState(false)
   const { ref, near } = useNearViewport<HTMLElement>()
   const [preview, setPreview] = useState<ListPreview | null>(null)
   const headingId = `home-${area}-heading`
@@ -388,8 +394,11 @@ function ListTile({
       </h2>
       {preview && preview.items.length > 0 && (
         <ol className="pc-rows mt-3">
-          {preview.items.map(item => (
-            <li key={`${item.position}-${item.name}`}>
+          {preview.items.map((item, i) => (
+            <li
+              key={`${item.position}-${item.name}`}
+              className={collapsible && !expanded && i >= PHONE_ROWS ? 'max-md:hidden' : undefined}
+            >
               {item.slug ? (
                 <Link to={`/drugs/${item.slug}`} className="pc-row lp-press rounded-md text-ink">
                   {ranked && <span className="pc-row__rank">{item.rank ?? item.position}</span>}
@@ -404,6 +413,16 @@ function ListTile({
             </li>
           ))}
         </ol>
+      )}
+      {collapsible && preview && preview.items.length > PHONE_ROWS && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded(e => !e)}
+          className="pc-row pc-row--more lp-toggle mt-3 rounded-md text-ink md:hidden"
+        >
+          {expanded ? `Show first ${PHONE_ROWS}` : `Show all ${preview.items.length}`}
+        </button>
       )}
       <Link to={`/lists/${slug}`} className="pc-row pc-row--more lp-press mt-3 rounded-md text-ink">
         {preview && preview.total > preview.items.length ? 'See the full list' : 'Open the list'}
@@ -420,7 +439,7 @@ function ToolsTile() {
       <h2 id="home-tools-heading" className="pc-tile-title text-ink">
         Tools
       </h2>
-      <ul className="pc-rows mt-3">
+      <ul className="pc-rows pc-rows--2 mt-3">
         {tools.map(tool => (
           <li key={tool.id}>
             {tool.to ? (
