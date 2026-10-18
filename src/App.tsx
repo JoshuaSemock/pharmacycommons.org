@@ -24,6 +24,8 @@ const ClassDetail = lazy(() => import('./pages/ClassDetail'))
 const ClassCompare = lazy(() => import('./pages/ClassCompare'))
 const ListIndex = lazy(() => import('./pages/ListIndex'))
 const TopicIndex = lazy(() => import('./pages/TopicIndex'))
+// Carries Cytoscape (loaded again on demand inside the page); its own chunk.
+const Network = lazy(() => import('./pages/Network'))
 const ListDetail = lazy(() => import('./pages/ListDetail'))
 const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
@@ -81,6 +83,7 @@ export default function App() {
           <Route path="/classes" element={<Moved to="/classifications" />} />
           <Route path="/classes/:slug" element={<MovedClass />} />
           <Route path="/topics" element={<TopicIndex />} />
+          <Route path="/network" element={<Network />} />
           <Route path="/lists" element={<ListIndex />} />
           <Route path="/lists/compare" element={<ListCompare />} />
           <Route path="/lists/:slug" element={<ListDetail />} />

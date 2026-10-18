@@ -165,7 +165,7 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 `/` · `/browse` · `/drugs/:slug` · `/classifications` (search across every class
 system, `?q=`, `?group=`, `?c=` compare tray) · `/classifications/compare?c=a,b,c` (up to three
 classes, `src/pages/ClassCompare.tsx`) · `/classifications/:slug` — `/classes`, `/classes/:slug`
-and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/topics` (blocks 6–9 A–Z with kind/subtype filters and
+and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/network` (graph of a concept's recorded relationships; Cytoscape, own chunk; see `docs/network.md`; phase 19 RPCs in `db/phase19_network.sql` — **not applied to production yet**) · `/topics` (blocks 6–9 A–Z with kind/subtype filters and
 "Most connected" sort; `src/pages/TopicIndex.tsx`, `src/topics.ts`) · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
