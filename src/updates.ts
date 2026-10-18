@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'network-graph',
+    date: '2026-10-18',
+    kind: 'Feature',
+    title: 'Network: see how a drug, class or condition connects',
+    summary:
+      'Pick a concept and see the classes it belongs to, the products that contain it, and the use and safety statements recorded for it. Every line shows its source, and a table lists the same relationships.',
+    to: '/network',
+    cta: 'Open the network',
+  },
+  {
     id: 'site-wide-search',
     date: '2026-10-13',
     kind: 'Feature',
