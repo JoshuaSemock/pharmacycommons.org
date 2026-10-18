@@ -60,6 +60,7 @@ const KIND_ORDER: Record<SiteKind, number> = { tool: 0, page: 1, list: 2, blog: 
 export const SITE_PAGES: SiteEntry[] = [
   { id: 'page-browse', kind: 'page', title: 'Drugs A to Z', hint: 'Browse every drug by name', to: '/browse', keywords: ['browse', 'drug index', 'all drugs', 'alphabetical', 'monographs'] },
   { id: 'page-topics', kind: 'page', title: 'Topics', hint: 'Conditions, labs, targets and herbals', to: '/topics', keywords: ['conditions', 'diseases', 'adverse reactions', 'lab tests', 'labs', 'targets', 'herbals', 'botanicals', 'supplements', 'concepts'] },
+  { id: 'page-network', kind: 'page', title: 'Network', hint: 'Explore how drugs, classes and topics connect', to: '/network', keywords: ['graph', 'knowledge graph', 'relationships', 'connections', 'map', 'cytoscape', 'class membership', 'visualization'] },
   { id: 'page-lists', kind: 'page', title: 'Lists', hint: 'Curated and authority drug lists', to: '/lists', keywords: ['drug lists', 'compare lists'] },
   { id: 'page-classifications', kind: 'page', title: 'Classifications', hint: 'ATC, FDA, VA, ChemOnt and contributor classes', to: '/classifications', keywords: ['classes', 'drug classes', 'categories', 'atc', 'pharmacologic class', 'mechanism of action', 'compare classes'] },
   { id: 'page-tools', kind: 'page', title: 'All tools', hint: 'Calculators, lists and reference tools', to: '/tools', keywords: ['calculators', 'tools'] },

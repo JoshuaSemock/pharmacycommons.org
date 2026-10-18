@@ -73,6 +73,11 @@ const STATIC_ROUTES = [
     description: 'Browse everything in Pharmacy Commons that is not a drug: indications, symptoms, adverse effects, lab tests, biological targets and herbal sources, by kind and A to Z.',
   },
   {
+    path: '/network',
+    title: 'Network',
+    description: 'Explore how drugs, classes, products and topics connect in Pharmacy Commons as an interactive graph. Every line is one stored statement with a stated meaning and, where recorded, a source.',
+  },
+  {
     path: '/lists',
     title: 'Lists',
     description: 'Compendium lists of drugs, such as the most-used drugs in the US, MPJE testable drugs and do-not-crush lists, linked to Pharmacy Commons records.',
