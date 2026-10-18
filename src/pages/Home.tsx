@@ -65,6 +65,13 @@ export default function Home() {
           title="Lists"
           blurb="MPJE, do-not-crush, arrhythmia risk, anticholinergic burden and more."
         />
+        <DestinationTile
+          area="network"
+          tint="salmon"
+          to="/network"
+          title="Network"
+          blurb="See how a drug, class or condition connects to others, with the source of every line."
+        />
         <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked collapsible />
         <ToolsTile />
         <DestinationTile

@@ -412,11 +412,11 @@ Developers reference panels, account panels, markdown tables, empty-state notes.
 The home page is an asymmetric golden-ratio bento (`.pc-bento` in `src/index.css`,
 tiles in `src/pages/Home.tsx`, mirrored by the static shell in `index.html`).
 Layout only: tiles are ordinary `.lp-raised` panels (hero, What's new, Contribute)
-and `.lp-card` links (Browse drugs, Classifications, Lists, Dictionary, References, Resources, About), so
+and `.lp-card` links (Browse drugs, Classifications, Lists, Network, Dictionary, References, Resources, About), so
 there is no new font or shadow, and hierarchy comes from size alone (color: see Brand pastels).
 
 - **lg (64rem+): 13 columns, 9 rows.** Hero 13. Rows 2-4: What's new 5 beside
-  Browse 8, About 3 + Classifications 5, Lists 8. Rows 5-6: Most-used drugs 8
+  Browse 8, About 3 + Classifications 5, Lists 5 + Network 3 (added 2026-10-18). Rows 5-6: Most-used drugs 8
   beside Tools 5 over Dictionary 5. Rows 7-8: Do not crush 5 + QTc prolonging 5
   beside References 3 over Resources 3. Row 9: Blog 8 + Contribute 5. Tiles are
   top-aligned and rows size to content, so no tile has a blank band above its text.
@@ -428,14 +428,14 @@ there is no new font or shadow, and hierarchy comes from size alone (color: see 
   failure they show just their link. Slugs: `most-used-drugs-us` (10), `do-not-crush`
   (5), `arrhythmia-risk-long-qt` (5). Tools lists live tools except the Clinical
   lists section.
-- **Brand pastels (2026-10-17, Joshua's call).** The seven whole-card links
-  (Browse, About, Classifications, Lists, Dictionary, References, Resources) are
+- **Brand pastels (2026-10-17, Joshua's call).** The eight whole-card links
+  (Browse, About, Classifications, Lists, Network, Dictionary, References, Resources) are
   tinted with `.pc-tint-mint|hepatica|salmon`: ramp step 100 at rest
   (#d8f9ec, #f2edfb, #fbece9), step 200 when pressed in by hover, focus or click
   (#a1f6d8, #e6dbfa, #fbd8d0), under a veil that lets the paper grain show at about
   a third. Dark mode uses steps 900 and 800. Text stays ink. This is the only place
   the palette fills a surface besides the foil; panels and list tiles stay paper.
-- **md (48rem): 8 columns,** rows pair 5:3 / 3:5 / 4:4 / 3:5 / 4:4 / 3:5; hero, What's new and Contribute take full rows.
+- **md (48rem): 8 columns,** rows pair 5:3 / 3:5 / 4:4 / 3:5 / 4:4 / 3:5; Network takes a full row after Lists; hero, What's new and Contribute take full rows.
 - **Below md (phones): 5 columns, same DOM order.** Most tiles span the row. The short
   link cards pair 2:3 (About | Classifications) and 3:2 (References | Resources), the
   5:3 rhythm again, with the short word in the narrow card. Tile padding drops to 1rem
