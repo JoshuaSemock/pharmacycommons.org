@@ -2,7 +2,7 @@
 
 An explorable graph of what the database records about a concept: classes it belongs to, products that contain it, and use, safety and interaction statements. **Cytoscape.js only draws.** PostgreSQL stays the source of truth; the page never writes.
 
-Status: code on branch `feature/network-page`. `db/phase19_network.sql` is **not applied to production** until Joshua says so. Until then the page shows "The network service is not switched on yet".
+Status: **live** (PR #92 merged 2026-10-18). `db/phase19_network.sql` was run by Joshua in the SQL editor and recorded in `schema_migrations` as 20261018170000/01/02 (`phase19a_network_predicate_group`, `phase19b_network_neighborhood`, `phase19c_network_edge_evidence`). Checked live: all three functions are SECURITY INVOKER and executable by anon; the security advisors list no new findings; `network_neighborhood(1000577)` (acetazolamide) returns 46 edges (classification 38, safety 4, use 3, composition 1) and the first page of 12 interleaves groups.
 
 ## Architecture
 
@@ -40,7 +40,7 @@ Bounded loading: a neighborhood returns at most 200 edges (default 40, 18 on pho
 - Totals include contributor-added edges even when they are hidden.
 - A line is not a treatment recommendation, and distance on the canvas means nothing. The page says both.
 
-## Deploying
+## Deploying (done 2026-10-18; kept for the next migration)
 
 1. Apply `db/phase19_network.sql` as 19a, 19b, 19c (`apply_migration`, or the SQL editor and record by hand). Confirm each in `supabase_migrations.schema_migrations`, then run `get_advisors(security)`; the new functions are intentionally executable by anon.
 2. Add the `src/updates.ts` entry when it ships.
