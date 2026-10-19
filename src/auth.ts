@@ -118,15 +118,42 @@ export async function signUpWithPassword(
   email: string,
   password: string,
   consent: LegalAgreementMetadata,
+  details: Record<string, string | boolean> = {},
 ) {
   const supabase = await getSupabase()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: consent, emailRedirectTo: authRedirectUrl() },
+    options: { data: { ...details, ...consent }, emailRedirectTo: authRedirectUrl() },
   })
-  if (error) throw error
+  if (error) {
+    // The database gate (db/phase19) surfaces as a generic message.
+    if (/database error saving new user/i.test(error.message)) {
+      throw new Error(
+        'We could not create the account. You must be 18 or older and fill in the required fields.',
+      )
+    }
+    throw error
+  }
   return data
+}
+
+export type AccountProfile = {
+  account_type: 'patient' | 'practitioner' | 'researcher'
+  first_name: string
+  last_name: string
+  npi_claimed: string | null
+}
+
+/** The signed-in user's sign-up profile; null for accounts created before phase 19. */
+export async function getMyAccountProfile(): Promise<AccountProfile | null> {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from('account_profiles')
+    .select('account_type, first_name, last_name, npi_claimed')
+    .maybeSingle()
+  if (error) return null
+  return data as AccountProfile | null
 }
 
 export async function signInWithPassword(email: string, password: string) {
