@@ -1196,3 +1196,18 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
     background: #fff;
   }
 }
+
+/* Phone bar (below md): the header sits at the bottom of the screen (see
+   MobileNav in Nav.tsx). Nothing is pinned to the top, so --nav-h is 0 and
+   anchors scroll flush; the page gets bottom padding the height of the bar
+   (plus the home-indicator inset) so the footer is never covered. Nav.tsx
+   overwrites --bottom-nav-h with the measured height once mounted. */
+@media (width < 48rem) {
+  :root {
+    --nav-h: 0px;
+    --bottom-nav-h: calc(4rem + env(safe-area-inset-bottom));
+  }
+  .page-content {
+    padding-bottom: var(--bottom-nav-h);
+  }
+}

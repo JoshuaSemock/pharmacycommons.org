@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!--
       The only HTML entry point. (index-updated.html was an older draft of this
@@ -216,8 +216,8 @@
           <div class="paper-sheet" aria-hidden="true"></div>
           <!-- Mirrors src/Nav.tsx. The search is a plain GET form, so it works before
                (and without) JavaScript; the menu button is a placeholder until React mounts. -->
-          <header class="pc-grain lp-rule-b sticky top-0 z-50 bg-paper">
-            <div class="mx-auto grid max-w-page grid-cols-[minmax(2rem,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
+          <header class="pc-grain lp-rule-b sticky top-0 z-50 bg-paper max-md:contents">
+            <div class="mx-auto grid max-md:hidden max-w-page grid-cols-[minmax(2rem,1fr)_auto_auto] items-center gap-x-1 px-3 pb-2 max-[359px]:px-2 sm:gap-x-3 sm:px-6 md:flex md:h-14 md:pb-0">
               <a href="/" class="lp-toggle flex h-9 min-w-0 items-center gap-2 justify-self-start rounded-md px-1 max-[359px]:gap-1.5 md:shrink-0 min-[600px]:pr-2.5 md:max-lg:pr-1" aria-label="Pharmacy Commons home">
                 <span class="flex h-7 w-7 shrink-0 items-center justify-center max-[359px]:h-6 max-[359px]:w-6">
                   <img src="/logo-40.png" alt="" width="20" height="20" class="h-5 w-5 object-contain" />
@@ -243,6 +243,17 @@
                 <span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span>
               </span>
             </div>
+            <!-- Phone bar (below md): mirrors MobileNav in src/Nav.tsx. Search, menu and account
+                 are plain links until React mounts. -->
+            <nav aria-label="Primary" class="pc-grain lp-rule-t fixed inset-x-0 bottom-0 z-50 bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
+              <ul class="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-1">
+                <li class="flex justify-center"><a href="/tools" class="lp-toggle flex h-14 w-full max-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-md font-sans text-ink"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5" /><path d="M8.5 7.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg><span class="text-[10.5px] leading-none">Tools</span></a></li>
+                <li class="flex justify-center"><a href="/browse" aria-label="Search the commons" class="lp-toggle flex h-14 w-full max-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-md font-sans text-ink"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.5" /><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg><span class="text-[10.5px] leading-none">Search</span></a></li>
+                <li class="flex justify-center"><a href="/" aria-label="Pharmacy Commons home" class="lp-toggle flex !h-14 !w-[4.5rem] flex-col items-center justify-center rounded-md"><img src="/logo-40.png" alt="" width="32" height="32" class="h-8 w-8 object-contain" /></a></li>
+                <li class="flex justify-center"><span class="lp-raised flex h-14 w-full max-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-md text-ink" aria-hidden="true"><span class="flex h-[22px] flex-col items-center justify-center gap-[3.4px]"><span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span><span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span><span class="block h-[1.6px] w-[18px] rounded-full bg-current"></span></span><span class="font-sans text-[10.5px] leading-none">Menu</span></span></li>
+                <li class="flex justify-center"><a href="/account" aria-label="Log in or register" class="lp-toggle flex h-14 w-full max-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-md font-sans text-ink"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5" /><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg><span class="text-[10.5px] leading-none">Log in</span></a></li>
+              </ul>
+            </nav>
           </header>
 
           <main class="mx-auto max-w-page px-4 pb-24 sm:px-6">
