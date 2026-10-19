@@ -291,3 +291,134 @@ describe('Network page', () => {
     expect(screen.getAllByText('<img src=x onerror=alert(1)>').length).toBeGreaterThan(0)
   })
 })
+
+describe('Network page: depth and display', () => {
+  beforeEach(() => window.localStorage.clear())
+
+  const kidney = n(6000011, 'Kidney failure', 'clinical')
+  const secondLevel = (pcid: number) => {
+    if (pcid === 6000010) {
+      return { center: lactic, nodes: [lactic, kidney], edges: [e('cs:31', 6000010, 'has_risk_factor', 6000011, 'safety')], group_counts: { safety: 1 }, total: 1, offset: 0, limit: 8 }
+    }
+    return { center: null, nodes: [], edges: [], group_counts: {}, total: 0, offset: 0, limit: 8 }
+  }
+  const nodesDrawn = () => screen.getByTestId('canvas').getAttribute('data-nodes')!
+
+  it('depth 2 expands the first-level concepts a few relationships at a time, specific lines before classes, and depth 1 takes them away', async () => {
+    fetchNeighborhood.mockImplementation(async (pcid: number) => (pcid === 1001923 ? rootPayload() : secondLevel(pcid)))
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    const slider = screen.getByLabelText(/Steps from the starting concept/)
+
+    fireEvent.change(slider, { target: { value: '2' } })
+    await waitFor(() => expect(nodesDrawn()).toContain('Kidney failure'))
+    const deep = fetchNeighborhood.mock.calls.slice(1)
+    expect(deep.map(c => c[0])).toEqual([6000010, 2000010, 5000100]) // warning, product, then the class
+    for (const c of deep) expect(c[1]).toEqual(expect.objectContaining({ limit: 8 }))
+
+    fireEvent.change(slider, { target: { value: '1' } })
+    await waitFor(() => expect(nodesDrawn()).not.toContain('Kidney failure'))
+    expect(nodesDrawn()).toContain('Lactic acidosis')
+    expect(fetchNeighborhood).toHaveBeenCalledTimes(4) // going shallower fetches nothing
+  })
+
+  it('going back to depth 2 after depth 1 loads the level again', async () => {
+    fetchNeighborhood.mockImplementation(async (pcid: number) => (pcid === 1001923 ? rootPayload() : secondLevel(pcid)))
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    const slider = screen.getByLabelText(/Steps from the starting concept/)
+    fireEvent.change(slider, { target: { value: '2' } })
+    await waitFor(() => expect(nodesDrawn()).toContain('Kidney failure'))
+    fireEvent.change(slider, { target: { value: '1' } })
+    await waitFor(() => expect(nodesDrawn()).not.toContain('Kidney failure'))
+    fireEvent.change(slider, { target: { value: '2' } })
+    await waitFor(() => expect(nodesDrawn()).toContain('Kidney failure'))
+  })
+
+  it('stops at the concept limit and says so', async () => {
+    const many = Array.from({ length: 150 }, (_, i) => n(7000000 + i, `Effect ${i}`, 'clinical'))
+    const big: NetworkPayload = {
+      center: metformin,
+      nodes: [metformin, ...many],
+      edges: many.map((m, i) => e(`cs:${100 + i}`, 1001923, 'has_side_effect', m.pcid, 'safety')),
+      group_counts: { safety: 150 }, total: 150, offset: 0, limit: 40,
+    } as NetworkPayload
+    fetchNeighborhood.mockImplementation(async (pcid: number) =>
+      pcid === 1001923 ? big : { center: null, nodes: [n(8000000 + pcid, `More ${pcid}`, 'clinical')], edges: [], group_counts: {}, total: 0, offset: 0, limit: 8 },
+    )
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    fireEvent.change(screen.getByLabelText(/Steps from the starting concept/), { target: { value: '2' } })
+    expect(await screen.findByText(/Stopped at 150 concepts/)).toBeTruthy()
+  })
+
+  it('keeps the depth slider honest when a concept is expanded by hand', async () => {
+    fetchNeighborhood.mockResolvedValueOnce(rootPayload())
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    fireEvent.click(screen.getAllByRole('button', { name: 'Biguanides' })[0])
+    fetchNeighborhood.mockResolvedValueOnce({ center: biguanides, nodes: [biguanides, n(1002000, 'sitagliptin')], edges: [e('cm:5000100:1002000', 1002000, 'member_of', 5000100, 'classification')], group_counts: { classification: 1 }, total: 1, offset: 0, limit: 40 })
+    fireEvent.click(await screen.findByRole('button', { name: 'Show its relationships' }))
+    await waitFor(() => expect(nodesDrawn()).toContain('sitagliptin'))
+    expect((screen.getByLabelText(/Steps from the starting concept/) as HTMLInputElement).value).toBe('2')
+  })
+
+  it('resets depth to 1 when a new starting concept is chosen', async () => {
+    fetchNeighborhood.mockImplementation(async (pcid: number) => (pcid === 1001923 ? rootPayload() : secondLevel(pcid)))
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    fireEvent.change(screen.getByLabelText(/Steps from the starting concept/), { target: { value: '3' } })
+    await waitFor(() => expect(nodesDrawn()).toContain('Kidney failure'))
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await waitFor(() => expect(nodesDrawn()).not.toContain('Kidney failure'))
+    expect((screen.getByLabelText(/Steps from the starting concept/) as HTMLInputElement).value).toBe('1')
+  })
+
+  it('remembers display settings between visits', async () => {
+    fetchNeighborhood.mockResolvedValue(rootPayload())
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    fireEvent.click(screen.getByLabelText('Arrows'))
+    fireEvent.click(screen.getByLabelText('Size by connections'))
+    const stored = JSON.parse(window.localStorage.getItem('pc.network.display') ?? '{}')
+    expect(stored.arrows).toBe(false)
+    expect(stored.sizeByDegree).toBe(false)
+    cleanup()
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    expect((screen.getByLabelText('Arrows') as HTMLInputElement).checked).toBe(false)
+  })
+
+  it('starts with physics off, labels it honestly, and the tree layout turns it off again', async () => {
+    fetchNeighborhood.mockResolvedValue(rootPayload())
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    const physics = screen.getByLabelText(/Live physics/) as HTMLInputElement
+    expect(physics.checked).toBe(false)
+    expect(screen.getByText(/Where they land means nothing/)).toBeTruthy()
+    fireEvent.click(physics)
+    expect(physics.checked).toBe(true)
+    expect(screen.getByRole('button', { name: 'Shake loose' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Tree layout' }))
+    expect(physics.checked).toBe(false)
+    expect(screen.getByRole('button', { name: 'Re-arrange' })).toBeTruthy()
+  })
+
+  it('resets display settings to the defaults', async () => {
+    fetchNeighborhood.mockResolvedValue(rootPayload())
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    fireEvent.click(screen.getByLabelText('Arrows'))
+    fireEvent.click(screen.getByRole('button', { name: 'Reset display' }))
+    expect((screen.getByLabelText('Arrows') as HTMLInputElement).checked).toBe(true)
+  })
+
+  it('disables the physics sliders until physics is on', async () => {
+    fetchNeighborhood.mockResolvedValue(rootPayload())
+    renderAt('/network?c=1001923')
+    await screen.findByTestId('canvas')
+    expect((screen.getByLabelText(/Repel force/) as HTMLInputElement).disabled).toBe(true)
+    fireEvent.click(screen.getByLabelText(/Live physics/))
+    expect((screen.getByLabelText(/Repel force/) as HTMLInputElement).disabled).toBe(false)
+  })
+})
