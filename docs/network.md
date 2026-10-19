@@ -33,6 +33,15 @@ Bounded loading: a neighborhood returns at most 200 edges (default 40, 18 on pho
 1. Predicate: add it to `public.predicates`, add a `when` line in `network_predicate_group()`, add its phrase and definition to `PREDICATES` in `predicates.ts`. `predicates.test.ts` parses the SQL and fails if the two drift.
 2. Node kind: add it to `nodeKind()` (shape and border) and its page path to `pagePath()`.
 
+## Display, depth and physics (v2)
+
+Modelled on Obsidian's local graph; no database changes.
+
+- `display.ts`: Display settings (arrows, size by connections, hover focus, text fade, line width, physics, repel, line length), sanitised and kept per reader in localStorage `pc.network.display`.
+- `depth.ts`: depth slider 1 to 3. Depth is the `introducedBy` chain from the start. Deeper levels load `DEEP_PAGE` (8) relationships per concept, use and safety lines before class memberships, and stop at `NODE_CAP` (150) concepts with a note. Going shallower prunes and fetches nothing; expanding a concept by hand raises the slider.
+- `physics.ts`: dependency-free force simulation, off by default. Drag pins a concept, double-tap pins or releases it (pinned = dashed border), Tree layout turns it off, above 300 concepts it holds still, reduced motion settles it at once.
+- Hover focus fades non-neighbors. Closeness on the canvas still means nothing, and the page says so.
+
 ## Honest data limits
 
 - The graph is rich in class memberships (ATC, EPC, MoA, VA, ChemOnt) and FDA `has_component` links, and thin in use, safety, mechanism and interaction statements. Sampled evidence is `curator_assertion` with no stored quotes; the details panel says so rather than filling gaps.

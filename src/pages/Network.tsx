@@ -23,6 +23,10 @@ import Card from '../components/Card'
 import GraphCanvas from '../network/GraphCanvas'
 import type { CanvasStatus, Selection, ViewCommand } from '../network/GraphCanvas'
 import NetworkSearch from '../network/NetworkSearch'
+import DisplayPanel from '../network/DisplayPanel'
+import { loadDisplay, saveDisplay } from '../network/display'
+import type { Display } from '../network/display'
+import { DEEP_PAGE, MAX_DEPTH, NODE_CAP, currentDepth, frontierAt, nodeDepths, pruneToDepth } from '../network/depth'
 import { Details, RelationTable } from '../network/Details'
 import type { EvidenceView } from '../network/Details'
 import { NetworkUnavailable, fetchEvidence, fetchNeighborhood, resolveSlug } from '../network/api'
@@ -79,7 +83,18 @@ export default function Network() {
   const [command, setCommand] = useState<ViewCommand>(null)
   const [evidence, setEvidence] = useState<EvidenceView>({ state: 'idle' })
   const [reload, setReload] = useState(0)
+  const [display, setDisplayState] = useState<Display>(loadDisplay)
+  const [depth, setDepth] = useState(1)
+  const [physicsPaused, setPhysicsPaused] = useState(false)
   const cmdN = useRef(0)
+  const graphRef = useRef(graph)
+  graphRef.current = graph
+  const depthRun = useRef<AbortController | null>(null)
+
+  const setDisplay = useCallback((d: Display) => {
+    setDisplayState(d)
+    saveDisplay(d)
+  }, [])
 
   useEffect(() => {
     document.title = `${TITLE} · Pharmacy Commons`
@@ -95,6 +110,8 @@ export default function Network() {
     setNote(null)
     setSelection(null)
     setFilters(defaultFilters())
+    setDepth(1)
+    depthRun.current?.abort()
     if (centerPcid === null) {
       setGraph(emptyGraph())
       setLoad({ s: 'idle' })
@@ -123,6 +140,8 @@ export default function Network() {
     return () => ac.abort()
   }, [centerPcid, reload, send])
 
+  useEffect(() => () => depthRun.current?.abort(), [])
+
   // Provenance for a selected line, fetched on demand.
   useEffect(() => {
     if (selection?.type !== 'edge') {
@@ -145,6 +164,9 @@ export default function Network() {
         const offset = graph.expanded.get(pcid)?.shown ?? 0
         const p = await fetchNeighborhood(pcid, { includeCommunity: true, limit: pageSize(), offset })
         setGraph(g => mergePayload(g, p, pcid))
+        // Expanding a concept by hand can go deeper than the slider says; keep the slider honest.
+        const at = nodeDepths(graphRef.current).get(pcid)
+        if (at !== undefined && p.edges.length > 0) setDepth(d => Math.min(MAX_DEPTH, Math.max(d, at + 1)))
         if (p.edges.length === 0) setNote('Nothing more is recorded for this concept.')
       } catch {
         setNote('Those relationships could not be loaded. Try again in a moment.')
@@ -154,6 +176,62 @@ export default function Network() {
     },
     [graph.expanded],
   )
+
+  /**
+   * Depth, as in Obsidian's local graph. Going deeper expands the concepts at each level a
+   * small page at a time (use, safety and product lines before class memberships) and stops
+   * at NODE_CAP concepts; going shallower removes the deeper branches.
+   */
+  const changeDepth = useCallback(async (target: number) => {
+    const next = Math.min(MAX_DEPTH, Math.max(1, Math.round(target)))
+    depthRun.current?.abort()
+    setNote(null)
+    const shown = currentDepth(graphRef.current)
+    setDepth(next)
+    if (next < shown) {
+      setGraph(g => pruneToDepth(g, next))
+      return
+    }
+    if (next === 1 || graphRef.current.root === null) return
+    const ac = new AbortController()
+    depthRun.current = ac
+    setBusy(true)
+    let working = graphRef.current
+    let capped = false
+    let failed = false
+    try {
+      for (let level = 1; level < next && !ac.signal.aborted && !capped; level++) {
+        const todo = frontierAt(working, level)
+        for (let i = 0; i < todo.length && !capped; i += 4) {
+          const batch = todo.slice(i, i + 4)
+          const results = await Promise.all(
+            batch.map(pcid =>
+              fetchNeighborhood(pcid, { includeCommunity: true, limit: DEEP_PAGE, signal: ac.signal })
+                .then(p => ({ pcid, p }))
+                .catch(() => null),
+            ),
+          )
+          if (ac.signal.aborted) return
+          for (const r of results) {
+            if (!r) {
+              failed = true
+              continue
+            }
+            if (working.nodes.size >= NODE_CAP) {
+              capped = true
+              break
+            }
+            working = mergePayload(working, r.p, r.pcid)
+          }
+          setGraph(working)
+        }
+      }
+      if (capped) setNote(`Stopped at ${NODE_CAP} concepts to keep the graph readable. Open a concept to follow it further.`)
+      else if (failed) setNote('Some relationships could not be loaded. Try again in a moment.')
+    } finally {
+      if (!ac.signal.aborted) setBusy(false)
+    }
+  }, [])
 
   const pick = useCallback(
     async (hit: SearchHit) => {
@@ -305,8 +383,16 @@ export default function Network() {
             <div className="mb-2 flex flex-wrap items-center gap-2" role="toolbar" aria-label="Graph controls">
               <Button size="sm" onClick={() => send('fit')}>Fit to screen</Button>
               <Button size="sm" onClick={() => send('center')}>Center on selection</Button>
-              <Button size="sm" onClick={() => send('arrange')}>Re-arrange</Button>
-              <Button size="sm" onClick={() => send('tree')}>Tree layout</Button>
+              <Button size="sm" onClick={() => send('arrange')}>{display.physics ? 'Shake loose' : 'Re-arrange'}</Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (display.physics) setDisplay({ ...display, physics: false })
+                  send('tree')
+                }}
+              >
+                Tree layout
+              </Button>
               <Button size="sm" onClick={() => setReload(n => n + 1)}>Reset</Button>
             </div>
 
@@ -373,6 +459,16 @@ export default function Network() {
               )}
             </div>
 
+            <DisplayPanel
+              display={display}
+              onDisplay={setDisplay}
+              depth={depth}
+              onDepth={changeDepth}
+              busy={busy}
+              physicsPaused={physicsPaused}
+              onUnpin={() => send('unpin')}
+            />
+
             <div className="lp-sunken relative h-[58vh] min-h-[22rem] overflow-hidden rounded-md lg:h-[36rem]">
               <GraphCanvas
                 visible={visible}
@@ -383,6 +479,8 @@ export default function Network() {
                 onSelectEdge={id => setSelection({ type: 'edge', id })}
                 onClear={() => setSelection(graph.root !== null ? { type: 'node', id: graph.root } : null)}
                 onStatus={setCanvas}
+                onPhysicsLimit={setPhysicsPaused}
+                display={display}
                 label={canvasLabel}
               />
               {canvas === 'loading' && <p className="absolute inset-0 grid place-items-center text-[13px] text-ink">Preparing the graph…</p>}
