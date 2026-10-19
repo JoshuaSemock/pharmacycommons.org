@@ -209,8 +209,8 @@ header in step with `Nav.tsx`.
 **index.html** is the single entry point (`index-updated.html` removed
 2026-09-25). `#root` holds a static shell (hero + About summary) that paints
 before JS and that React replaces on mount; its hero mirrors `Home.tsx`, keep
-them in step. Fonts load from `index.html` (one Google Fonts request, non-blocking),
-not `@import` in `src/index.css`. All routes except Home are `lazy()` in `App.tsx`.
+them in step. Fonts are self-hosted (`@fontsource` packages imported in `src/main.tsx`, latin subset;
+no Google Fonts requests, so no visitor IPs go to third parties). Do not re-add Google links. All routes except Home are `lazy()` in `App.tsx`.
 Lighthouse baseline and fixes: `docs/performance-2026-09-25.md`.
 
 **Search/browse shows moieties only.** `src/catalog.ts` `loadCatalog()` filters

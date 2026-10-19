@@ -186,8 +186,8 @@ emphasis is 500 (`font-medium`) or 600 (`font-semibold`).
 - **IBM Plex Mono** (400/500/600, `font-mono`) is used only for machine strings:
   PCIDs, codes (ATC, NDC), JSON, API paths, numbers in tool inputs. It is not a second
   reading face.
-- Fonts load in one non-blocking Google Fonts request from `index.html` (preconnected),
-  never `@import` in CSS.
+- Fonts are self-hosted via `@fontsource` imports in `src/main.tsx` (latin subset, bundled
+  by Vite). Never link or `@import` Google Fonts: it sends visitor IPs to Google.
 
 **Letter-spacing:** the font's own spacing everywhere. No base tracking is set.
 Deliberate exceptions, all Tailwind utilities:
@@ -463,7 +463,7 @@ list), with nav and footer removed; that page sets landscape itself.
 | What | Where |
 | --- | --- |
 | Tokens, theme flip, letterpress classes, page/paper CSS | `src/index.css` |
-| Theme script (before paint), font request, static shell | `index.html` |
+| Theme script (before paint), static shell | `index.html` |
 | Theme choice (React) | `src/theme.ts` |
 | Letterpress components | `src/components/` |
 | Nav and site menu | `src/Nav.tsx`, `src/SiteMenu.tsx` |
