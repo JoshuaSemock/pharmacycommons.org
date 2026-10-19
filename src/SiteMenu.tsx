@@ -55,13 +55,37 @@ const LEGAL_LINKS = [
 
 const MENU_ID = 'site-menu'
 
-export default function SiteMenu() {
+/** A slot in the phone bar at the bottom of the screen: 56px tall (well past
+    the 44px touch minimum), icon over a tiny label. Used by Nav.tsx's MobileNav. */
+export const BAR_ITEM = [
+  'lp-toggle flex h-14 w-full max-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-md font-sans text-ink',
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40',
+].join(' ')
+
+type SiteMenuProps = {
+  /** `below` drops from the header bar (md and up); `above` grows upward from the phone bar. */
+  placement?: 'below' | 'above'
+  /** Text under the hamburger (phone bar only). */
+  label?: string
+  /** Controlled mode: the phone bar owns the state so search and menu never open together. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export default function SiteMenu({ placement = 'below', label, open, onOpenChange }: SiteMenuProps = {}) {
+  const above = placement === 'above'
   const { pathname, search } = useLocation()
-  const [isOpen, setIsOpen] = useState(false)
+  const [innerOpen, setInnerOpen] = useState(false)
+  const isOpen = open ?? innerOpen
+  const setIsOpen = (next: boolean) => {
+    setInnerOpen(next)
+    onOpenChange?.(next)
+  }
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Navigating anywhere (including a link inside the menu) closes it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setIsOpen(false), [pathname, search])
 
   // Escape closes and returns focus to the button; the page behind stops
@@ -94,13 +118,26 @@ export default function SiteMenu() {
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen(open => !open)}
+        onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        className="lp-toggle flex h-8 w-8 shrink-0 flex-col items-center justify-center gap-[3.4px] rounded-md md:h-9 md:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40"
+        className={
+          above
+            ? BAR_ITEM
+            : 'lp-toggle flex h-8 w-8 shrink-0 flex-col items-center justify-center gap-[3.4px] rounded-md md:h-9 md:w-9 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40'
+        }
       >
-        <MenuBars open={isOpen} />
+        {above ? (
+          <>
+            <span className="flex h-[22px] flex-col items-center justify-center gap-[3.4px]">
+              <MenuBars open={isOpen} />
+            </span>
+            {label && <span className="text-[10.5px] leading-none">{label}</span>}
+          </>
+        ) : (
+          <MenuBars open={isOpen} />
+        )}
       </button>
 
       {/* Dimmed page under the bar; tapping it closes the menu. */}
@@ -108,7 +145,8 @@ export default function SiteMenu() {
         aria-hidden="true"
         onClick={() => setIsOpen(false)}
         className={[
-          'absolute inset-x-0 top-full h-[100dvh] bg-black/30 transition-opacity duration-200 motion-reduce:transition-none',
+          'absolute inset-x-0 h-[100dvh] bg-black/30 transition-opacity duration-200 motion-reduce:transition-none',
+          above ? 'bottom-full' : 'top-full',
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         ].join(' ')}
       />
@@ -119,18 +157,25 @@ export default function SiteMenu() {
         aria-label="Site menu"
         onBlur={onPanelBlur}
         className={[
-          'pc-grain absolute inset-x-0 top-full bg-paper shadow-lg shadow-black/15',
-          'max-h-[calc(100dvh-var(--nav-h,3.5rem))] overflow-y-auto overscroll-contain',
+          'pc-grain absolute inset-x-0 bg-paper',
+          above
+            ? 'bottom-full max-h-[calc(100dvh-var(--bottom-nav-h,4rem)-0.75rem)] rounded-t-lg shadow-[0_-8px_24px_rgb(0_0_0/0.15)]'
+            : 'top-full max-h-[calc(100dvh-var(--nav-h,3.5rem))] shadow-lg shadow-black/15',
+          'overflow-y-auto overscroll-contain',
           'transition-[opacity,translate,visibility] duration-200 ease-out motion-reduce:transition-none',
-          isOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0',
+          isOpen
+            ? 'visible translate-y-0 opacity-100'
+            : `invisible opacity-0 ${above ? 'translate-y-2' : '-translate-y-2'}`,
         ].join(' ')}
       >
         <div className="mx-auto max-w-page px-4 pt-2 pb-6 sm:px-6 md:grid md:grid-cols-[1fr_1.6fr_1fr] md:gap-x-10 md:pt-5">
           <div>
             {/* The bar shows the account button from md up; below that it lives here. */}
-            <div className="lp-rule-b py-3 md:hidden">
-              <AccountButton block />
-            </div>
+            {!above && (
+              <div className="lp-rule-b py-3 md:hidden">
+                <AccountButton block />
+              </div>
+            )}
             <MenuGroup label="Explore" links={EXPLORE_LINKS} />
           </div>
 
@@ -199,6 +244,24 @@ export function AccountButton({ block = false }: { block?: boolean }) {
     <Link to="/account" className={`${base} lp-raised lp-press`}>
       Log in / Register
     </Link>
+  )
+}
+
+/** Account slot of the phone bar: a person icon, with a small foil dot once signed in. */
+export function AccountIconLink() {
+  const { user, loading } = useSession()
+  const name = loading ? 'Account' : user ? 'Account, signed in' : 'Log in or register'
+  return (
+    <NavLink to="/account" end aria-label={name} className={BAR_ITEM}>
+      <span className="relative">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+        {user && <span className="absolute -right-1 top-0 h-1.5 w-1.5 rounded-full bg-foil" aria-hidden="true" />}
+      </span>
+      <span className="text-[10.5px] leading-none">{user ? 'Account' : 'Log in'}</span>
+    </NavLink>
   )
 }
 

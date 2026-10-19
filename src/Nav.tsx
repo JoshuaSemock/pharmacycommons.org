@@ -1,8 +1,8 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './catalog'
-import SiteMenu, { AccountButton, BAR_LINKS } from './SiteMenu'
+import SiteMenu, { AccountButton, AccountIconLink, BAR_ITEM, BAR_LINKS } from './SiteMenu'
 import { drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
 import type { SiteEntry } from './siteSearch'
 
@@ -21,10 +21,30 @@ import type { SiteEntry } from './siteSearch'
  * search box is shown on every page, including / and /browse, which also have
  * their own.
  *
+ * Below md (phones) none of that is used: the bar moves to the bottom edge of
+ * the screen, inside the thumb's reach (see MobileNav below). One bar is
+ * mounted at a time, chosen by Nav().
+ *
  * The static copy of this bar in index.html (inside #root) paints before the
  * bundle loads; keep the two in step.
  */
+const MOBILE_QUERY = '(max-width: 47.999rem)' // Tailwind's md is 48rem
+
+function subscribeMobile(onChange: () => void) {
+  const mq = window.matchMedia(MOBILE_QUERY)
+  mq.addEventListener('change', onChange)
+  return () => mq.removeEventListener('change', onChange)
+}
+
+export function useIsMobile(): boolean {
+  return useSyncExternalStore(subscribeMobile, () => window.matchMedia(MOBILE_QUERY).matches, () => false)
+}
+
 export default function Nav() {
+  return useIsMobile() ? <MobileNav /> : <DesktopNav />
+}
+
+function DesktopNav() {
   const navRef = useRef<HTMLElement>(null)
 
   // Publish the header height so sticky elements below it (the browse index)
@@ -105,7 +125,9 @@ const barLinkClass = [
 /** One selectable row in the dropdown. */
 type Option = { key: string; to: string }
 
-function HeaderSearch() {
+function HeaderSearch({ placement = 'bar', onDone }: { placement?: 'bar' | 'sheet'; onDone?: () => void }) {
+  const sheet = placement === 'sheet'
+  const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const [focused, setFocused] = useState(false)
   const [query, setQuery] = useState('')
@@ -175,10 +197,16 @@ function HeaderSearch() {
 
   useEffect(() => setActive(-1), [q])
 
+  // In the bottom sheet the field is focused the moment the sheet opens.
+  useLayoutEffect(() => {
+    if (sheet) inputRef.current?.focus()
+  }, [sheet])
+
   function go(to: string) {
     navigate(to)
     setQuery('')
     setFocused(false)
+    onDone?.()
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -216,11 +244,12 @@ function HeaderSearch() {
   return (
     // Below md the bar is a 3-column grid and this spans row 2 on its own; from
     // md the bar is a flex row and this sits between the name and the links.
-    <div className="relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1">
+    <div className={sheet ? 'relative min-w-0' : 'relative col-span-3 row-start-2 min-w-0 md:mx-2 md:max-w-xl md:flex-1'}>
       <form onSubmit={handleSubmit} role="search">
-        <div className="lp-field lp-foil flex h-10 items-center gap-2 rounded-md px-3 md:h-9">
+        <div className={`lp-field lp-foil flex items-center gap-2 rounded-md px-3 ${sheet ? 'h-12' : 'h-10 md:h-9'}`}>
           <SearchIcon />
           <input
+            ref={inputRef}
             type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -241,7 +270,7 @@ function HeaderSearch() {
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center text-ink"
+              className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center text-ink"
               aria-label="Clear search"
             >
               <XIcon />
@@ -255,7 +284,9 @@ function HeaderSearch() {
           id={listId}
           role="listbox"
           aria-label="Search results"
-          className="lp-popover pc-grain absolute top-full z-10 mt-1.5 grid max-h-[70vh] w-full gap-1.5 md:min-w-[24rem] overflow-y-auto rounded-lg bg-paper p-1.5"
+          className={`lp-popover pc-grain absolute z-10 grid w-full gap-1.5 md:min-w-[24rem] overflow-y-auto rounded-lg bg-paper p-1.5 ${
+            sheet ? 'bottom-full mb-1.5 max-h-[calc(100dvh-14rem)]' : 'top-full mt-1.5 max-h-[70vh]'
+          }`}
         >
           {groups.map(group => (
             <div key={group.key} role="group" aria-label={group.label} className="grid gap-1.5">
@@ -276,6 +307,144 @@ function HeaderSearch() {
         </div>
       )}
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Phone bar (below md)
+// ---------------------------------------------------------------------------
+
+type Panel = 'search' | 'menu' | null
+
+/**
+ * The phone header lives at the bottom of the screen, where the thumb rests.
+ * Five equal slots, left to right: Tools, Search, Home (the logo), Menu, Account.
+ * Search and the menu open as sheets that grow upward from the bar, one at a
+ * time. Search results also open upward, so nothing the thumb needs is ever
+ * above the finger.
+ *
+ * The bar is `fixed` (not inside any backdrop-filter element) so the sheets can
+ * be `absolute` against it. --nav-h is 0 here (nothing is pinned to the top);
+ * --bottom-nav-h carries the bar's height for page padding and sheet limits.
+ * Do not add `relative` to any element between SiteMenu and this <nav>.
+ */
+function MobileNav() {
+  const navRef = useRef<HTMLElement>(null)
+  const { pathname, search } = useLocation()
+  const [panel, setPanel] = useState<Panel>(null)
+
+  // Any navigation closes whatever is open.
+  useEffect(() => setPanel(null), [pathname, search])
+
+  useLayoutEffect(() => {
+    const el = navRef.current
+    if (!el) return
+    const root = document.documentElement
+    root.style.setProperty('--nav-h', '0px')
+    const publish = () => root.style.setProperty('--bottom-nav-h', `${el.getBoundingClientRect().height}px`)
+    publish()
+    const observer = new ResizeObserver(publish)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // iOS keeps the layout viewport under the on-screen keyboard, which would
+  // hide the bar and the search sheet. While searching, lift the bar by the
+  // keyboard's height (0 on Android, where the viewport itself shrinks).
+  useEffect(() => {
+    const vv = window.visualViewport
+    const el = navRef.current
+    if (panel !== 'search' || !vv || !el) return
+    const sync = () => {
+      el.style.bottom = `${Math.max(0, window.innerHeight - vv.height - vv.offsetTop)}px`
+    }
+    sync()
+    vv.addEventListener('resize', sync)
+    vv.addEventListener('scroll', sync)
+    return () => {
+      vv.removeEventListener('resize', sync)
+      vv.removeEventListener('scroll', sync)
+      el.style.bottom = ''
+    }
+  }, [panel])
+
+  useEffect(() => {
+    if (panel !== 'search') return
+    const onKeyDown = (e: globalThis.KeyboardEvent) => e.key === 'Escape' && setPanel(null)
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [panel])
+
+  const searching = panel === 'search'
+
+  return (
+    <nav
+      ref={navRef}
+      aria-label="Primary"
+      className="pc-grain lp-rule-t fixed inset-x-0 bottom-0 z-50 bg-paper pb-[env(safe-area-inset-bottom)]"
+    >
+      {searching && (
+        <>
+          <div aria-hidden="true" onClick={() => setPanel(null)} className="absolute inset-x-0 bottom-full h-[100dvh] bg-black/30" />
+          <div className="pc-grain lp-rule-t absolute inset-x-0 bottom-full bg-paper px-3 pt-3 pb-3 shadow-[0_-8px_24px_rgb(0_0_0/0.15)]">
+            <HeaderSearch placement="sheet" onDone={() => setPanel(null)} />
+          </div>
+        </>
+      )}
+
+      <ul className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-1">
+        <li className="flex justify-center">
+          <NavLink to="/tools" className={BAR_ITEM}>
+            <ToolsIcon />
+            <span className="text-[10.5px] leading-none">Tools</span>
+          </NavLink>
+        </li>
+        <li className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setPanel(p => (p === 'search' ? null : 'search'))}
+            aria-expanded={searching}
+            aria-label={searching ? 'Close search' : 'Search the commons'}
+            className={BAR_ITEM}
+          >
+            <BarSearchIcon />
+            <span className="text-[10.5px] leading-none">Search</span>
+          </button>
+        </li>
+        <li className="flex justify-center">
+          <NavLink to="/" end aria-label="Pharmacy Commons home" className={`${BAR_ITEM} !h-14 !w-[4.5rem]`}>
+            <img src="/logo-40.png" alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+          </NavLink>
+        </li>
+        <li className="flex justify-center">
+          <SiteMenu placement="above" label="Menu" open={panel === 'menu'} onOpenChange={o => setPanel(o ? 'menu' : null)} />
+        </li>
+        <li className="flex justify-center">
+          <AccountIconLink />
+        </li>
+      </ul>
+    </nav>
+  )
+}
+
+function ToolsIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-ink">
+      <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8.5 7.5h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <g fill="currentColor">
+        {[9, 12, 15].flatMap(x => [12, 16].map(y => <circle key={`${x}-${y}`} cx={x} cy={y} r="0.9" />))}
+      </g>
+    </svg>
+  )
+}
+
+function BarSearchIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-ink">
+      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M16 16l4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   )
 }
 
