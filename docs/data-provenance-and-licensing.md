@@ -1,6 +1,6 @@
 # Pharmacy Commons — Data Provenance and Licensing Policy
 
-**Effective Date:** September 29, 2026
+**Effective Date:** October 19, 2026
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
