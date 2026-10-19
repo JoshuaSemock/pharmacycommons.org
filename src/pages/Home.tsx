@@ -150,7 +150,7 @@ function Hero() {
         Query structured data in an open educational source for providers and the public. While not to be used as a substitute for direct medical evaluation or clinical recommendation, this resource can be used to aid licensed practitioners.
       </p>
 
-      <div className="relative mx-auto max-w-lg text-left">
+      <div className="relative mx-auto w-full max-w-xl text-left">
         <form onSubmit={handleSubmit} role="search">
           <div className="lp-field lp-foil flex items-center gap-2 rounded-md px-4 py-3">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-ink">
