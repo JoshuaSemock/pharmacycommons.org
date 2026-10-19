@@ -49,14 +49,14 @@ export default function Home() {
           tint="hepatica"
           to="/about"
           title="About"
-          blurb="What the Commons is, why it exists and who runs it."
+          blurb="Explore the vision for the Commons is, the founding principles, and more."
         />
         <DestinationTile
           area="classes"
           tint="salmon"
           to="/classifications"
           title="Classifications"
-          blurb="Pharmacologic classes from FDA, RxClass and ClassyFire, searchable and comparable."
+          blurb="Pharmacologic classes from FDA, WHO, VA, RxClass and ClassyFire, searchable and comparable."
         />
         <DestinationTile
           area="lists"
@@ -70,7 +70,7 @@ export default function Home() {
           tint="salmon"
           to="/network"
           title="Network"
-          blurb="See how a drug, class or condition connects to others, with the source of every line."
+          blurb="Explore how a drug, class or condition connects to others in a graph view."
         />
         <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked collapsible />
         <ToolsTile />
@@ -88,7 +88,7 @@ export default function Home() {
           tint="salmon"
           to="/references"
           title="References"
-          blurb="Every source dataset and reference behind the Commons, with its license."
+          blurb="Every source dataset and reference behind the Commons."
         />
         <DestinationTile
           area="resources"
@@ -163,7 +163,7 @@ function Hero() {
               onChange={e => setQuery(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setTimeout(() => setFocused(false), 150)}
-              placeholder="drug, brand name, combination product, class..."
+              placeholder="Search drugs, tools, lists, classes"
               aria-label="Search the commons"
               className="min-w-0 flex-1 bg-transparent font-sans text-[14px] text-ink placeholder:text-ink outline-none"
               autoFocus={FINE_POINTER}
