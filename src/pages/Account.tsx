@@ -7,6 +7,7 @@ import {
   authErrorMessage,
   authRedirectError,
   legalAgreementMetadata,
+  getMyAccountProfile,
   getMyProviderVerification,
   getSavedEntities,
   sendPasswordReset,
@@ -21,6 +22,19 @@ import {
 } from '../auth'
 import type { ProviderVerification, SavedEntity } from '../auth'
 import MyContributions from '../components/MyContributions'
+import PaperDatePicker from '../components/PaperDatePicker'
+import PaperSelect from '../components/PaperSelect'
+import {
+  ACCOUNT_TYPES,
+  COUNTRIES,
+  EMPTY_SIGNUP_DETAILS,
+  MINIMUM_AGE,
+  PROFESSIONS,
+  latestEligibleBirthDate,
+  signupMetadata,
+  validateSignupDetails,
+} from '../signup'
+import type { AccountType, SignupDetails } from '../signup'
 import { isAdmin } from '../contributions'
 
 /**
@@ -611,6 +625,13 @@ function NpiVerification() {
 
   useEffect(() => {
     let cancelled = false
+    // An NPI (and name) given at sign-up is only a claim; prefill it so the
+    // person can verify it in one click.
+    getMyAccountProfile().then(p => {
+      if (cancelled || !p) return
+      if (p.npi_claimed) setNpi(current => current || (p.npi_claimed ?? ''))
+      setLastName(current => current || p.last_name)
+    })
     getMyProviderVerification()
       .then(v => {
         if (!cancelled) setVerification(v)
@@ -873,7 +894,12 @@ function RegisterForm() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [details, setDetails] = useState<SignupDetails>(EMPTY_SIGNUP_DETAILS)
   const [status, setStatus] = useState<'idle' | 'loading' | 'check-email'>('idle')
+
+  function setDetail<K extends keyof SignupDetails>(key: K, value: SignupDetails[K]) {
+    setDetails(prev => ({ ...prev, [key]: value }))
+  }
   const [error, setError] = useState<string | null>(null)
   const loading = status === 'loading'
 
@@ -885,6 +911,12 @@ function RegisterForm() {
     // pressing Enter in a field, which submits the form directly.
     if (!agreedToTerms) {
       setError('Please agree to the Terms of Use and policies to create an account.')
+      return
+    }
+
+    const detailsError = validateSignupDetails(details)
+    if (detailsError) {
+      setError(detailsError)
       return
     }
 
@@ -903,6 +935,7 @@ function RegisterForm() {
         email,
         password,
         legalAgreementMetadata(LEGAL_VERSION),
+        signupMetadata(details),
       )
       // A session comes back immediately only if email confirmation is off
       // for this project; otherwise Supabase sends a confirmation link and
@@ -918,12 +951,161 @@ function RegisterForm() {
     return (
       <p className="lp-sunken mt-5 rounded-md px-3.5 py-3 font-sans text-md leading-relaxed text-ink">
         Check {email} for a confirmation link to finish setting up your account.
+        {details.accountType === 'practitioner' && ' Once you are signed in, verify your NPI under your account to unlock editing.'}
       </p>
     )
   }
 
+  const accountType: AccountType | '' = details.accountType
+
   return (
     <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+      <Field label="I am a…">
+        <PaperSelect
+          value={details.accountType}
+          onChange={v => setDetail('accountType', v as AccountType)}
+          placeholder="Choose one"
+          searchable={false}
+          className="w-full px-3 py-2 text-md"
+          options={ACCOUNT_TYPES.map(t => ({ value: t.value, label: t.label, sublabel: t.hint }))}
+        />
+      </Field>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="First name">
+          <input
+            type="text"
+            autoComplete="given-name"
+            required
+            maxLength={80}
+            value={details.firstName}
+            onChange={e => setDetail('firstName', e.target.value)}
+            className={inputClass}
+          />
+        </Field>
+        <Field label="Last name">
+          <input
+            type="text"
+            autoComplete="family-name"
+            required
+            maxLength={80}
+            value={details.lastName}
+            onChange={e => setDetail('lastName', e.target.value)}
+            className={inputClass}
+          />
+        </Field>
+      </div>
+
+      <Field label="Date of birth" hint={`You must be ${MINIMUM_AGE} or older. Never shown publicly.`}>
+        <PaperDatePicker
+          value={details.dateOfBirth}
+          onChange={v => setDetail('dateOfBirth', v)}
+          max={latestEligibleBirthDate()}
+          minYear={1920}
+          maxYear={new Date().getFullYear() - MINIMUM_AGE}
+          clearable={false}
+          placeholder="Pick your birth date"
+          className="w-full px-3 py-2 text-md"
+        />
+      </Field>
+      <label className="flex cursor-pointer items-start gap-2.5">
+        <input
+          type="checkbox"
+          checked={details.ageConfirmed}
+          onChange={e => setDetail('ageConfirmed', e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/30 accent-neutral-700 text-ink focus:ring-ink/20"
+        />
+        <span className="font-sans text-sm leading-relaxed text-ink">
+          I confirm that I am {MINIMUM_AGE} years of age or older.
+        </span>
+      </label>
+
+      {accountType === 'practitioner' && (
+        <>
+          <Field label="Profession (optional)">
+            <PaperSelect
+              value={details.profession}
+              onChange={v => setDetail('profession', v)}
+              placeholder="Choose one"
+              searchable={false}
+              className="w-full px-3 py-2 text-md"
+              options={PROFESSIONS.map(p => ({ value: p, label: p }))}
+            />
+          </Field>
+          <Field
+            label="NPI number (optional)"
+            hint="10 digits. We check it against the CMS NPI Registry after you sign in, which unlocks editing."
+          >
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder="1234567890"
+              value={details.npi}
+              onChange={e => setDetail('npi', e.target.value.replace(/\D/g, ''))}
+              className={inputClass}
+            />
+          </Field>
+        </>
+      )}
+
+      {accountType === 'researcher' && (
+        <>
+          <Field label="Institution or organization (optional)">
+            <input
+              type="text"
+              autoComplete="organization"
+              maxLength={160}
+              value={details.organization}
+              onChange={e => setDetail('organization', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Research area (optional)">
+            <input
+              type="text"
+              maxLength={160}
+              value={details.researchArea}
+              onChange={e => setDetail('researchArea', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+        </>
+      )}
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Country (optional)">
+          <PaperSelect
+            value={details.country}
+            onChange={v => setDetail('country', v)}
+            placeholder="Choose"
+            searchable="auto"
+            className="w-full px-3 py-2 text-md"
+            options={COUNTRIES}
+          />
+        </Field>
+        <Field label="ZIP / postal code (optional)">
+          <input
+            type="text"
+            autoComplete="postal-code"
+            maxLength={16}
+            value={details.postalCode}
+            onChange={e => setDetail('postalCode', e.target.value)}
+            className={inputClass}
+          />
+        </Field>
+      </div>
+      <Field label="Phone (optional)" hint="Never shown publicly.">
+        <input
+          type="tel"
+          autoComplete="tel"
+          maxLength={32}
+          value={details.phone}
+          onChange={e => setDetail('phone', e.target.value)}
+          className={inputClass}
+        />
+      </Field>
+
       <Field label="Email">
         <input
           type="email"
