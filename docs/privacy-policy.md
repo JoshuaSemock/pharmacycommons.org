@@ -28,6 +28,8 @@ We collect information in two categories: data you actively provide and technica
 **B. Information Collected Automatically**
 
 * **Infrastructure Logs:** Our frontend is hosted on GitHub Pages. When you visit the site, GitHub automatically collects standard web server logs, including your IP address, browser type, operating system, and the timestamps of your requests, to maintain security and monitor traffic.
+* **Network and Analytics Data:** Traffic to pharmacycommons.org passes through Cloudflare, which acts as our content delivery network and security proxy. Cloudflare receives your IP address, browser type, and request details in order to route and protect the traffic, and it provides us with aggregate, privacy-focused traffic statistics through Cloudflare Web Analytics. We do not use Cloudflare Web Analytics to build individual profiles, and it does not use cookies or track you across other sites.
+* **Our own code and IP addresses:** Pharmacy Commons does not itself read, store, or share your IP address, and we do not use it for advertising, profiling, or location tracking. Your IP address reaches the providers listed in Section 5 because your browser connects to them, as it does for any website.
 * **Authentication & Session Data:** Our backend database and user authentication are powered by Supabase. Supabase logs authentication attempts and API requests to secure the platform against abuse and unauthorized access.
 
 ### 3. Cookies and Local Storage
@@ -51,8 +53,11 @@ We do not sell, rent, or lease your personal information to third parties. We us
 To operate the platform, your data is processed by our trusted infrastructure partners, who are bound by their own rigorous security and privacy standards:
 
 * **GitHub (Microsoft):** Hosts the frontend static assets and routes public web traffic.
-* **Supabase:** Hosts the PostgreSQL database, executes Edge Functions, and manages user authentication and encrypted password storage.
-* **Porkbun / Cloudflare:** Manages domain registration and DNS routing.
+* **Supabase:** Hosts the PostgreSQL database, executes Edge Functions, and manages user authentication and encrypted password storage. When you log in, Supabase records the IP address and browser details of your session and authentication events for security.
+* **Cloudflare:** Provides DNS, a content delivery network and security proxy for all traffic to the site, and Cloudflare Web Analytics (aggregate traffic statistics).
+* **Porkbun:** Domain registrar.
+
+We do not load fonts, scripts, or advertising from other third parties: our fonts are served from our own domain.
 
 ### 6. Data Retention and Account Deletion
 
