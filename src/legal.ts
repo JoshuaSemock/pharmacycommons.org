@@ -16,7 +16,7 @@
  */
 
 /** Effective Date of the current documents, ISO yyyy-mm-dd. */
-export const LEGAL_VERSION = '2026-09-29'
+export const LEGAL_VERSION = '2026-10-19'
 
 export const LEGAL_CONTACT_EMAIL = 'contact@pharmacycommons.org'
 

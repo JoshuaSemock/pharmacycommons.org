@@ -1,6 +1,6 @@
 # Pharmacy Commons — Privacy Policy
 
-**Effective Date:** September 29, 2026
+**Effective Date:** October 19, 2026
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
@@ -20,8 +20,8 @@ We collect information in two categories: data you actively provide and technica
 
 **A. Information You Provide**
 
-* **Account Registration:** If you register to contribute to the database, we collect your email address, a hashed password, and your chosen username or public identifier.
-* **Clinical Verification:** If you request write-access to edit clinical monographs, we may collect professional verification data, such as your National Provider Identifier (NPI) or licensure status.
+* **Account Registration:** When you register, we collect your email address, a hashed password, your first and last name, your date of birth (used only to confirm that you are at least 18 years old), and the kind of account you choose (patient or caregiver, practitioner, or researcher). You may also choose to give a country, ZIP or postal code, and phone number, and, depending on your account type, a profession, a claimed NPI, an institution, and a research area. We do not ask for a street address. These details are private: they are visible only to you and to the maintainers, and are never shown on your public contributions. Your public username or identifier is chosen separately.
+* **Clinical Verification:** If you request write-access to edit clinical monographs, we may collect professional verification data, such as your National Provider Identifier (NPI) or licensure status. An NPI given at registration is treated as a claim until it is checked against the CMS NPI Registry.
 * **Public Contributions:** Any edits, annotations, structured data relationships, or comments you submit to the database are recorded. Because this is a public commons, your contributions are permanently associated with your public username or identifier.
 * **Communications:** If you email `contact@pharmacycommons.org` with questions, takedown requests, or feedback, we retain that correspondence.
 
@@ -41,7 +41,7 @@ Pharmacy Commons uses minimal local storage and strictly necessary cookies to pr
 
 We do not sell, rent, or lease your personal information to third parties. We use your data exclusively to:
 
-* Authenticate your identity and manage your write-access permissions.
+* Authenticate your identity, confirm that you meet the minimum age, and manage your write-access permissions.
 * Attribute database edits to the correct contributor to maintain an auditable version history.
 * Communicate with you regarding account security, policy updates, or issues with your submissions.
 * Monitor platform stability, troubleshoot API errors, and prevent malicious scraping or denial-of-service attacks.
@@ -64,11 +64,15 @@ You may request to delete your account at any time by emailing `contact@pharmacy
 
 We implement industry-standard security measures, including HTTPS/TLS encryption for all data in transit, Row Level Security (RLS) on our PostgreSQL database to isolate user permissions, and secure credential hashing via Supabase. However, no internet-connected database is completely impenetrable. You are responsible for maintaining the security of your password and account credentials.
 
-### 8. Changes to This Policy
+### 8. Children
+
+The Services are for adults. You must be at least 18 years old to create an account, and registration requires a date of birth that meets this requirement. We do not knowingly collect personal information from anyone under 18. Reading the public site does not require an account. If you believe a person under 18 has registered, contact us at `contact@pharmacycommons.org` and we will delete the account.
+
+### 9. Changes to This Policy
 
 We may update this Privacy Policy as we add new features, such as moderation UI tools or expanded API access. When material changes are made, we will update the "Effective Date" at the top of this document. Continued use of the Services after an update constitutes acceptance of the revised practices.
 
-### 9. Contact
+### 10. Contact
 
 If you have questions about this Privacy Policy, your data rights, or account deletion, please contact the maintainers at:
 **Email:** contact@pharmacycommons.org

@@ -1,6 +1,6 @@
 # Pharmacy Commons — Terms of Use
 
-**Effective Date:** September 29, 2026
+**Effective Date:** October 19, 2026
 **Last revised:** October 4, 2026 (Section 3, community contributions)
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
@@ -15,9 +15,9 @@ Welcome to Pharmacy Commons. These Terms of Use (“Terms”) govern your access
 
 ### 2. User Accounts and Verification
 
-Certain features, such as contributing edits or annotations to the database, require you to register for an account. Because clinical contributions directly impact the public trust, write access for monograph editing is gated and requires active National Provider Identifier (NPI) verification. You agree to:
+Certain features, such as contributing edits or annotations to the database, require you to register for an account. **You must be at least 18 years old to create an account.** By registering, you confirm that you are 18 or older, and you agree to give your true date of birth; we may suspend or delete an account that was opened by someone under 18 or with a false date of birth. Reading the public Services does not require an account. Because clinical contributions directly impact the public trust, write access for monograph editing is gated and requires active National Provider Identifier (NPI) verification. You agree to:
 
-* Provide accurate and current information when registering and verifying your credentials.
+* Provide accurate and current information when registering and verifying your credentials, including your account type (patient or caregiver, practitioner, or researcher) and your date of birth.
 * Maintain the confidentiality of your login credentials.
 * Take responsibility for all activity conducted through your account.
 * Notify Pharmacy Commons immediately of any suspected unauthorized access.
