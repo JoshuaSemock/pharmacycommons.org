@@ -19,6 +19,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getListBySlug } from '../api'
 import type { ListDetail as ListRecord, ListItem } from '../api.generated'
 import { formatDrugName } from '../names'
+import StudyLinks from '../components/StudyLinks'
 import PaperSelect from '../components/PaperSelect'
 import {
   defaultSortKey,
@@ -189,6 +190,9 @@ function ListHeader({ list }: { list: ListRecord }) {
         >
           Compare with another list
         </Link>
+      </div>
+      <div className="mt-4">
+        <StudyLinks listSlug={list.slug} label="Study this list:" />
       </div>
     </header>
   )
