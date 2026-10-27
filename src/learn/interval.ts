@@ -21,12 +21,12 @@ export function formatInterval(ms: number): string {
   return `${Number((d / 365.25).toFixed(1))}y`
 }
 
-/** Next interval label for each rating of a flashcard, from the card's current state (null = new). */
-export function intervalPreview(state: SchedState | null, now: Date): Record<Rating, string> {
+/** Next interval label for each rating, from the card's current state (null = new). `mode` matches the session's scheduling mode. */
+export function intervalPreview(state: SchedState | null, now: Date, mode: 'flashcard' | 'mcq' = 'flashcard'): Record<Rating, string> {
   const before = state ?? newState(now)
   const out = {} as Record<Rating, string>
   for (const r of [1, 2, 3, 4] as const) {
-    const after = schedule(before, r, now, { mode: 'flashcard' })
+    const after = schedule(before, r, now, { mode })
     out[r] = formatInterval(new Date(after.due_at).getTime() - now.getTime())
   }
   return out

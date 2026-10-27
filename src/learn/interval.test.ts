@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { formatInterval, intervalPreview } from './interval'
+import { newState, schedule } from './scheduler'
 
 const NOW = new Date('2026-03-01T12:00:00Z')
 
@@ -21,5 +22,19 @@ describe('intervalPreview', () => {
     expect(p[2]).toBe('6m') // py-fsrs: Hard on the first step waits the mean of the two steps (5.5 min)
     expect(p[3]).toBe('10m')
     expect(p[4]).toMatch(/d$/)
+  })
+
+  it('uses the multiple-choice dampener when asked, so the label matches what is scheduled', () => {
+    let s = newState(NOW)
+    let t = NOW
+    for (let i = 0; i < 4; i++) {
+      s = schedule(s, 3, t, { mode: 'flashcard' })
+      t = new Date(s.due_at)
+    }
+    const card = intervalPreview(s, t)
+    const mcq = intervalPreview(s, t, 'mcq')
+    expect(mcq[3]).not.toBe(card[3])
+    const expected = schedule(s, 3, t, { mode: 'mcq' })
+    expect(new Date(expected.due_at).getTime()).toBeLessThan(new Date(schedule(s, 3, t, { mode: 'flashcard' }).due_at).getTime())
   })
 })

@@ -110,6 +110,7 @@ one mint for accents. Unlike the ramps it does **not** flip in dark mode. Utilit
 
 - the foil-debossed search bars (`.lp-foil`, §6), since 2026-10-17 filled with the lighter mint-200 `#a1f6d8` (`--lp-search-foil`) rather than the full foil;
 - selected dates in the Days Supply calendar (`.lp-foil-set`: the same foil and grain, always on; pressed-in days between two dates, raised ends);
+- a right answer in Learn multiple choice (`.lp-toggle.lp-foil-set[aria-pressed="true"]`: debossed, mint-filled), with its wrong-answer twin `.lp-wrong-set` (salmon-400 `#ffa08d`, same grain, debossed; dark ink, does not flip in dark mode). The other tiles are `disabled`, flat and dimmed;
 - text selection (`::selection`);
 - the global scrollbar thumb (was `mint-200`, which dark mode turned into deep mint-800);
 - checkbox ticks (`accent-foil`, was `accent-mint-700`);
