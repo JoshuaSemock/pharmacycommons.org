@@ -89,7 +89,7 @@ export function patrolNewPage(pcid: number): Promise<void> {
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
-export type Role = 'patroller' | 'admin'
+export type Role = 'patroller' | 'admin' | 'owner'
 
 export type AdminContributor = {
   user_id: string
@@ -173,6 +173,13 @@ export function adminErrorMessage(err: unknown): string {
       return 'Only admins can do that.'
     case 'not_patroller':
       return 'Only reviewers can do that.'
+    case 'not_owner':
+      return 'Only the head administrator can grant or remove the admin role.'
+    case 'owner_not_grantable':
+    case 'owner_not_revocable':
+      return 'The head administrator role can’t be changed here.'
+    case 'cannot_block_owner':
+      return 'The head administrator can’t be blocked.'
     case 'not_verified':
       return 'Roles can only go to contributors with a verified NPI.'
     case 'cannot_revoke_own_admin':
@@ -181,6 +188,13 @@ export function adminErrorMessage(err: unknown): string {
       return 'Already reviewed, or it’s your own page (another reviewer has to check it).'
   }
   return 'That didn’t work. Please try again.'
+}
+
+/** True once the signed-in user is confirmed to be the head administrator. */
+export async function isOwner(): Promise<boolean> {
+  const { data, error } = await supabase.rpc('has_role', { p_role: 'owner' })
+  if (error) return false
+  return data === true
 }
 
 /** True once the signed-in user is confirmed to hold the admin role. */

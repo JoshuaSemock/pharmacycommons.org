@@ -36,10 +36,10 @@ export default function RevisionActions({ pcid, revisionId, revisionStatus, auth
   if (status.kind !== 'ready') return null
   const own = status.handle !== null && status.handle === authorHandle
   const canRestore = !isCurrent && revisionStatus !== 'pending' && revisionStatus !== 'rejected' && status.handle !== null
-  const canPatrol = status.patroller && !own && revisionStatus === 'unpatrolled'
-  const canDecide = status.patroller && !own && revisionStatus === 'pending'
+  const canPatrol = status.patroller && (!own || status.owner) && revisionStatus === 'unpatrolled'
+  const canDecide = status.patroller && (!own || status.owner) && revisionStatus === 'pending'
   if (!canRestore && !canPatrol && !canDecide) {
-    return own && status.patroller && (revisionStatus === 'pending' || revisionStatus === 'unpatrolled') ? (
+    return own && status.patroller && !status.owner && (revisionStatus === 'pending' || revisionStatus === 'unpatrolled') ? (
       <p className="font-sans text-sm text-ink">This is your edit, so another reviewer has to check it.</p>
     ) : null
   }

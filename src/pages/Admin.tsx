@@ -13,6 +13,7 @@ import {
   getProtectedPages,
   grantRole,
   isAdmin,
+  isOwner,
   revokeRole,
   setPageProtection,
   unblockContributor,
@@ -43,6 +44,7 @@ const CHIP =
 export default function Admin() {
   const { user, loading } = useSession()
   const [admin, setAdmin] = useState<boolean | null>(null)
+  const [owner, setOwner] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
@@ -59,6 +61,9 @@ export default function Admin() {
     isAdmin().then(a => {
       if (!cancelled) setAdmin(a)
     })
+    isOwner().then(o => {
+      if (!cancelled) setOwner(o)
+    })
     return () => {
       cancelled = true
     }
@@ -71,7 +76,7 @@ export default function Admin() {
           Admin
         </h1>
         <p className="mt-2 max-w-2xl font-sans text-base leading-relaxed text-ink">
-          Contributor roles and blocks, and which pages hold edits for review. Edits themselves are checked in the{' '}
+          Contributor roles and blocks, and which pages hold edits for review. Only the head administrator can grant or remove the admin role. Edits themselves are checked in the{' '}
           <Link to="/review" className={LINK}>
             review queue
           </Link>
@@ -102,7 +107,7 @@ export default function Admin() {
         </p>
       ) : (
         <div className="space-y-14">
-          <Contributors selfId={user?.id ?? null} onNotice={setNotice} />
+          <Contributors selfId={user?.id ?? null} owner={owner} onNotice={setNotice} />
           <ProtectionSection onNotice={setNotice} />
         </div>
       )}
@@ -112,7 +117,7 @@ export default function Admin() {
 
 // ─── Contributors ─────────────────────────────────────────────────────────────
 
-function Contributors({ selfId, onNotice }: { selfId: string | null; onNotice: (m: string) => void }) {
+function Contributors({ selfId, owner, onNotice }: { selfId: string | null; owner: boolean; onNotice: (m: string) => void }) {
   const [query, setQuery] = useState('')
   const [rows, setRows] = useState<AdminContributor[] | 'loading' | 'failed'>('loading')
   const [version, setVersion] = useState(0)
@@ -166,6 +171,7 @@ function Contributors({ selfId, onNotice }: { selfId: string | null; onNotice: (
               key={c.user_id}
               c={c}
               self={c.user_id === selfId}
+              owner={owner}
               onDone={m => {
                 onNotice(m)
                 setVersion(v => v + 1)
@@ -186,7 +192,7 @@ const BLOCK_LENGTHS: { key: BlockLength; label: string }[] = [
   { key: 'none', label: 'Until lifted' },
 ]
 
-function ContributorRow({ c, self, onDone }: { c: AdminContributor; self: boolean; onDone: (message: string) => void }) {
+function ContributorRow({ c, self, owner, onDone }: { c: AdminContributor; self: boolean; owner: boolean; onDone: (message: string) => void }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [panel, setPanel] = useState<'none' | 'block' | 'admin'>('none')
@@ -223,7 +229,7 @@ function ContributorRow({ c, self, onDone }: { c: AdminContributor; self: boolea
         </span>
         <span>
           {[
-            has('admin') ? 'Admin' : has('patroller') ? 'Reviewer' : null,
+            has('owner') ? 'Head administrator' : has('admin') ? 'Admin' : has('patroller') ? 'Reviewer' : null,
             c.verified ? 'NPI verified' : 'NPI not active',
             c.blocked ? 'Blocked' : null,
           ]
@@ -242,7 +248,9 @@ function ContributorRow({ c, self, onDone }: { c: AdminContributor; self: boolea
           </>
         )}
       </p>
-      {self ? (
+      {has('owner') ? (
+        <p>{self ? 'This is you, the head administrator. ' : ''}The head administrator role and its access can’t be changed or blocked here.</p>
+      ) : self ? (
         <p>This is you. Your own roles and blocks can only be changed by another admin.</p>
       ) : (
       <div className="flex flex-wrap gap-2">
@@ -251,15 +259,16 @@ function ContributorRow({ c, self, onDone }: { c: AdminContributor; self: boolea
             {has('patroller') ? 'Remove reviewer' : 'Make reviewer'}
           </Button>
         )}
-        {has('admin') ? (
-          <Button size="sm" disabled={busy} onClick={() => void toggle('admin', 'an admin')}>
-            Remove admin
-          </Button>
-        ) : (
-          <Button size="sm" disabled={busy || !c.verified} onClick={() => setPanel(p => (p === 'admin' ? 'none' : 'admin'))}>
-            Make admin…
-          </Button>
-        )}
+        {owner &&
+          (has('admin') ? (
+            <Button size="sm" disabled={busy} onClick={() => void toggle('admin', 'an admin')}>
+              Remove admin
+            </Button>
+          ) : (
+            <Button size="sm" disabled={busy || !c.verified} onClick={() => setPanel(p => (p === 'admin' ? 'none' : 'admin'))}>
+              Make admin…
+            </Button>
+          ))}
         {c.blocked ? (
           <Button size="sm" disabled={busy} onClick={() => void run(() => unblockContributor(c.user_id), `@${c.handle} can edit again.`)}>
             Lift block
