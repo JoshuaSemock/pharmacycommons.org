@@ -63,6 +63,7 @@ export const SITE_PAGES: SiteEntry[] = [
   { id: 'page-network', kind: 'page', title: 'Network', hint: 'Explore how drugs, classes and topics connect', to: '/network', keywords: ['graph', 'knowledge graph', 'relationships', 'connections', 'map', 'cytoscape', 'class membership', 'visualization'] },
   { id: 'page-lists', kind: 'page', title: 'Lists', hint: 'Curated and authority drug lists', to: '/lists', keywords: ['drug lists', 'compare lists'] },
   { id: 'page-classifications', kind: 'page', title: 'Classifications', hint: 'ATC, FDA, VA, ChemOnt and contributor classes', to: '/classifications', keywords: ['classes', 'drug classes', 'categories', 'atc', 'pharmacologic class', 'mechanism of action', 'compare classes'] },
+  { id: 'page-learn', kind: 'page', title: 'Learn', hint: 'Flashcards and questions with spaced repetition', to: '/learn', keywords: ['flashcards', 'quiz', 'study', 'mcq', 'practice questions', 'spaced repetition', 'fsrs', 'anki', 'pharmacy school', 'naplex', 'review'] },
   { id: 'page-tools', kind: 'page', title: 'All tools', hint: 'Calculators, lists and reference tools', to: '/tools', keywords: ['calculators', 'tools'] },
   { id: 'page-blog', kind: 'page', title: 'Blog', hint: 'Posts from the Commons', to: '/blog', keywords: ['posts', 'news', 'articles', 'updates', 'whats new'] },
   { id: 'page-about', kind: 'page', title: 'About', hint: 'What Pharmacy Commons is', to: '/about', keywords: ['about us', 'mission', 'who we are', 'contact'] },
