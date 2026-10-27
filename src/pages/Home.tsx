@@ -524,6 +524,19 @@ function Contribute() {
   )
 }
 
+function SourcesFooter() {
+  return (
+    <footer className="lp-rule-t mt-16 pt-8">
+      <div className="grid gap-6 sm:grid-cols-3">
+        <DataSource
+          label="Founded by Dr. Joshua Semock, PharmD"
+          desc="(2026) contact@pharmacycommons.org"
+        />
+      </div>
+    </footer>
+  )
+}
+
 function DataSource({ label, desc }: { label: string; desc: string }) {
   return (
     <div className="flex gap-3">
