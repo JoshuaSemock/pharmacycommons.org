@@ -427,10 +427,44 @@ button.lp-raised {
   background-blend-mode: normal, hard-light, normal;
   color: var(--lp-foil-ink);
 }
+/* Salmon fill, always on (2026-10-27): the wrong-answer twin of .lp-foil-set.
+   Learn's multiple-choice tiles are .lp-toggle[aria-pressed="true"] (debossed)
+   plus .lp-foil-set for the right answer or .lp-wrong-set for a wrong pick.
+   Salmon-400 (#ffa08d) matches the foil's saturation; dark ink on it is 6.3:1
+   in both themes, and like the foil it does not flip in dark mode. */
+:root {
+  --lp-wrong: var(--color-salmon-400);
+  --lp-wrong-veil: color-mix(in srgb, var(--color-salmon-400) 35%, transparent);
+}
+/* A settled answer tile: the deboss is deeper on the filled color, as on a focused foil search bar. */
+.lp-toggle.lp-foil-set[aria-pressed="true"],
+.lp-toggle.lp-wrong-set[aria-pressed="true"] {
+  box-shadow:
+    inset 1px 1px 1px rgb(0 0 0 / 0.24), inset 2px 2px 3px rgb(0 0 0 / 0.12),
+    inset 0 0 0 1px rgb(0 0 0 / 0.08), inset -1px -1px 0 rgb(255 255 255 / 0.55);
+}
+:root[data-theme="dark"] :is(.lp-toggle.lp-foil-set, .lp-toggle.lp-wrong-set)[aria-pressed="true"] {
+  box-shadow:
+    inset 1px 1px 1px rgb(0 0 0 / 0.5), inset 2px 2px 3px rgb(0 0 0 / 0.25),
+    inset 0 0 0 1px rgb(0 0 0 / 0.2), inset -1px -1px 0 rgb(255 255 255 / 0.3);
+}
+.lp-wrong-set {
+  background:
+    linear-gradient(var(--lp-wrong-veil), var(--lp-wrong-veil)),
+    url("/textures/paper-grain.webp") 0 0 / var(--grain-size, 600px) repeat,
+    var(--lp-wrong);
+  background-blend-mode: normal, hard-light, normal;
+  color: var(--lp-foil-ink);
+}
 @media (width <= 780px) {
   .lp-foil-set {
     background-image:
       linear-gradient(var(--lp-foil-veil), var(--lp-foil-veil)),
+      url("/textures/paper-grain-sm.webp");
+  }
+  .lp-wrong-set {
+    background-image:
+      linear-gradient(var(--lp-wrong-veil), var(--lp-wrong-veil)),
       url("/textures/paper-grain-sm.webp");
   }
 }

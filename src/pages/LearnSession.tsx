@@ -16,12 +16,14 @@ import { getCollection, getItemsByIds } from '../learn/api'
 import { buildQueue, requeue, type QueueEntry } from '../learn/queue'
 import { intervalPreview } from '../learn/interval'
 import { gradeMcq, newState, schedule, SCHEDULER_VERSION } from '../learn/scheduler'
+import { optionKey } from '../learn/keys'
 import { optionOrder } from '../learn/shuffle'
 import type { EventMode, LearnItem, Rating, ReviewEvent } from '../learn/types'
 import { useProgress } from '../learn/useProgress'
 
 type Loaded = { title: string; collectionId: string | null; items: LearnItem[] }
 type Tally = { answered: number; again: number; correct: number; mcq: number }
+type McqOption = NonNullable<LearnItem['mcq_options']>[number]
 
 const RATINGS: { rating: Rating; label: string }[] = [
   { rating: 1, label: 'Again' },
@@ -149,6 +151,51 @@ export default function LearnSession() {
     [queue, progress, isDue, loaded],
   )
 
+  // Multiple choice: grade now, then the learner reads the explanation and continues.
+  const choose = useCallback((o: McqOption, guessing: boolean) => {
+    const ok = o.is_correct
+    pending.current = { rating: gradeMcq(ok, guessing), selected: o.id, correct: ok, unsure: guessing }
+    setUnsure(guessing)
+    setPicked(o.id)
+  }, [])
+
+  const continueMcq = useCallback(() => {
+    const p = pending.current
+    if (current && p) void advance(current.item, p.rating, { selected: p.selected, correct: p.correct, unsure: p.unsure })
+  }, [current, advance])
+
+  // Once an answer is in, focus goes to Continue, so Enter or Space moves on.
+  useEffect(() => {
+    if (picked !== null) document.querySelector<HTMLButtonElement>('[data-learn-continue]')?.focus()
+  }, [picked])
+
+  // Keyboard, multiple choice: 1-5 pick that option (Shift+number = "guessing"), U toggles "not sure", Enter reveals covered options.
+  useEffect(() => {
+    if (!current || current.item.item_type !== 'mcq' || picked !== null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || (t.tagName === 'INPUT' && (t as HTMLInputElement).type !== 'checkbox'))) return
+      if (cover && !uncovered) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (t && t.tagName === 'BUTTON') return
+          e.preventDefault()
+          setUncovered(true)
+        }
+        return
+      }
+      const k = optionKey(e, order.length)
+      if (k) {
+        e.preventDefault()
+        choose(order[k.index], k.unsure || unsure)
+      } else if (e.key === 'u' || e.key === 'U') {
+        setUnsure(v => !v)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [current, picked, cover, uncovered, order, unsure, choose])
+
   // Keyboard: Space/Enter reveals a flashcard; 1-4 rate it.
   useEffect(() => {
     if (!current || current.item.item_type !== 'flashcard') return
@@ -215,7 +262,6 @@ export default function LearnSession() {
 
   const { item } = current
   const isMcq = item.item_type === 'mcq'
-  const correctOption = item.mcq_options?.find(o => o.is_correct)
   const answered = isMcq && picked !== null
   const preview = !isMcq && revealed ? intervalPreview(progress.states.get(item.id) ?? null, new Date()) : null
 
@@ -224,7 +270,7 @@ export default function LearnSession() {
       <div className="flex items-baseline justify-between gap-4">
         {back}
         <p className="font-mono text-[12.5px] text-ink" aria-live="polite">
-          {loaded.title} · {queue.length} left
+          {loaded.title} · {queue.length} left{tally.mcq > 0 ? ` · ${tally.correct} of ${tally.mcq} correct` : ''}
         </p>
       </div>
 
@@ -241,47 +287,97 @@ export default function LearnSession() {
           </div>
         ) : isMcq ? (
           <>
-            <ul className="mt-6 space-y-2.5" role="list">
+            <div
+              role="group"
+              aria-label="Answer options"
+              className="mt-6 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2"
+            >
               {order.map((o, i) => {
                 const chosen = picked === o.id
-                const show = answered
+                const state = !answered ? 'idle' : o.is_correct ? 'right' : chosen ? 'wrong' : 'rest'
+                const lastOdd = order.length % 2 === 1 && i === order.length - 1
                 return (
-                  <li key={o.id}>
-                    <button
-                      type="button"
-                      disabled={answered}
-                      aria-pressed={chosen}
-                      onClick={() => {
-                        const ok = o.is_correct
-                        setPicked(o.id)
-                        // Grade now; the learner reads the explanation, then continues.
-                        pending.current = { rating: gradeMcq(ok, unsure), selected: o.id, correct: ok, unsure }
-                      }}
-                      className={[
-                        'lp-toggle flex w-full items-start gap-3 rounded-md border-0 bg-transparent px-4 py-3 text-left font-sans text-[15px] text-ink',
-                        'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink/40 disabled:cursor-default',
-                        show && o.is_correct ? 'font-semibold' : '',
-                      ].join(' ')}
-                    >
-                      <span className="font-mono text-[13px]">{String.fromCharCode(65 + i)}</span>
-                      <span className="min-w-0 flex-1">
-                        {o.text}
-                        {show && (o.is_correct || chosen) && (
-                          <span className="mt-1 block text-[13.5px] font-normal">
-                            {o.is_correct ? 'Correct.' : 'Your answer.'} {o.rationale}
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  </li>
+                  <button
+                    key={o.id}
+                    type="button"
+                    // Settled tiles that were neither picked nor right lie flat; the two that matter stay debossed and filled.
+                    disabled={state === 'rest'}
+                    aria-disabled={answered || undefined}
+                    aria-pressed={state === 'right' || state === 'wrong'}
+                    onClick={() => {
+                      if (!answered) choose(o, unsure)
+                    }}
+                    className={[
+                      'lp-toggle flex min-h-[3.5rem] w-full min-[480px]:min-h-[4.75rem] items-start gap-3 rounded-md border-0 bg-transparent px-4 py-3.5 text-left font-sans text-[15px] leading-snug text-ink',
+                      'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink/40 disabled:cursor-default',
+                      lastOdd ? 'min-[480px]:col-span-2' : '',
+                      state === 'right' ? 'lp-foil-set' : state === 'wrong' ? 'lp-wrong-set' : '',
+                      state === 'rest' ? 'opacity-60' : '',
+                    ].join(' ')}
+                  >
+                    <span className="font-mono text-[13px] leading-snug" aria-hidden="true">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      {o.text}
+                      {state === 'right' && <span className="mt-1.5 block text-[12.5px]">Correct answer</span>}
+                      {state === 'wrong' && <span className="mt-1.5 block text-[12.5px]">Your answer</span>}
+                    </span>
+                  </button>
                 )
               })}
-            </ul>
+            </div>
+            {answered && picked !== null && pending.current && (() => {
+              const ok = pending.current.correct
+              const right = order.findIndex(o => o.is_correct)
+              const mine = order.findIndex(o => o.id === picked)
+              const next = intervalPreview(progress.states.get(item.id) ?? null, new Date(), 'mcq')[pending.current.rating]
+              return (
+                <div className="lp-sunken mt-5 space-y-2 rounded-md p-4 font-sans text-[14.5px] leading-relaxed text-ink" role="status">
+                  <p className="text-[16px]">
+                    {ok ? 'Correct.' : `Not quite. The answer is ${right + 1}: ${item.concise_answer}`}
+                  </p>
+                  {!ok && order[mine]?.rationale && (
+                    <p>Option {mine + 1}: {order[mine].rationale}</p>
+                  )}
+                  {order[right]?.rationale && (
+                    <p>
+                      {!ok && `Option ${right + 1}: `}
+                      {order[right].rationale}
+                    </p>
+                  )}
+                  {order.some((o, i) => i !== right && i !== mine && o.rationale) && (
+                    <details>
+                      <summary className="lp-toggle inline-block cursor-pointer list-none rounded-md px-3 py-1 text-[12.5px]">
+                        {ok ? 'Why the other options are wrong' : 'The other options'}
+                      </summary>
+                      <ul className="mt-2 space-y-1.5 text-[13.5px]" role="list">
+                        {order.map((o, i) =>
+                          i !== right && i !== mine && o.rationale ? (
+                            <li key={o.id}>
+                              Option {i + 1}: {o.rationale}
+                            </li>
+                          ) : null,
+                        )}
+                      </ul>
+                    </details>
+                  )}
+                  <p className="text-[12.5px]">
+                    {pending.current.unsure && ok ? 'Marked as a guess, so it comes back sooner. ' : ''}Next review in {next}.
+                  </p>
+                </div>
+              )
+            })()}
             {!answered && (
-              <label className="mt-5 flex items-center gap-2 font-sans text-[14px] text-ink">
-                <input type="checkbox" checked={unsure} onChange={e => setUnsure(e.target.checked)} />
-                I’m not sure (guessing)
-              </label>
+              <div className="mt-5 space-y-2 font-sans text-[14px] text-ink">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={unsure} onChange={e => setUnsure(e.target.checked)} />
+                  I’m not sure (guessing)
+                </label>
+                <p className="hidden text-[12.5px] [@media(hover:hover)]:block">
+                  Press 1 to {order.length} to answer. Hold Shift if you are guessing. U toggles “not sure”.
+                </p>
+              </div>
             )}
           </>
         ) : (
@@ -292,7 +388,6 @@ export default function LearnSession() {
 
         {(revealed || answered) && (
           <div className="mt-5 space-y-3 font-sans text-[14.5px] leading-relaxed text-ink">
-            {isMcq && correctOption && picked !== correctOption.id && <p>Answer: {item.concise_answer}</p>}
             {item.clinical_rationale && <p>{item.clinical_rationale}</p>}
             {item.clinical_caveats && <p className="text-[13.5px]">Note: {item.clinical_caveats}</p>}
             <p className="text-[12.5px]">
@@ -323,12 +418,7 @@ export default function LearnSession() {
       <div className="mt-6 flex flex-wrap items-center gap-2.5">
         {isMcq ? (
           answered && (
-            <Button
-              onClick={() => {
-                const p = pending.current
-                if (p) void advance(item, p.rating, { selected: p.selected, correct: p.correct, unsure: p.unsure })
-              }}
-            >
+            <Button data-learn-continue="" onClick={continueMcq}>
               Continue
             </Button>
           )
