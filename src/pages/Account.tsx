@@ -35,7 +35,7 @@ import {
   validateSignupDetails,
 } from '../signup'
 import type { AccountType, SignupDetails } from '../signup'
-import { isAdmin } from '../contributions'
+import { isAdmin, isOwner } from '../contributions'
 
 /**
  * Sign in / register / account dashboard.
@@ -137,7 +137,7 @@ export default function Account() {
 // Signed in — dashboard with Overview / Saved pages / Settings
 // ─────────────────────────────────────────────────────────────────────────────
 
-type DashboardTab = 'overview' | 'contributions' | 'saved' | 'settings'
+type DashboardTab = 'overview' | 'contributions' | 'saved' | 'settings' | 'admin'
 
 const DASHBOARD_TABS: { key: DashboardTab; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -146,8 +146,22 @@ const DASHBOARD_TABS: { key: DashboardTab; label: string }[] = [
   { key: 'settings', label: 'Settings' },
 ]
 
+/** Shown only to admins (and the head administrator). */
+const ADMIN_TAB: { key: DashboardTab; label: string } = { key: 'admin', label: 'Administration' }
+
 function SignedIn({ email }: { email: string }) {
   const [tab, setTab] = useState<DashboardTab>('overview')
+  const [admin, setAdmin] = useState(false)
+  const [owner, setOwner] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    isAdmin().then(a => !cancelled && setAdmin(a))
+    isOwner().then(o => !cancelled && setOwner(o))
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Saved-page count is fetched once here (not per-tab) so the Overview
   // summary and the tab label can both show it without duplicating the call.
@@ -175,7 +189,7 @@ function SignedIn({ email }: { email: string }) {
         aria-label="Account sections"
         className="inline-flex flex-wrap gap-1.5"
       >
-        {DASHBOARD_TABS.map(t => (
+        {(admin ? [...DASHBOARD_TABS, ADMIN_TAB] : DASHBOARD_TABS).map(t => (
           <button
             key={t.key}
             type="button"
@@ -205,6 +219,7 @@ function SignedIn({ email }: { email: string }) {
         {tab === 'contributions' && <MyContributions />}
         {tab === 'saved' && <SavedPanel onCountChange={setSavedCount} />}
         {tab === 'settings' && <SettingsPanel email={email} />}
+        {tab === 'admin' && admin && <AdminPanel owner={owner} />}
       </div>
     </Section>
   )
@@ -242,6 +257,34 @@ function OverviewPanel({
       <NpiVerification />
 
       <ContributingNote />
+    </div>
+  )
+}
+
+/** Where the admin tools are, with what each is for. */
+function AdminPanel({ owner }: { owner: boolean }) {
+  const rows: { to: string; label: string; what: string }[] = [
+    { to: '/admin', label: 'Contributors and page protection', what: 'Reviewer roles, blocks, and which pages hold edits for review.' },
+    { to: '/review', label: 'Review queue', what: 'Edits waiting for a check: pages, Quick Facts, brands, new pages, blog comments.' },
+    { to: '/admin/learn', label: 'Review Learn', what: 'Approve generated study items and publish collections.' },
+  ]
+  return (
+    <div className="space-y-4">
+      <p className="max-w-xl font-sans text-sm leading-relaxed text-ink">
+        {owner
+          ? 'You are the head administrator. You can review your own edits, and you are the only one who can grant or remove the admin role.'
+          : 'You are an admin.'}
+      </p>
+      <ul className="lp-divide-y max-w-xl">
+        {rows.map(r => (
+          <li key={r.to} className="py-3">
+            <Link to={r.to} className="font-sans text-base font-medium text-ink underline underline-offset-2">
+              {r.label}
+            </Link>
+            <p className="mt-0.5 font-sans text-sm text-ink">{r.what}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

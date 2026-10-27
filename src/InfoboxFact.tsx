@@ -344,8 +344,8 @@ function HistoryList({
         {edits.map(e => {
           const own = me?.handle !== null && me?.handle === e.handle
           const canRestore = me && me.handle && !e.is_current && e.patrol_status !== 'pending' && e.patrol_status !== 'rejected'
-          const canPatrol = me?.patroller && !own && e.patrol_status === 'unpatrolled'
-          const canDecide = me?.patroller && !own && e.patrol_status === 'pending'
+          const canPatrol = me?.patroller && (!own || me.owner) && e.patrol_status === 'unpatrolled'
+          const canDecide = me?.patroller && (!own || me.owner) && e.patrol_status === 'pending'
           return (
             <li key={e.id} className="space-y-1 py-2 font-sans text-xs leading-snug text-ink">
               <span className="block text-sm whitespace-pre-line">{e.value ?? <em>cleared (source value shown)</em>}</span>

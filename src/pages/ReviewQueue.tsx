@@ -310,7 +310,7 @@ function FactsQueue({
                   · {e.summary} · @{e.handle}
                   {e.credential ? ` · ${e.credential}` : ''} · {STATUS_LABEL[e.patrol_status]}
                 </span>
-                {me?.patroller && !own && (
+                {me?.patroller && (!own || me.owner) && (
                   <span className="flex flex-wrap gap-2 pt-1">
                     {e.patrol_status === 'pending' ? (
                       <>
@@ -328,7 +328,7 @@ function FactsQueue({
                     )}
                   </span>
                 )}
-                {me?.patroller && own && <span className="block">Your change: another reviewer has to check it.</span>}
+                {me?.patroller && own && !me.owner && <span className="block">Your change: another reviewer has to check it.</span>}
                 {rejecting === e.id && (
                   <form
                     className="max-w-xl space-y-2 pt-1"
@@ -513,7 +513,7 @@ function BrandQueue({
                   · {e.summary} · @{e.handle}
                   {e.credential ? ` · ${e.credential}` : ''} · {STATUS_LABEL[e.patrol_status]}
                 </span>
-                {me?.patroller && !own && (
+                {me?.patroller && (!own || me.owner) && (
                   <span className="flex flex-wrap gap-2 pt-1">
                     {e.patrol_status === 'pending' ? (
                       <>
@@ -531,7 +531,7 @@ function BrandQueue({
                     )}
                   </span>
                 )}
-                {me?.patroller && own && <span className="block">Your change: another reviewer has to check it.</span>}
+                {me?.patroller && own && !me.owner && <span className="block">Your change: another reviewer has to check it.</span>}
                 {rejecting === e.id && (
                   <form
                     className="max-w-xl space-y-2 pt-1"

@@ -16,7 +16,7 @@ export type ContributorStatus =
   | { kind: 'signed-out' }
   | { kind: 'unverified' }
   | { kind: 'blocked' }
-  | { kind: 'ready'; handle: string | null; displayCredential: boolean; patroller: boolean }
+  | { kind: 'ready'; handle: string | null; displayCredential: boolean; patroller: boolean; owner: boolean }
 
 /** What the signed-in user can do on community pages. Re-runs when `userId` changes. */
 export function useContributorStatus(userId: string | null, sessionLoading: boolean): ContributorStatus {
@@ -50,13 +50,14 @@ export function useContributorStatus(userId: string | null, sessionLoading: bool
 }
 
 async function loadStatus(): Promise<ContributorStatus> {
-  const [verified, patroller, profile, blocked] = await Promise.all([
+  const [verified, patroller, owner, profile, blocked] = await Promise.all([
     supabase.rpc('is_verified_contributor'),
     supabase.rpc('has_role', { p_role: 'patroller' }),
+    supabase.rpc('has_role', { p_role: 'owner' }),
     supabase.from('contributor_profiles').select('handle, display_credential').maybeSingle(),
     supabase.from('contributor_blocks').select('expires_at').maybeSingle(),
   ])
-  for (const r of [verified, patroller, profile, blocked]) if (r.error) throw new Error(r.error.message)
+  for (const r of [verified, patroller, owner, profile, blocked]) if (r.error) throw new Error(r.error.message)
 
   if (verified.data !== true) {
     const block = blocked.data as { expires_at: string | null } | null
@@ -69,6 +70,7 @@ async function loadStatus(): Promise<ContributorStatus> {
     handle: p?.handle ?? null,
     displayCredential: p?.display_credential ?? true,
     patroller: patroller.data === true,
+    owner: owner.data === true,
   }
 }
 

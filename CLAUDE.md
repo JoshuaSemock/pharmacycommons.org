@@ -354,7 +354,7 @@ Slash-named rows can be unit/serotype separators, not moiety boundaries.
 **Phase 15 — community editing (2026-10-04, `db/phase15_community_editing.sql`,
 `docs/user-edits.md`):** tables `page_content`, `page_revisions`, `page_links`,
 `page_property_refs`, `community_pages`, `infobox_properties` (10 rows), `infobox_edits`,
-`user_roles` (Joshua = admin), `contributor_profiles`, `contributor_blocks`;
+`user_roles` (Joshua = admin; since 22a also `owner`), `contributor_profiles`, `contributor_blocks`;
 `pcid_retired.replaced_by_pcid`; `provider_verifications.credential`. Applied as 15a–c via
 `apply_migration`, 15d–e via the SQL editor (recorded in `schema_migrations` by hand).
 Behaviour tests: `db/phase15_test/` (stub schema + 46 checks; run on a local Postgres 16).
@@ -410,6 +410,8 @@ Classifications and Terminology (Anatomy, Physiologic Process, Organism, Procedu
 Dosage Form, Route of Administration, Term — all `concept_type` on block 6). Page creation
 starts from the Topics "Create a page" panel (`/new?type=`); Account no longer links `/new`.
 Class pages (`src/pages/ClassDetail.tsx`) now carry the Overview.
+
+**Phase 22a — head administrator (`db/phase22a_head_admin.sql`, applied 2026-10-27 as `phase22a_1_head_admin_drop_check` + `phase22a_2_head_admin`):** role `owner` (Joshua, joshua.semock.pharmd@gmail.com) implies admin implies patroller (`has_role('owner')` matches only the owner). Owner-only: reviewing one's own edits (the four `patrol_*` functions and the `own` checks in `RevisionActions`, `InfoboxFact`, `ReviewQueue`), granting or removing the `admin` role (`grant_role`/`revoke_role`; admins can still grant/revoke `patroller`). The owner role cannot be granted or revoked through the API and the owner cannot be blocked (`block_contributor`); change it only in the SQL editor. Account → Administration tab (admins only) links `/admin`, `/review`, `/admin/learn`.
 
 **Phase 16 — full-page editor (spec and go-live steps: `docs/page-editor.md`; live
 2026-10-11: PR #59 merged, phase16a + 16b_1/2/3 in `schema_migrations` (16b_3 run in the SQL
