@@ -30,6 +30,22 @@ const RATINGS: { rating: Rating; label: string }[] = [
   { rating: 4, label: 'Easy' },
 ]
 
+const COVER_KEY = 'pc_learn_cover'
+function readCover(): boolean {
+  try {
+    return localStorage.getItem(COVER_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+function writeCover(on: boolean): void {
+  try {
+    localStorage.setItem(COVER_KEY, on ? '1' : '0')
+  } catch {
+    // storage unavailable: the choice lasts for this visit only
+  }
+}
+
 function uuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   const hex = () => Math.floor(Math.random() * 16).toString(16)
@@ -47,6 +63,8 @@ export default function LearnSession() {
   const [revealed, setRevealed] = useState(false)
   const [picked, setPicked] = useState<string | null>(null)
   const [unsure, setUnsure] = useState(false)
+  const [cover, setCover] = useState(readCover)
+  const [uncovered, setUncovered] = useState(false)
   const shownAt = useRef(Date.now())
   const seed = useRef(uuid())
   const pending = useRef<{ rating: Rating; selected: string; correct: boolean; unsure: boolean } | null>(null)
@@ -124,6 +142,7 @@ export default function LearnSession() {
       setRevealed(false)
       setPicked(null)
       setUnsure(false)
+      setUncovered(false)
       shownAt.current = Date.now()
       await progress.record(event)
     },
@@ -213,7 +232,14 @@ export default function LearnSession() {
         <p className="font-sans text-[12.5px] text-ink">{item.topic}</p>
         <h1 className="mt-2 font-sans text-[19px] font-medium leading-snug text-ink">{item.prompt}</h1>
 
-        {isMcq ? (
+        {isMcq && cover && !uncovered && picked === null ? (
+          <div className="mt-6">
+            <p className="font-sans text-[14px] text-ink">Think of your answer first.</p>
+            <Button className="mt-3" onClick={() => setUncovered(true)}>
+              Show options
+            </Button>
+          </div>
+        ) : isMcq ? (
           <>
             <ul className="mt-6 space-y-2.5" role="list">
               {order.map((o, i) => {
@@ -316,6 +342,19 @@ export default function LearnSession() {
           ))
         )}
       </div>
+      {isMcq && (
+        <label className="mt-4 flex items-center gap-2 font-sans text-[13px] text-ink">
+          <input
+            type="checkbox"
+            checked={cover}
+            onChange={e => {
+              setCover(e.target.checked)
+              writeCover(e.target.checked)
+            }}
+          />
+          Hide the options until I ask for them
+        </label>
+      )}
       {!isMcq && !revealed && (
         <p className="mt-3 font-sans text-[12.5px] text-ink">Space shows the answer; 1 to 4 rate it.</p>
       )}
