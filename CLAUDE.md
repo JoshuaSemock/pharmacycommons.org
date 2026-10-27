@@ -171,7 +171,7 @@ and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),
 `/tools/days-supply` (browser-only; see `docs/days-supply.md`; version 3, 2026-10-13, puts the Refill calendar card first with a scrollable calendar view (`CalendarView.tsx`, `calendar.ts`), adds the step-schedule card `src/tools/dayssupply/ScheduleCard.tsx` + `schedule.ts` and the fingertip-unit cream estimate `TopicalCard.tsx` + `topical.ts`; `product_packaging` (`db/phase18_product_packaging.sql` + seed `phase18b`, read by `dayssupply/packaging.ts` and `PackagingPicker.tsx`) applied 2026-10-13 by Joshua in the SQL editor (apply_migration was cancelled twice; recorded by hand as 20261014003500/01) — 3 curated rows: Lantus SoloStar, ProAir HFA, Xalatan, `/tools/dictionary` (Word `.dic`
-download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/admin` (admins only) · `/drugs/:slug/history` · `/developers` (API console
+download + A–Z dictionary; see `docs/dictionary.md`) · `/new` (create a page) · `/review` · `/admin` (admins only) · `/admin/learn` (review and publish Learn items; `db/phase21i_learn_review.sql`) · `/drugs/:slug/history` · `/developers` (API console
 and reference; `src/developers/`) · `/resources` (outside links, grouped by
 `headers`, minus `'Source datasets'`) · `/references` (every row, grouped by `reference_section`,
 source datasets marked; `/citations` redirects here since 2026-09-25) — both read

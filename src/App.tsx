@@ -46,6 +46,7 @@ const Admin = lazy(() => import('./pages/Admin'))
 // Learn: flashcards and questions with spaced repetition (docs/learn.md).
 const Learn = lazy(() => import('./pages/Learn'))
 const LearnSession = lazy(() => import('./pages/LearnSession'))
+const LearnReview = lazy(() => import('./pages/LearnReview'))
 
 /** Fills the viewport while a route chunk loads, so the footer stays below the fold and does not jump (layout shift) when the page arrives. */
 const routeFallback = <main className="min-h-screen" aria-busy="true" />
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/review" element={<ReviewQueue />} />
           <Route path="/new" element={<CreatePage />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/learn" element={<LearnReview />} />
           <Route path="/classifications" element={<ClassIndex />} />
           <Route path="/classifications/compare" element={<ClassCompare />} />
           <Route path="/classifications/:slug" element={<ClassDetail />} />
