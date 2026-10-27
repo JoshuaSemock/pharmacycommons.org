@@ -309,6 +309,8 @@ create table if not exists public.learn_user_settings (
 
 **Phase 1a: schema.** 21a/21b, advisors clean, SQL tests in `db/learn_test/` (RLS isolation, constraints, `learn_record_review` idempotency, official rows unwritable by users).
 **Phase 1b: generators.** 21c: one SQL function per template, then the audit sheet per 5.3. Do not publish until Joshua approves each sample.
+
+*Status 2026-10-27:* 21c (generators), 21d (draft collections), 21e (audit fixes) applied. Built: `dnc_member`, `dnc_reason` (+`_mcq`), `acb_score`, `acb_highest`, `arrhythmia_condition`, `mpje_schedule`, `jc_dnu` = 1,334 draft items in 5 official collections, all `draft`. Not built yet: `class_of`, `brand_generic`. Known limits for the audit: (1) Do Not Crush distractors are checked against the list, not against pharmacology, so hazardous drugs missing from the list (e.g. methotrexate) can appear as "wrong" options; (2) the ACB and Joint Commission items carry `third_party_sources` (D1); (3) some arrhythmia rows look questionable at source (e.g. diltiazem under Long QT) and should be checked in the list, not in the generator. Tests: `db/learn_test/tests_21c.sql`.
 **Phase 1c: study loop.** `src/learn/*`, `LearnSession.tsx`, guest mode and sync.
 **Phase 1d: hub and integration.** `Learn.tsx`, study pills on drug and list pages, nav entry, `postbuild.mjs`, `src/updates.ts`, this doc, `CLAUDE.md` routes and status, `docs/design-system.md` if new components are added, privacy-policy review (D7).
 
