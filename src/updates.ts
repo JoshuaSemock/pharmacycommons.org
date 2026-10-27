@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'learn',
+    date: '2026-10-27',
+    kind: 'Feature',
+    title: 'Learn: flashcards and questions that schedule themselves',
+    summary:
+      'Study brand and generic names, drug classes, do-not-crush, anticholinergic burden, arrhythmia risk, controlled substances and Joint Commission do-not-use terms. Spaced repetition brings each card back just before you would forget it. It works without an account, and signing in saves your progress.',
+    to: '/learn',
+    cta: 'Start studying',
+  },
+  {
     id: 'network-graph',
     date: '2026-10-18',
     kind: 'Feature',

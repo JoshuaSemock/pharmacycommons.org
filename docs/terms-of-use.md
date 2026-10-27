@@ -1,6 +1,6 @@
 # Pharmacy Commons — Terms of Use
 
-**Effective Date:** October 19, 2026
+**Effective Date:** October 27, 2026
 **Last revised:** October 4, 2026 (Section 3, community contributions)
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 

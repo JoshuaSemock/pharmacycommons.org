@@ -72,6 +72,13 @@ export default function Home() {
           title="Network"
           blurb="Explore how a drug, class or condition connects to others in a graph view."
         />
+        <DestinationTile
+          area="learn"
+          tint="hepatica"
+          to="/learn"
+          title="Learn"
+          blurb="Flashcards and questions with spaced repetition: brands and generics, classes, do-not-crush, controlled substances and more."
+        />
         <ListTile area="topdrugs" slug="most-used-drugs-us" title="Most-used drugs in the US" count={10} ranked collapsible />
         <ToolsTile />
         <DestinationTile

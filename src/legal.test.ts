@@ -72,7 +72,7 @@ describe('signup consent metadata', () => {
     const { legalAgreementMetadata } = await import('./auth')
     expect(legalAgreementMetadata(LEGAL_VERSION, new Date('2026-09-30T12:00:00Z'))).toEqual({
       legal_agreements_accepted: true,
-      legal_agreements_version: '2026-10-19',
+      legal_agreements_version: '2026-10-27',
       legal_agreements_accepted_at: '2026-09-30T12:00:00.000Z',
     })
   })
