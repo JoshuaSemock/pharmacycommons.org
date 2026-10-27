@@ -425,7 +425,7 @@ function NewPagesQueue({
                   </span>
                 </span>
                 {me?.patroller &&
-                  (own ? (
+                  (own && !me.owner ? (
                     <span>Your page: another reviewer has to check it.</span>
                   ) : (
                     <Button size="sm" disabled={busy !== null} onClick={() => void mark(p.pcid)}>
