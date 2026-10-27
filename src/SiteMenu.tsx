@@ -35,6 +35,7 @@ const EXPLORE_LINKS = [
   { to: '/topics', label: 'Topics' },
   { to: '/lists', label: 'Lists' },
   { to: '/classifications', label: 'Classifications' },
+  { to: '/learn', label: 'Learn' },
   { to: '/network', label: 'Network' },
   { to: '/tools', label: 'Tools' },
 ]

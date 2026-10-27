@@ -843,7 +843,8 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
   .pc-bento__about { grid-column: 6 / 9; }
   .pc-bento__classes { grid-column: 1 / 4; }
   .pc-bento__lists { grid-column: 4 / 9; }
-  .pc-bento__network { grid-column: 1 / 9; }
+  .pc-bento__network { grid-column: 1 / 5; }
+  .pc-bento__learn { grid-column: 5 / 9; }
   .pc-bento__topdrugs { grid-column: 1 / 5; }
   .pc-bento__tools { grid-column: 5 / 9; }
   .pc-bento__dictionary { grid-column: 1 / 4; }
@@ -857,28 +858,29 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
 @media (min-width: 64rem) {
   .pc-bento {
     grid-template-columns: repeat(13, minmax(0, 1fr));
-    grid-template-rows: minmax(13rem, auto) repeat(8, auto);
+    grid-template-rows: minmax(13rem, auto) repeat(9, auto);
   }
   /* Row 1 hero (13). Rows 2-4: What's new (5) beside Browse (8), About (3) +
-     Classifications (5), Lists (5) + Network (3). Rows 5-6: Most-used drugs (8) beside
-     Tools (5) over Dictionary (5). Rows 7-8: Do not crush (5) + QTc (5) beside
-     References (3) over Resources (3). Row 9: Blog (8) + Contribute (5). */
+     Classifications (5), Lists (8). Row 5: Network (5) + Learn (8). Rows 6-7: Most-used
+     drugs (8) beside Tools (5) over Dictionary (5). Rows 8-9: Do not crush (5) + QTc (5)
+     beside References (3) over Resources (3). Row 10: Blog (8) + Contribute (5). */
   .pc-bento__hero { grid-column: 1 / -1; grid-row: 1; }
   .pc-bento__new { grid-column: 1 / 6; grid-row: 2 / 5; }
   .pc-bento__browse { grid-column: 6 / 14; grid-row: 2; }
   .pc-bento__about { grid-column: 6 / 9; grid-row: 3; }
   .pc-bento__classes { grid-column: 9 / 14; grid-row: 3; }
-  .pc-bento__lists { grid-column: 6 / 11; grid-row: 4; }
-  .pc-bento__network { grid-column: 11 / 14; grid-row: 4; }
-  .pc-bento__topdrugs { grid-column: 1 / 9; grid-row: 5 / 7; }
-  .pc-bento__tools { grid-column: 9 / 14; grid-row: 5; }
-  .pc-bento__dictionary { grid-column: 9 / 14; grid-row: 6; }
-  .pc-bento__dnc { grid-column: 1 / 6; grid-row: 7 / 9; }
-  .pc-bento__qtc { grid-column: 6 / 11; grid-row: 7 / 9; }
-  .pc-bento__references { grid-column: 11 / 14; grid-row: 7; }
-  .pc-bento__resources { grid-column: 11 / 14; grid-row: 8; }
-  .pc-bento__blog { grid-column: 1 / 9; grid-row: 9; }
-  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 9; }
+  .pc-bento__lists { grid-column: 6 / 14; grid-row: 4; }
+  .pc-bento__network { grid-column: 1 / 6; grid-row: 5; }
+  .pc-bento__learn { grid-column: 6 / 14; grid-row: 5; }
+  .pc-bento__topdrugs { grid-column: 1 / 9; grid-row: 6 / 8; }
+  .pc-bento__tools { grid-column: 9 / 14; grid-row: 6; }
+  .pc-bento__dictionary { grid-column: 9 / 14; grid-row: 7; }
+  .pc-bento__dnc { grid-column: 1 / 6; grid-row: 8 / 10; }
+  .pc-bento__qtc { grid-column: 6 / 11; grid-row: 8 / 10; }
+  .pc-bento__references { grid-column: 11 / 14; grid-row: 8; }
+  .pc-bento__resources { grid-column: 11 / 14; grid-row: 9; }
+  .pc-bento__blog { grid-column: 1 / 9; grid-row: 10; }
+  .pc-bento__contribute { grid-column: 9 / 14; grid-row: 10; }
   .pc-tile-title { font-size: var(--text-2xl); }
   .pc-bento__about .pc-tile-title,
   .pc-bento__network .pc-tile-title,

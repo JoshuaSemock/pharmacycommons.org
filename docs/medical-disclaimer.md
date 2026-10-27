@@ -1,6 +1,6 @@
 # Pharmacy Commons — Medical Information Disclaimer
 
-**Effective Date:** October 19, 2026
+**Effective Date:** October 27, 2026
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 

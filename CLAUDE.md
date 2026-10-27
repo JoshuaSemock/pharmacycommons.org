@@ -47,7 +47,7 @@ for every file produced.**
   Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
   CAS Common Chemistry rows (physiochemical) stay CC BY-NC 4.0 whatever we choose.
   ATC and ChemOnt restrict commercial redistribution — never present them as CC0.
-- **Legal documents** (effective 2026-10-19; operator Pharmacy of the Commons, LLC):
+- **Legal documents** (effective 2026-10-27; operator Pharmacy of the Commons, LLC):
   canonical text is `docs/terms-of-use.md`, `docs/medical-disclaimer.md`,
   `docs/privacy-policy.md`, `docs/data-provenance-and-licensing.md`. The `/terms`,
   `/disclaimer`, `/privacy`, `/licensing` pages import those files `?raw` and render them
@@ -166,7 +166,7 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 system, `?q=`, `?group=`, `?c=` compare tray) · `/classifications/compare?c=a,b,c` (up to three
 classes, `src/pages/ClassCompare.tsx`) · `/classifications/:slug` — `/classes`, `/classes/:slug`
 and the old `?type=` tabs redirect there since 2026-10-02 (shared logic in `src/classifications.ts`) · `/network` (graph of a concept's recorded relationships; Cytoscape, own chunk; see `docs/network.md`; phase 19 RPCs in `db/phase19_network.sql`, live 2026-10-18, run in the SQL editor and recorded by hand as 20261018170000/01/02) · `/topics` (blocks 6–9 A–Z with kind/subtype filters and
-"Most connected" sort; `src/pages/TopicIndex.tsx`, `src/topics.ts`) · `/learn` (flashcards and questions with FSRS spaced repetition; `/learn/study/:collectionId`, `due` for the review queue; guest progress in `localStorage` `pc_learn_guest_v1`, replayed on sign-in; see `docs/learn.md`; **unpublished**: all collections are `draft`, no nav link yet) · `/lists` ·
+"Most connected" sort; `src/pages/TopicIndex.tsx`, `src/topics.ts`) · `/learn` (flashcards and questions with FSRS spaced repetition; `/learn/study/:collectionId`, `due` for the review queue; guest progress in `localStorage` `pc_learn_guest_v1`, replayed on sign-in; see `docs/learn.md`; **published 2026-10-27**: seven official collections, 2,380 approved items; Learn is in the site menu, the home page and What's new) · `/lists` ·
 `/lists/compare` · `/lists/:slug` · `/id/:pcid` (permanent PCID permalink; accepts
 7- and 8-digit PCIDs) · `/tools`, `/tools/creatinine-clearance`,
 `/tools/medication-reconciliation` (browser-only; see `docs/medication-reconciliation.md`),

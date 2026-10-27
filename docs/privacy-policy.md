@@ -1,6 +1,6 @@
 # Pharmacy Commons — Privacy Policy
 
-**Effective Date:** October 19, 2026
+**Effective Date:** October 27, 2026
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
@@ -23,6 +23,7 @@ We collect information in two categories: data you actively provide and technica
 * **Account Registration:** When you register, we collect your email address, a hashed password, your first and last name, your date of birth (used only to confirm that you are at least 18 years old), and the kind of account you choose (patient or caregiver, practitioner, or researcher). You may also choose to give a country, ZIP or postal code, and phone number, and, depending on your account type, a profession, a claimed NPI, an institution, and a research area. We do not ask for a street address. These details are private: they are visible only to you and to the maintainers, and are never shown on your public contributions. Your public username or identifier is chosen separately.
 * **Clinical Verification:** If you request write-access to edit clinical monographs, we may collect professional verification data, such as your National Provider Identifier (NPI) or licensure status. An NPI given at registration is treated as a claim until it is checked against the CMS NPI Registry.
 * **Public Contributions:** Any edits, annotations, structured data relationships, or comments you submit to the database are recorded. Because this is a public commons, your contributions are permanently associated with your public username or identifier.
+* **Study Activity (Learn):** If you are signed in and use Learn, we store your study progress: for each flashcard or question, when it is next due and the scheduling values used to set that date, and a log of each answer (the rating, whether it was correct, the option you chose, whether you marked yourself unsure, how long you took and when). We also store your Learn settings, such as daily limits. This is private to your account. It is not shown on your public profile or contributions, and it is never sold or used for advertising. We may look at aggregate statistics, for example how often an item is answered correctly, to find and fix unclear or wrong items.
 * **Communications:** If you email `contact@pharmacycommons.org` with questions, takedown requests, or feedback, we retain that correspondence.
 
 **B. Information Collected Automatically**
@@ -37,7 +38,8 @@ We collect information in two categories: data you actively provide and technica
 Pharmacy Commons uses minimal local storage and strictly necessary cookies to provide core functionality. We do not use third-party tracking cookies, marketing pixels, or cross-site advertising trackers.
 
 * **Authentication Tokens:** When you log in, Supabase issues secure session tokens stored in your browser to keep you authenticated.
-* **UI Preferences:** We utilize your browser’s local storage to remember your interface preferences, such as your manual override for Light/Dark mode.
+* **UI Preferences:** We utilize your browser’s local storage to remember your interface preferences, such as your manual override for Light/Dark mode and whether Learn hides answer options until you reveal them.
+* **Learn Progress Without an Account:** If you study in Learn without signing in, your progress is kept only in your browser’s local storage on your device. When you later sign in, it is uploaded to your account and then follows the rules above. Clearing your browser data removes it.
 
 ### 4. How We Use Your Information
 
@@ -45,6 +47,7 @@ We do not sell, rent, or lease your personal information to third parties. We us
 
 * Authenticate your identity, confirm that you meet the minimum age, and manage your write-access permissions.
 * Attribute database edits to the correct contributor to maintain an auditable version history.
+* Schedule your Learn reviews and show your study progress back to you.
 * Communicate with you regarding account security, policy updates, or issues with your submissions.
 * Monitor platform stability, troubleshoot API errors, and prevent malicious scraping or denial-of-service attacks.
 
@@ -62,6 +65,8 @@ We do not load fonts, scripts, or advertising from other third parties: our font
 ### 6. Data Retention and Account Deletion
 
 You may request to delete your account at any time by emailing `contact@pharmacycommons.org`. Upon receiving a verifiable request, we will delete your email address and authentication credentials from our Supabase backend.
+
+**Note on Study Activity:** Your Learn progress, answer log and settings are deleted together with your account. They are not part of the public record.
 
 **Note on Public Contributions:** Because Pharmacy Commons operates as a public trust, historical edits and structured data you submitted prior to account deletion become part of the permanent database. When you delete your account, your past contributions will not be removed, but they will be anonymized and disassociated from your personal identity to preserve the integrity and auditability of the clinical record.
 
