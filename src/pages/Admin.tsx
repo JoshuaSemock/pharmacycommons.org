@@ -75,6 +75,10 @@ export default function Admin() {
           <Link to="/review" className={LINK}>
             review queue
           </Link>
+          . Generated study items are reviewed in{' '}
+          <Link to="/admin/learn" className={LINK}>
+            Review Learn
+          </Link>
           .
         </p>
       </header>
