@@ -32,6 +32,7 @@ import { CONCEPT_ATTRS, conceptKindLine, getStatementsAbout, groupByPredicate, i
 import type { ConceptStatement } from './concepts'
 import { entityHref } from './wiki'
 import { abbreviationSuffix, useAbbreviations } from './abbreviations'
+import StudyLinks from './components/StudyLinks'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
@@ -219,7 +220,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
       case 'classifications':
         return <ClassificationsSection key={embedName} classes={classes} className="" style={style} />
       case 'lists':
-        return <ListsSection key={embedName} lists={lists} className="" style={style} />
+        return <ListsSection key={embedName} lists={lists} pcid={drug.pcid_code} className="" style={style} />
       case 'references':
         return <ReferencesFrame key={embedName} page={page} style={style} />
       case 'metadata':
@@ -309,7 +310,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
               </PageSection>
               <GuidelinesSection pcidCode={drug.pcid_code} className="order-7" />
               <ClassificationsSection classes={classes} className="order-8" />
-              <ListsSection lists={lists} className="order-9" />
+              <ListsSection lists={lists} pcid={drug.pcid_code} className="order-9" />
               <MetadataSection drug={drug} className="order-10" />
             </>
           )}
@@ -1386,7 +1387,7 @@ function ClassGroupRow({ group }: { group: ClassGroup }) {
 
 // ─── 8. Lists ─────────────────────────────────────────────────────────────────
 
-function ListsSection({ lists, className, style }: { lists: Loadable<EntityList[]>; className: string; style?: CSSProperties }) {
+function ListsSection({ lists, pcid, className, style }: { lists: Loadable<EntityList[]>; pcid: string; className: string; style?: CSSProperties }) {
   let body: ReactNode
   if (lists.failed) {
     body = <p className="font-sans text-base text-ink">Lists couldn’t be loaded right now.</p>
@@ -1418,6 +1419,9 @@ function ListsSection({ lists, className, style }: { lists: Loadable<EntityList[
   return (
     <PageSection id="lists" title="Lists" className={className} style={style}>
       {body}
+      <div className="mt-4">
+        <StudyLinks pcid={pcid} label="Study sets that include this drug:" />
+      </div>
     </PageSection>
   )
 }
