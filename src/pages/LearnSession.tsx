@@ -14,6 +14,7 @@ import { Link, useParams } from 'react-router-dom'
 import Button from '../components/Button'
 import { getCollection, getItemsByIds } from '../learn/api'
 import { buildQueue, requeue, type QueueEntry } from '../learn/queue'
+import { intervalPreview } from '../learn/interval'
 import { gradeMcq, newState, schedule, SCHEDULER_VERSION } from '../learn/scheduler'
 import { optionOrder } from '../learn/shuffle'
 import type { EventMode, LearnItem, Rating, ReviewEvent } from '../learn/types'
@@ -197,6 +198,7 @@ export default function LearnSession() {
   const isMcq = item.item_type === 'mcq'
   const correctOption = item.mcq_options?.find(o => o.is_correct)
   const answered = isMcq && picked !== null
+  const preview = !isMcq && revealed ? intervalPreview(progress.states.get(item.id) ?? null, new Date()) : null
 
   return (
     <main className="mx-auto max-w-[42rem] px-4 pb-24 pt-8 sm:px-6">
@@ -309,7 +311,7 @@ export default function LearnSession() {
         ) : (
           RATINGS.map(r => (
             <Button key={r.rating} onClick={() => void advance(item, r.rating, { selected: null, correct: null, unsure: false })}>
-              {r.label} <span className="font-mono text-[11.5px]">{r.rating}</span>
+              {r.label} <span className="font-mono text-[11.5px]">{preview?.[r.rating] ?? r.rating}</span>
             </Button>
           ))
         )}
