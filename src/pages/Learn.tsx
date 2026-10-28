@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import LearnSettings from '../components/LearnSettings'
 import { listCollections } from '../learn/api'
 import { useProgress } from '../learn/useProgress'
 import type { LearnCollection } from '../learn/types'
@@ -116,18 +117,29 @@ export default function Learn() {
                     {c.description && <p className="mt-1 font-sans text-[14px] leading-relaxed text-ink">{c.description}</p>}
                     <p className="mt-1 font-mono text-[12.5px] text-ink">{c.item_count.toLocaleString()} cards</p>
                   </div>
-                  <Link
-                    to={`/learn/study/${c.slug ?? c.id}`}
-                    className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink"
-                  >
-                    Study
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Link
+                      to={`/learn/study/${c.slug ?? c.id}`}
+                      className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink"
+                    >
+                      Study
+                    </Link>
+                    <Link
+                      to={`/learn/study/${c.slug ?? c.id}?mode=cram`}
+                      title="Go through every card now, without changing your schedule"
+                      className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] text-ink"
+                    >
+                      Cram
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
           </section>
         ))
       )}
+
+      <LearnSettings progress={progress} />
     </main>
   )
 }

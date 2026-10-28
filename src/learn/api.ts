@@ -6,7 +6,7 @@
  */
 
 import { getSupabase } from '../db'
-import { DEFAULT_LIMITS, type Limits } from './queue'
+import { clampLimits, type LearnSettings } from './settings'
 import type { LearnCollection, LearnItem, McqOption, ReviewEvent, SchedState } from './types'
 
 const ITEM_COLS =
@@ -104,11 +104,32 @@ export async function getMyStates(): Promise<Map<string, SchedState>> {
   return out
 }
 
-export async function getMyLimits(): Promise<Limits> {
+/** The signed-in learner's saved settings; null when they have never saved any. Throws when the read fails. */
+export async function getMySettings(): Promise<LearnSettings | null> {
   const sb = await getSupabase()
-  const { data, error } = await sb.from('learn_user_settings').select('max_new_per_day,max_reviews_per_day').maybeSingle()
-  if (error || !data) return DEFAULT_LIMITS
-  return { newItems: data.max_new_per_day as number, reviews: data.max_reviews_per_day as number }
+  const { data, error } = await sb.from('learn_user_settings').select('max_new_per_day,max_reviews_per_day,cover_options').maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  return {
+    limits: clampLimits({ newItems: data.max_new_per_day as number, reviews: data.max_reviews_per_day as number }),
+    coverOptions: data.cover_options === true,
+  }
+}
+
+/** Save the signed-in learner's settings (one row per user; RLS limits it to their own). */
+export async function saveMySettings(userId: string, s: LearnSettings): Promise<void> {
+  const sb = await getSupabase()
+  const { error } = await sb.from('learn_user_settings').upsert(
+    {
+      user_id: userId,
+      max_new_per_day: s.limits.newItems,
+      max_reviews_per_day: s.limits.reviews,
+      cover_options: s.coverOptions,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' },
+  )
+  if (error) throw error
 }
 
 /** How many cards the signed-in learner has started since local midnight (counts against the new-card limit). */

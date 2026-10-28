@@ -7,9 +7,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from '../auth'
-import { countMyNewToday, getMyLimits, getMyStates, recordReview } from './api'
+import { countMyNewToday, getMySettings, getMyStates, recordReview, saveMySettings } from './api'
 import { clearGuest, flushGuest, guestStates, hasGuestProgress, loadGuest, recordGuestReview } from './guest'
-import { countNewToday, DEFAULT_LIMITS, type Limits } from './queue'
+import { countNewToday, type Limits } from './queue'
+import { clampLimits, DEFAULT_SETTINGS, readLocalSettings, sameSettings, writeLocalSettings, type LearnSettings } from './settings'
 import type { ReviewEvent, SchedState } from './types'
 
 export type Progress = {
@@ -17,6 +18,12 @@ export type Progress = {
   signedIn: boolean
   states: Map<string, SchedState>
   limits: Limits
+  /** Daily limits and the hide-options choice: from the account when signed in, this browser otherwise. */
+  settings: LearnSettings
+  /** Change settings; they apply at once, are kept on this device, and are saved to the account when signed in. */
+  updateSettings: (patch: { limits?: Partial<Limits>; coverOptions?: boolean }) => void
+  /** True when the last save to the account failed (the change still holds on this device). */
+  settingsSaveFailed: boolean
   newToday: number
   /** Set when some reviews could not be sent and are waiting on this device. */
   pending: boolean
@@ -28,7 +35,8 @@ export type Progress = {
 export function useProgress(): Progress {
   const { user, loading } = useSession()
   const [states, setStates] = useState<Map<string, SchedState>>(new Map())
-  const [limits, setLimits] = useState<Limits>(DEFAULT_LIMITS)
+  const [settings, setSettings] = useState<LearnSettings>(readLocalSettings)
+  const [settingsSaveFailed, setSettingsSaveFailed] = useState(false)
   const [newToday, setNewToday] = useState(0)
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -46,17 +54,32 @@ export function useProgress(): Progress {
       try {
         if (user) {
           if (hasGuestProgress()) await flushGuest(recordReview)
-          const [s, l, n] = await Promise.all([getMyStates(), getMyLimits(), countMyNewToday()])
+          const [s, remote, n] = await Promise.all([
+            getMyStates(),
+            getMySettings().catch((err): undefined => {
+              console.error(err)
+              return undefined
+            }),
+            countMyNewToday(),
+          ])
           if (cancelled) return
+          const local = readLocalSettings()
+          if (remote) {
+            setSettings(remote)
+            writeLocalSettings(remote)
+          } else {
+            setSettings(local)
+            // No saved row yet: carry over what was chosen as a guest on this device.
+            if (remote === null && !sameSettings(local, DEFAULT_SETTINGS)) saveMySettings(user.id, local).catch(err => console.error(err))
+          }
           setStates(s)
-          setLimits(l)
           setNewToday(n)
           setPending(hasGuestProgress())
         } else {
           const g = loadGuest()
           if (cancelled) return
           setStates(guestStates())
-          setLimits(DEFAULT_LIMITS)
+          setSettings(readLocalSettings())
           setNewToday(countNewToday(g.events, new Date()))
           setPending(false)
         }
@@ -88,7 +111,27 @@ export function useProgress(): Progress {
     }
   }, [])
 
-  return { ready, signedIn, states, limits, newToday, pending, failed, record }
+  const userId = user?.id ?? null
+  const updateSettings = useCallback(
+    (patch: { limits?: Partial<Limits>; coverOptions?: boolean }) => {
+      const next: LearnSettings = {
+        limits: clampLimits({ ...settings.limits, ...patch.limits }),
+        coverOptions: patch.coverOptions ?? settings.coverOptions,
+      }
+      setSettings(next)
+      writeLocalSettings(next)
+      setSettingsSaveFailed(false)
+      if (userId) {
+        saveMySettings(userId, next).catch(err => {
+          console.error(err)
+          setSettingsSaveFailed(true)
+        })
+      }
+    },
+    [settings, userId],
+  )
+
+  return { ready, signedIn, states, limits: settings.limits, settings, updateSettings, settingsSaveFailed, newToday, pending, failed, record }
 }
 
 /** For tests and sign-out: forget everything held on this device. */
