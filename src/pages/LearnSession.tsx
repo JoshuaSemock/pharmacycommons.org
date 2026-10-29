@@ -10,9 +10,10 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import Button from '../components/Button'
 import { getCollection, getItemsByIds } from '../learn/api'
+import { cramQueue, cramRequeue } from '../learn/cram'
 import { buildQueue, requeue, type QueueEntry } from '../learn/queue'
 import { intervalPreview } from '../learn/interval'
 import { gradeMcq, newState, schedule, SCHEDULER_VERSION } from '../learn/scheduler'
@@ -32,22 +33,6 @@ const RATINGS: { rating: Rating; label: string }[] = [
   { rating: 4, label: 'Easy' },
 ]
 
-const COVER_KEY = 'pc_learn_cover'
-function readCover(): boolean {
-  try {
-    return localStorage.getItem(COVER_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-function writeCover(on: boolean): void {
-  try {
-    localStorage.setItem(COVER_KEY, on ? '1' : '0')
-  } catch {
-    // storage unavailable: the choice lasts for this visit only
-  }
-}
-
 function uuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   const hex = () => Math.floor(Math.random() * 16).toString(16)
@@ -57,6 +42,9 @@ function uuid(): string {
 export default function LearnSession() {
   const { collectionId = '' } = useParams<{ collectionId: string }>()
   const isDue = collectionId === 'due'
+  const [params] = useSearchParams()
+  // Cram: every card once, shuffled, nothing scheduled or saved (src/learn/cram.ts).
+  const cram = !isDue && params.get('mode') === 'cram'
   const progress = useProgress()
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const [missing, setMissing] = useState(false)
@@ -65,7 +53,7 @@ export default function LearnSession() {
   const [revealed, setRevealed] = useState(false)
   const [picked, setPicked] = useState<string | null>(null)
   const [unsure, setUnsure] = useState(false)
-  const [cover, setCover] = useState(readCover)
+  const cover = progress.settings.coverOptions
   const [uncovered, setUncovered] = useState(false)
   const shownAt = useRef(Date.now())
   const seed = useRef(uuid())
@@ -102,11 +90,16 @@ export default function LearnSession() {
   // Build the queue once content and progress are both in.
   useEffect(() => {
     if (!loaded || !progress.ready || queue) return
+    if (cram) {
+      setQueue(cramQueue(loaded.items, seed.current))
+      shownAt.current = Date.now()
+      return
+    }
     const built = buildQueue(loaded.items, progress.states, new Date(), progress.limits, { newToday: progress.newToday })
     // The due queue only holds cards already started; buildQueue would add new ones for items without state, so drop them.
     setQueue(isDue ? built.entries.filter(e => e.state) : built.entries)
     shownAt.current = Date.now()
-  }, [loaded, progress.ready, queue, progress.states, progress.limits, progress.newToday, isDue])
+  }, [loaded, progress.ready, queue, progress.states, progress.limits, progress.newToday, isDue, cram])
 
   const current = queue && queue.length > 0 ? queue[0] : null
   const order = useMemo(() => (current ? optionOrder(current.item, seed.current) : []), [current])
@@ -151,18 +144,50 @@ export default function LearnSession() {
     [queue, progress, isDue, loaded],
   )
 
+  // Cram: no scheduling and nothing saved. A missed card returns a few cards later.
+  const cramAdvance = useCallback(
+    (item: LearnItem, missed: boolean, correct: boolean | null) => {
+      if (!queue) return
+      setTally(t => ({
+        answered: t.answered + 1,
+        again: t.again + (missed ? 1 : 0),
+        correct: t.correct + (correct ? 1 : 0),
+        mcq: t.mcq + (item.item_type === 'mcq' ? 1 : 0),
+      }))
+      setQueue(cramRequeue(queue.slice(1), item, missed))
+      setRevealed(false)
+      setPicked(null)
+      setUnsure(false)
+      setUncovered(false)
+    },
+    [queue],
+  )
+
+  const restartCram = () => {
+    if (!loaded) return
+    seed.current = uuid()
+    setTally({ answered: 0, again: 0, correct: 0, mcq: 0 })
+    setQueue(cramQueue(loaded.items, seed.current))
+  }
+
   // Multiple choice: grade now, then the learner reads the explanation and continues.
-  const choose = useCallback((o: McqOption, guessing: boolean) => {
-    const ok = o.is_correct
-    pending.current = { rating: gradeMcq(ok, guessing), selected: o.id, correct: ok, unsure: guessing }
-    setUnsure(guessing)
-    setPicked(o.id)
-  }, [])
+  const choose = useCallback(
+    (o: McqOption, wasGuessing: boolean) => {
+      const guessing = wasGuessing && !cram // a guess only changes scheduling, and cram does not schedule
+      const ok = o.is_correct
+      pending.current = { rating: gradeMcq(ok, guessing), selected: o.id, correct: ok, unsure: guessing }
+      setUnsure(guessing)
+      setPicked(o.id)
+    },
+    [cram],
+  )
 
   const continueMcq = useCallback(() => {
     const p = pending.current
-    if (current && p) void advance(current.item, p.rating, { selected: p.selected, correct: p.correct, unsure: p.unsure })
-  }, [current, advance])
+    if (!current || !p) return
+    if (cram) cramAdvance(current.item, !p.correct, p.correct)
+    else void advance(current.item, p.rating, { selected: p.selected, correct: p.correct, unsure: p.unsure })
+  }, [current, advance, cram, cramAdvance])
 
   // Once an answer is in, focus goes to Continue, so Enter or Space moves on.
   useEffect(() => {
@@ -206,13 +231,15 @@ export default function LearnSession() {
       if (!revealed && (e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault()
         setRevealed(true)
-      } else if (revealed && ['1', '2', '3', '4'].includes(e.key)) {
+      } else if (revealed && cram && (e.key === '1' || e.key === '2')) {
+        cramAdvance(current.item, e.key === '1', null)
+      } else if (revealed && !cram && ['1', '2', '3', '4'].includes(e.key)) {
         void advance(current.item, Number(e.key) as Rating, { selected: null, correct: null, unsure: false })
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [current, revealed, advance])
+  }, [current, revealed, advance, cram, cramAdvance])
 
   const back = (
     <Link to="/learn" className="font-sans text-[13.5px] text-ink underline">
@@ -237,24 +264,29 @@ export default function LearnSession() {
       <main className="mx-auto max-w-[42rem] px-4 pb-24 pt-10 sm:px-6">
         {back}
         <h1 className="mt-6 font-display text-[1.618rem] font-semibold text-ink" style={{ fontFamily: 'var(--font-display)' }}>
-          {empty ? 'Nothing due right now' : 'Session complete'}
+          {cram ? (empty ? 'Nothing to cram' : 'Cram complete') : empty ? 'Nothing due right now' : 'Session complete'}
         </h1>
         <p className="mt-4 font-sans text-[16px] leading-relaxed text-ink">
-          {empty
-            ? 'Every card in this set is scheduled for later, or today’s new-card limit is used up. Come back later.'
-            : `${tally.answered} cards reviewed${tally.again ? `, ${tally.again} to see again soon` : ''}${
-                tally.mcq ? `. Multiple choice: ${tally.correct} of ${tally.mcq} correct` : ''
-              }.`}
+          {cram
+            ? empty
+              ? 'This set has no cards yet.'
+              : `${tally.answered} cards answered${tally.again ? `, ${tally.again} missed along the way` : ', none missed'}. Your schedule was not changed.`
+            : empty
+              ? 'Every card in this set is scheduled for later, or today’s new-card limit is used up. Come back later.'
+              : `${tally.answered} cards reviewed${tally.again ? `, ${tally.again} to see again soon` : ''}${
+                  tally.mcq ? `. Multiple choice: ${tally.correct} of ${tally.mcq} correct` : ''
+                }.`}
         </p>
-        {!progress.signedIn && !empty && (
+        {!cram && !progress.signedIn && !empty && (
           <p className="mt-3 font-sans text-[14px] text-ink">
             Saved on this device only. <Link to="/account" className="underline">Sign in</Link> to keep your progress across devices.
           </p>
         )}
-        <div className="mt-8 flex gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/learn" className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink">
             Back to Learn
           </Link>
+          {cram && !empty && <Button onClick={restartCram}>Cram again</Button>}
         </div>
       </main>
     )
@@ -270,9 +302,15 @@ export default function LearnSession() {
       <div className="flex items-baseline justify-between gap-4">
         {back}
         <p className="font-mono text-[12.5px] text-ink" aria-live="polite">
-          {loaded.title} · {queue.length} left{tally.mcq > 0 ? ` · ${tally.correct} of ${tally.mcq} correct` : ''}
+          {loaded.title}{cram ? ' · Cram' : ''} · {queue.length} left{tally.mcq > 0 ? ` · ${tally.correct} of ${tally.mcq} correct` : ''}
         </p>
       </div>
+
+      {cram && (
+        <p className="mt-3 font-sans text-[12.5px] text-ink">
+          Cram: every card once, in a new order. Nothing here changes your schedule.
+        </p>
+      )}
 
       <article className="lp-raised mt-6 rounded-md p-6 sm:p-8" aria-label="Card">
         <p className="font-sans text-[12.5px] text-ink">{item.topic}</p>
@@ -331,7 +369,7 @@ export default function LearnSession() {
               const ok = pending.current.correct
               const right = order.findIndex(o => o.is_correct)
               const mine = order.findIndex(o => o.id === picked)
-              const next = intervalPreview(progress.states.get(item.id) ?? null, new Date(), 'mcq')[pending.current.rating]
+              const next = cram ? null : intervalPreview(progress.states.get(item.id) ?? null, new Date(), 'mcq')[pending.current.rating]
               return (
                 <div className="lp-sunken mt-5 space-y-2 rounded-md p-4 font-sans text-[14.5px] leading-relaxed text-ink" role="status">
                   <p className="text-[16px]">
@@ -362,20 +400,26 @@ export default function LearnSession() {
                       </ul>
                     </details>
                   )}
-                  <p className="text-[12.5px]">
-                    {pending.current.unsure && ok ? 'Marked as a guess, so it comes back sooner. ' : ''}Next review in {next}.
-                  </p>
+                  {next ? (
+                    <p className="text-[12.5px]">
+                      {pending.current.unsure && ok ? 'Marked as a guess, so it comes back sooner. ' : ''}Next review in {next}.
+                    </p>
+                  ) : (
+                    !ok && <p className="text-[12.5px]">This one comes back in a few cards.</p>
+                  )}
                 </div>
               )
             })()}
             {!answered && (
               <div className="mt-5 space-y-2 font-sans text-[14px] text-ink">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={unsure} onChange={e => setUnsure(e.target.checked)} />
-                  I’m not sure (guessing)
-                </label>
+                {!cram && (
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={unsure} onChange={e => setUnsure(e.target.checked)} />
+                    I’m not sure (guessing)
+                  </label>
+                )}
                 <p className="hidden text-[12.5px] [@media(hover:hover)]:block">
-                  Press 1 to {order.length} to answer. Hold Shift if you are guessing. U toggles “not sure”.
+                  Press 1 to {order.length} to answer.{cram ? '' : ' Hold Shift if you are guessing. U toggles “not sure”.'}
                 </p>
               </div>
             )}
@@ -424,6 +468,15 @@ export default function LearnSession() {
           )
         ) : !revealed ? (
           <Button onClick={() => setRevealed(true)}>Show answer</Button>
+        ) : cram ? (
+          <>
+            <Button onClick={() => cramAdvance(item, true, null)}>
+              Missed it <span className="font-mono text-[11.5px]">1</span>
+            </Button>
+            <Button onClick={() => cramAdvance(item, false, null)}>
+              Got it <span className="font-mono text-[11.5px]">2</span>
+            </Button>
+          </>
         ) : (
           RATINGS.map(r => (
             <Button key={r.rating} onClick={() => void advance(item, r.rating, { selected: null, correct: null, unsure: false })}>
@@ -438,15 +491,16 @@ export default function LearnSession() {
             type="checkbox"
             checked={cover}
             onChange={e => {
-              setCover(e.target.checked)
-              writeCover(e.target.checked)
+              progress.updateSettings({ coverOptions: e.target.checked })
             }}
           />
           Hide the options until I ask for them
         </label>
       )}
       {!isMcq && !revealed && (
-        <p className="mt-3 font-sans text-[12.5px] text-ink">Space shows the answer; 1 to 4 rate it.</p>
+        <p className="mt-3 font-sans text-[12.5px] text-ink">
+          {cram ? 'Space shows the answer; 1 missed it, 2 got it.' : 'Space shows the answer; 1 to 4 rate it.'}
+        </p>
       )}
     </main>
   )
