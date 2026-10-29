@@ -101,7 +101,7 @@ Inspect each source's real shape before writing its generator, and report what y
 | `dnc_reason` | `do-not-crush` + 6 reason sub-lists | "Why shouldn't {drug/form} be crushed?" The options are the reason categories. |
 | `acb_score` | `anticholinergic-burden-score-1/2/3` | "What is the ACB score of {drug}?" |
 | `class_of` | `class_members` for core moieties (inspect `class_type` values first) | "{drug} belongs to which class?" Distractors are sibling classes of the same `class_type`. |
-| `brand_generic` (both directions) | `rxnorm_brands` / `entity_brand_names`, scoped to Notable Drugs and Most-used | Single-ingredient brands only. |
+| `brand_generic` (brand → generic) | **`learn_brand_list`** (owner's Brands.xlsx, 1,252 ready rows, importance High / Medium / Low; phase 23, 2026-10-29). Replaced the Notable-Drugs generator `learn_gen_brand_generic()` (21f/21g; its 465 items are archived). | Items `brand_list:<sheet_id>`; distractors from the sheet, same therapeutic domain first, never sharing a first-word ingredient with the answer. Rows with status `held`/`excluded` are skipped. |
 | `jc_dnu` | `joint-commission-do-not-use` (19 terms) | Term → why it is unsafe and the preferred form (from `note`). |
 | `mpje_controlled` | `georgia-mpje-controlled-substances` (405) | "What is the Georgia schedule for {drug}?" Items carry `jurisdiction = 'US-GA'`. Joshua's own compilation. |
 
@@ -340,3 +340,5 @@ create table if not exists public.learn_user_settings (
 - **Sync:** replaying the same guest events twice changes nothing.
 - **Provenance:** every published official item has a non-empty `source_citation`; every `llm_draft` has a verified `source_quote`.
 - **UI:** study flow works by keyboard alone; answer reveal is announced to screen readers; no horizontal overflow at 375px; action bar clears the bottom nav.
+
+*Status 2026-10-29 (phase 23):* the brand learner is driven only by `learn_brand_list` (`db/phase23a`–`23d`). 1,252 items published directly (template-built from the owner's sheet), sectioned High 612 / Medium 299 / Low 341 in collection `brand-generic`; the 465 older `brand_generic:` items are `archived` and detached (kept so learner state and FSRS events survive). Total approved items 3,167. To add or fix brands: edit `learn_brand_list` (brand, generic, importance), link PCIDs as in 23b, then `select learn_gen_brand_list();` and re-run the collection insert in 23d. Held for Joshua: Xylocaine and Indopan (a moiety record named like the brand owns the slug).
