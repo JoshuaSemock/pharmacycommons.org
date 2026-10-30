@@ -1,6 +1,6 @@
 # Pharmacy Commons — Project Instructions for Claude
 
-> Last reconciled against live Supabase and this repo: **2026-09-25** (lists added; FDA → PCID linking, phase 10).
+> Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
 > Detailed phase-by-phase history (Phases 1–4 narratives, validation runs, script
 > notes) moved to `docs/project-history.md` — read it when you need the "why",
 > not on every session.
