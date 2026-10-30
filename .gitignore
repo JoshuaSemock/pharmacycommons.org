@@ -21,3 +21,7 @@ logs/
 
 # Written by scripts/postbuild.mjs into dist/, never into public/
 public/sitemap.xml
+
+# Output of scripts/export_to_excel.py
+scripts/export_log.txt
+scripts/PharmacyCommons_*
