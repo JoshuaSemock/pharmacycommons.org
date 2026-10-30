@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'federal-controlled-substances',
+    date: '2026-10-30',
+    kind: 'Feature',
+    title: 'Federal controlled substances, by schedule and importance',
+    summary:
+      'Every substance on the DEA schedules with its brand names, schedule and an importance rating. Open the whole list or just Schedule II, Schedules III to V, or the High, Medium and Low importance parts.',
+    to: '/lists/federal-controlled-substances',
+    cta: 'Open the list',
+  },
+  {
     id: 'learn',
     date: '2026-10-27',
     kind: 'Feature',
