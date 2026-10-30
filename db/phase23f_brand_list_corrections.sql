@@ -1,4 +1,6 @@
 -- Phase 23f — learn_brand_list corrections (Joshua, 2026-10-29: "correct them"); applied via execute_sql
+-- APPLIED 2026-10-29 via execute_sql. NOTE: this file was written after the fact as a readable mirror; column lists in the
+-- combination mint are indicative, not a byte-for-byte copy of what ran.
 -- Destination: db/phase23f_brand_list_corrections.sql   (run after 23e)
 -- Mirena        generic "intrauterine devices, all" -> levonorgestrel (1003189)
 -- Cyanokit      generic "cyanide antidote" -> hydroxocobalamin (1003025)

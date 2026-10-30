@@ -6,6 +6,7 @@
 -- Same pattern as phase 19a: every FK to entities(pcid) is re-pointed (row by row; a row that would duplicate one the survivor
 -- already has is dropped), the old moiety/entity rows are deleted and the old PCID goes to pcid_retired with replaced_by_pcid
 -- (the API 301s it). That frees the slugs 'xylocaine' and 'indopan' for the brand formulations, which are then minted here.
+-- APPLIED 2026-10-29 via execute_sql with v_dry := false (file keeps true so a re-read is a dry run; recorded by hand, not in schema_migrations).
 -- All-or-nothing; v_dry = true runs everything and raises an exception with the summary, keeping nothing.
 do $$
 declare
