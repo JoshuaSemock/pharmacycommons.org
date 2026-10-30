@@ -32,7 +32,7 @@ page; legal documents (effective 2026-10-27).
 ## Now — finish what's half-done
 
 **1. Non-core moiety cleanup** *(2026-10-30: Joshua chose delete junk / relabel / merge instead of hide-only; `db/phase25a_noncore_moiety_cleanup.sql` written, dry-run default, **not yet run** — `execute_sql` confirmations were cancelled; run it in the SQL editor, then refresh `moiety_hierarchy`, `ingredient_moiety_map`, `entity_brand_names`)*
-- Deletes 1 junk row, relabels 13 single compounds to Core moiety, merges 40 salts and 14 product rows into their parent drug moieties (55 PCIDs retired with `replaced_by_pcid`). About 82 rows remain non-core by design: ion-parent salts/products, true combinations (vaccines etc.), no-parent rows, and statute-text rows.
+- Deletes 1 junk row, relabels 13 single compounds to Core moiety, merges 40 salts and 14 product rows into their parent drug moieties (55 PCIDs retired with `replaced_by_pcid`). 69 rows remain non-core by design (13 salts, 28 products, 28 combinations): ion-parent salts/products, true combinations (vaccines etc.), no-parent rows, and statute-text rows.
 - The hide-from-search flag below is still needed for what remains.
 
 **1b. Hide the remaining non-core moiety rows from search** *(decision made 2026-10-21; not implemented)*
