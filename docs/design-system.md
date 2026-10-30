@@ -351,6 +351,14 @@ line beside it, scored into the paper.
 pages, notices, sentences), the footer, and the JSON tree on the Developers page. They
 keep the underline style.
 
+**Learn study layout (2026-10-30).** `/learn` and `/learn/study/*` use the drug-page two-column shape: a sticky left
+rail (`LearnRail`, `.learn-rail`: Today, Study settings in a `.lp-sunken` tray, Collections as embossed rows) and a
+study canvas (`.learn-canvas`). Joshua's deliberate departures from the rules above, scoped to those two classes:
+collection rows lift 1px on hover (`.learn-row`, instead of pressing in); text there carries a 1px stamped-ink
+`text-shadow` (the global `none !important` rule is overridden with `!important` inside `.learn-canvas` and
+`.learn-rail` only); the question `<h1>` uses `.learn-prompt` so the bare h1 size doesn't apply. Mint and salmon
+fills stay limited to correct and wrong answers.
+
 ---
 
 ## 7. Components

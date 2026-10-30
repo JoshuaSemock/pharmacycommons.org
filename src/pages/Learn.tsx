@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import LearnSettings from '../components/LearnSettings'
+import LearnRail from '../components/LearnRail'
 import { listCollections } from '../learn/api'
 import { useProgress } from '../learn/useProgress'
 import type { LearnCollection } from '../learn/types'
@@ -46,6 +46,8 @@ export default function Learn() {
 
   return (
     <main className="mx-auto max-w-page px-4 pb-24 sm:px-6">
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-10">
+      <div className="min-w-0 lg:order-2">
       <header className="border-b border-ink/15 pb-10 pt-10 sm:pt-14">
         <h1
           className="font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.015em] text-ink sm:text-[2.618rem]"
@@ -139,7 +141,11 @@ export default function Learn() {
         ))
       )}
 
-      <LearnSettings progress={progress} />
+    </div>
+      <div className="min-w-0 lg:order-1 lg:pt-14">
+        <LearnRail progress={progress} collections={failed ? [] : collections} />
+      </div>
+      </div>
     </main>
   )
 }

@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import Button from '../components/Button'
+import LearnRail from '../components/LearnRail'
 import { getCollection, getItemsByIds } from '../learn/api'
 import { cramQueue, cramRequeue } from '../learn/cram'
 import { buildQueue, requeue, type QueueEntry } from '../learn/queue'
@@ -297,8 +298,37 @@ export default function LearnSession() {
   const answered = isMcq && picked !== null
   const preview = !isMcq && revealed ? intervalPreview(progress.states.get(item.id) ?? null, new Date()) : null
 
+  const source = (
+    <p className="text-[12.5px]">
+      Source:{' '}
+      {item.source_url ? (
+        <a href={item.source_url} className="underline" rel="noreferrer">
+          {item.source_citation}
+        </a>
+      ) : (
+        item.source_citation
+      )}
+      {item.third_party_sources.length > 0 && ` · includes ${item.third_party_sources.join(', ')}`}
+      {' · '}
+      {item.license}
+      {item.primary_pcid && (
+        <>
+          {' · '}
+          <Link to={`/id/PCID-${item.primary_pcid}`} className="underline">
+            Drug page
+          </Link>
+        </>
+      )}
+    </p>
+  )
+
   return (
-    <main className="mx-auto max-w-[42rem] px-4 pb-24 pt-8 sm:px-6">
+    <main className="mx-auto max-w-page px-4 pb-24 pt-8 sm:px-6">
+     <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-10">
+      <div className="min-w-0 lg:order-1">
+        <LearnRail progress={progress} activeId={isDue ? 'due' : collectionId} />
+      </div>
+      <div className="learn-canvas min-w-0 max-w-[48rem] lg:order-2">
       <div className="flex items-baseline justify-between gap-4">
         {back}
         <p className="font-mono text-[12.5px] text-ink" aria-live="polite">
@@ -314,7 +344,7 @@ export default function LearnSession() {
 
       <article className="lp-raised mt-6 rounded-md p-6 sm:p-8" aria-label="Card">
         <p className="font-sans text-[12.5px] text-ink">{item.topic}</p>
-        <h1 className="mt-2 font-sans text-[19px] font-medium leading-snug text-ink">{item.prompt}</h1>
+        <h1 className="learn-prompt mt-2 text-ink">{item.prompt}</h1>
 
         {isMcq && cover && !uncovered && picked === null ? (
           <div className="mt-6">
@@ -407,6 +437,9 @@ export default function LearnSession() {
                   ) : (
                     !ok && <p className="text-[12.5px]">This one comes back in a few cards.</p>
                   )}
+                  {item.clinical_rationale && <p>{item.clinical_rationale}</p>}
+                  {item.clinical_caveats && <p className="text-[13.5px]">Note: {item.clinical_caveats}</p>}
+                  {source}
                 </div>
               )
             })()}
@@ -430,31 +463,11 @@ export default function LearnSession() {
           )
         )}
 
-        {(revealed || answered) && (
+        {revealed && !isMcq && (
           <div className="mt-5 space-y-3 font-sans text-[14.5px] leading-relaxed text-ink">
             {item.clinical_rationale && <p>{item.clinical_rationale}</p>}
             {item.clinical_caveats && <p className="text-[13.5px]">Note: {item.clinical_caveats}</p>}
-            <p className="text-[12.5px]">
-              Source:{' '}
-              {item.source_url ? (
-                <a href={item.source_url} className="underline" rel="noreferrer">
-                  {item.source_citation}
-                </a>
-              ) : (
-                item.source_citation
-              )}
-              {item.third_party_sources.length > 0 && ` · includes ${item.third_party_sources.join(', ')}`}
-              {' · '}
-              {item.license}
-              {item.primary_pcid && (
-                <>
-                  {' · '}
-                  <Link to={`/id/PCID-${item.primary_pcid}`} className="underline">
-                    Drug page
-                  </Link>
-                </>
-              )}
-            </p>
+            {source}
           </div>
         )}
       </article>
@@ -502,6 +515,8 @@ export default function LearnSession() {
           {cram ? 'Space shows the answer; 1 missed it, 2 got it.' : 'Space shows the answer; 1 to 4 rate it.'}
         </p>
       )}
+      </div>
+     </div>
     </main>
   )
 }

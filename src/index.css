@@ -1247,3 +1247,53 @@ h6 { font-size: var(--text-base); line-height: 1.35; font-weight: 600; }
     padding-bottom: var(--bottom-nav-h);
   }
 }
+/* Learn study layout (2026-10-30, src/components/LearnRail.tsx, src/pages/Learn*.tsx).
+   Joshua's call for this surface, in three deliberate departures from the global rules above:
+   1. The question prompt is an <h1>; .learn-prompt scopes its size so the bare h1 rule doesn't make it a page title.
+   2. Collection rows in the rail lift 1px on hover (emboss gets a touch deeper) instead of pressing in.
+   3. Stamped ink: a 1px white text-shadow on text inside .learn-canvas / .learn-rail. The global
+      "no text shadows" rule is !important, so these carry !important too and stay scoped to the two classes. */
+.learn-prompt {
+  font-size: var(--text-xl);
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.learn-row {
+  --shadow-emboss-hover:
+    -1px -1px 0 var(--lp-rim), 1px 2px 2px var(--lp-edge), 3px 4px 6px var(--lp-ambient),
+    inset 1px 1px 0 var(--lp-bevel-light), inset -1px -1px 0 var(--lp-bevel-dark);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+@media (hover: hover) {
+  .learn-row:not([aria-current="page"]):hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-emboss-hover);
+  }
+}
+.learn-row[aria-current="page"] {
+  box-shadow: var(--shadow-deboss);
+}
+@media (prefers-reduced-motion: reduce) {
+  .learn-row { transition: none; }
+  .learn-row:hover { transform: none !important; }
+}
+.learn-canvas :is(p, h1, span, li, summary, label, a),
+.learn-rail :is(p, h2, span, li, label, a) {
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.4) !important;
+}
+.learn-canvas .lp-sunken :is(p, span, li, summary),
+.learn-rail .lp-sunken :is(p, h2, span, label) {
+  text-shadow: 0 -1px 0 rgb(255 255 255 / 0.4) !important;
+}
+/* Dark paper: light ink would vanish with a white highlight, so the stamp becomes a dark one. */
+:root[data-theme="dark"] .learn-canvas :is(p, h1, span, li, summary, label, a),
+:root[data-theme="dark"] .learn-rail :is(p, h2, span, li, label, a),
+:root[data-theme="dark"] .learn-canvas .lp-sunken :is(p, span, li, summary),
+:root[data-theme="dark"] .learn-rail .lp-sunken :is(p, h2, span, label) {
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.5) !important;
+}
+/* Tiles filled mint or salmon keep dark ink on a light fill in both themes, so they keep the light stamp. */
+.learn-canvas :is(.lp-foil-set, .lp-wrong-set) :is(span) {
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.4) !important;
+}
