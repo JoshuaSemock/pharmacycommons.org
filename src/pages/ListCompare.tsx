@@ -1,7 +1,7 @@
 /**
  * /lists/compare?l=slug,slug,slug — up to three lists side by side.
  *
- * Rows are drugs (by PCID), columns are lists; each cell shows what that list
+ * Rows are drugs (by PCID; a brand-name entry matches on its generic), columns are lists; each cell shows what that list
  * says about the drug (its rank, its legal status, or just that it is there).
  * "On every list" / "Not on every list" narrows the rows; the chosen lists live in ?l= so a
  * comparison can be linked.
@@ -13,14 +13,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getListBySlug, listLists } from '../api'
 import type { ListDetail, ListItem, ListSummary } from '../api.generated'
-import { formatDrugName } from '../names'
+import { compareRows, type CompareRow } from '../lists'
 import PaperSelect from '../components/PaperSelect'
 
 const MAX_LISTS = 3
 const BATCH = 300
 
-/** `key` is the PCID, or `term:<name>` for entries that are plain terms (no drug record). */
-type Row = { key: string; slug: string | null; name: string; cells: (ListItem | null)[] }
 type Show = 'all' | 'every' | 'some'
 
 export default function ListCompare() {
@@ -72,33 +70,19 @@ export default function ListCompare() {
   const ready = lists.every(l => l !== undefined)
   const shown = useMemo(() => lists.filter((l): l is ListDetail => Boolean(l)), [lists])
 
-  const rows = useMemo<Row[]>(() => {
-    if (!ready) return []
-    const byKey = new Map<string, Row>()
-    shown.forEach((list, col) => {
-      for (const item of list.items) {
-        const key = item.pcid ? String(item.pcid) : `term:${item.source_name}`
-        let row = byKey.get(key)
-        if (!row) {
-          row = { key, slug: item.slug, name: item.slug ? formatDrugName(item.name) : item.name, cells: shown.map(() => null) }
-          byKey.set(key, row)
-        }
-        if (!row.cells[col]) row.cells[col] = item
-      }
-    })
-    return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
-  }, [ready, shown])
+  // Rows are drugs by PCID; brand-name entries match on their generic (see compareRows).
+  const rows = useMemo<CompareRow[]>(() => (ready ? compareRows(shown) : []), [ready, shown])
 
   const counts = useMemo(() => {
-    const every = rows.filter(r => r.cells.every(Boolean)).length
+    const every = rows.filter(r => r.cells.every(c => c.length > 0)).length
     return { all: rows.length, every, some: rows.length - every }
   }, [rows])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return rows.filter(r => {
-      if (show === 'every' && !r.cells.every(Boolean)) return false
-      if (show === 'some' && r.cells.every(Boolean)) return false
+      if (show === 'every' && !r.cells.every(c => c.length > 0)) return false
+      if (show === 'some' && r.cells.every(c => c.length > 0)) return false
       return !q || r.name.toLowerCase().includes(q)
     })
   }, [rows, show, query])
@@ -242,7 +226,7 @@ export default function ListCompare() {
                     </th>
                     {r.cells.map((c, i) => (
                       <td key={i} className="px-4 py-2">
-                        <Cell item={c} />
+                        <Cell items={c} />
                       </td>
                     ))}
                   </tr>
@@ -267,8 +251,8 @@ export default function ListCompare() {
   )
 }
 
-function Cell({ item }: { item: ListItem | null }) {
-  if (!item) {
+function Cell({ items }: { items: ListItem[] }) {
+  if (items.length === 0) {
     return (
       <span className="text-ink" aria-label="Not on this list">
         —
@@ -276,18 +260,24 @@ function Cell({ item }: { item: ListItem | null }) {
     )
   }
   return (
-    <span className="flex flex-wrap items-center gap-2">
-      {item.rank !== null && <span className="font-mono text-[12.5px] text-ink">#{item.rank}</span>}
-      {item.legal_status && (
-        <span className="lp-label rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
-          {item.legal_status}
+    <span className="flex flex-col gap-1">
+      {items.map((item, i) => (
+        <span key={i} className="flex flex-wrap items-center gap-2">
+          {/* A brand-name entry shows the brand, since the row itself is named for the generic. */}
+          {item.component_pcid != null && <span className="text-ink">{item.name}</span>}
+          {item.rank !== null && <span className="font-mono text-[12.5px] text-ink">#{item.rank}</span>}
+          {item.legal_status && (
+            <span className="lp-label rounded-md bg-rose-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink">
+              {item.legal_status}
+            </span>
+          )}
+          {item.rank === null && !item.legal_status && item.component_pcid == null && (
+            <span className="text-ink" aria-label="On this list">
+              ✓
+            </span>
+          )}
         </span>
-      )}
-      {item.rank === null && !item.legal_status && (
-        <span className="text-ink" aria-label="On this list">
-          ✓
-        </span>
-      )}
+      ))}
     </span>
   )
 }

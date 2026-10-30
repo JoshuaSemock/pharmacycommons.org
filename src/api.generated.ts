@@ -297,6 +297,11 @@ export type ListItem = {
   entity_type: string
   /** dictionary_terms.id for term entries; null or absent for drugs. */
   term_id?: number | null
+  /** The generic (moiety or combination) this entry stands for, set on brand-name lists
+   *  (phase 23j). List compare matches rows on it, so a brand lines up with its generic. */
+  component_pcid?: number | null
+  component_slug?: string | null
+  component_name?: string | null
 }
 
 export type ListRef = { slug: string; title: string }
