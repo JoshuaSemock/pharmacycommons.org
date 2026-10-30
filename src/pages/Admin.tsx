@@ -19,7 +19,7 @@ import {
   unblockContributor,
 } from '../contributions'
 import type { AdminContributor, Protection, ProtectedPage, Role } from '../contributions'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { entityHref } from '../wiki'
 
 /**
@@ -373,7 +373,7 @@ function LevelPicker({ name, value, onChange }: { name: string; value: Protectio
 }
 
 function pageName(name: string, entityType: string): string {
-  return ['moiety', 'precise_form', 'combination'].includes(entityType) ? formatDrugName(name) : name
+  return ['moiety', 'precise_form', 'combination', 'formulation'].includes(entityType) ? formatEntityName(name, entityType) : name
 }
 
 function ProtectionSection({ onNotice }: { onNotice: (m: string) => void }) {

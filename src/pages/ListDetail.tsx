@@ -18,7 +18,7 @@ import type { ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getListBySlug } from '../api'
 import type { ListDetail as ListRecord, ListItem } from '../api.generated'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import StudyLinks from '../components/StudyLinks'
 import PaperSelect from '../components/PaperSelect'
 import {
@@ -450,7 +450,7 @@ function Row({
   valueLabel: string
 }) {
   const isTerm = !item.slug
-  const name = isTerm ? item.name : formatDrugName(item.name)
+  const name = isTerm ? item.name : formatEntityName(item.name, item.entity_type)
   const sourceDiffers = item.source_name.trim().toLowerCase().replace(/\s*\/\s*/g, '/') !== item.name.trim().toLowerCase()
   return (
     <li

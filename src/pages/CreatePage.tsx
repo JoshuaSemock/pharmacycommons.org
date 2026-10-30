@@ -18,7 +18,7 @@ import {
 } from '../contribute'
 import type { PageSuggestion } from '../contribute'
 import { HandleSetup } from '../OverviewEditor'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { entityHref } from '../wiki'
 import { abbreviationSuffix, getAbbreviations } from '../abbreviations'
 
@@ -292,7 +292,7 @@ export default function CreatePage() {
                     {(exact ? [exact] : similar).map(s => (
                       <li key={s.slug}>
                         <Link to={entityHref(s.entityType, s.slug)} className={LINK}>
-                          {formatDrugName(s.name)}
+                          {formatEntityName(s.name, s.entityType)}
                         </Link>{' '}
                         <span>· {kindLabel(s.entityType)}</span>
                       </li>

@@ -6,7 +6,7 @@
  */
 
 import type { ListDetail, ListItem } from './api.generated'
-import { formatDrugName } from './names'
+import { formatEntityName } from './names'
 
 export type SortKey = 'rank' | 'value' | 'name' | 'status'
 
@@ -151,7 +151,7 @@ export function listToCsv(list: Pick<ListDetail, 'measure_label' | 'status_label
   if (hasSources) header.push('also_listed_by')
   const lines = [header.map(csvCell).join(',')]
   for (const i of items) {
-    const row: (string | number | null)[] = [i.rank, i.slug ? formatDrugName(i.name) : i.name, i.pcid ? `PCID-${i.pcid}` : '', i.source_name]
+    const row: (string | number | null)[] = [i.rank, i.slug ? formatEntityName(i.name, i.entity_type) : i.name, i.pcid ? `PCID-${i.pcid}` : '', i.source_name]
     if (hasValue) row.push(i.value)
     if (hasStatus) row.push(i.legal_status)
     if (hasNote) row.push(i.note)
@@ -188,7 +188,7 @@ export function compareRows(lists: Pick<ListDetail, 'items'>[]): CompareRow[] {
       if (!row) {
         const slug = viaComponent ? (item.component_slug ?? null) : item.slug
         const name = viaComponent ? (item.component_name ?? item.name) : item.name
-        row = { key, slug, name: slug ? formatDrugName(name) : name, cells: lists.map(() => []) }
+        row = { key, slug, name: slug ? formatEntityName(name, viaComponent ? 'moiety' : item.entity_type) : name, cells: lists.map(() => []) }
         byKey.set(key, row)
       }
       if (row.cells[col].length === 0 || viaComponent) row.cells[col].push(item)

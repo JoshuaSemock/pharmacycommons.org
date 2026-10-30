@@ -14,7 +14,7 @@ import { adminErrorMessage, getNewPagesQueue, patrolNewPage } from '../contribut
 import type { NewPage } from '../contributions'
 import { brandActionText, getBrandQueue, patrolBrandEdit, reviewBrandEdit } from '../brands'
 import type { BrandEdit } from '../brands'
-import { formatBrandName, formatDrugName } from '../names'
+import { formatBrandName, formatEntityName } from '../names'
 import { entityHref } from '../wiki'
 import { commentError, getCommentQueue, moderateComment } from '../blogComments'
 import type { QueuedComment } from '../blogComments'
@@ -116,7 +116,7 @@ export default function ReviewQueue() {
                 className={`grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 text-left font-sans text-ink ${FOCUS}`}
               >
                 <span className="min-w-0">
-                  <span className="block text-base font-medium">{r.page ? formatDrugName(r.page.name) : `PCID-${r.pcid}`}</span>
+                  <span className="block text-base font-medium">{r.page ? formatEntityName(r.page.name, r.page.entityType) : `PCID-${r.pcid}`}</span>
                   <span className="block text-sm [overflow-wrap:anywhere]">
                     {r.summary} · @{r.handle}
                     {r.credential ? ` · ${r.credential}` : ''} · {new Date(r.created_at).toLocaleString()}
@@ -290,7 +290,7 @@ function FactsQueue({
                 <span className="block text-base font-medium">
                   {e.page ? (
                     <Link to={entityHref(e.page.entityType, e.page.slug)} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
-                      {formatDrugName(e.page.name)}
+                      {formatEntityName(e.page.name, e.page.entityType)}
                     </Link>
                   ) : (
                     `PCID-${e.pcid}`
@@ -497,7 +497,7 @@ function BrandQueue({
               <li key={e.id} className="space-y-1.5 py-3 font-sans text-sm text-ink">
                 <span className="block text-base font-medium">
                   <Link to={entityHref(e.entity_type, e.slug)} className="lp-press inline-flex items-center rounded-md px-2 py-0.5">
-                    {formatDrugName(e.name)}
+                    {formatEntityName(e.name, e.entity_type)}
                   </Link>{' '}
                   · {brandActionText(e.action, formatBrandName(e.brand_display))}
                 </span>

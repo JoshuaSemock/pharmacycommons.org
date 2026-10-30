@@ -5,7 +5,7 @@ import type { Contribution } from '../contributions'
 import { INFOBOX_KEY_LABEL } from '../infobox'
 import { brandActionText } from '../brands'
 import type { BrandAction } from '../brands'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { entityHref } from '../wiki'
 
 /**
@@ -37,8 +37,8 @@ function whatLabel(c: Contribution): string {
 }
 
 function displayName(c: Contribution): string {
-  return c.entity_type === 'moiety' || c.entity_type === 'precise_form' || c.entity_type === 'combination'
-    ? formatDrugName(c.name)
+  return c.entity_type === 'moiety' || c.entity_type === 'precise_form' || c.entity_type === 'combination' || c.entity_type === 'formulation'
+    ? formatEntityName(c.name, c.entity_type)
     : c.name
 }
 

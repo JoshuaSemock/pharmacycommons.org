@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getDrugBySlug } from '../api'
 import type { DrugDetail } from '../api.generated'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { pageTypeFor } from '../pageSource'
 import { entityHref } from '../wiki'
 import PageEditor from '../pageEditor/PageEditor'
@@ -35,7 +35,7 @@ export default function EditPage() {
   }, [slug])
 
   // Drug names display lower-cased; concept, herbal and class names keep their case (as publish-page titles them).
-  const name = drug && drug !== 'missing' ? (pageTypeFor(drug.block_kind) === 'drug' ? formatDrugName(drug.name) : drug.name.trim()) : ''
+  const name = drug && drug !== 'missing' ? (pageTypeFor(drug.block_kind) === 'drug' ? formatEntityName(drug.name, drug.block_kind) : drug.name.trim()) : ''
   useEffect(() => {
     document.title = name ? `Editing ${name} · Pharmacy Commons` : 'Pharmacy Commons'
   }, [name])

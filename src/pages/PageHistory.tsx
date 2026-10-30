@@ -6,7 +6,7 @@ import { useSession } from '../auth'
 import { useContributorStatus } from '../contribute'
 import { STATUS_LABEL, getCurrentRevisionId, getHistory, getPageBySlug } from '../history'
 import type { HistoryEntry, PageRef } from '../history'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { entityHref } from '../wiki'
 
 /**
@@ -54,7 +54,7 @@ export default function PageHistory() {
     }
   }, [load, version])
 
-  const name = typeof state === 'object' ? formatDrugName(state.page.name) : slug
+  const name = typeof state === 'object' ? formatEntityName(state.page.name, state.page.entityType) : slug
   useEffect(() => {
     document.title = `History: ${name} · Pharmacy Commons`
   }, [name])

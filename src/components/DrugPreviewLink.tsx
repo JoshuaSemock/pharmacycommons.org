@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { getEntityClasses } from '@/api'
 import type { EntityClass } from '@/api.generated'
 import { supabase } from '@/supabaseClient'
-import { formatDrugName } from '@/names'
+import { formatEntityName } from '@/names'
 import { leadSummary } from '@/pageSource/citations'
 import { usePopoverPlacement } from './popover'
 
@@ -167,7 +167,7 @@ export default function DrugPreviewLink({
             {data && (
               <div className="space-y-2">
                 <div>
-                  <p className="text-[15px] font-semibold leading-snug">{formatDrugName(data.name)}</p>
+                  <p className="text-[15px] font-semibold leading-snug">{formatEntityName(data.name, data.entityType)}</p>
                   <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-[12px]">
                     <span>{TYPE_LABEL[data.entityType] ?? data.entityType}</span>
                     <span className="font-mono text-[11.5px]">PCID-{data.pcid}</span>
