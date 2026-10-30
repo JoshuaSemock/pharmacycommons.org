@@ -4,7 +4,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { entryKindLine, loadCatalog, orderedCatalog, pcidOf, searchCatalog, toDrug } from '../catalog'
 import { formatDate, listPosts } from '../blog'
 import { loadListPreview, type ListPreview } from '../homeLists'
-import { formatDrugName } from '../names'
+import { formatEntityName } from '../names'
 import { TOOLS, isActive } from '../tools'
 import { ctaFor, whatsNew } from '../updates'
 import Stamp from '../components/Stamp'
@@ -416,12 +416,12 @@ function ListTile({
               {item.slug ? (
                 <Link to={`/drugs/${item.slug}`} className="pc-row lp-press rounded-md text-ink">
                   {ranked && <span className="pc-row__rank">{item.rank ?? item.position}</span>}
-                  <span className="pc-row__text">{formatDrugName(item.name)}</span>
+                  <span className="pc-row__text">{formatEntityName(item.name, item.entity_type)}</span>
                 </Link>
               ) : (
                 <span className="pc-row text-ink">
                   {ranked && <span className="pc-row__rank">{item.rank ?? item.position}</span>}
-                  <span className="pc-row__text">{formatDrugName(item.name)}</span>
+                  <span className="pc-row__text">{formatEntityName(item.name, item.entity_type)}</span>
                 </span>
               )}
             </li>

@@ -58,6 +58,22 @@ export function formatBrandName(name: string | null | undefined): string {
   return s.replace(/[A-Za-z0-9]+(?:['’][A-Za-z]+)*/g, capitalizeToken)
 }
 
+/**
+ * The one place that decides how an entity's own name is displayed, from its
+ * block kind (`entities.entity_type`): marketed formulations (brands) are
+ * capitalized, every other drug record is lower case. Use this wherever a
+ * record's name is shown and its kind is known, instead of choosing
+ * formatDrugName or formatBrandName by hand.
+ */
+export function formatEntityName(name: string | null | undefined, entityType: string | null | undefined): string {
+  return entityType === 'formulation' ? formatBrandName(name) : formatDrugName(name)
+}
+
+/** Entity kind from a PCID's block, for rows that carry a PCID but no kind (block 4 = brand formulation). */
+export function formatNameByPcid(name: string | null | undefined, pcid: number | null | undefined): string {
+  return formatEntityName(name, pcid != null && pcid >= 4000000 && pcid < 5000000 ? 'formulation' : undefined)
+}
+
 /** "metformin (Glucophage)" */
 export function drugWithBrand(name: string, brand: string | null | undefined): string {
   const drug = formatDrugName(name)

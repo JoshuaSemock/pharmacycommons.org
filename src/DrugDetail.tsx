@@ -17,7 +17,7 @@ import type { Guideline } from './guidelines'
 import { sourcedValue } from './identifiers'
 import type { Segment } from './identifiers'
 import type { LabelSection } from './labels'
-import { formatBrandName, formatDrugName } from './names'
+import { formatBrandName, formatDrugName, formatEntityName, formatNameByPcid } from './names'
 import MachinePanels from './MachinePanels'
 import OpenSection from './OpenSection'
 import { pageTypeFor } from './pageSource'
@@ -157,7 +157,7 @@ export default function DrugDetail() {
   }, [slug])
 
   useEffect(() => {
-    document.title = drug ? `${formatDrugName(drug.name)} · Pharmacy Commons` : 'Pharmacy Commons'
+    document.title = drug ? `${formatEntityName(drug.name, drug.block_kind)} · Pharmacy Commons` : 'Pharmacy Commons'
   }, [drug])
 
   if (loading) {
@@ -200,7 +200,7 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
     )
   }, [])
 
-  const name = formatDrugName(drug.name)
+  const name = formatEntityName(drug.name, drug.block_kind)
   const page = useCommunityPage(drug.pcid_code, drug.block_kind ?? 'moiety', 'drug', name)
   const modelMode = page.state.status === 'ready' || page.state.status === 'loading'
 
@@ -517,7 +517,7 @@ function StatementsSection({ pcidCode, name }: { pcidCode: string; name: string 
                         className={`${STAMP_LINK} inline-block max-w-full px-2.5 py-1 font-sans text-sm [overflow-wrap:anywhere]`}
                         title={[r.qualifier, r.source].filter(Boolean).join(' · ') || undefined}
                       >
-                        {formatDrugName(r.subject.name)}
+                        {formatEntityName(r.subject.name, r.subject.entityType)}
                         {r.qualifier && <span className="font-normal"> · {r.qualifier}</span>}
                       </Link>
                     ) : (
@@ -578,7 +578,7 @@ function DrugHeader({
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">
-            {formatDrugName(drug.name)}
+            {formatEntityName(drug.name, drug.block_kind)}
           </h1>
           <span className="lp-label shrink-0 rounded px-2 py-0.5 font-mono text-sm text-ink">INN</span>
         </div>
@@ -913,7 +913,7 @@ function KeyListFact({ slug, lists }: { slug: string; lists: Loadable<EntityList
         {main}
       </Link>
       {detail && <span className="mt-1 block">{detail}</span>}
-      {entry.via_name && <span className="mt-1 block">as {formatDrugName(entry.via_name)}</span>}
+      {entry.via_name && <span className="mt-1 block">as {formatNameByPcid(entry.via_name, entry.via_pcid)}</span>}
     </span>
   )
 }
@@ -1405,7 +1405,7 @@ function ListsSection({ lists, pcid, className, style }: { lists: Loadable<Entit
               <Link to={`/lists/${l.slug}`} className={`${STAMP_LINK} flex h-full items-baseline justify-between gap-3 px-3 py-2`}>
                 <span className="min-w-0 font-sans text-base leading-snug text-ink [overflow-wrap:anywhere]">
                   {l.title}
-                  {l.via_name && <span className="block text-sm">as {formatDrugName(l.via_name)}</span>}
+                  {l.via_name && <span className="block text-sm">as {formatNameByPcid(l.via_name, l.via_pcid)}</span>}
                 </span>
                 {detail && <span className="shrink-0 font-mono text-sm text-ink">{detail}</span>}
               </Link>
