@@ -58,15 +58,26 @@ function LimitField({
   )
 }
 
-export default function LearnSettings({ progress }: { progress: Progress }) {
+export default function LearnSettings({
+  progress,
+  compact = false,
+}: {
+  progress: Progress
+  /** The rail version: a recessed tray, one column, no page-level spacing. */
+  compact?: boolean
+}) {
   const { settings, updateSettings, settingsSaveFailed, signedIn } = progress
   return (
-    <section className="pt-12" aria-labelledby="learn-settings-h">
-      <h2 id="learn-settings-h" className="font-display text-[1.25rem] font-semibold text-ink" style={{ fontFamily: 'var(--font-display)' }}>
+    <section className={compact ? '' : 'pt-12'} aria-labelledby="learn-settings-h">
+      <h2
+        id="learn-settings-h"
+        className="font-sans font-medium text-ink"
+        style={{ fontSize: compact ? 'var(--text-xl)' : '1.25rem' }}
+      >
         Study settings
       </h2>
-      <div className="lp-raised mt-4 rounded-md p-6">
-        <div className="grid gap-6 sm:grid-cols-2">
+      <div className={`${compact ? 'lp-sunken p-4' : 'lp-raised p-6'} mt-4 rounded-md`}>
+        <div className={compact ? 'grid gap-5' : 'grid gap-6 sm:grid-cols-2'}>
           <LimitField
             label="New cards per day"
             hint={`0 to ${LIMIT_BOUNDS.newItems.max}. Cards you start today count against it.`}
@@ -84,14 +95,14 @@ export default function LearnSettings({ progress }: { progress: Progress }) {
             onCommit={n => updateSettings({ limits: { reviews: n } })}
           />
         </div>
-        <label className="mt-6 flex items-start gap-2 font-sans text-[14px] text-ink">
+        <label className={`${compact ? 'mt-5' : 'mt-6'} flex items-start gap-2 font-sans text-[14px] text-ink`}>
           <input
             type="checkbox"
             className="mt-1"
             checked={settings.coverOptions}
             onChange={e => updateSettings({ coverOptions: e.target.checked })}
           />
-          <span>Hide the options of multiple-choice questions until I ask for them, so I recall the answer first.</span>
+          <span>Hide options until I ask for them{compact ? '' : ', so I recall the answer first'}.</span>
         </label>
         <p className="mt-5 font-sans text-[12.5px] text-ink" role="status">
           {settingsSaveFailed
