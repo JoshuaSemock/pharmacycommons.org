@@ -9,7 +9,7 @@
 -- Applied as three migrations:
 --   phase13a_drop_moieties_class_pcid_fkey      applied 2026-10-02
 --   phase13b_moieties_description_text          applied 2026-10-02
---   phase13c_drop_moieties_class_pcid_class_name  NOT YET APPLIED (needs approval)
+--   phase13c_drop_moieties_class_pcid_class_name  APPROVED 2026-10-30, NOT YET APPLIED (apply_migration prompt was cancelled; run in the SQL editor, then record in schema_migrations)
 
 -- phase13a
 alter table public.moieties drop constraint moieties_class_pcid_fkey;

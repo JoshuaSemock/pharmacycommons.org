@@ -157,8 +157,8 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 - **Tests:** vitest. `tests/api.test.ts` mocks `@/supabaseClient` with an in-memory
   query builder so CI runs offline — keep it that way.
 - **Code style:** default-export components; no `any`; double quotes for strings
-  containing apostrophes; format with `oxfmt` — but not 0.2, which corrupts code
-  (see Known drift). Match the existing style by hand: single quotes, no
+  containing apostrophes. There is no formatter (`oxfmt` was removed 2026-10-30 — 0.2
+  corrupted code). Match the existing style by hand: single quotes, no
   semicolons, `x => …` arrows.
 
 ## Routes (src/App.tsx)
@@ -546,10 +546,10 @@ formulations in the moiety hierarchy (phase 10).
 - Duplicate combination records exist under different name orders, e.g. "hydrochlorothiazide;
   lisinopril" and "LISINOPRIL AND HYDROCHLOROTHIAZIDE" (both surfaced by `/v1/search`).
   Merge calls are Joshua's.
-- **`oxfmt` 0.2 is unsafe:** it deletes the separators in one-line object types
-  (`{ a: string; b: number }` → `{ a: string b: number }`), and it would reformat
-  nearly every file in `src/` (the code is not actually kept in its style). Don't
-  run `pnpm format` until it's upgraded or replaced.
+- **`oxfmt` removed (2026-10-30):** 0.2 deleted the separators in one-line object types
+  (`{ a: string; b: number }` → `{ a: string b: number }`) and would have reformatted
+  nearly every file in `src/`. The dependency and the `format` script are gone; add a
+  formatter back only after trying it on a branch and reading the whole diff.
 
 - **References catalog (phase 12):** `guidelines` was *not* dropped — `entity_guidelines`
   (drug-page guideline links) has an FK to it; its 14 rows are mirrored in

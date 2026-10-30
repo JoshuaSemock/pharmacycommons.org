@@ -2,8 +2,13 @@
 # Generated for binary, large, and non-diffable file types
 
 # ---------------------------------------------------------------------------
-# Images & Graphics
+# Images & Graphics: intentionally NOT tracked by LFS
 # ---------------------------------------------------------------------------
+# The deploy workflow checks out without `lfs: true`, so an LFS-tracked image in
+# public/ or src/ would ship as a 130-byte pointer file and break the site.
+# Source images in assets/ (e.g. paper-texture.png, 21 MB) are plain blobs that
+# scripts/paper-textures.py and scripts/lichen-images.py read directly. Keep new
+# site images small (webp/jpg in public/); don't add image rules here.
 
 # ---------------------------------------------------------------------------
 # Video

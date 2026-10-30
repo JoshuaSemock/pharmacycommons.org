@@ -46,7 +46,8 @@ page; legal documents (effective 2026-10-27).
   hygiene audit — nothing to update there.)
 - *Done when:* CI green with the new behavior asserted, still offline.
 
-**3. `/api` on the site domain** *(decided 2026-09-28: Cloudflare proxy)*
+**3. `/api` on the site domain** *(decided 2026-09-28: Cloudflare proxy; Worker source written 2026-10-30 in `workers/api-proxy/`, not yet deployed)*
+- Deploy it with `npx wrangler deploy` from `workers/api-proxy/` (needs Joshua's Cloudflare login), run the checks in its README, then switch over.
 - Build/verify the `pharmacycommons-api` Worker on `pharmacycommons.org/api/*`, then follow the
   switch-over steps in `docs/machine-readable-api.md`: `api_meta.api_base`, `PC_API_BASE`,
   `VITE_PC_API_BASE`, and `CURRENT_API_BASE` in `src/developers/endpoints.ts` (still the
@@ -57,9 +58,9 @@ page; legal documents (effective 2026-10-27).
 - Browse page cards overflow to the right on phones. Fix centrally so other pages benefit.
 
 **5. Bookkeeping**
-- Log the phase 23 and 24 mint batches in `Dispatch_Log` / `PCID_Blocks` (database is the
-  authority; batch tables can be regenerated from the docs).
-- Apply phase 13c (drop `moieties.class_pcid` / `class_name`) — **destructive, needs Joshua's OK**.
+- Phase 23 and 24 mint batches: rows to paste into the workbook's `Dispatch_Log` are in
+  `docs/dispatch-log-phase23-24.md` (database is the authority; `pcid_blocks` already current).
+- Apply phase 13c (drop `moieties.class_pcid` / `class_name`) — **approved 2026-10-30**; checked no view/FK/function dependents; `apply_migration` was cancelled, so run the last two statements of `db/phase13_moieties_description_text.sql` in the SQL editor.
 - Confirm the DrugBank IDs came from the CC0 vocabulary file.
 - Fix the stale MIT mention in `docs/data-model-decisions.md`.
 
@@ -104,7 +105,7 @@ schema definition for the API.
 ## Later — legal and repo hygiene
 
 - USPTO Intent-to-Use filing (Class 42) — low priority, Joshua decides timing.
-- `oxfmt` 0.2 is unsafe — don't run `pnpm format` until upgraded or replaced.
+- ~~`oxfmt` 0.2 is unsafe~~ — removed (dependency and `format` script) 2026-10-30; no formatter now.
 - Heading sizes (`docs/design-system.md` §4) — Joshua's call.
 - `references_resources` rows labeled "Source dataset" that nothing uses (WebMD, RxList, NHS.uk,
   MACPAC, NIPH, MedChemExpress) — confirm or re-file.

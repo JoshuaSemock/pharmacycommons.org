@@ -1,0 +1,13 @@
+# pharmacycommons-api: serves pharmacycommons.org/api/* from the Supabase Edge Function.
+# Deploy:  cd workers/api-proxy && npx wrangler deploy
+# The zone is on Cloudflare (nameservers athena / igor.ns.cloudflare.com).
+name = "pharmacycommons-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Route only /api/*; every other path still comes from GitHub Pages.
+routes = [
+  { pattern = "pharmacycommons.org/api/*", zone_name = "pharmacycommons.org" },
+  { pattern = "pharmacycommons.org/api", zone_name = "pharmacycommons.org" },
+]
+workers_dev = false
