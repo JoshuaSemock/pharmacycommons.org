@@ -81,8 +81,12 @@ export default {
           : { cacheEverything: true, cacheTtlByStatus: CACHE_TTL_BY_STATUS },
     } as RequestInit)
 
-    // Pass the function's response through unchanged (body, ETag, Link, CORS,
-    // Cache-Control); a Response copy makes the headers mutable if ever needed.
-    return new Response(upstream.body, upstream)
+    // Pass the function's response through (body, ETag, Link, CORS, Cache-Control)
+    // with one exception: drop Set-Cookie. Supabase's edge adds a __cf_bm cookie
+    // scoped to supabase.co, which is meaningless on pharmacycommons.org and would
+    // make a public, cacheable API response look personalised.
+    const response = new Response(upstream.body, upstream)
+    response.headers.delete('set-cookie')
+    return response
   },
 }
