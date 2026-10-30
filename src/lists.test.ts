@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ListItem } from './api.generated'
 import {
+  compareRows,
   defaultSortKey,
   filterItems,
   formatCount,
@@ -181,5 +182,55 @@ describe('lists with a reason instead of a legal status', () => {
     const csv = listToCsv({ measure_label: null, status_label: 'Reason' }, dnc)
     expect(csv.split('\n')[0]).toBe('rank,drug,pcid,name_in_source,reason,note,also_listed_by')
     expect(csv).toContain("MPR; Pharmacist's Letter")
+  })
+})
+
+describe('compareRows', () => {
+  const generic = (name: string, pcid: number, extra: Partial<ListItem> = {}) => item({ name, pcid, ...extra })
+  const brand = (name: string, pcid: number, of: { pcid: number; name: string }, status: string) =>
+    item({
+      name,
+      pcid,
+      slug: name.toLowerCase(),
+      entity_type: 'formulation',
+      legal_status: status,
+      component_pcid: of.pcid,
+      component_slug: of.name,
+      component_name: of.name,
+    })
+
+  it('puts a brand on the same row as its generic from another list', () => {
+    const doNotCrush = { items: [generic('metformin', 1001, { legal_status: 'Modified-release' })] }
+    const brands = { items: [brand('Glucophage XR', 4001, { pcid: 1001, name: 'metformin' }, 'High')] }
+    const rows = compareRows([doNotCrush, brands])
+    expect(rows).toHaveLength(1)
+    expect(rows[0].key).toBe('1001')
+    expect(rows[0].cells[0]).toHaveLength(1)
+    expect(rows[0].cells[1].map(i => i.name)).toEqual(['Glucophage XR'])
+  })
+
+  it('keeps every brand that shares a generic, in one cell', () => {
+    const brands = {
+      items: [
+        brand('Abilify', 4002, { pcid: 1002, name: 'aripiprazole' }, 'High'),
+        brand('Abilify Maintena', 4003, { pcid: 1002, name: 'aripiprazole' }, 'High'),
+      ],
+    }
+    const rows = compareRows([brands, { items: [] }])
+    expect(rows).toHaveLength(1)
+    expect(rows[0].cells[0].map(i => i.name)).toEqual(['Abilify', 'Abilify Maintena'])
+    expect(rows[0].cells[1]).toEqual([])
+  })
+
+  it('still keeps only the first entry for a plain drug repeated in one list', () => {
+    const list = { items: [generic('toprol', 1003, { note: 'tablet' }), generic('toprol', 1003, { note: 'capsule' })] }
+    const rows = compareRows([list])
+    expect(rows[0].cells[0]).toHaveLength(1)
+    expect(rows[0].cells[0][0].note).toBe('tablet')
+  })
+
+  it('keys term entries by their source name', () => {
+    const terms = { items: [item({ name: 'U', pcid: null, slug: null, entity_type: 'term' })] }
+    expect(compareRows([terms])[0].key).toBe('term:U')
   })
 })

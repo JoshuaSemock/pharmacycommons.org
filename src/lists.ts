@@ -167,3 +167,32 @@ export function formatCount(n: number): string {
   if (n >= 1_000) return `${Math.round(n / 1_000).toLocaleString()} K`
   return n.toLocaleString()
 }
+
+/** One row of the compare table: a drug (or term) and, per list, the entries that mention it. */
+export type CompareRow = { key: string; slug: string | null; name: string; cells: ListItem[][] }
+
+/**
+ * Rows for /lists/compare. Entries are matched by PCID, except that an entry with a
+ * `component_pcid` (a brand-name entry pointing at its generic) is matched on that, so a brand
+ * list lines up with generic lists. A list normally keeps its first entry for a drug; entries that
+ * carry a component are all kept, because several brands can share one generic.
+ */
+export function compareRows(lists: Pick<ListDetail, 'items'>[]): CompareRow[] {
+  const byKey = new Map<string, CompareRow>()
+  lists.forEach((list, col) => {
+    for (const item of list.items) {
+      const viaComponent = item.component_pcid != null
+      const pcid = viaComponent ? item.component_pcid : item.pcid
+      const key = pcid ? String(pcid) : `term:${item.source_name}`
+      let row = byKey.get(key)
+      if (!row) {
+        const slug = viaComponent ? (item.component_slug ?? null) : item.slug
+        const name = viaComponent ? (item.component_name ?? item.name) : item.name
+        row = { key, slug, name: slug ? formatDrugName(name) : name, cells: lists.map(() => []) }
+        byKey.set(key, row)
+      }
+      if (row.cells[col].length === 0 || viaComponent) row.cells[col].push(item)
+    }
+  })
+  return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+}
