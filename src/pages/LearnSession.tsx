@@ -15,6 +15,8 @@ import Button from '../components/Button'
 import LearnRail from '../components/LearnRail'
 import { getCollection, getItemsByIds } from '../learn/api'
 import { cramQueue, cramRequeue } from '../learn/cram'
+import FilterPanel from '../learn/FilterPanel'
+import { applyFilters, parseSelection, serializeSelection, type Selection } from '../learn/filters'
 import { buildQueue, requeue, type QueueEntry } from '../learn/queue'
 import { intervalPreview } from '../learn/interval'
 import { gradeMcq, newState, schedule, SCHEDULER_VERSION } from '../learn/scheduler'
@@ -43,9 +45,20 @@ function uuid(): string {
 export default function LearnSession() {
   const { collectionId = '' } = useParams<{ collectionId: string }>()
   const isDue = collectionId === 'due'
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   // Cram: every card once, shuffled, nothing scheduled or saved (src/learn/cram.ts).
   const cram = !isDue && params.get('mode') === 'cram'
+  // Question filters (src/learn/filters.ts): kept in the URL as ?f=schedule:2,importance:high.
+  const filterKey = params.get('f') ?? ''
+  const selection = useMemo(() => parseSelection(filterKey), [filterKey])
+  const builtKey = useRef<string | null>(null)
+  const changeFilters = (next: Selection) => {
+    const q = new URLSearchParams(params)
+    const f = serializeSelection(next)
+    if (f) q.set('f', f)
+    else q.delete('f')
+    setParams(q, { replace: true })
+  }
   const progress = useProgress()
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const [missing, setMissing] = useState(false)
@@ -88,19 +101,29 @@ export default function LearnSession() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionId, isDue, isDue ? progress.ready : false])
 
-  // Build the queue once content and progress are both in.
+  // Build the queue once content and progress are both in, and again whenever the filters change.
+  const shown = useMemo(() => (loaded ? applyFilters(loaded.items, selection) : []), [loaded, selection])
   useEffect(() => {
-    if (!loaded || !progress.ready || queue) return
+    if (!loaded || !progress.ready) return
+    if (queue && builtKey.current === filterKey) return
+    if (queue) {
+      setTally({ answered: 0, again: 0, correct: 0, mcq: 0 })
+      setRevealed(false)
+      setPicked(null)
+      setUnsure(false)
+      setUncovered(false)
+    }
+    builtKey.current = filterKey
     if (cram) {
-      setQueue(cramQueue(loaded.items, seed.current))
+      setQueue(cramQueue(shown, seed.current))
       shownAt.current = Date.now()
       return
     }
-    const built = buildQueue(loaded.items, progress.states, new Date(), progress.limits, { newToday: progress.newToday })
+    const built = buildQueue(shown, progress.states, new Date(), progress.limits, { newToday: progress.newToday })
     // The due queue only holds cards already started; buildQueue would add new ones for items without state, so drop them.
     setQueue(isDue ? built.entries.filter(e => e.state) : built.entries)
     shownAt.current = Date.now()
-  }, [loaded, progress.ready, queue, progress.states, progress.limits, progress.newToday, isDue, cram])
+  }, [loaded, shown, filterKey, progress.ready, queue, progress.states, progress.limits, progress.newToday, isDue, cram])
 
   const current = queue && queue.length > 0 ? queue[0] : null
   const order = useMemo(() => (current ? optionOrder(current.item, seed.current) : []), [current])
@@ -168,7 +191,7 @@ export default function LearnSession() {
     if (!loaded) return
     seed.current = uuid()
     setTally({ answered: 0, again: 0, correct: 0, mcq: 0 })
-    setQueue(cramQueue(loaded.items, seed.current))
+    setQueue(cramQueue(shown, seed.current))
   }
 
   // Multiple choice: grade now, then the learner reads the explanation and continues.
@@ -283,6 +306,7 @@ export default function LearnSession() {
             Saved on this device only. <Link to="/account" className="underline">Sign in</Link> to keep your progress across devices.
           </p>
         )}
+        <FilterPanel items={loaded.items} selection={selection} matching={shown.length} onChange={changeFilters} />
         <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/learn" className="lp-raised lp-press rounded-md px-4 py-2 font-sans text-[13.5px] font-medium text-ink">
             Back to Learn
@@ -335,6 +359,7 @@ export default function LearnSession() {
           {loaded.title}{cram ? ' · Cram' : ''} · {queue.length} left{tally.mcq > 0 ? ` · ${tally.correct} of ${tally.mcq} correct` : ''}
         </p>
       </div>
+      <FilterPanel items={loaded.items} selection={selection} matching={shown.length} onChange={changeFilters} />
 
       {cram && (
         <p className="mt-3 font-sans text-[12.5px] text-ink">

@@ -103,7 +103,7 @@ Inspect each source's real shape before writing its generator, and report what y
 | `class_of` | `class_members` for core moieties (inspect `class_type` values first) | "{drug} belongs to which class?" Distractors are sibling classes of the same `class_type`. |
 | `brand_generic` (brand → generic) | **`learn_brand_list`** (owner's Brands.xlsx, 1,252 ready rows, importance High / Medium / Low; phase 23, 2026-10-29). Replaced the Notable-Drugs generator `learn_gen_brand_generic()` (21f/21g; its 465 items are archived). | Items `brand_list:<sheet_id>`; distractors from the sheet, same therapeutic domain first, never sharing a first-word ingredient with the answer. Rows with status `held`/`excluded` are skipped. |
 | `jc_dnu` | `joint-commission-do-not-use` (19 terms) | Term → why it is unsafe and the preferred form (from `note`). |
-| `mpje_controlled` | `georgia-mpje-controlled-substances` (405) | "What is the Georgia schedule for {drug}?" Items carry `jurisdiction = 'US-GA'`. Joshua's own compilation. |
+| `mpje_controlled` | **Retired 2026-10-30** (list and collection removed; items archived). | Replaced by `federal_schedule` over `federal-controlled-substances-high`/`-medium` ("Under federal law, which schedule is {drug}?", 174 items, draft until approved). |
 
 ### 5.3 Generator quality gates (each is an acceptance criterion)
 
@@ -346,3 +346,9 @@ create table if not exists public.learn_user_settings (
 **Brand names by importance (phase 23g, 2026-10-29):** three official collections share the 1,254 items from `learn_brand_list`: "Brand names: High importance" (`brand-generic-high`, 613), "Brand names: High + Medium" (`brand-generic-high-medium`, 912) and "Brand names: All" (`brand-generic`, 1,254). Item tags are lowercase `importance:high|medium|low`. FSRS state is keyed (user, item), so studying one set advances the others. Refresh with `db/phase23g_brand_importance_collections.sql`.
 
 The same 1,254 brands are also published as the list `brand-names` ("Brand Names by Importance", phase 23h) under `/lists/brand-names`; its Importance column filters High / Medium / Low.
+
+---
+
+## Question filters (2026-10-30)
+
+The study page has a "Filter questions" panel (`src/learn/FilterPanel.tsx`, logic in `src/learn/filters.ts`). A filter is a `key:value` tag on an item; the panel shows a group only when it splits the collection (two or more values). Choices OR within a group and AND across groups, and live in the URL as `?f=schedule:2,schedule:3,importance:high` (works with cram and the due queue). Changing a filter rebuilds the queue and resets the session tally; answers already saved are kept. Groups today: `schedule` (federal items, tags `schedule:1`–`5`; migration `db/phase24k`) and `importance` (`importance:high|medium|low` on the brand and federal items). **To add a filter,** tag the items `key:value` and add the key to `FILTER_GROUPS` in `filters.ts`.
