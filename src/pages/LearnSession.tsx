@@ -215,8 +215,25 @@ export default function LearnSession() {
 
   // Once an answer is in, focus goes to Continue, so Enter or Space moves on.
   useEffect(() => {
-    if (picked !== null) document.querySelector<HTMLButtonElement>('[data-learn-continue]')?.focus()
+    // preventScroll: focusing must not jump the page; Continue now sits right under the options.
+    if (picked !== null) document.querySelector<HTMLButtonElement>('[data-learn-continue]')?.focus({ preventScroll: true })
   }, [picked])
+
+  // When the next card appears, bring it to the middle of the screen instead of leaving the page where the
+  // previous card's explanation ended (the old scroll position is far below the new, shorter card on a phone).
+  const cardRef = useRef<HTMLElement | null>(null)
+  const hasShownCard = useRef(false)
+  useEffect(() => {
+    if (!current) return
+    if (!hasShownCard.current) {
+      hasShownCard.current = true // first card of the session: leave the page where it is
+      return
+    }
+    const el = cardRef.current
+    if (!el) return
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' })
+  }, [current])
 
   // Keyboard, multiple choice: 1-5 pick that option (Shift+number = "guessing"), U toggles "not sure", Enter reveals covered options.
   useEffect(() => {
@@ -367,7 +384,7 @@ export default function LearnSession() {
         </p>
       )}
 
-      <article className="lp-raised mt-6 rounded-md p-6 sm:p-8" aria-label="Card">
+      <article ref={cardRef} className="lp-raised mt-6 rounded-md p-6 sm:p-8" aria-label="Card">
         <p className="font-sans text-[12.5px] text-ink">{item.topic}</p>
         <h1 className="learn-prompt mt-2 text-ink">{item.prompt}</h1>
 
@@ -420,6 +437,13 @@ export default function LearnSession() {
                 )
               })}
             </div>
+            {answered && (
+              <div className="mt-5">
+                <Button data-learn-continue="" onClick={continueMcq}>
+                  Continue
+                </Button>
+              </div>
+            )}
             {answered && picked !== null && pending.current && (() => {
               const ok = pending.current.correct
               const right = order.findIndex(o => o.is_correct)
@@ -497,14 +521,8 @@ export default function LearnSession() {
         )}
       </article>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2.5">
-        {isMcq ? (
-          answered && (
-            <Button data-learn-continue="" onClick={continueMcq}>
-              Continue
-            </Button>
-          )
-        ) : !revealed ? (
+      <div className={`mt-6 flex flex-wrap items-center gap-2.5${isMcq ? ' hidden' : ''}`}>
+        {isMcq ? null : !revealed ? (
           <Button onClick={() => setRevealed(true)}>Show answer</Button>
         ) : cram ? (
           <>
