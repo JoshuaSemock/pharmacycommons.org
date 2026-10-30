@@ -53,7 +53,7 @@ Drug pages and list pages get a pill, "Study this topic (N items)", only when pu
 - Read `docs/design-system.md` first. Use the existing `Button`, `Card`, `Stamp`, `PaperSelect`. No native `<select>`, no new fonts or colors. IBM Plex Sans Condensed throughout; Mono only for codes and IDs.
 - Match the mobile navigation spec (thumb-zone bottom nav). A sticky study action bar must sit above the bottom nav and not overflow horizontally. Tap targets are at least 44px.
 - Import Supabase via `getSupabase()` (`src/db.ts`), never statically, so the SDK stays out of the first-load bundle.
-- Code style: TypeScript, no `any`, default-export components, single quotes and no semicolons to match the repo, double quotes only for strings containing apostrophes. Do **not** run `pnpm format` (oxfmt 0.2 corrupts code).
+- Code style: TypeScript, no `any`, default-export components, single quotes and no semicolons to match the repo, double quotes only for strings containing apostrophes. There is no formatter (`oxfmt` was removed 2026-10-30 because 0.2 corrupted code).
 - Learner code lives in `src/learn/` (`scheduler.ts`, `queue.ts`, `shuffle.ts`, `guest.ts`, `api.ts`, `types.ts`), with tests as `src/learn/*.test.ts`. Tests mock `@/supabaseClient` offline, as `tests/api.test.ts` does.
 
 ---
