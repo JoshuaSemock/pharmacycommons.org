@@ -20,7 +20,7 @@ export const API_BASES = {
   site: 'https://pharmacycommons.org/api',
   supabase: 'https://nenwovhyrdcdkhxzjiiv.supabase.co/functions/v1/api',
 } as const
-export const CURRENT_API_BASE: string = API_BASES.supabase
+export const CURRENT_API_BASE: string = API_BASES.site
 
 export const SITE_BASE = 'https://pharmacycommons.org'
 
