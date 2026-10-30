@@ -44,7 +44,7 @@ for every file produced.**
 - Aggregated datasets: **CC0 1.0 for Pharmacy Commons–authored content** (decided
   2026-09-24, matches the site footer). Third-party fields keep their source license —
   recorded in `api_meta.data_license_scope`. Set by `db/phase8j_data_license.sql`.
-  Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
+  **Settled — do not re-ask Joshua about the data license.** Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
   CAS Common Chemistry rows (physiochemical) stay CC BY-NC 4.0 whatever we choose.
   ATC and ChemOnt restrict commercial redistribution — never present them as CC0.
 - **Legal documents** (effective 2026-10-27; operator Pharmacy of the Commons, LLC):
@@ -330,26 +330,27 @@ it has changed once). Sheets: `Table_Contents`, `Sandbox`, `Dispatch_Log`,
 `postgres-sheet-audit`. Watch for mojibake (UTF-8 read as cp1252) in new imports.
 Slash-named rows can be unit/serotype separators, not moiety boundaries.
 
-## Current status (2026-09-25, verified live)
+## Current status (counts re-queried 2026-10-30; rows marked † are still the 2026-09-25 figures)
 | Table / object | Rows |
 | --- | --- |
-| `entities` | 31,297 |
-| `moieties` / `combinations` / `precise_forms` / `formulations` | 15,610 / 2,350 / 1,451 / 6,581 |
-| `drug_classes` / `class_members` | 4,981 / 241,919 |
-| `clinical_statements` / `predicates` | 6,695 (6,443 FDA `has_component`) / 37 |
-| `chemont_links` | 240,094 |
-| `fda_applications` / `fda_products` | 6,372 / 12,261 — `pcid` linked on 5,161 / 10,631 |
-| `fda_product_ingredients` | 15,630 (14,893 linked to a moiety) |
-| `label_documents` / `label_sections` / `label_document_formulations` | 52,571 / 2.33M / 98,251 |
-| `rxnorm_brands` / `guidelines` | 12,417 / 14 |
-| `references_resources` (phase 12, 2026-09-30) | 80 (25 `Source datasets`; 14 linked to `guidelines` by `guideline_id`) |
-| `entity_versions` / `entity_changes` | 31,248 (baseline) / 12,962 |
-| `moiety_hierarchy` (matview) | 11,544 (1,360 precise_form · 6,437 combination · 3,747 formulation) |
-| `entity_brand_names` / `ingredient_moiety_map` | 6,896 / 16,559 |
+| `entities` | 32,129 |
+| `moieties` / `combinations` / `precise_forms` / `formulations` | 15,969 / 2,512 / 1,451 / 6,893 |
+| `drug_classes` / `class_members` | 4,981 / 241,880 |
+| `clinical_statements` / `predicates` | 7,029 (6,443 FDA `has_component` †) / 37 † |
+| `chemont_links` † | 240,094 |
+| `fda_applications` / `fda_products` † | 6,372 / 12,261 — `pcid` linked on 5,161 / 10,631 |
+| `fda_product_ingredients` † | 15,630 (14,893 linked to a moiety) |
+| `label_documents` / `label_sections` / `label_document_formulations` † | 52,571 / 2.33M / 98,251 |
+| `rxnorm_brands` / `guidelines` † | 12,417 / 14 |
+| `references_resources` † (phase 12, 2026-09-30) | 80 (25 `Source datasets`; 14 linked to `guidelines` by `guideline_id`) |
+| `entity_versions` / `entity_changes` | 46,957 / 15,333 |
+| `moiety_hierarchy` (matview) | 12,042 |
+| `lists` / `list_items` | 42 / 7,044 |
+| `entity_brand_names` / `ingredient_moiety_map` † | 6,896 / 16,559 |
 | `physiochemical` | **0** (CAS backfill not run) |
 
-`pcid_blocks.next_pcid` (2026-10-03): 1→1015681, 2→2002591, 3→3001452, 4→4006582,
-5→5004982, 6→6000077, 7→7000014, 8→8000028, 9→9000060, 10→10000039.
+`pcid_blocks.next_pcid` (2026-10-30): 1→1015973, 2→2002613, 3→3001452, 4→4006894,
+5→5004982, 6→6000078, 7→7000014, 8→8000029, 9→9000060, 10→10000047.
 
 **Phase 15 — community editing (2026-10-04, `db/phase15_community_editing.sql`,
 `docs/user-edits.md`):** tables `page_content`, `page_revisions`, `page_links`,
@@ -482,7 +483,7 @@ Lists (Phase 9, `db/phase9-lists.md`): 38 published lists (checked 2026-10-07) �
 
 Deployed Edge Functions (9): `api` (public), `publish-page` (phase 16), `label-text`, `drugsfda-ingest`,
 `rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`.
-64 migrations applied, latest `phase10e_fda_ingredients_form_idx` (phase 10a–10e: FDA product → PCID linking).
+149 migrations applied (checked 2026-10-30), latest version 20261030190349 (phase 24k, Learn federal filter tags). All 9 deployed functions have source under `supabase/functions/`. Live migration names don't always match repo file names (e.g. repo `phase24*` = live `phase19*_federal_*`) — match by version, not name.
 
 Shipped: 9-block schema + RLS; full workbook load; Supabase-backed frontend;
 moiety-only search with hierarchy nesting; DailyMed labels + openFDA label-text
@@ -493,7 +494,7 @@ pages, compare view, Lists card on drug pages); FDA product → PCID linking and
 formulations in the moiety hierarchy (phase 10).
 
 ## Known drift & gaps (fix or confirm — don't build on top of them)
-**Repo ↔ Supabase ↔ claude.ai Project out of sync:**
+**Repo ↔ Supabase ↔ claude.ai Project (re-checked 2026-10-30):** the three formerly missing Edge Functions (`rxclass-ingest`, `chemont-terms`, `classyfire-ingest`) are in the repo; the `sitemap` script points at `scripts/postbuild.mjs`; all dead files listed in the old roadmap are gone. Remaining:
 - **Reconstructed db/ files (2026-10-13):** the lost originals were rebuilt from the live catalog,
   not recovered: `01_core_schema_v2.sql`, `phase4_fda_ingestion_tables.sql` (also the label tables and
   `entity_labels`), `phase4_physiochemical_table.sql`, `phase8_class_system.sql` (class tables,
@@ -527,6 +528,11 @@ formulations in the moiety hierarchy (phase 10).
   `needs_manual_review.csv`.
 - Tests: `api.test.ts` / `integration.test.ts` not yet updated for moiety-only
   filtering and hierarchy.
+- **Phase 13c still unapplied (2026-10-30):** `moieties.class_pcid` and `class_name` still exist (live column check). Dropping them is destructive — needs Joshua's approval.
+- **No hide-from-search mechanism exists yet (2026-10-30):** the 137 non-core `moieties` rows are unchanged. On 2026-10-21 Joshua chose *hide from search only* (keep rows, PCIDs and list entries) over retiring/deleting, but neither the schema (no flag column) nor the search code (no `term_type` filter in `src/api.ts`) implements it. Next code task.
+- **Dispatch_Log / PCID_Blocks not updated** for the phase 23 and 24 mint batches (database is the authority; regenerate the batch tables from `docs/federal-controlled-substances.md` and the phase 23 section).
+- `tests/integration.test.ts` no longer exists (removed in the hygiene audit); `tests/api.test.ts` remains the stale one.
+- Typo moiety `succinylchloline` (1002643) duplicates succinylcholine — merge is Joshua's call.
 - **Heading sizes:** the unlayered `h1`–`h6` rules beat Tailwind `text-*` utilities;
   see `docs/design-system.md` §4 (Joshua's call to change).
 - `phase8i_public_read_surfaces` and `phase8j_data_license` were **not actually applied
@@ -555,9 +561,9 @@ formulations in the moiety hierarchy (phase 10).
   `.gitattributes` routes `*.xlsx` through LFS, so git shows it modified on every checkout.
 
 ## Decisions that belong to Joshua — ask, don't decide
-- `/api` hosting on the site domain; trademark timing.
+- Trademark timing. (`/api` hosting is decided: Cloudflare proxy, 2026-09-28; the remaining work is building/verifying the Worker and flipping `CURRENT_API_BASE` — not a decision.)
 - Merge/duplicate calls: `_unresolved_merges.csv` (8 targets), `merge_candidates.csv`
-  (`amobrarbital`, THC pair with **disagreeing controlled-substance schedules**),
+  (`amobrarbital`, THC pair with **disagreeing controlled-substance schedules**; note phase 24 now links controlled substances to PCIDs, so check the THC pair against `federal_controlled_substances` before ruling),
   `fda_moiety_conflicts_2026-09-25.csv` (65 Type A duplicate-record pairs such as
   albuterol/Salbutamol, aspirin/Acetylsalicylic acid), manual-review rows.
 - Canonical schema / data-architecture choices, font/design direction, and anything
