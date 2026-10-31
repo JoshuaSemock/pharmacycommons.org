@@ -30,5 +30,5 @@ with `verify_jwt = false`.
    - Supabase, Edge Functions, Secrets: `PC_API_BASE = https://pharmacycommons.org/api`
    - `src/developers/endpoints.ts`: `CURRENT_API_BASE = API_BASES.site`
 
-`CURRENT_API_BASE` is deliberately **still** `API_BASES.supabase`: flipping it before
-the Worker is live would break the Developers page console.
+Switch-over done 2026-10-30 (`CURRENT_API_BASE = API_BASES.site`). Do not flip it back
+without checking that the Worker still answers: the Developers page console depends on it.
