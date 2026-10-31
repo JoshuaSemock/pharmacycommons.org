@@ -50,7 +50,7 @@ page; legal documents (effective 2026-10-27).
 - *Done when:* CI green with the new behavior asserted, still offline.
 
 **3. `/api` on the site domain** *(decided 2026-09-28: Cloudflare proxy; **live 2026-10-30**: Worker deployed from `workers/api-proxy/`, `PC_API_BASE` fixed, `CURRENT_API_BASE` flipped)*
-- Done 2026-10-30: deployed, checked (200, CORS, no `Set-Cookie`, clean `links.*`, `openapi.json` on the site domain). Open: edge cache not engaging (see CLAUDE.md); retired PCIDs return 410 without a `replaced_by` pointer or 301.
+- Done 2026-10-30: deployed, checked (200, CORS, no `Set-Cookie`, clean `links.*`, `openapi.json` on the site domain). Open: edge cache not engaging (see CLAUDE.md); retired PCIDs return 410 without a `replaced_by` pointer or 301 (fix written: `db/phase26a_api_retired_replacement.sql` + `supabase/functions/api`, not yet applied/deployed).
 - Build/verify the `pharmacycommons-api` Worker on `pharmacycommons.org/api/*`, then follow the
   switch-over steps in `docs/machine-readable-api.md`: `api_meta.api_base`, `PC_API_BASE`,
   `VITE_PC_API_BASE`, and `CURRENT_API_BASE` in `src/developers/endpoints.ts` (still the
