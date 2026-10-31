@@ -83,6 +83,25 @@ function passError(req: Request, j: Json): Response | null {
   return null;
 }
 
+/**
+ * A retired PCID that has a live replacement (phase 26a puts replaced_by in the 410 body):
+ * 301 to the same record document on the replacement, keeping .json/.jsonld and the query string.
+ * Only the record document redirects. Versions, changes and members belong to the retired record
+ * and keep the 410, which names the replacement in its body.
+ */
+function redirectRetired(j: Json, url: URL, collection: string, rawRef: string): Response | null {
+  if (!j || j.error !== true || j.code !== "retired" || typeof j.replaced_by !== "string") return null;
+  const ext = rawRef.match(/\.(jsonld|json)$/i)?.[0] ?? "";
+  return new Response(null, {
+    status: 301,
+    headers: {
+      ...CORS,
+      Location: `${API_BASE}/v1/${collection}/${j.replaced_by}${ext}${url.search}`,
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
 // Postgres jsonb stores keys in its own order; serve documents top-down instead:
 // identity first, then data sections, then the envelope.
 const DOC_ORDER = [
@@ -205,6 +224,8 @@ Deno.serve(async (req) => {
 
       if (!sub) {
         const doc = await rpc("api_entity_document", { p_ref: ref });
+        const moved = redirectRetired(doc, url, parts[1], rawRef);
+        if (moved) return moved;
         const err = passError(req, doc);
         if (err) return err;
         return send(req, ordered(doc), { ld, compact, ...documentHeaders(doc) });
