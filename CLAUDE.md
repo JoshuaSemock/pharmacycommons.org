@@ -254,6 +254,7 @@ History: `entity_versions` (immutable snapshots; baseline captured for all PCIDs
 Cloudflare; a Worker on `pharmacycommons.org/api/*` forwards to the function. Switch-over
 steps (after the Worker is verified) are in `docs/machine-readable-api.md`; in code the
 only switch is `CURRENT_API_BASE` in `src/developers/endpoints.ts`.
+**Live 2026-10-30:** Worker `pharmacycommons-api` deployed (source `workers/api-proxy/`, strips upstream `Set-Cookie`), `PC_API_BASE` secret = `https://pharmacycommons.org/api` (SHA-256 `8bee06e0…c1a8`; it had held markdown-wrapped text since 2026-09-28, which broke `links.self`/`links.docs`), `CURRENT_API_BASE = API_BASES.site`. The edge cache does not engage (consecutive requests show different `Date`); likely the `cf` fetch cache vs `Vary: Accept` — switch to the Workers Cache API if load requires it.
 
 **Endpoints are listed once**, in `src/developers/endpoints.ts`. The Developers page
 console and reference, the code snippets, `dist/openapi.json` and `dist/llms.txt` are all
@@ -521,14 +522,16 @@ formulations in the moiety hierarchy (phase 10).
   under the drug name; Joshua writes them in a spreadsheet keyed by PCID and Claude
   loads them, blanks skipped) replaces `class_name`/`class_pcid` on moieties. Applied:
   13a (FK drop) and 13b (new column). **13c (drop `moieties.class_pcid` and
-  `moieties.class_name`) is not applied yet** — see `db/phase13_moieties_description_text.sql`.
+  `moieties.class_name`) applied 2026-10-30** (run by Joshua in the SQL editor, recorded as
+  `20261030232500`; see `db/phase13_moieties_description_text.sql`).
   The other three blocks still carry unused `class_pcid`/`class_name`.
 - `physiochemical` empty; ECOTOX/PPCP loader not written (needs real archive schema).
 - `Unclassified_Holding`: 634 rows still parked (no identifiers); 157 rows in
   `needs_manual_review.csv`.
 - Tests: `api.test.ts` / `integration.test.ts` not yet updated for moiety-only
   filtering and hierarchy.
-- **Phase 13c still unapplied (2026-10-30):** `moieties.class_pcid` and `class_name` still exist (live column check). Dropping them is destructive — needs Joshua's approval.
+- **Phase 25a applied 2026-10-30** (`db/phase25a_noncore_moiety_cleanup.sql`, run in the SQL editor, recorded as `20261030232600`): 55 non-core moieties merged or deleted (40 salts, 14 products, 1 junk), 13 relabelled Core; old PCIDs in `pcid_retired` with `replaced_by_pcid`; 69 non-core rows remain by design and still need the hide-from-search flag.
+- **Retired PCIDs return 410, not 301 (checked 2026-10-30):** `api_not_found()` reports `retired` and never reads `replaced_by_pcid`; the Edge Function has no redirect. Fix: add `replaced_by` to the 410 body and 301 to the replacement.
 - **No hide-from-search mechanism exists yet (2026-10-30):** the 137 non-core `moieties` rows are unchanged. On 2026-10-21 Joshua chose *hide from search only* (keep rows, PCIDs and list entries) over retiring/deleting, but neither the schema (no flag column) nor the search code (no `term_type` filter in `src/api.ts`) implements it. Next code task.
 - **Dispatch_Log / PCID_Blocks not updated** for the phase 23 and 24 mint batches (database is the authority; regenerate the batch tables from `docs/federal-controlled-substances.md` and the phase 23 section).
 - `tests/integration.test.ts` no longer exists (removed in the hygiene audit); `tests/api.test.ts` remains the stale one.
@@ -561,7 +564,7 @@ formulations in the moiety hierarchy (phase 10).
   `.gitattributes` routes `*.xlsx` through LFS, so git shows it modified on every checkout.
 
 ## Decisions that belong to Joshua — ask, don't decide
-- Trademark timing. (`/api` hosting is decided: Cloudflare proxy, 2026-09-28; the remaining work is building/verifying the Worker and flipping `CURRENT_API_BASE` — not a decision.)
+- Trademark timing. (`/api` hosting is decided: Cloudflare proxy, 2026-09-28; done 2026-10-30: Worker deployed, `CURRENT_API_BASE` flipped.)
 - Merge/duplicate calls: `_unresolved_merges.csv` (8 targets), `merge_candidates.csv`
   (`amobrarbital`, THC pair with **disagreeing controlled-substance schedules**; note phase 24 now links controlled substances to PCIDs, so check the THC pair against `federal_controlled_substances` before ruling),
   `fda_moiety_conflicts_2026-09-25.csv` (65 Type A duplicate-record pairs such as

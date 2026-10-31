@@ -6,8 +6,7 @@
 > re-opened. Conventions and live numbers live in `CLAUDE.md`; history in
 > `docs/project-history.md`.
 >
-> *Not verified this pass:* whether the Cloudflare Worker for `/api` is live, the
-> Browse-page mobile overflow, and the FDA "Products & approvals" frontend card.
+> *Not verified this pass:* the Browse-page mobile overflow, and the FDA "Products & approvals" frontend card.
 
 ## Where things stand
 
@@ -20,7 +19,7 @@
 | 8 | Drug classes, machine-readable API v1, version history, permalinks | ✅ Done; `/api` on the site domain still to switch over |
 | 9 | Lists | ✅ Shipped: 42 lists, 7,044 items, compare view |
 | 11–12 | API search; references catalog | ✅ Done |
-| 13–16 | Drug descriptions, dictionary, community editing, page editor/publish | ✅ Shipped (13c column drop pending approval) |
+| 13–16 | Drug descriptions, dictionary, community editing, page editor/publish | ✅ Shipped (13c column drop applied 2026-10-30) |
 | 17–19 | Blog comments, product packaging, network, signup profiles | ✅ Shipped |
 | 21–24 | Learn (flashcards/questions, FSRS), brand-name learner, federal controlled substances | ✅ Shipped — Learn published 2026-10-27; 10 collections (9 published, Georgia MPJE archived) |
 
@@ -31,7 +30,7 @@ page; legal documents (effective 2026-10-27).
 
 ## Now — finish what's half-done
 
-**1. Non-core moiety cleanup** *(2026-10-30: Joshua chose delete junk / relabel / merge instead of hide-only; `db/phase25a_noncore_moiety_cleanup.sql` written, dry-run default, **not yet run** — `execute_sql` confirmations were cancelled; run it in the SQL editor, then refresh `moiety_hierarchy`, `ingredient_moiety_map`, `entity_brand_names`)*
+**1. Non-core moiety cleanup** *(2026-10-30: Joshua chose delete junk / relabel / merge instead of hide-only; `db/phase25a_noncore_moiety_cleanup.sql` written, **applied 2026-10-30** in the SQL editor as `20261030232600`; `moiety_hierarchy`, `ingredient_moiety_map`, `entity_brand_names` refreshed)*
 - Deletes 1 junk row, relabels 13 single compounds to Core moiety, merges 40 salts and 14 product rows into their parent drug moieties (55 PCIDs retired with `replaced_by_pcid`). 69 rows remain non-core by design (13 salts, 28 products, 28 combinations): ion-parent salts/products, true combinations (vaccines etc.), no-parent rows, and statute-text rows.
 - The hide-from-search flag below is still needed for what remains.
 
@@ -50,8 +49,8 @@ page; legal documents (effective 2026-10-27).
   hygiene audit — nothing to update there.)
 - *Done when:* CI green with the new behavior asserted, still offline.
 
-**3. `/api` on the site domain** *(decided 2026-09-28: Cloudflare proxy; Worker source written 2026-10-30 in `workers/api-proxy/`, not yet deployed)*
-- Deploy it with `npx wrangler deploy` from `workers/api-proxy/` (needs Joshua's Cloudflare login), run the checks in its README, then switch over.
+**3. `/api` on the site domain** *(decided 2026-09-28: Cloudflare proxy; **live 2026-10-30**: Worker deployed from `workers/api-proxy/`, `PC_API_BASE` fixed, `CURRENT_API_BASE` flipped)*
+- Done 2026-10-30: deployed, checked (200, CORS, no `Set-Cookie`, clean `links.*`, `openapi.json` on the site domain). Open: edge cache not engaging (see CLAUDE.md); retired PCIDs return 410 without a `replaced_by` pointer or 301.
 - Build/verify the `pharmacycommons-api` Worker on `pharmacycommons.org/api/*`, then follow the
   switch-over steps in `docs/machine-readable-api.md`: `api_meta.api_base`, `PC_API_BASE`,
   `VITE_PC_API_BASE`, and `CURRENT_API_BASE` in `src/developers/endpoints.ts` (still the
@@ -64,7 +63,7 @@ page; legal documents (effective 2026-10-27).
 **5. Bookkeeping**
 - Phase 23 and 24 mint batches: rows to paste into the workbook's `Dispatch_Log` are in
   `docs/dispatch-log-phase23-24.md` (database is the authority; `pcid_blocks` already current).
-- Apply phase 13c (drop `moieties.class_pcid` / `class_name`) — **approved 2026-10-30**; checked no view/FK/function dependents; `apply_migration` was cancelled, so run the last two statements of `db/phase13_moieties_description_text.sql` in the SQL editor.
+- Phase 13c (drop `moieties.class_pcid` / `class_name`) — **applied 2026-10-30** by Joshua in the SQL editor.
 - Confirm the DrugBank IDs came from the CC0 vocabulary file.
 - Fix the stale MIT mention in `docs/data-model-decisions.md`.
 

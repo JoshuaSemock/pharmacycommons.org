@@ -23,8 +23,8 @@ PCID therefore has, from one source of truth:
 | Documentation and live console | `https://pharmacycommons.org/developers` |
 
 `{API}` is today `https://nenwovhyrdcdkhxzjiiv.supabase.co/functions/v1/api`
-and will be `https://pharmacycommons.org/api` once the Cloudflare Worker is live
-(see *Serving from pharmacycommons.org* below).
+and is `https://pharmacycommons.org/api` since 2026-10-30 (Cloudflare Worker live;
+see *Serving from pharmacycommons.org* below). The Supabase URL still works.
 
 ## Architecture
 
