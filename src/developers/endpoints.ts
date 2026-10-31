@@ -84,7 +84,16 @@ const REF: Param = {
 }
 
 const NOT_FOUND = { status: 404, code: 'not_found', when: 'No record has that PCID or slug.' }
-const GONE = { status: 410, code: 'retired', when: 'The PCID was retired. The body names its replacement.' }
+const GONE = {
+  status: 410,
+  code: 'retired',
+  when: 'The PCID was retired. The body names its replacement (replaced_by) when there is one.',
+}
+const MOVED = {
+  status: 301,
+  code: 'retired',
+  when: 'The PCID was retired and has a replacement: the response redirects to the same record on the replacement (Location).',
+}
 
 export const ENDPOINTS: readonly Endpoint[] = [
   {
@@ -124,7 +133,7 @@ export const ENDPOINTS: readonly Endpoint[] = [
     params: [REF],
     jsonld: true,
     cacheSeconds: 300,
-    errors: [NOT_FOUND, GONE],
+    errors: [NOT_FOUND, MOVED, GONE],
   },
   {
     id: 'versions',
