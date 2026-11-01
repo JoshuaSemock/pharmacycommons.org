@@ -33,7 +33,7 @@ import type { ConceptStatement } from './concepts'
 import { entityHref } from './wiki'
 import { abbreviationSuffix, useAbbreviations } from './abbreviations'
 import StudyLinks from './components/StudyLinks'
-import { isAbort, useEntityClasses, useEntityLists, useLabelText } from './drugPageData'
+import { isAbort, useEntityClasses, useEntityLists, useLabelText, useLegalStatusLine } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
@@ -776,11 +776,13 @@ function QuickFacts({
   }
 
   const boxed = find('boxed_warning')
-  const legal = dedupeContained(
-    [attr(drug, 'Rx status'), attr(drug, 'Legal status'), attr(drug, 'FDA marketing status')].filter(
-      (v): v is string => v !== null,
-    ),
-  )
+  // One line from legal_status_line() (2026-11-01). FDA marketing status is not a legal
+  // status and listed every product ever discontinued, so it is no longer shown here.
+  const legalLine = useLegalStatusLine(drug.pcid_code)
+  const legalFallback = dedupeContained(
+    [attr(drug, 'Rx status'), attr(drug, 'Legal status')].filter((v): v is string => v !== null),
+  ).join('; ')
+  const legal = legalLine.failed ? legalFallback || null : legalLine.data
 
   return (
     <section aria-labelledby="quick-facts-heading" className="lp-raised rounded-md">
@@ -818,17 +820,7 @@ function QuickFacts({
           <EpcClasses classes={classes} />
         </InfoboxFact>
         <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
-          {legal.length === 0 ? (
-            <span>Not recorded</span>
-          ) : (
-            <span className="block space-y-0.5">
-              {legal.map(v => (
-                <span key={v} className="block">
-                  {v}
-                </span>
-              ))}
-            </span>
-          )}
+          {legal === undefined ? <FactSkeleton /> : legal === null ? <span>Not recorded</span> : <span>{legal}</span>}
         </InfoboxFact>
         {QUICK_LISTS.map(q => (
           <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>

@@ -23,8 +23,8 @@ MAX_SHEET_ROWS = 1_000_000  # data rows per sheet (Excel limit is 1,048,576 incl
 PK = {
     "biological_targets": ["pcid"], "chemont_links": ["pcid", "chemont_id"],
     "chemont_terms": ["chemont_id"], "class_agent_review": ["member_pcid", "class_slug"],
-    "class_agent_skip": ["member_pcid"], "class_members": ["class_pcid", "member_pcid"],
-    "class_review_queue": ["pcid"], "class_rules": ["code"], "classyfire_lookup": ["pcid"],
+    "class_members": ["class_pcid", "member_pcid"],
+    "class_rules": ["code"], "classyfire_lookup": ["pcid"],
     "clinical_concepts": ["pcid"], "clinical_statements": ["statement_id"],
     "combinations": ["pcid"], "drug_classes": ["pcid"], "entities": ["pcid"],
     "entity_brand_names": None, "entity_guidelines": ["pcid", "guideline_id"],
@@ -55,7 +55,7 @@ SUBSETS = {
         "drug_classes", "class_members", "chemont_terms", "chemont_links",
         "classyfire_lookup", "rxclass_classes", "rxclass_drug", "rxclass_lookup",
         "rxclass_va_products", "rxnorm_brands", "rxnorm_lookup", "class_rules",
-        "class_review_queue", "class_agent_review", "class_agent_skip"]),
+        "class_agent_review"]),
     3: ("3_FDA_Labels", [
         "fda_applications", "fda_products", "label_documents",
         "label_document_formulations", "label_section_text", "label_fetch_log",
