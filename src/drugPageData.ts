@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { getEntityClasses, getEntityLists } from './api'
 import type { EntityClass, EntityList } from './api.generated'
 import { getLabelText } from './labels'
+import { supabase } from './supabaseClient'
 import type { LabelText } from './labels'
 
 /** `data` is null while loading; `failed` is set (and data stays null) when the request errors. */
@@ -66,6 +67,40 @@ function usePcidQuery<T>(
 /** Every class the drug is in, including ones it reaches through a sub-class. */
 export function useEntityClasses(pcidCode: string): Loadable<EntityClass[]> {
   return usePcidQuery(pcidCode, (pcid, signal) => getEntityClasses(pcid, true, { signal }), 'classes')
+}
+
+/**
+ * One-line legal status for Quick Facts (CS-n, Legend, OTC, "Legend and OTC"),
+ * computed in the database by legal_status_line() (phase 26c). `data` is
+ * undefined while loading and null when nothing is recorded.
+ */
+export function useLegalStatusLine(pcidCode: string): { data: string | null | undefined; failed: boolean } {
+  const [state, setState] = useState<{ data: string | null | undefined; failed: boolean }>({ data: undefined, failed: false })
+
+  useEffect(() => {
+    const pcid = pcidNumber(pcidCode)
+    if (pcid === null) {
+      setState({ data: null, failed: false })
+      return
+    }
+    const controller = new AbortController()
+    setState({ data: undefined, failed: false })
+    supabase
+      .rpc('legal_status_line', { p_pcid: pcid })
+      .abortSignal(controller.signal)
+      .then(({ data, error }) => {
+        if (controller.signal.aborted) return
+        if (error) {
+          if (!isAbort(error)) console.error(`Failed to load legal status for ${pcidCode}`, error)
+          setState({ data: null, failed: true })
+          return
+        }
+        setState({ data: typeof data === 'string' && data.trim() ? data.trim() : null, failed: false })
+      })
+    return () => controller.abort()
+  }, [pcidCode])
+
+  return state
 }
 
 /** Every list the drug is on (for a moiety, also lists that name one of its forms or combinations). */
