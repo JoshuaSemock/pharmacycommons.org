@@ -23,6 +23,7 @@ export type InfoboxKey =
   | 'do_not_crush'
   | 'acb_score'
   | 'qtc_risk'
+  | 'lasa'
 
 /** Row names for Quick Facts keys, as shown in queues and contribution lists. */
 export const INFOBOX_KEY_LABEL: Record<string, string> = {
@@ -36,6 +37,7 @@ export const INFOBOX_KEY_LABEL: Record<string, string> = {
   do_not_crush: 'Do not crush',
   acb_score: 'ACB score',
   qtc_risk: 'QTc risk',
+  lasa: 'Look-alike/sound-alike',
 }
 
 export type InfoboxEdit = {

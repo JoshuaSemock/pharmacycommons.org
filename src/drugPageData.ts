@@ -103,6 +103,26 @@ export function useLegalStatusLine(pcidCode: string): { data: string | null | un
   return state
 }
 
+/** One look-alike/sound-alike pair from get_lasa() (phase 27c). Names keep their Tall Man casing. */
+export type LasaPair = {
+  name: string
+  name_pcid: number | null
+  has_tall_man: boolean
+  confused_with: string
+  confused_with_pcid: number | null
+}
+
+async function getLasa(pcid: number, signal: AbortSignal): Promise<LasaPair[]> {
+  const { data, error } = await supabase.rpc('get_lasa', { p_pcid: pcid }).abortSignal(signal)
+  if (error) throw new Error(error.message)
+  return (data ?? []) as LasaPair[]
+}
+
+/** Look-alike/sound-alike names for the drug (a moiety also gets its brands and forms). */
+export function useLasa(pcidCode: string): Loadable<LasaPair[]> {
+  return usePcidQuery(pcidCode, getLasa, 'look-alike/sound-alike names')
+}
+
 /** Every list the drug is on (for a moiety, also lists that name one of its forms or combinations). */
 export function useEntityLists(pcidCode: string): Loadable<EntityList[]> {
   return usePcidQuery(pcidCode, (pcid, signal) => getEntityLists(pcid, { signal }), 'lists')

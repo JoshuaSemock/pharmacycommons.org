@@ -276,7 +276,7 @@ function SyntaxHelp() {
         <li>
           Show a live value: <code className="font-mono">{'{{acb_score}}'}</code> for this page, or{' '}
           <code className="font-mono">{'{{acb_score:amitriptyline}}'}</code> for another. Keys: acb_score, qtc_risk,
-          do_not_crush, most_used, legal_status, indications, dosing, contraindications, boxed_warning, epc_class.
+          lasa, do_not_crush, most_used, legal_status, indications, dosing, contraindications, boxed_warning, epc_class.
         </li>
         <li>Cite your sources in the text and the edit summary.</li>
       </ul>
