@@ -9,7 +9,7 @@ Joshua's (CC BY-NC 4.0).
 
 | Rung | Source | Keyed by | Function | Status |
 | --- | --- | --- | --- | --- |
-| 1 | PubChem PUG REST | `moieties.inchi_key` | `pubchem-structures` | 7,787 of 10,231 done; **paused**, see "PubChem block" |
+| 1 | PubChem PUG REST | `moieties.inchi_key` | `pubchem-structures` | Done (10,231 of 10,231), after a temporary block; see "PubChem block" |
 | 2 | FDA GSRS (`/api/v1/substances/{UNII}?view=full`) | `moieties.unii`, only where `inchi_key` is blank | `gsrs-structures` | Done (3,567 of 3,567) |
 | 3 | PubChem cross-reference by DrugBank ID (~515 moieties) | `moieties.drugbank_id` | not written | Next |
 | 4 | Name lookup, strict match, **reviewed before writing** (~1,500 moieties with no identifier) | name | not written | Next |
@@ -21,15 +21,15 @@ Core moieties only (`term_type = 'Core moiety'`). Both queues are RPCs callable 
 
 | | Moieties |
 | --- | --- |
-| SMILES stored (PubChem 7,543, GSRS 849) | 8,392 of 15,930 (52.7%) |
+| SMILES stored (PubChem 9,882, GSRS 849) | 10,731 of 15,930 (67.4%) |
 | Not applicable: GSRS protein 987, nucleicAcid 81, structurallyDiverse 1,317 (`not_applicable_biologic`) | 2,385 |
 | Not applicable: GSRS polymer 123, mixture 159, concept 46, specifiedSubstanceG1 5 (`not_applicable_other`) | 333 |
-| Tried, not found at PubChem (`not_found`) | 244 |
-| Waiting on PubChem (have an InChIKey) | 2,444 |
-| Never tried: no UNII and no InChIKey (about 2,060 core moieties) | rungs 3 and 4 |
+| Tried, not found at PubChem (`not_found`) | 349 |
+| Never tried: 2,063 core moieties with no UNII and no InChIKey (rungs 3 and 4), plus 69 non-core rows | 2,132 |
 
 Against moieties that can have a structure at all (15,930 minus the 2,718 not
-applicable) coverage is 63.5%. **The UNII-only group is mostly biologics**: 2,385 of
+applicable) coverage is 81.2%. The two InChIKey-sharing moieties held back from rung 1
+(dextilidine, tilidine) are among the 2,063. **The UNII-only group is mostly biologics**: 2,385 of
 3,567 are proteins, nucleic acids or structurally diverse substances (vaccines,
 botanicals, venoms), so rung 2 added 849 structures, not thousands.
 `not_applicable_*` comes from GSRS's own `substanceClass`, never from a name guess.
@@ -53,17 +53,19 @@ botanicals, venoms), so rung 2 added 849 structures, not thousands.
   guard pattern as the other ingest functions). Both accept `{limit, pcids, chain, probe}`;
   `probe` is a diagnostic that writes nothing.
 
-## PubChem block (open)
+## PubChem block (resolved 2026-11-03)
 
 At 4 workers (about 4.7 requests a second) PubChem began answering **every** request from
 the Edge Function with HTTP 503 `PUGREST.ServerBusy` ("too many requests per second or
-blacklisted") while its own throttling header read 0%. It is an address block, not a bad
-key: metformin failed as well. The last PubChem write was 2026-11-03 20:17 UTC. The
-function now runs 2 workers with a 300 ms pause (about 3 a second) and 4 s, 8 s, 12 s
-back-off, and **never chains a batch that wrote nothing**. PubChem's published limits are
-5 requests a second, 400 a minute and 300 seconds of running time a minute. Resume with
-`{ "limit": 100, "chain": true }` once a `probe` returns 200. The sandbox cannot reach
-PubChem directly; probe through the function.
+blacklisted") while its own throttling header read 0%. It was an address block, not a bad
+key: metformin failed as well. The last write before the block was 20:17 UTC; it was still
+blocked at a 20:38 probe and clear at the 21:30 recheck. At 2 workers with a 300 ms pause
+(about 3 a second) the remaining 2,444 moieties ran in about 12 minutes with no throttling.
+The function keeps those settings, backs off 4 s, 8 s, 12 s, and **never chains a batch
+that wrote nothing**. PubChem's published limits are 5 requests a second, 400 a minute and
+300 seconds of running time a minute; stay at or below the current pace. Before any
+further run, send a `probe` and start only on a 200. The sandbox cannot reach PubChem
+directly; probe through the function.
 
 ## Operational notes
 

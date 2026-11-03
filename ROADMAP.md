@@ -13,7 +13,7 @@
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1–3 | Core schema, workbook ETL, frontend cutover | ✅ Done |
-| 4 | Enrichment: openFDA, CAS structures, classes, ECOTOX | 🟡 FDA products linked to PCIDs (phase 10) and classes loaded; **structures via PubChem and FDA GSRS 8,392 of 15,930 (phase 34); CAS structures and ECOTOX not started** |
+| 4 | Enrichment: openFDA, CAS structures, classes, ECOTOX | 🟡 FDA products linked to PCIDs (phase 10) and classes loaded; **structures via PubChem and FDA GSRS 10,731 of 15,930 (phase 34); CAS structures and ECOTOX not started** |
 | 5 | Governance & community: NPI verification, saved pages, moderation | ✅ Built — moderator UI (`/review`, `/admin`), roles incl. `owner`, community editing (phase 15), contributions admin; end-to-end test not written |
 | 6–7 | Label text; brand names via RxNorm | ✅ Done |
 | 8 | Drug classes, machine-readable API v1, version history, permalinks | ✅ Done; `/api` on the site domain still to switch over |
@@ -90,11 +90,11 @@ page; legal documents (effective 2026-10-27).
 ## Next — enrichment
 
 **6. Structure identifiers** — *2026-11-03 (phase 34, `docs/structure-fetch.md`):* SMILES, InChI/InChIKey,
-formula and mass now come from PubChem (by InChIKey) and FDA GSRS (by UNII), not CAS: 8,392 of 15,930
-moieties done, 2,718 marked not applicable (biologics etc.), 2,444 waiting on PubChem (the Edge Function's
-address is blocked; resume after a `probe` returns 200), about 2,060 with no identifier. Next: DrugBank-ID
-rung, a reviewed name-lookup rung, then InChIKey backfill into `moieties` after Joshua rules on seven
-InChIKey-sharing pairs, plus licence wording for the new rows.
+formula and mass now come from PubChem (by InChIKey) and FDA GSRS (by UNII), not CAS: 10,731 of 15,930
+moieties done (81.2% of those that can have a structure), 2,718 marked not applicable (biologics etc.),
+349 not found at PubChem, 2,132 never tried (2,063 core moieties with no UNII or InChIKey). Next: DrugBank-ID
+rung (about 515), a reviewed name-lookup rung, then InChIKey backfill into `moieties` after Joshua rules on
+seven InChIKey-sharing pairs, plus licence wording for the new rows. Probe PubChem before any further run.
 *Still open:* the CAS Common Chemistry backfill. CAS rows stay CC BY-NC 4.0 and must not be presented as
 CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow / pKa / solubility —
 those need a separate physprop source.
