@@ -38,10 +38,11 @@ botanicals, venoms), so rung 2 added 849 structures, not thousands.
 
 - **Insert-only.** Both functions upsert with `ignoreDuplicates`; an existing row is never
   overwritten. They write `physiochemical` only, never `moieties`.
-- **`source` is always set** (`PubChem` or `FDA GSRS`). The column's default is
-  `'CAS Common Chemistry'`, so a row inserted without `source` would be mislabelled as
-  CC BY-NC data. `raw` is NOT NULL and always set (it holds the response summary or the
-  404 note). Consider dropping the default (Joshua's call; not done).
+- **`source` is always set** (`PubChem` or `FDA GSRS`). The column used to default to
+  `'CAS Common Chemistry'`, which would have mislabelled an unlabelled row as CC BY-NC data;
+  the default was dropped 2026-11-03 (`db/phase34c_physiochemical_source_no_default.sql`), so
+  an insert without `source` now fails. `raw` is NOT NULL and always set (it holds the
+  response summary or the 404 note).
 - **Key check.** PubChem rows must return the InChIKey that was asked for; otherwise
   `structure_status = 'key_mismatch'` and no structure is stored (0 so far).
 - **Shared InChIKeys are held back** from rung 1 (see below).
@@ -90,7 +91,7 @@ structure row, except the first pair, which rung 1 skips):
 | `WTFXARWRTYJXII-UHFFFAOYSA-N` | 1001440 FERUMOXIDES, 1001442 FERUMOXYTOL |
 | `PEYUIKBAABKQKQ-AFHBHXEDSA-N` | 1015527 SESAMIN, 1015528 SESAMIN, (±)- |
 
-- **Licensing.** `physiochemical` now holds PubChem and GSRS rows next to the (still empty)
+- **Licensing (shelved by Joshua, 2026-11-03: wording not settled; do not draft it until he reopens it).** `physiochemical` now holds PubChem and GSRS rows next to the (still empty)
   CAS scope. GSRS is U.S. government data. PubChem record data is generally open, but
   depositors can attach their own terms. Confirm how `docs/data-provenance-and-licensing.md`
   and `api_meta.data_license_scope` should describe these rows before the table is served

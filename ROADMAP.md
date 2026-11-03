@@ -94,7 +94,7 @@ formula and mass now come from PubChem (by InChIKey) and FDA GSRS (by UNII), not
 moieties done (81.2% of those that can have a structure), 2,718 marked not applicable (biologics etc.),
 349 not found at PubChem, 2,132 never tried (2,063 core moieties with no UNII or InChIKey). Next: DrugBank-ID
 rung (about 515), a reviewed name-lookup rung, then InChIKey backfill into `moieties` after Joshua rules on
-seven InChIKey-sharing pairs, plus licence wording for the new rows. Probe PubChem before any further run.
+seven InChIKey-sharing pairs, (licence wording for the PubChem/GSRS rows is shelved by Joshua, 2026-11-03). Probe PubChem before any further run.
 *Still open:* the CAS Common Chemistry backfill. CAS rows stay CC BY-NC 4.0 and must not be presented as
 CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow / pKa / solubility —
 those need a separate physprop source.
