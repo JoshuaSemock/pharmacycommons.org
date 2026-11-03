@@ -17,16 +17,32 @@ Status: **live** (PR #92 merged 2026-10-18). `db/phase19_network.sql` was run by
 | Search / details | `NetworkSearch.tsx`, `Details.tsx` | ARIA combobox; node/edge panel; accessible relationship table |
 | Page | `src/pages/Network.tsx` | URL state `?c=<PCID>`, filters, toolbar, legend |
 
+Lists (v3, 2026-11-03, `db/phase31a_network_lists.sql`): see "Lists" below.
+
 No `/api/v1/network` endpoint exists; the RPCs are internal to the site (decided 2026-10-18).
 
 ## Edges
 
 Edge ids come from the database, so one record never appears twice:
-`cm:<class>:<member>` (class_members), `sc:<child>:<parent>` (class hierarchy), `cs:<statement_id>` (clinical_statements), `co:<id>` (community_statements, off by default, labelled contributor-added). Direction is subject to object as recorded; the page derives "incoming".
+`cm:<class>:<member>` (class_members), `sc:<child>:<parent>` (class hierarchy), `cs:<statement_id>` (clinical_statements), `co:<id>` (community_statements, off by default, labelled contributor-added), `li:<list>:<member>` (list_items). Direction is subject to object as recorded; the page derives "incoming".
 
-Groups (line styles, no colour): classification, composition, use, safety, interaction, lineage. Predicates that map to no group (dosing, definitions, acronyms, pregnancy and lactation guidance) are page properties and are not drawn.
+`li:<list_pcid>:<member_pcid>` (list_items, v3).
+
+Groups (line styles, no colour): classification, composition, use, safety, interaction, lists, lineage. Predicates that map to no group (dosing, definitions, acronyms, pregnancy and lactation guidance) are page properties and are not drawn.
 
 Bounded loading: a neighborhood returns at most 200 edges (default 40, 18 on phones) and pages by offset. Paging is round-robin across groups so a concept's use and safety edges are not buried behind many class memberships.
+
+## Lists (v3, 2026-11-03)
+
+A record is linked to every **published** list it is an entry on; a list opened as the centre links to its entries. Applied as `phase31a_network_lists_group`, `phase31b_network_lists_neighborhood`, `phase31c_network_lists_evidence` (20261103144236 / 254 / 307).
+
+- `on_list` is **derived** from `list_items` (like `member_of` from `class_members`). It is not a row in `public.predicates` and nothing is written to `clinical_statements`. Lists stay separate from classes (decisions.md, Lists): their own group (`lists`, dotted line), node kind (`list`, barrel shape) and page (`/lists/:slug`).
+- Entries with no member PCID (dictionary terms, 19 rows) are skipped. A list that repeats a drug yields one edge. Sub-lists (e.g. Anticholinergic Burden: Score 3) are separate lists with separate edges; the parent list also lists the drug.
+- Evidence (`network_edge_evidence('li:…')`) returns the list, its source citation, URL and license, and the entry's rank, value (labelled by the list's `measure_label`), status and note.
+- The Network search offers lists as start points (`searchConcepts`). Pages link in with `src/components/NetworkLink.tsx`: drug and concept pages (Identifiers rail), class pages and list pages (header).
+- Not included: `list_items.component_pcid` (a brand-name entry pointing at its generic). A drug does not yet show the Brand Names list through its brands.
+- Large lists (722 entries on Federal Controlled Substances) are paged by the usual round-robin cap; members sort alphabetically, not by rank.
+- First page of a drug that is on many lists shows only one list edge before use/safety edges in the round-robin; use the Lists filter chip for the rest.
 
 ## Adding a predicate or node kind
 
@@ -65,4 +81,4 @@ Modelled on Obsidian's local graph; no database changes.
 
 ## Future work
 
-Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. A public `/v1/network` endpoint, new predicates for mechanism and interaction data, and server-side paging UI for very large classes.
+Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. Entry rank/score ordering for a list's own graph, brand entries via `component_pcid`, a public `/v1/network` endpoint, new predicates for mechanism and interaction data, and server-side paging UI for very large classes.

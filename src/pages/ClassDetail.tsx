@@ -19,6 +19,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import NetworkLink from '../components/NetworkLink'
 import { supabase } from '../supabaseClient'
 import MachinePanels from '../MachinePanels'
 import { formatDrugName } from '../names'
@@ -174,6 +175,9 @@ function ClassBody({ cls, pcidCode }: { cls: ClassRecord; pcidCode: string }) {
         {cls.description && (
           <p className="mt-3 max-w-2xl font-sans text-md leading-relaxed text-ink">{cls.description}</p>
         )}
+        <div className="mt-4">
+          <NetworkLink pcid={pcidCode} />
+        </div>
         {modelMode && <PageTools page={page} slug={cls.slug} />}
       </header>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">

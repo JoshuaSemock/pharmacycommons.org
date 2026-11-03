@@ -50,11 +50,35 @@ const LABEL_KEYS: [string, string][] = [
   ['match_basis', 'Matched by'],
   ['class_system', 'Classification system'],
   ['class_code', 'Class code'],
+  ['list_title', 'List'],
+  ['list_kind', 'List kind'],
+  ['jurisdiction', 'Jurisdiction'],
+  ['status', 'Status on the list'],
+  ['note', 'Note'],
+  ['source_citation', 'List source'],
+  ['source_url', 'Source link'],
+  ['license', 'License'],
   ['effect', 'What the contributor wrote'],
   ['block', 'Page section'],
 ]
 
 const text = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null)
+
+type Rec = Record<string, unknown>
+
+/** The score or measure an entry has on its list, labelled by the list ("Anticholinergic score: 3"). */
+function listMeasure(r: Rec): { label: string; value: string } | null {
+  const v = r.value
+  if (typeof v !== 'number' && typeof v !== 'string') return null
+  const n = typeof v === 'number' ? v : Number(v)
+  if (v === '' || !Number.isFinite(n)) return null
+  const unit = text(r.measure_unit)
+  return { label: text(r.measure_label) ?? 'Value', value: `${n.toLocaleString('en-US')}${unit ? ` ${unit}` : ''}` }
+}
+
+function listRank(r: Rec): { label: string; value: string } | null {
+  return typeof r.rank === 'number' ? { label: text(r.rank_label) ?? 'Rank', value: `#${r.rank}` } : null
+}
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
@@ -101,6 +125,8 @@ function EdgeDetails({ edge, graph, evidence }: { edge: NetworkEdge; graph: Grap
               const v = text(record[key])
               return v ? <Row key={key} k={label} v={v} /> : null
             })}
+          {record && record.kind === 'list_membership' && listMeasure(record) && <Row k={listMeasure(record)!.label} v={listMeasure(record)!.value} />}
+          {record && record.kind === 'list_membership' && listRank(record) && <Row k={listRank(record)!.label} v={listRank(record)!.value} />}
           {record && typeof record.direct === 'boolean' && <Row k="Membership" v={record.direct ? 'Direct' : 'Inherited from a parent class'} />}
           {citations.length > 0 && <Row k="Citations" v={citations.join(', ')} />}
         </dl>
@@ -108,7 +134,7 @@ function EdgeDetails({ edge, graph, evidence }: { edge: NetworkEdge; graph: Grap
         {evidence.state === 'ready' && !record && !edge.evidence_level && !edge.source_agency && !edge.source_doc_id && (
           <p className="text-[13px] text-ink">No source details are recorded for this relationship.</p>
         )}
-        {evidence.state === 'ready' && record && !quote && edge.group !== 'classification' && (
+        {evidence.state === 'ready' && record && !quote && edge.group !== 'classification' && edge.group !== 'lists' && (
           <p className="text-[13px] text-ink">No quotation from the source is stored for this relationship.</p>
         )}
       </div>

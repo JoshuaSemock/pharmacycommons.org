@@ -254,3 +254,22 @@ describe('relationsOf', () => {
     expect(rows.map(r => r.edge.id)).toEqual(['cs:9'])
   })
 })
+
+describe('list-membership edges', () => {
+  it('parses the lists group and keeps a list as a node of its own kind', () => {
+    const p = parsePayload({
+      center: { pcid: 1000240, slug: 'oxybutynin', name: 'Oxybutynin', entity_type: 'moiety' },
+      nodes: [
+        { pcid: 1000240, slug: 'oxybutynin', name: 'Oxybutynin', entity_type: 'moiety' },
+        { pcid: 10000034, slug: 'anticholinergic-burden', name: 'Anticholinergic Burden', entity_type: 'list' },
+      ],
+      edges: [{ id: 'li:10000034:1000240', subject: 1000240, predicate: 'on_list', object: 10000034, group: 'lists', basis: 'curated list' }],
+      group_counts: { lists: 9 },
+      total: 9,
+    })
+    expect(p.edges).toHaveLength(1)
+    expect(p.edges[0].group).toBe('lists')
+    expect(p.group_counts.lists).toBe(9)
+    expect(kindsPresent(mergePayload(emptyGraph(), p, 1000240, true))).toContain('list')
+  })
+})

@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { GROUPS, GROUP_ORDER, KIND_KEYS, PREDICATES, isGroup, nodeKind, pagePath, predicateDefinition, predicatePhrase } from './predicates'
 
 // The SQL decides which predicates become edges. Read it, so the two can't drift.
-const sql = readFileSync(new URL('../../db/phase19_network.sql', import.meta.url), 'utf8')
-const mapping = [...sql.matchAll(/when '([a-z_]+)'\s+then '([a-z]+)'/g)].map(m => ({ predicate: m[1], group: m[2] }))
+// phase 19 holds the original mapping; later phases (31a adds on_list) redefine the function, so read them all.
+const sql = ['phase19_network.sql', 'phase31a_network_lists.sql'].map(f => readFileSync(new URL(`../../db/${f}`, import.meta.url), 'utf8')).join('\n')
+const mapping = [...new Map([...sql.matchAll(/when '([a-z_]+)'\s+then '([a-z]+)'/g)].map(m => [m[1], { predicate: m[1], group: m[2] }])).values()]
 
 describe('predicate vocabulary', () => {
   it('finds the mapping in the migration', () => {
@@ -59,6 +60,20 @@ describe('node kinds and links', () => {
     expect(nodeKind('class').shape).not.toBe(nodeKind('moiety').shape)
     expect(nodeKind('clinical').shape).not.toBe(nodeKind('target').shape)
     expect(KIND_KEYS).toContain('functional')
+  })
+
+  it('draws a list as its own kind and links it to /lists', () => {
+    expect(nodeKind('list').label).toBe('List')
+    expect(nodeKind('list').shape).not.toBe(nodeKind('class').shape)
+    expect(pagePath('list', 'anticholinergic-burden')).toBe('/lists/anticholinergic-burden')
+  })
+
+  it('reads on_list from either end and keeps lists apart from classification', () => {
+    expect(isGroup('lists')).toBe(true)
+    expect(predicatePhrase('on_list', 'subject')).toBe('is listed on')
+    expect(predicatePhrase('on_list', 'object')).toBe('lists')
+    expect(mapping).toContainEqual({ predicate: 'on_list', group: 'lists' })
+    expect(GROUPS.lists.meaning).toMatch(/not a recommendation/i)
   })
 
   it('does not break on a kind it has not heard of', () => {
