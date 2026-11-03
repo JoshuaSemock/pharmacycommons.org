@@ -15,7 +15,7 @@ const show = (pcid: string | number) =>
 describe('NetworkLink', () => {
   it('opens the Network on this record, from a PCID code or digits', () => {
     show('PCID-1001923')
-    expect(screen.getByRole('link', { name: /see how it connects/i }).getAttribute('href')).toBe('/network?c=1001923')
+    expect(screen.getByRole('link', { name: /view in network/i }).getAttribute('href')).toBe('/network?c=1001923')
     cleanup()
     show(10000034)
     expect(screen.getByRole('link').getAttribute('href')).toBe('/network?c=10000034')

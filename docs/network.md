@@ -39,7 +39,7 @@ A record is linked to every **published** list it is an entry on; a list opened 
 - `on_list` is **derived** from `list_items` (like `member_of` from `class_members`). It is not a row in `public.predicates` and nothing is written to `clinical_statements`. Lists stay separate from classes (decisions.md, Lists): their own group (`lists`, dotted line), node kind (`list`, barrel shape) and page (`/lists/:slug`).
 - Entries with no member PCID (dictionary terms, 19 rows) are skipped. A list that repeats a drug yields one edge. Sub-lists (e.g. Anticholinergic Burden: Score 3) are separate lists with separate edges; the parent list also lists the drug.
 - Evidence (`network_edge_evidence('li:…')`) returns the list, its source citation, URL and license, and the entry's rank, value (labelled by the list's `measure_label`), status and note.
-- The Network search offers lists as start points (`searchConcepts`). Pages link in with `src/components/NetworkLink.tsx`: drug and concept pages (Identifiers rail), class pages and list pages (header).
+- The Network search offers lists as start points (`searchConcepts`). Pages link in with `src/components/NetworkLink.tsx` ("View in Network"), in the page header under the title: drug, concept and INN pages, class pages and list pages.
 - Not included: `list_items.component_pcid` (a brand-name entry pointing at its generic). A drug does not yet show the Brand Names list through its brands.
 - Large lists (722 entries on Federal Controlled Substances) are paged by the usual round-robin cap; members sort alphabetically, not by rank.
 - First page of a drug that is on many lists shows only one list edge before use/safety edges in the round-robin; use the Lists filter chip for the rest.

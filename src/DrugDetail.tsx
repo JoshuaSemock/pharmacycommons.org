@@ -419,6 +419,9 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
           </div>
         </div>
         <p className="mt-1 font-sans text-lg text-ink">{kind}</p>
+        <div className="mt-3">
+          <NetworkLink pcid={drug.pcid_code} />
+        </div>
         <PageTools page={page} slug={drug.slug} />
       </header>
 
@@ -463,9 +466,6 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
                 </div>
               ))}
             </dl>
-            <div className="mt-4">
-              <NetworkLink pcid={drug.pcid_code} />
-            </div>
           </section>
         </aside>
       </div>
@@ -593,6 +593,9 @@ function DrugHeader({
       </div>
 
       <p className="mt-1 font-sans text-lg text-ink">{drug.entity_type}</p>
+      <div className="mt-3">
+        <NetworkLink pcid={drug.pcid_code} />
+      </div>
 
       <BrandNames key={version} pcidCode={drug.pcid_code} brands={drug.brands ?? []} onEdit={onEditBrands} />
       {tools}
@@ -1138,9 +1141,6 @@ function IdentifiersSection({ drug }: { drug: DrugDetailType }) {
           </IdentifierRow>
         ))}
       </dl>
-      <div className="mt-4">
-        <NetworkLink pcid={drug.pcid_code} />
-      </div>
     </section>
   )
 }
