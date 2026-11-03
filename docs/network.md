@@ -53,6 +53,18 @@ A record is linked to every **published** list it is an entry on; a list opened 
 - **Non-core moieties.** Nodes now carry `term_type` (moieties only). The flag is the existing `moieties.term_type`; "non-core" means any value other than `Core moiety` (69 rows after phase 25a). The filter chip "Non-core moiety records (N)" appears only when such a node is on the graph, is **on by default** (nothing is hidden unasked), and never hides the starting concept. Hiding them from search and browse is a separate, still-open task.
 - **Evidence sources.** `network_edge_evidence()` adds `source` to clinical statements, resolved from `data_sources` and, for `Drugs@FDA appl …` documents, `fda_applications` (application type and number, sponsor, and a link to that application on Drugs@FDA). Nothing is synthesised: the 6,443 FDA and 334 Pharmacy Commons composition statements have a source record but no quotation, and the panel says "Only the source record is stored … not its wording". 105 curator assertions have no resolvable source and still show only what they carry. Real quotations would need a separate ingest of label text; the 147 `fda_table_pgx` rows already have them.
 
+## Compare (v5, 2026-11-03)
+
+`/network/compare?c=<pcid>,<pcid>[,…]` (two to four concepts; `src/pages/NetworkCompare.tsx`, model in `src/network/compare.ts`) shows what the compared concepts share and what only one of them has. Entry points: "Compare with…" in the node details, "compare" in the Network intro, header search ("Compare in Network").
+
+`db/phase32b_network_compare.sql` (applied as `phase32b_network_compare`): `network_compare(pcids, include_community, members, limit, offset)` reads every concept's edges through `network_edges()` and turns them inside out, so each *other* concept knows which compared concepts link to it. A **set** is one distinct group of linking concepts (in common to all, shared by some, only X). The result is summarised by set (`sets`: size and a count per relationship group) and returns a capped number of rows per set; passing `members` pages one set (alphabetical within group order). Links between the compared concepts themselves come back as `between`. Fewer than two or more than four distinct PCIDs return null.
+
+- **What "shared" means.** Two concepts point at the same other concept (the same class, list, product or condition). It does not mean the statements agree: each row keeps every concept's own predicate, direction, inherited flag and source, and the table says so. Absence is absence from the database, and the page says that too.
+- **Brands.** The picker uses the same search as the Network, which resolves a brand to the drug it contains (Jardiance compares as empagliflozin) and says so. A formulation PCID in the URL is compared as itself.
+- **Cost.** Checked live: metformin vs empagliflozin vs acetazolamide 44 ms; the two largest classes (6,817 and 5,904 members) 0.47 s and a 62 KB first page. Paging a set repeats the computation.
+- **Graph.** "Show as a graph" draws the compared concepts, every concept loaded so far and the lines between them, through the same `GraphCanvas`. Shared concepts are the ones with lines to more than one compared concept. It is built from the loaded rows, so load more of a set to see more of it.
+- Contributor-added relationships are off unless ticked.
+
 ## Adding a predicate or node kind
 
 1. Predicate: add it to `public.predicates`, add a `when` line in `network_predicate_group()`, add its phrase and definition to `PREDICATES` in `predicates.ts`. `predicates.test.ts` parses the SQL and fails if the two drift.
@@ -90,4 +102,4 @@ Modelled on Obsidian's local graph; no database changes.
 
 ## Future work
 
-Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. Entry rank/score ordering for a list's own graph, brand entries via `component_pcid`, a public `/v1/network` endpoint, new predicates for mechanism and interaction data. Quotations for FDA composition statements would need label text ingested per statement.
+Compare: a combined group filter across all sets, saving a comparison as a list, comparing a brand formulation's own record against a generic, and mechanism or interaction predicates between the compared concepts once they are loaded. Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. Entry rank/score ordering for a list's own graph, brand entries via `component_pcid`, a public `/v1/network` endpoint, new predicates for mechanism and interaction data. Quotations for FDA composition statements would need label text ingested per statement.

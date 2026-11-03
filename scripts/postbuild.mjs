@@ -78,6 +78,11 @@ const STATIC_ROUTES = [
     description: 'Explore how drugs, classes, products and topics connect in Pharmacy Commons as an interactive graph. Every line is one stored statement with a stated meaning and, where recorded, a source.',
   },
   {
+    path: '/network/compare',
+    title: 'Compare in Network',
+    description: 'Pick two to four drugs, classes or topics and see what they share and what only one of them has, from the relationships recorded in Pharmacy Commons.',
+  },
+  {
     path: '/learn',
     title: 'Learn',
     description: 'Free flashcards and single-best-answer questions built from Pharmacy Commons records, scheduled with spaced repetition. No account needed.',
