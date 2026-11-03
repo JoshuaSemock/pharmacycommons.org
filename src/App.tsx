@@ -27,6 +27,7 @@ const TopicIndex = lazy(() => import('./pages/TopicIndex'))
 // Carries Cytoscape (loaded again on demand inside the page); its own chunk.
 const Network = lazy(() => import('./pages/Network'))
 const NetworkCompare = lazy(() => import('./pages/NetworkCompare'))
+const NetworkHierarchy = lazy(() => import('./pages/NetworkHierarchy'))
 const ListDetail = lazy(() => import('./pages/ListDetail'))
 const ListCompare = lazy(() => import('./pages/ListCompare'))
 // Carries the vanilla calculator bundle; load it only on its own route.
@@ -91,6 +92,7 @@ export default function App() {
           <Route path="/topics" element={<TopicIndex />} />
           <Route path="/network" element={<Network />} />
           <Route path="/network/compare" element={<NetworkCompare />} />
+          <Route path="/network/hierarchy" element={<NetworkHierarchy />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/study/:collectionId" element={<LearnSession />} />
           <Route path="/lists" element={<ListIndex />} />

@@ -14,6 +14,8 @@ import { parseNodeValue, parsePayload, parseRelations } from './model'
 import type { NetworkNode, NetworkPayload, RelationsPage } from './model'
 import { MAX_COMPARE, MIN_COMPARE, parseCompare } from './compare'
 import type { ComparePayload } from './compare'
+import { MAX_HIERARCHY, MIN_HIERARCHY, parseHierarchy } from './hierarchy'
+import type { HierarchyPayload } from './hierarchy'
 import type { NetworkGroup } from './predicates'
 
 export const PAGE_SIZE = 40
@@ -122,6 +124,25 @@ export async function fetchCompare(pcids: number[], opts: CompareOptions = {}): 
   }
   const parsed = parseCompare(data)
   if (!parsed) throw new NetworkUnavailable('The comparison could not be read.', false)
+  return parsed
+}
+
+/** The classification trees (ATC, VA, FDA, ChemOnt, …) above one to four concepts, and where they meet. */
+export async function fetchHierarchy(pcids: number[], signal?: AbortSignal): Promise<HierarchyPayload> {
+  const ids = [...new Set(pcids)]
+  if (ids.length < MIN_HIERARCHY || ids.length > MAX_HIERARCHY || ids.some(p => !Number.isSafeInteger(p) || p <= 0)) {
+    throw new NetworkUnavailable(`Pick ${MIN_HIERARCHY} to ${MAX_HIERARCHY} concepts.`, false)
+  }
+  const supabase = await getSupabase()
+  let q = supabase.rpc('network_hierarchy', { p_pcids: ids })
+  if (signal) q = q.abortSignal(signal)
+  const { data, error } = await q
+  if (error) {
+    const missing = error.code === 'PGRST202' || error.code === '42883'
+    throw new NetworkUnavailable(missing ? 'The network service is not available yet.' : 'The hierarchy could not be loaded.', missing)
+  }
+  const parsed = parseHierarchy(data)
+  if (!parsed) throw new NetworkUnavailable('The hierarchy could not be read.', false)
   return parsed
 }
 

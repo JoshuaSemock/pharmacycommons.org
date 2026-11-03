@@ -315,6 +315,13 @@ export default function NetworkCompare() {
             </ul>
           </Card>
 
+          <p className="mt-3 text-[13px] text-ink">
+            <Link to={`/network/hierarchy?c=${pcids.join(',')}`} className="underline decoration-foil decoration-2 underline-offset-2">
+              See where they sit in each classification tree
+            </Link>{' '}
+            (WHO ATC, VA, FDA and others), and the lowest class they share.
+          </p>
+
           {data.between.length > 0 ? (
             <section aria-labelledby="compare-between" className="mt-8">
               <h2 id="compare-between" className="font-sans text-[18px] text-ink">
