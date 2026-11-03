@@ -56,7 +56,7 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
 const str = (v: unknown): string | null => (typeof v === 'string' && v ? v : null)
 const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
 
-function parseNode(v: unknown): NetworkNode | null {
+export function parseNodeValue(v: unknown): NetworkNode | null {
   if (!isRecord(v)) return null
   const pcid = num(v.pcid)
   const slug = str(v.slug)
@@ -70,7 +70,7 @@ export const CORE_MOIETY = 'Core moiety'
 /** A moiety row that is really a salt form, brand or combination (phase 25a left 69 by design). */
 export const isNonCore = (n: NetworkNode): boolean => n.entity_type === 'moiety' && !!n.term_type && n.term_type !== CORE_MOIETY
 
-function parseEdge(v: unknown): NetworkEdge | null {
+export function parseEdgeValue(v: unknown): NetworkEdge | null {
   if (!isRecord(v)) return null
   const id = str(v.id)
   const subject = num(v.subject)
@@ -96,8 +96,8 @@ function parseEdge(v: unknown): NetworkEdge | null {
 /** Reads an RPC result defensively. Anything malformed is dropped, never rendered. */
 export function parsePayload(raw: unknown): NetworkPayload {
   const r = isRecord(raw) ? raw : {}
-  const nodes = (Array.isArray(r.nodes) ? r.nodes : []).map(parseNode).filter((n): n is NetworkNode => n !== null)
-  const edges = (Array.isArray(r.edges) ? r.edges : []).map(parseEdge).filter((e): e is NetworkEdge => e !== null)
+  const nodes = (Array.isArray(r.nodes) ? r.nodes : []).map(parseNodeValue).filter((n): n is NetworkNode => n !== null)
+  const edges = (Array.isArray(r.edges) ? r.edges : []).map(parseEdgeValue).filter((e): e is NetworkEdge => e !== null)
   const counts: Partial<Record<NetworkGroup, number>> = {}
   if (isRecord(r.group_counts)) {
     for (const [k, v] of Object.entries(r.group_counts)) {
@@ -106,7 +106,7 @@ export function parsePayload(raw: unknown): NetworkPayload {
     }
   }
   return {
-    center: parseNode(r.center),
+    center: parseNodeValue(r.center),
     nodes,
     edges,
     group_counts: counts,
@@ -362,8 +362,8 @@ export function parseRelations(raw: unknown): RelationsPage {
   const rows: RelationsRow[] = []
   for (const item of Array.isArray(r.rows) ? r.rows : []) {
     if (!isRecord(item)) continue
-    const edge = parseEdge(item.edge)
-    const node = parseNode(item.node)
+    const edge = parseEdgeValue(item.edge)
+    const node = parseNodeValue(item.node)
     if (edge && node) rows.push({ edge, node, outgoing: item.outgoing === true })
   }
   const counts: Partial<Record<NetworkGroup, number>> = {}

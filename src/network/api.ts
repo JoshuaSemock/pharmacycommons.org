@@ -10,8 +10,10 @@
 import { getSupabase } from '../db'
 import { loadCatalog, searchCatalog } from '../catalog'
 import { loadAllClasses, searchClasses } from '../classifications'
-import { parsePayload, parseRelations } from './model'
-import type { NetworkPayload, RelationsPage } from './model'
+import { parseNodeValue, parsePayload, parseRelations } from './model'
+import type { NetworkNode, NetworkPayload, RelationsPage } from './model'
+import { MAX_COMPARE, MIN_COMPARE, parseCompare } from './compare'
+import type { ComparePayload } from './compare'
 import type { NetworkGroup } from './predicates'
 
 export const PAGE_SIZE = 40
@@ -85,6 +87,54 @@ export async function fetchRelations(pcid: number, opts: RelationsOptions = {}):
     throw new NetworkUnavailable(missing ? 'The network service is not available yet.' : 'The relationships could not be loaded.', missing)
   }
   return parseRelations(data)
+}
+
+export type CompareOptions = {
+  includeCommunity?: boolean
+  /** One set's sorted PCIDs: page through just that set. Without it, the first rows of every set. */
+  members?: number[]
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}
+
+export const COMPARE_PAGE = 30
+
+/** Two to four concepts side by side: what they share and what only one of them has. */
+export async function fetchCompare(pcids: number[], opts: CompareOptions = {}): Promise<ComparePayload> {
+  const ids = [...new Set(pcids)]
+  if (ids.length < MIN_COMPARE || ids.length > MAX_COMPARE || ids.some(p => !Number.isSafeInteger(p) || p <= 0)) {
+    throw new NetworkUnavailable(`Compare ${MIN_COMPARE} to ${MAX_COMPARE} concepts.`, false)
+  }
+  const supabase = await getSupabase()
+  let q = supabase.rpc('network_compare', {
+    p_pcids: ids,
+    p_include_community: opts.includeCommunity ?? false,
+    p_members: opts.members && opts.members.length ? opts.members : null,
+    p_limit: Math.min(Math.max(opts.limit ?? COMPARE_PAGE, 1), MAX_PAGE_SIZE),
+    p_offset: Math.max(opts.offset ?? 0, 0),
+  })
+  if (opts.signal) q = q.abortSignal(opts.signal)
+  const { data, error } = await q
+  if (error) {
+    const missing = error.code === 'PGRST202' || error.code === '42883'
+    throw new NetworkUnavailable(missing ? 'The network service is not available yet.' : 'The comparison could not be loaded.', missing)
+  }
+  const parsed = parseCompare(data)
+  if (!parsed) throw new NetworkUnavailable('The comparison could not be read.', false)
+  return parsed
+}
+
+/** Names for PCIDs, in the order given, so the picker can show chips before (or without) a comparison. */
+export async function fetchConcepts(pcids: number[], signal?: AbortSignal): Promise<NetworkNode[]> {
+  if (pcids.length === 0) return []
+  const supabase = await getSupabase()
+  let q = supabase.from('entities').select('pcid, slug, name, entity_type').in('pcid', pcids)
+  if (signal) q = q.abortSignal(signal)
+  const { data, error } = await q
+  if (error || !Array.isArray(data)) return []
+  const found = data.map(parseNodeValue).filter((n): n is NetworkNode => n !== null)
+  return pcids.map(p => found.find(n => n.pcid === p)).filter((n): n is NetworkNode => n !== undefined)
 }
 
 export type EvidenceRecord = Record<string, unknown> & { kind: string }

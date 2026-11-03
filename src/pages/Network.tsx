@@ -318,7 +318,11 @@ export default function Network() {
         </p>
         <p className="mt-2 text-[13px] text-ink">
           A line is not a treatment recommendation, and two concepts sitting near each other on the canvas means nothing.
-          Classes with many members show a page at a time. See the{' '}
+          Classes with many members show a page at a time. To see what two or more concepts share, use{' '}
+          <Link to={centerPcid !== null ? `/network/compare?c=${centerPcid}` : '/network/compare'} className="underline decoration-foil decoration-2 underline-offset-2">
+            compare
+          </Link>
+          . See the{' '}
           <Link to="/disclaimer" className="underline decoration-foil decoration-2 underline-offset-2">
             medical disclaimer
           </Link>
