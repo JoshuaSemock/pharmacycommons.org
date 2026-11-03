@@ -103,6 +103,29 @@ GSRS structure row (still counted in the 10,731, now attached to the class pcid)
 FDA's own active moiety and what `active_moiety_pcid` already said. The class has no direct members yet, so `list_classes()`
 hides it from the class index (the page works by slug). Ferumoxytol 1001442 is untouched.
 
+## Drawings (phase 35, 2026-11-03)
+
+The stored SMILES are drawn **in the browser, on demand**; no image or SVG is stored (Joshua's call, 2026-11-03).
+- `src/structureDraw.ts` loads RDKit.js (`@rdkit/rdkit`, BSD-3-Clause, WASM) with a dynamic import, so only a page that
+  has a structure downloads it: about 22 KB of JavaScript and a 7.4 MB WASM file (2.4 MB gzipped), cached by the browser.
+  Results are cached in memory per SMILES. Every colour RDKit paints is replaced by the one ink colour, in a light and a dark
+  variant that CSS switches between (the site is colourless letterpress; no heteroatom colours). Stereo shows as wedges; no R/S labels.
+- Limits: over 250 atoms (`MAX_ATOMS`) or over 8 dot-separated parts (`MAX_FRAGMENTS`) show a short note instead of a drawing.
+  Lab check: 27 of 27 sample SMILES (peptides, oligonucleotides, metal salts, isotopes, a 49-part mixture) parse and draw in
+  under 70 ms each.
+- `get_structures(pcid)` (`db/phase35a_get_structures.sql`; live as `phase35a_get_structures` then
+  `phase35b_get_structures_component_triples`; security invoker, same grants as `get_rems`): a moiety returns itself; a salt,
+  brand or combination returns one row per component moiety, from `moiety_hierarchy` **and** the record's own `has_component`
+  triples (the hierarchy misses some combinations, e.g. 2002591-2002611). A component with no structure comes back with null
+  `smiles`, so the page names it ("No structure on file: neomycin").
+- `src/components/StructureDrawing.tsx` sits at the top of Quick facts (`useStructures` in `src/drugPageData.ts`); the SMILES row under
+  Identifiers (`StructureIdentifier`) is unchanged. Nothing renders while loading or when no component has a structure.
+- **Data gap found while building:** 1,408 of the 2,612 `combinations` rows have no component link at all (neither in
+  `moiety_hierarchy` nor a `has_component` triple), so they get no drawing. Many are not real combinations: single compounds
+  named by IUPAC name, IV-fluid mixes and allergen pollen mixes. Linking or reclassifying them is Joshua's call; nothing was changed.
+- Not done: an API/image endpoint for structures (the API's `structure` section already serves the SMILES), 3D, downloads,
+  similarity search.
+
 ## Open items
 
 - **Licensing (shelved by Joshua, 2026-11-03: wording not settled; do not draft it until he reopens it).** `physiochemical` now holds PubChem and GSRS rows next to the (still empty)
