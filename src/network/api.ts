@@ -93,7 +93,13 @@ export async function searchConcepts(query: string, limit = 10): Promise<SearchH
   for (const c of searchClasses(classes, q).slice(0, Math.max(3, Math.floor(limit / 2)))) {
     hits.push({ key: `c${c.slug}`, name: c.name, hint: `${c.class_type_label} class · ${c.member_count} members`, pcid: null, slug: c.slug })
   }
-  return hits.slice(0, limit + 3)
+  // Published lists are start points too: a list opens as a graph of its entries.
+  const needle = q.toLowerCase()
+  const lists = await import('../api').then(m => m.listLists()).catch(() => [])
+  for (const l of lists.filter(l => l.title.toLowerCase().includes(needle)).slice(0, 3)) {
+    hits.push({ key: `l${l.slug}`, name: l.title, hint: `List · ${l.item_count} entries`, pcid: l.pcid, slug: l.slug })
+  }
+  return hits.slice(0, limit + 6)
 }
 
 const ENTRY_KIND = ['Drug', 'Combination product', 'Salt or ester', 'Brand product', 'Topic'] as const

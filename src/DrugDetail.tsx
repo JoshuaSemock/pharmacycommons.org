@@ -36,6 +36,7 @@ import StudyLinks from './components/StudyLinks'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText, useLegalStatusLine } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 import LasaFact from './components/LasaFact'
+import NetworkLink from './components/NetworkLink'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
 //
@@ -462,6 +463,9 @@ function ConceptPage({ drug }: { drug: DrugDetailType }) {
                 </div>
               ))}
             </dl>
+            <div className="mt-4">
+              <NetworkLink pcid={drug.pcid_code} />
+            </div>
           </section>
         </aside>
       </div>
@@ -1134,6 +1138,9 @@ function IdentifiersSection({ drug }: { drug: DrugDetailType }) {
           </IdentifierRow>
         ))}
       </dl>
+      <div className="mt-4">
+        <NetworkLink pcid={drug.pcid_code} />
+      </div>
     </section>
   )
 }

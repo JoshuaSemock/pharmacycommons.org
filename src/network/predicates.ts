@@ -16,9 +16,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export type NetworkGroup = 'classification' | 'composition' | 'use' | 'safety' | 'interaction' | 'lineage'
+export type NetworkGroup = 'classification' | 'composition' | 'use' | 'safety' | 'interaction' | 'lists' | 'lineage'
 
-export const GROUP_ORDER: NetworkGroup[] = ['classification', 'composition', 'use', 'safety', 'interaction', 'lineage']
+export const GROUP_ORDER: NetworkGroup[] = ['classification', 'composition', 'use', 'safety', 'interaction', 'lists', 'lineage']
 
 export type GroupMeta = {
   label: string
@@ -53,6 +53,11 @@ export const GROUPS: Record<NetworkGroup, GroupMeta> = {
     label: 'Interactions and genes',
     meaning: 'A recorded interaction, metabolic or pharmacogenomic association. The source text says what to do about it.',
     line: 'dashed',
+  },
+  lists: {
+    label: 'Lists',
+    meaning: 'A published list this record is an entry on, such as Anticholinergic Burden or Federal Controlled Substances. Being on a list is not a recommendation; the list page says what the list measures and where it comes from.',
+    line: 'dotted',
   },
   lineage: {
     label: 'Chemical lineage',
@@ -138,6 +143,11 @@ export const PREDICATES: Record<string, PredicateMeta> = {
   has_lab_effect: { forward: 'can affect lab', reverse: 'can be affected by', definition: 'A laboratory effect recorded by a source.' },
   monitored_by: { forward: 'is monitored by', reverse: 'monitors', definition: 'A monitoring parameter recorded by a source.' },
   has_monitoring: { forward: 'has monitoring', reverse: 'is monitoring for', definition: 'A monitoring parameter recorded by a source.' },
+  on_list: {
+    forward: 'is listed on',
+    reverse: 'lists',
+    definition: 'An entry on a published list. The score, rank or status it has there, and the list\u2019s source, are shown with the edge.',
+  },
   derived_from: { forward: 'is derived from', reverse: 'is a source of', definition: 'A recorded derivation between substances.' },
 }
 
@@ -183,6 +193,7 @@ const KINDS: Record<string, NodeKind> = {
   measurement: { label: 'Lab or measurement', shape: 'rhomboid', border: 2 },
   target: { label: 'Biological target', shape: 'octagon', border: 2 },
   functional: { label: 'Herbal or botanical', shape: 'tag', border: 2 },
+  list: { label: 'List', shape: 'barrel', border: 2 },
 }
 
 const UNKNOWN_KIND: NodeKind = { label: 'Record', shape: 'ellipse', border: 1 }

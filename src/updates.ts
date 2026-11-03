@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'network-lists',
+    date: '2026-11-03',
+    kind: 'Feature',
+    title: 'Network: see which lists a drug is on',
+    summary:
+      'The Network now links every drug to the published lists it appears on, such as Anticholinergic Burden, the look-alike names and Federal Controlled Substances. Open any list as a graph of its entries, or follow the new See how it connects link from a drug, class or list page.',
+    to: '/network',
+    cta: 'Open the Network',
+  },
+  {
     id: 'federal-controlled-substances',
     date: '2026-10-30',
     kind: 'Feature',

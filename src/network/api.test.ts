@@ -4,15 +4,20 @@ const rpc = vi.fn()
 vi.mock('../db', () => ({ getSupabase: async () => ({ rpc: (...a: unknown[]) => ({ ...rpcResult(...a), abortSignal: () => rpcResult(...a) }) }) }))
 vi.mock('../catalog', () => ({ loadCatalog: async () => [], searchCatalog: () => [] }))
 vi.mock('../classifications', () => ({ loadAllClasses: async () => [], searchClasses: () => [] }))
+const listLists = vi.fn()
+vi.mock('../api', () => ({ listLists: () => listLists() }))
 
 function rpcResult(...args: unknown[]) {
   const p = Promise.resolve(rpc(...args))
   return { then: p.then.bind(p), catch: p.catch.bind(p), finally: p.finally.bind(p) }
 }
 
-const { NetworkUnavailable, fetchEvidence, fetchNeighborhood } = await import('./api')
+const { NetworkUnavailable, fetchEvidence, fetchNeighborhood, searchConcepts } = await import('./api')
 
-beforeEach(() => rpc.mockReset())
+beforeEach(() => {
+  rpc.mockReset()
+  listLists.mockReset()
+})
 
 describe('fetchNeighborhood', () => {
   it('rejects a PCID that is not a positive integer without calling the database', async () => {
@@ -71,5 +76,21 @@ describe('fetchEvidence', () => {
   it('returns the record when it has a kind', async () => {
     rpc.mockReturnValue({ data: { kind: 'clinical_statement', evidence_level: 'curator_assertion' }, error: null })
     expect(await fetchEvidence('cs:1')).toMatchObject({ kind: 'clinical_statement' })
+  })
+})
+
+describe('searchConcepts with lists', () => {
+  it('offers a matching published list as a start point, with its PCID', async () => {
+    listLists.mockResolvedValue([
+      { pcid: 10000034, slug: 'anticholinergic-burden', title: 'Anticholinergic Burden', item_count: 214 },
+      { pcid: 10000023, slug: 'do-not-crush', title: 'Do Not Crush', item_count: 226 },
+    ])
+    const hits = await searchConcepts('anticholinergic')
+    expect(hits).toEqual([{ key: 'lanticholinergic-burden', name: 'Anticholinergic Burden', hint: 'List \u00b7 214 entries', pcid: 10000034, slug: 'anticholinergic-burden' }])
+  })
+
+  it('still searches when the lists cannot be loaded', async () => {
+    listLists.mockRejectedValue(new Error('offline'))
+    await expect(searchConcepts('metformin')).resolves.toEqual([])
   })
 })
