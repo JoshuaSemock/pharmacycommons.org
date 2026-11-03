@@ -28,12 +28,13 @@ import { loadDisplay, saveDisplay } from '../network/display'
 import type { Display } from '../network/display'
 import { DEEP_PAGE, MAX_DEPTH, NODE_CAP, currentDepth, frontierAt, nodeDepths, pruneToDepth } from '../network/depth'
 import { Details, RelationTable } from '../network/Details'
+import RelationsBrowser from '../network/RelationsBrowser'
 import type { EvidenceView } from '../network/Details'
 import { NetworkUnavailable, fetchEvidence, fetchNeighborhood, resolveSlug } from '../network/api'
 import type { SearchHit } from '../network/api'
-import { classTypesPresent, collapse, defaultFilters, emptyGraph, kindsPresent, mergePayload, visibleGraph } from '../network/model'
+import { addRelations, classTypesPresent, collapse, defaultFilters, emptyGraph, kindsPresent, mergePayload, nonCoreCount, visibleGraph } from '../network/model'
 import { SYSTEMS, systemBadge } from '../classifications'
-import type { Filters, GraphState } from '../network/model'
+import type { Filters, GraphState, RelationsRow } from '../network/model'
 import { GROUPS, GROUP_ORDER, nodeKind } from '../network/predicates'
 import type { NetworkGroup } from '../network/predicates'
 
@@ -86,6 +87,7 @@ export default function Network() {
   const [display, setDisplayState] = useState<Display>(loadDisplay)
   const [depth, setDepth] = useState(1)
   const [physicsPaused, setPhysicsPaused] = useState(false)
+  const [browsePcid, setBrowsePcid] = useState<number | null>(null)
   const cmdN = useRef(0)
   const graphRef = useRef(graph)
   graphRef.current = graph
@@ -109,6 +111,7 @@ export default function Network() {
   useEffect(() => {
     setNote(null)
     setSelection(null)
+    setBrowsePcid(null)
     setFilters(defaultFilters())
     setDepth(1)
     depthRun.current?.abort()
@@ -249,6 +252,7 @@ export default function Network() {
 
   const visible = useMemo(() => visibleGraph(graph, filters), [graph, filters])
   const kinds = useMemo(() => kindsPresent(graph), [graph])
+  const nonCore = useMemo(() => nonCoreCount(graph), [graph])
   const systems = useMemo(() => {
     const order = new Map(SYSTEMS.map((x, i) => [x.type, i]))
     return classTypesPresent(graph).sort((a, b) => (order.get(a) ?? 99) - (order.get(b) ?? 99))
@@ -290,12 +294,18 @@ export default function Network() {
       return { ...f, hiddenKinds: next }
     })
 
+  const addFromBrowser = useCallback((pcid: number, rows: RelationsRow[]) => {
+    setGraph(g => addRelations(g, pcid, rows))
+    setNote(rows.length === 1 ? `Added ${rows[0].node.name} to the graph.` : `Added ${rows.length} concepts to the graph.`)
+  }, [])
+  const browseNode = browsePcid !== null ? (graph.nodes.get(browsePcid) ?? null) : null
+
   const canvasLabel = root
     ? `Graph of ${root.name}: ${visible.nodes.length} concepts and ${visible.edges.length} relationships. The same relationships are listed in the table below the graph.`
     : 'Graph canvas'
 
   const ready = load.s === 'ready' && root
-  const filtersActive = availableGroups.some(g => !filters.groups.has(g)) || filters.hiddenKinds.size > 0 || filters.hiddenClassTypes.size > 0
+  const filtersActive = availableGroups.some(g => !filters.groups.has(g)) || filters.hiddenKinds.size > 0 || filters.hiddenClassTypes.size > 0 || filters.hideNonCore
 
   return (
     <main className="mx-auto w-full max-w-page px-4 pb-16 pt-8 sm:px-6">
@@ -441,6 +451,22 @@ export default function Network() {
                   ))}
                 </fieldset>
               )}
+              {nonCore > 0 && (
+                <fieldset className="flex flex-wrap items-center gap-2">
+                  <legend className="mb-1 text-[13px] text-ink">Show salt, brand and combination records</legend>
+                  <label className="cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      checked={!filters.hideNonCore}
+                      onChange={() => setFilters(f => ({ ...f, hideNonCore: !f.hideNonCore }))}
+                    />
+                    <span className={CHIP} title="Moiety records that are really a salt form, a brand or a combination product">
+                      Non-core moiety records ({nonCore})
+                    </span>
+                  </label>
+                </fieldset>
+              )}
               {systems.length > 1 && (
                 <fieldset className="flex flex-wrap items-center gap-2">
                   <legend className="mb-1 text-[13px] text-ink">Show classification systems</legend>
@@ -540,10 +566,21 @@ export default function Network() {
                 }}
                 onSelectNode={pcid => setSelection({ type: 'node', id: pcid })}
                 onRecenter={startFresh}
+                onBrowse={setBrowsePcid}
               />
             </Card>
           </aside>
         </div>
+      )}
+
+      {ready && browseNode && (
+        <RelationsBrowser
+          graph={graph}
+          node={browseNode}
+          includeCommunity={filters.includeCommunity}
+          onAdd={addFromBrowser}
+          onClose={() => setBrowsePcid(null)}
+        />
       )}
 
       {ready && (

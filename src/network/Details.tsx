@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import Stamp from '../components/Stamp'
 import { GROUPS, GROUP_ORDER, nodeKind, pagePath, predicateDefinition, predicatePhrase } from './predicates'
-import { hasMore, relationsOf } from './model'
+import { hasMore, isNonCore, relationsOf } from './model'
 import type { Filters, GraphState, NetworkEdge, NetworkNode } from './model'
 import type { EvidenceRecord } from './api'
 
@@ -35,6 +35,7 @@ type DetailsProps = {
   onCollapse: (pcid: number) => void
   onSelectNode: (pcid: number) => void
   onRecenter: (pcid: number) => void
+  onBrowse: (pcid: number) => void
 }
 
 const LABEL_KEYS: [string, string][] = [
@@ -80,6 +81,25 @@ function listRank(r: Rec): { label: string; value: string } | null {
   return typeof r.rank === 'number' ? { label: text(r.rank_label) ?? 'Rank', value: `#${r.rank}` } : null
 }
 
+/** Only http(s) links are ever rendered as links. */
+const safeUrl = (v: unknown): string | null => {
+  const t = text(v)
+  return t && /^https?:\/\//i.test(t) ? t : null
+}
+
+function LinkRow({ k, href, label }: { k: string; href: string; label: string }) {
+  return (
+    <div className="flex gap-3 py-1">
+      <dt className="w-32 shrink-0 text-[12.5px] text-ink">{k}</dt>
+      <dd className="min-w-0 break-words text-[13px] text-ink">
+        <a href={href} target="_blank" rel="noopener noreferrer" className="underline decoration-foil decoration-2 underline-offset-2">
+          {label}
+        </a>
+      </dd>
+    </div>
+  )
+}
+
 function Row({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex gap-3 py-1">
@@ -95,6 +115,11 @@ function EdgeDetails({ edge, graph, evidence }: { edge: NetworkEdge; graph: Grap
   const group = GROUPS[edge.group]
   const record = evidence.state === 'ready' ? evidence.record : null
   const quote = text(record?.source_quote)
+  const source = record && typeof record.source === 'object' && record.source !== null && !Array.isArray(record.source) ? (record.source as Rec) : null
+  const sourceName = text(source?.name)
+  const sourceUrl = safeUrl(source?.url)
+  const recordLabel = text(source?.record_label)
+  const recordUrl = safeUrl(source?.record_url)
   const citations = Array.isArray(record?.citations) ? (record?.citations as unknown[]).filter((c): c is string => typeof c === 'string') : []
 
   return (
@@ -128,6 +153,10 @@ function EdgeDetails({ edge, graph, evidence }: { edge: NetworkEdge; graph: Grap
           {record && record.kind === 'list_membership' && listMeasure(record) && <Row k={listMeasure(record)!.label} v={listMeasure(record)!.value} />}
           {record && record.kind === 'list_membership' && listRank(record) && <Row k={listRank(record)!.label} v={listRank(record)!.value} />}
           {record && typeof record.direct === 'boolean' && <Row k="Membership" v={record.direct ? 'Direct' : 'Inherited from a parent class'} />}
+          {sourceName && (sourceUrl ? <LinkRow k="Source dataset" href={sourceUrl} label={sourceName} /> : <Row k="Source dataset" v={sourceName} />)}
+          {recordLabel && (recordUrl ? <LinkRow k="Source record" href={recordUrl} label={recordLabel} /> : <Row k="Source record" v={recordLabel} />)}
+          {text(source?.record_sponsor) && <Row k="Sponsor" v={text(source?.record_sponsor)!} />}
+          {text(source?.license) && <Row k="Data license" v={text(source?.license)!} />}
           {citations.length > 0 && <Row k="Citations" v={citations.join(', ')} />}
         </dl>
         {quote && <blockquote className="lp-score mt-2 pl-3 text-[13px] italic text-ink">{quote}</blockquote>}
@@ -135,7 +164,11 @@ function EdgeDetails({ edge, graph, evidence }: { edge: NetworkEdge; graph: Grap
           <p className="text-[13px] text-ink">No source details are recorded for this relationship.</p>
         )}
         {evidence.state === 'ready' && record && !quote && edge.group !== 'classification' && edge.group !== 'lists' && (
-          <p className="text-[13px] text-ink">No quotation from the source is stored for this relationship.</p>
+          <p className="text-[13px] text-ink">
+            {sourceName
+              ? `Only the source record is stored for this relationship, not its wording. The link above opens the source itself.`
+              : 'No quotation from the source is stored for this relationship.'}
+          </p>
         )}
       </div>
 
@@ -168,6 +201,7 @@ function NodeDetails({
   onExpand,
   onCollapse,
   onRecenter,
+  onBrowse,
 }: {
   graph: GraphState
   node: NetworkNode
@@ -175,6 +209,7 @@ function NodeDetails({
   onExpand: (p: number) => void
   onCollapse: (p: number) => void
   onRecenter: (p: number) => void
+  onBrowse: (p: number) => void
 }) {
   const kind = nodeKind(node.entity_type)
   const info = graph.expanded.get(node.pcid)
@@ -189,6 +224,7 @@ function NodeDetails({
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <Stamp>{kind.label}</Stamp>
           {node.class_type && <Stamp>{node.class_type.toUpperCase()}</Stamp>}
+          {isNonCore(node) && <Stamp sunken>{node.term_type}</Stamp>}
           <span className="font-mono text-[12px] text-ink">PCID-{node.pcid}</span>
         </div>
       </div>
@@ -225,6 +261,11 @@ function NodeDetails({
             Collapse
           </Button>
         )}
+        {info && info.total > 0 && (
+          <Button size="sm" onClick={() => onBrowse(node.pcid)}>
+            Browse all {info.total.toLocaleString('en-US')}
+          </Button>
+        )}
         <Button size="sm" onClick={() => onRecenter(node.pcid)} disabled={busy}>
           Start a new graph here
         </Button>
@@ -245,10 +286,10 @@ function NodeDetails({
 }
 
 export function Details(props: DetailsProps) {
-  const { graph, selectedNode, selectedEdge, evidence, busy, onExpand, onCollapse, onRecenter } = props
+  const { graph, selectedNode, selectedEdge, evidence, busy, onExpand, onCollapse, onRecenter, onBrowse } = props
   if (selectedEdge) return <EdgeDetails edge={selectedEdge} graph={graph} evidence={evidence} />
   if (selectedNode) {
-    return <NodeDetails graph={graph} node={selectedNode} busy={busy} onExpand={onExpand} onCollapse={onCollapse} onRecenter={onRecenter} />
+    return <NodeDetails graph={graph} node={selectedNode} busy={busy} onExpand={onExpand} onCollapse={onCollapse} onRecenter={onRecenter} onBrowse={onBrowse} />
   }
   return (
     <p className="text-[13px] text-ink">

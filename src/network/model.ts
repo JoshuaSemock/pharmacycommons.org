@@ -20,6 +20,8 @@ export type NetworkNode = {
   name: string
   entity_type: string
   class_type: string | null
+  /** Moieties only: 'Core moiety', or the kind of non-core record (salt form, brand, combination). */
+  term_type?: string | null
 }
 
 export type NetworkEdge = {
@@ -60,8 +62,13 @@ function parseNode(v: unknown): NetworkNode | null {
   const slug = str(v.slug)
   const name = str(v.name)
   if (pcid === null || !slug || !name) return null
-  return { pcid, slug, name, entity_type: str(v.entity_type) ?? '', class_type: str(v.class_type) }
+  return { pcid, slug, name, entity_type: str(v.entity_type) ?? '', class_type: str(v.class_type), term_type: str(v.term_type) }
 }
+
+export const CORE_MOIETY = 'Core moiety'
+
+/** A moiety row that is really a salt form, brand or combination (phase 25a left 69 by design). */
+export const isNonCore = (n: NetworkNode): boolean => n.entity_type === 'moiety' && !!n.term_type && n.term_type !== CORE_MOIETY
 
 function parseEdge(v: unknown): NetworkEdge | null {
   if (!isRecord(v)) return null
@@ -222,6 +229,8 @@ export type Filters = {
   hiddenKinds: ReadonlySet<string>
   /** Classification systems to hide (class_type: 'chemont', 'atc', ...). */
   hiddenClassTypes: ReadonlySet<string>
+  /** Hide moiety records whose term_type is not 'Core moiety'. Off by default: nothing is hidden unasked. */
+  hideNonCore: boolean
   includeCommunity: boolean
 }
 
@@ -229,6 +238,7 @@ export const defaultFilters = (): Filters => ({
   groups: new Set(GROUP_ORDER),
   hiddenKinds: new Set(),
   hiddenClassTypes: new Set(),
+  hideNonCore: false,
   includeCommunity: false,
 })
 
@@ -245,6 +255,7 @@ export function visibleGraph(state: GraphState, filters: Filters): Visible {
     if (!n) return false
     if (pcid === state.root) return true
     if (filters.hiddenKinds.has(n.entity_type)) return false
+    if (filters.hideNonCore && isNonCore(n)) return false
     return !(n.class_type && filters.hiddenClassTypes.has(n.class_type))
   }
   const edges: NetworkEdge[] = []
@@ -271,6 +282,13 @@ export function classTypesPresent(state: GraphState): string[] {
   const seen = new Set<string>()
   for (const n of state.nodes.values()) if (n.entity_type === 'class' && n.class_type) seen.add(n.class_type)
   return [...seen].sort()
+}
+
+/** How many non-core moiety records the graph holds, for the filter chip. */
+export function nonCoreCount(state: GraphState): number {
+  let n = 0
+  for (const node of state.nodes.values()) if (isNonCore(node)) n++
+  return n
 }
 
 /** Distinct entity types present in the graph, for the node-type filter. */
@@ -318,4 +336,63 @@ export function relationsOf(state: GraphState, pcid: number, filters: Filters): 
 export function hasMore(state: GraphState, pcid: number): number {
   const info = state.expanded.get(pcid)
   return info ? Math.max(0, info.total - info.shown) : 0
+}
+
+// ─── Paged relations (hub browser) ───────────────────────────────────────────
+
+export type RelationsRow = {
+  edge: NetworkEdge
+  node: NetworkNode
+  /** Is the browsed concept the subject of the recorded edge? */
+  outgoing: boolean
+}
+
+export type RelationsPage = {
+  rows: RelationsRow[]
+  group_counts: Partial<Record<NetworkGroup, number>>
+  /** Rows matching the group and name filters, across every page. */
+  total: number
+  offset: number
+  limit: number
+}
+
+/** Reads network_relations() defensively; malformed rows are dropped. */
+export function parseRelations(raw: unknown): RelationsPage {
+  const r = isRecord(raw) ? raw : {}
+  const rows: RelationsRow[] = []
+  for (const item of Array.isArray(r.rows) ? r.rows : []) {
+    if (!isRecord(item)) continue
+    const edge = parseEdge(item.edge)
+    const node = parseNode(item.node)
+    if (edge && node) rows.push({ edge, node, outgoing: item.outgoing === true })
+  }
+  const counts: Partial<Record<NetworkGroup, number>> = {}
+  if (isRecord(r.group_counts)) {
+    for (const [k, v] of Object.entries(r.group_counts)) {
+      const n = num(v)
+      if (isGroup(k) && n !== null) counts[k] = n
+    }
+  }
+  return { rows, group_counts: counts, total: num(r.total) ?? rows.length, offset: num(r.offset) ?? 0, limit: num(r.limit) ?? rows.length }
+}
+
+/**
+ * Puts chosen rows from the hub browser on the graph. `from` is the browsed concept, so collapsing
+ * it later takes these neighbors away with the rest of its branch. Edges already drawn are kept as
+ * they are; the concept's own "shown of total" counter is left alone, because these rows were
+ * picked by name, not by the round-robin order it counts.
+ */
+export function addRelations(state: GraphState, from: number, rows: RelationsRow[]): GraphState {
+  if (!state.nodes.has(from)) return state
+  const nodes = new Map(state.nodes)
+  const edges = new Map(state.edges)
+  const introducedBy = new Map(state.introducedBy)
+  for (const { edge, node } of rows) {
+    if (!nodes.has(node.pcid)) {
+      nodes.set(node.pcid, node)
+      introducedBy.set(node.pcid, from)
+    }
+    if (!edges.has(edge.id) && nodes.has(edge.subject) && nodes.has(edge.object)) edges.set(edge.id, edge)
+  }
+  return { ...state, nodes, edges, introducedBy }
 }
