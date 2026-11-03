@@ -283,6 +283,9 @@ function NodeDetails({
         <Link to={`/network/compare?c=${node.pcid}`} className="lp-press rounded-md px-3 py-1 font-sans text-[12.5px] text-ink">
           Compare with…
         </Link>
+        <Link to={`/network/hierarchy?c=${node.pcid}`} className="lp-press rounded-md px-3 py-1 font-sans text-[12.5px] text-ink">
+          Classification tree
+        </Link>
       </div>
     </div>
   )

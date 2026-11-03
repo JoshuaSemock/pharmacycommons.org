@@ -65,6 +65,20 @@ A record is linked to every **published** list it is an entry on; a list opened 
 - **Graph.** "Show as a graph" draws the compared concepts, every concept loaded so far and the lines between them, through the same `GraphCanvas`. Shared concepts are the ones with lines to more than one compared concept. It is built from the loaded rows, so load more of a set to see more of it.
 - Contributor-added relationships are off unless ticked.
 
+## Classification hierarchy (v6, 2026-11-03)
+
+`/network/hierarchy?c=<pcid>[,<pcid>…]` (one to four concepts; `src/pages/NetworkHierarchy.tsx`, model and layout in `src/network/hierarchy.ts`, drawing in `src/network/HierarchyView.tsx`) shows where concepts sit in each classification system as the tree it is. Entry points: "Classification tree" in the node details, the Network intro, a link on the Compare page, header search.
+
+**Why.** `class_members` stores every ancestor of a class as an inherited (`is_direct = false`) membership, so a flat reading makes metformin look like a member of five unrelated ATC and VA classes. The tree is in `drug_classes.parent_pcid`; the force graph still draws the flat edges, this page draws the tree.
+
+`db/phase33_network_hierarchy.sql` (applied as `phase33_network_hierarchy`): `network_hierarchy(pcids)` starts from each concept's direct classes (or the concept itself when it is a class), walks `parent_pcid` to the root (a recursive `UNION`, so a cycle in bad data terminates), and returns every class on those paths with the concepts beneath it (`members`) and a `meeting` flag. Null for none or more than four distinct PCIDs. SECURITY INVOKER, executable by anon.
+
+- **Meeting point.** A class with two or more of the concepts beneath it and no child class holding the same set: the lowest clade they have in common in that system. Metformin and empagliflozin meet at *Blood glucose lowering drugs, excl. insulins* in ATC (Biguanides and SGLT2 inhibitors sit below it, one drug each) and at *Oral hypoglycemic agents, oral* in VA (both drugs are direct members). A class that holds only one concept is not shared however high it sits.
+- **Reading order.** The "In common" card gives the lowest shared class first, in bold, then the path from the root (Alimentary tract and metabolism › Drugs used in diabetes › Blood glucose lowering drugs, excl. insulins). Systems where the concepts meet are drawn open and first, in the site's system order (ATC, VA, FDA, ChemOnt); the rest follow folded. Within a class, branches holding more concepts come before branches holding one.
+- **Drawing.** Plain SVG, left to right, root at the left and the compared concepts as leaves. Filled dot = more than one concept beneath, hollow = one, ringed and bold = meeting point, square = the concept itself. Shape and weight, not color. Long names wrap at 26 characters so a deep tree fits a page; a leaf row is as tall as the tallest label on its path to the root. Labels are real links (classes to `/classifications/:slug`, drugs to their pages); the tooltip is on the marker so a link's name is not read twice.
+- **One concept** works too: its classes in each system, no "In common" card.
+- Checked live: metformin + empagliflozin 53 classes across seven systems, 10.6 KB, 8 ms for four drugs.
+
 ## Adding a predicate or node kind
 
 1. Predicate: add it to `public.predicates`, add a `when` line in `network_predicate_group()`, add its phrase and definition to `PREDICATES` in `predicates.ts`. `predicates.test.ts` parses the SQL and fails if the two drift.

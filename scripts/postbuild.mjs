@@ -83,6 +83,11 @@ const STATIC_ROUTES = [
     description: 'Pick two to four drugs, classes or topics and see what they share and what only one of them has, from the relationships recorded in Pharmacy Commons.',
   },
   {
+    path: '/network/hierarchy',
+    title: 'Classification hierarchy in Network',
+    description: 'See where drugs or classes sit in WHO ATC, VA and other classification trees, and the lowest class two or more of them share, from Pharmacy Commons records.',
+  },
+  {
     path: '/learn',
     title: 'Learn',
     description: 'Free flashcards and single-best-answer questions built from Pharmacy Commons records, scheduled with spaced repetition. No account needed.',

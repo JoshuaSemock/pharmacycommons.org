@@ -322,6 +322,10 @@ export default function Network() {
           <Link to={centerPcid !== null ? `/network/compare?c=${centerPcid}` : '/network/compare'} className="underline decoration-foil decoration-2 underline-offset-2">
             compare
           </Link>
+          , and for where a concept sits in each classification system, the{' '}
+          <Link to={centerPcid !== null ? `/network/hierarchy?c=${centerPcid}` : '/network/hierarchy'} className="underline decoration-foil decoration-2 underline-offset-2">
+            classification tree
+          </Link>
           . See the{' '}
           <Link to="/disclaimer" className="underline decoration-foil decoration-2 underline-offset-2">
             medical disclaimer
