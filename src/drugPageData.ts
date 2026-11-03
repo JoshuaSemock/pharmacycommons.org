@@ -123,6 +123,32 @@ export function useLasa(pcidCode: string): Loadable<LasaPair[]> {
   return usePcidQuery(pcidCode, getLasa, 'look-alike/sound-alike names')
 }
 
+/** One REMS program covering the drug, from get_rems() (phase 30). Brand and combination pages roll up to their moiety. */
+export type RemsProgram = {
+  rems_id: number
+  program: string
+  status: 'Active' | 'Inactive'
+  etasu: boolean
+  medication_guide: boolean
+  communication_plan: boolean
+  implementation_system: boolean
+  shared_system: boolean
+  website: string | null
+  brands: string | null
+  inactive_brands: string | null
+}
+
+async function getRems(pcid: number, signal: AbortSignal): Promise<RemsProgram[]> {
+  const { data, error } = await supabase.rpc('get_rems', { p_pcid: pcid }).abortSignal(signal)
+  if (error) throw new Error(error.message)
+  return (data ?? []) as RemsProgram[]
+}
+
+/** FDA REMS programs that cover the drug (active first). */
+export function useRems(pcidCode: string): Loadable<RemsProgram[]> {
+  return usePcidQuery(pcidCode, getRems, 'REMS programs')
+}
+
 /** Every list the drug is on (for a moiety, also lists that name one of its forms or combinations). */
 export function useEntityLists(pcidCode: string): Loadable<EntityList[]> {
   return usePcidQuery(pcidCode, (pcid, signal) => getEntityLists(pcid, { signal }), 'lists')

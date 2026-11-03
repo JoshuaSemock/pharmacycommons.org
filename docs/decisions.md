@@ -77,6 +77,11 @@
 **Look-alike/sound-alike names (2026-11-02)**
 - LASA list from Joshua's TallMan.xlsx (which names each drug is confused with, and whether it has Tall Man lettering), linked to PCIDs and shown in each drug page's Quick facts box.
 
+**REMS products (2026-11-03)**
+- New list from REMS_Products.csv: one row per generic moiety, affected brand names alongside, with Active and Inactive sublists.
+- Each drug page's Quick facts box gets a REMS row (programs, status, elements, brands).
+- Combination products list the REMS-driving moiety only, unless the REMS covers both components.
+
 ## Community editing
 
 **Page layout**
