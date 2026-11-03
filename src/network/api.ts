@@ -10,12 +10,13 @@
 import { getSupabase } from '../db'
 import { loadCatalog, searchCatalog } from '../catalog'
 import { loadAllClasses, searchClasses } from '../classifications'
-import { parsePayload } from './model'
-import type { NetworkPayload } from './model'
+import { parsePayload, parseRelations } from './model'
+import type { NetworkPayload, RelationsPage } from './model'
 import type { NetworkGroup } from './predicates'
 
 export const PAGE_SIZE = 40
 export const MAX_PAGE_SIZE = 200
+export const RELATIONS_PAGE = 25
 
 export class NetworkUnavailable extends Error {
   /** True when the RPC does not exist yet (migration 19 not applied), as opposed to a transient failure. */
@@ -53,6 +54,37 @@ export async function fetchNeighborhood(pcid: number, opts: NeighborhoodOptions 
     throw new NetworkUnavailable(missing ? 'The network service is not available yet.' : 'The network could not be loaded.', missing)
   }
   return parsePayload(data)
+}
+
+export type RelationsOptions = {
+  groups?: NetworkGroup[]
+  query?: string
+  includeCommunity?: boolean
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}
+
+/** One page of a concept's relations, alphabetical by the other concept's name, for the hub browser. */
+export async function fetchRelations(pcid: number, opts: RelationsOptions = {}): Promise<RelationsPage> {
+  if (!Number.isSafeInteger(pcid) || pcid <= 0) throw new NetworkUnavailable('Not a valid PCID.', false)
+  const supabase = await getSupabase()
+  const limit = Math.min(Math.max(opts.limit ?? RELATIONS_PAGE, 1), MAX_PAGE_SIZE)
+  let q = supabase.rpc('network_relations', {
+    p_pcid: pcid,
+    p_groups: opts.groups && opts.groups.length ? opts.groups : null,
+    p_include_community: opts.includeCommunity ?? false,
+    p_query: opts.query?.trim() ? opts.query.trim() : null,
+    p_limit: limit,
+    p_offset: Math.max(opts.offset ?? 0, 0),
+  })
+  if (opts.signal) q = q.abortSignal(opts.signal)
+  const { data, error } = await q
+  if (error) {
+    const missing = error.code === 'PGRST202' || error.code === '42883'
+    throw new NetworkUnavailable(missing ? 'The network service is not available yet.' : 'The relationships could not be loaded.', missing)
+  }
+  return parseRelations(data)
 }
 
 export type EvidenceRecord = Record<string, unknown> & { kind: string }

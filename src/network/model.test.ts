@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { branchOf, classTypesPresent, collapse, defaultFilters, emptyGraph, hasMore, kindsPresent, mergePayload, parsePayload, relationsOf, visibleGraph } from './model'
+import { addRelations, branchOf, classTypesPresent, collapse, defaultFilters, emptyGraph, hasMore, isNonCore, kindsPresent, mergePayload, nonCoreCount, parsePayload, parseRelations, relationsOf, visibleGraph } from './model'
 import type { NetworkEdge, NetworkNode, NetworkPayload } from './model'
 
 const node = (pcid: number, name: string, entity_type = 'moiety', class_type: string | null = null): NetworkNode => ({
@@ -271,5 +271,80 @@ describe('list-membership edges', () => {
     expect(p.edges[0].group).toBe('lists')
     expect(p.group_counts.lists).toBe(9)
     expect(kindsPresent(mergePayload(emptyGraph(), p, 1000240, true))).toContain('list')
+  })
+})
+
+describe('non-core moiety filter', () => {
+  const salt = { ...node(1000900, 'metformin hydrochloride'), term_type: 'Salt form' }
+  const core = { ...node(1000901, 'glipizide'), term_type: 'Core moiety' }
+  const g = mergePayload(
+    emptyGraph(),
+    payload(metformin, [salt, core, biguanides], [
+      edge('cs:1', 1001923, 'has_component', 1000900, 'composition'),
+      edge('cs:2', 1001923, 'interacts_with', 1000901, 'interaction'),
+      edge('cm:5000100:1001923', 1001923, 'member_of', 5000100, 'classification'),
+    ]),
+    1001923,
+    true,
+  )
+
+  it('recognises only moiety records whose term_type is not Core moiety', () => {
+    expect(isNonCore(salt)).toBe(true)
+    expect(isNonCore(core)).toBe(false)
+    expect(isNonCore(biguanides)).toBe(false)
+    expect(isNonCore({ ...salt, term_type: null })).toBe(false)
+    expect(isNonCore({ ...salt, entity_type: 'combination' })).toBe(false)
+    expect(nonCoreCount(g)).toBe(1)
+  })
+
+  it('hides them only when asked, without deleting them, and never hides the root', () => {
+    expect(visibleGraph(g, defaultFilters()).nodes.map(n => n.pcid)).toContain(1000900)
+    const v = visibleGraph(g, { ...defaultFilters(), hideNonCore: true })
+    expect(v.nodes.map(n => n.pcid)).not.toContain(1000900)
+    expect(v.edges.map(e => e.id)).not.toContain('cs:1')
+    expect(g.nodes.has(1000900)).toBe(true)
+    const rootSalt = { ...salt }
+    const solo = mergePayload(emptyGraph(), payload(rootSalt, [], []), 1000900, true)
+    expect(visibleGraph(solo, { ...defaultFilters(), hideNonCore: true }).nodes.map(n => n.pcid)).toEqual([1000900])
+  })
+
+  it('reads term_type from the payload', () => {
+    const p = parsePayload({ nodes: [{ pcid: 1, slug: 'a', name: 'A', entity_type: 'moiety', term_type: 'Brand / proprietary formulation' }] })
+    expect(p.nodes[0].term_type).toBe('Brand / proprietary formulation')
+  })
+})
+
+describe('paged relations', () => {
+  const row = {
+    edge: { id: 'cm:5000100:1001923', subject: 1001923, predicate: 'member_of', object: 5000100, group: 'classification', direct: true, community: false },
+    node: { pcid: 5000100, slug: 'biguanides', name: 'Biguanides', entity_type: 'class', class_type: 'epc' },
+    outgoing: true,
+  }
+
+  it('parses rows and counts, dropping malformed rows', () => {
+    const page = parseRelations({ rows: [row, { edge: { id: 'x' }, node: {} }, 'nope'], group_counts: { classification: 38, bogus: 3 }, total: 38, offset: 25, limit: 25 })
+    expect(page.rows).toHaveLength(1)
+    expect(page.rows[0].outgoing).toBe(true)
+    expect(page.group_counts).toEqual({ classification: 38 })
+    expect([page.total, page.offset, page.limit]).toEqual([38, 25, 25])
+    expect(parseRelations(null)).toEqual({ rows: [], group_counts: {}, total: 0, offset: 0, limit: 0 })
+  })
+
+  it('adds chosen rows under the browsed concept and leaves its counters alone', () => {
+    const start = mergePayload(emptyGraph(), payload(metformin, [], [], { total: 80 }), 1001923, true)
+    const page = parseRelations({ rows: [row] })
+    const next = addRelations(start, 1001923, page.rows)
+    expect(next.nodes.has(5000100)).toBe(true)
+    expect(next.edges.has('cm:5000100:1001923')).toBe(true)
+    expect(next.introducedBy.get(5000100)).toBe(1001923)
+    expect(next.expanded.get(1001923)).toEqual(start.expanded.get(1001923))
+    expect(addRelations(next, 1001923, page.rows).edges.size).toBe(1)
+    // collapsing the browsed concept takes the added branch away like any other
+    expect(collapse(next, 1001923).nodes.has(5000100)).toBe(false)
+  })
+
+  it('ignores rows for a concept that is not on the graph', () => {
+    const start = mergePayload(emptyGraph(), payload(metformin, [], []), 1001923, true)
+    expect(addRelations(start, 42, parseRelations({ rows: [row] }).rows)).toBe(start)
   })
 })

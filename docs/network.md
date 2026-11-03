@@ -44,6 +44,15 @@ A record is linked to every **published** list it is an entry on; a list opened 
 - Large lists (722 entries on Federal Controlled Substances) are paged by the usual round-robin cap; members sort alphabetically, not by rank.
 - First page of a drug that is on many lists shows only one list edge before use/safety edges in the round-robin; use the Lists filter chip for the rest.
 
+## Hub paging, non-core filter and evidence sources (v4, 2026-11-03)
+
+`db/phase32a_network_hubs.sql`, applied as `phase32a_1/2/3_*`:
+
+- **`network_edges(pcid, include_community)`** is the one place every edge kind is unioned; `network_neighborhood()` now reads it. Edges and group counts for four concepts (acetazolamide, metformin, oxybutynin, lidocaine) hashed identically before and after. Add a new edge source there, once.
+- **`network_relations(pcid, groups, include_community, query, limit, offset)`** is the table-style read for hubs: alphabetical by the other concept's name, filtered by group and by name (`ilike`, wildcards escaped), `total` after the filters, `group_counts` before them. The graph keeps its round-robin read; this is for browsing a class with thousands of members. Client: `fetchRelations` and `src/network/RelationsBrowser.tsx`, opened from "Browse all N" in the node details. Rows are added to the graph one at a time or a page at a time (`addRelations` in `model.ts`); they hang under the browsed concept, so Collapse removes them, and its "shown of total" counter is untouched because these rows were chosen by name, not by the round-robin order.
+- **Non-core moieties.** Nodes now carry `term_type` (moieties only). The flag is the existing `moieties.term_type`; "non-core" means any value other than `Core moiety` (69 rows after phase 25a). The filter chip "Non-core moiety records (N)" appears only when such a node is on the graph, is **on by default** (nothing is hidden unasked), and never hides the starting concept. Hiding them from search and browse is a separate, still-open task.
+- **Evidence sources.** `network_edge_evidence()` adds `source` to clinical statements, resolved from `data_sources` and, for `Drugs@FDA appl …` documents, `fda_applications` (application type and number, sponsor, and a link to that application on Drugs@FDA). Nothing is synthesised: the 6,443 FDA and 334 Pharmacy Commons composition statements have a source record but no quotation, and the panel says "Only the source record is stored … not its wording". 105 curator assertions have no resolvable source and still show only what they carry. Real quotations would need a separate ingest of label text; the 147 `fda_table_pgx` rows already have them.
+
 ## Adding a predicate or node kind
 
 1. Predicate: add it to `public.predicates`, add a `when` line in `network_predicate_group()`, add its phrase and definition to `PREDICATES` in `predicates.ts`. `predicates.test.ts` parses the SQL and fails if the two drift.
@@ -81,4 +90,4 @@ Modelled on Obsidian's local graph; no database changes.
 
 ## Future work
 
-Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. Entry rank/score ordering for a list's own graph, brand entries via `component_pcid`, a public `/v1/network` endpoint, new predicates for mechanism and interaction data, and server-side paging UI for very large classes.
+Pharmacopoe AI can read the same neighborhood RPC to explain a graph; it must read the record, never write relationships. Entry rank/score ordering for a list's own graph, brand entries via `component_pcid`, a public `/v1/network` endpoint, new predicates for mechanism and interaction data. Quotations for FDA composition statements would need label text ingested per statement.

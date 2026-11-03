@@ -12,7 +12,7 @@ function rpcResult(...args: unknown[]) {
   return { then: p.then.bind(p), catch: p.catch.bind(p), finally: p.finally.bind(p) }
 }
 
-const { NetworkUnavailable, fetchEvidence, fetchNeighborhood, searchConcepts } = await import('./api')
+const { NetworkUnavailable, fetchEvidence, fetchNeighborhood, fetchRelations, searchConcepts } = await import('./api')
 
 beforeEach(() => {
   rpc.mockReset()
@@ -92,5 +92,33 @@ describe('searchConcepts with lists', () => {
   it('still searches when the lists cannot be loaded', async () => {
     listLists.mockRejectedValue(new Error('offline'))
     await expect(searchConcepts('metformin')).resolves.toEqual([])
+  })
+})
+
+describe('fetchRelations', () => {
+  it('sends validated, clamped arguments', async () => {
+    rpc.mockReturnValue({ data: { rows: [], total: 0 }, error: null })
+    await fetchRelations(1000577, { groups: ['classification'], query: '  carbon  ', limit: 99999, offset: -4 })
+    expect(rpc).toHaveBeenCalledWith('network_relations', {
+      p_pcid: 1000577,
+      p_groups: ['classification'],
+      p_include_community: false,
+      p_query: 'carbon',
+      p_limit: 200,
+      p_offset: 0,
+    })
+    await fetchRelations(1000577)
+    expect(rpc).toHaveBeenLastCalledWith('network_relations', expect.objectContaining({ p_groups: null, p_query: null, p_limit: 25 }))
+  })
+
+  it('rejects a bad PCID without calling the database, and maps errors', async () => {
+    await expect(fetchRelations(0)).rejects.toBeInstanceOf(NetworkUnavailable)
+    expect(rpc).not.toHaveBeenCalled()
+    rpc.mockReturnValue({ data: null, error: { code: 'PGRST202' } })
+    await expect(fetchRelations(1000577)).rejects.toMatchObject({ notDeployed: true })
+    rpc.mockReturnValue({ data: null, error: { code: '57014', message: 'internals' } })
+    const err = await fetchRelations(1000577).catch(e => e)
+    expect(err.notDeployed).toBe(false)
+    expect(err.message).not.toMatch(/internals/)
   })
 })
