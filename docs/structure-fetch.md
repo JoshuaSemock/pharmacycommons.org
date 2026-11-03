@@ -87,10 +87,21 @@ No merge was made. Seven pairs share an InChIKey; each was ruled on (all have di
 | `QBKSWRVVCFFDOT-UHFFFAOYSA-N` | 1015139 GOSSYPOL, (R)-, 1008990 GOSSYPOL | Keep; `synonym_of_pcid` of 1015139 set to 1008990 (live 2026-11-03, tag `phase34d_inchikey_pair_rulings`). |
 | `XCGYUJZMCCFSRP-UHFFFAOYSA-N` | 1015524 OXAMNIQUINE, (-)-, 1002149 OXAMNIQUINE | Keep; the (-) row already has `synonym_of_pcid` = 1002149. |
 | `XZEUAXYWNKYKPL-WDYNHAJCSA-N` | 1015209 LEVORMELOXIFENE, 1011773 ORMELOXIFENE | Keep separate; no link. |
-| `WTFXARWRTYJXII-UHFFFAOYSA-N` | 1001440 FERUMOXIDES, 1001442 FERUMOXYTOL | Ferumoxytol is the moiety; ferumoxides is a class (Joshua). Both rows kept for now; 1001440 is still filed as a moiety. |
+| `WTFXARWRTYJXII-UHFFFAOYSA-N` | 1001440 FERUMOXIDES, 1001442 FERUMOXYTOL | Ferumoxytol is the moiety; ferumoxides is a class (Joshua). Moiety 1001440 retired, replaced by class 5004982 `ferumoxides` (phase 34d, below). |
 | `PEYUIKBAABKQKQ-AFHBHXEDSA-N` | 1015527 SESAMIN, 1015528 SESAMIN, (±)- | Keep; the (±) row already has `synonym_of_pcid` = 1015527. |
 
 The 849 GSRS InChIKeys can now be backfilled into `moieties` with COALESCE guards; the shared keys above are known and intended.
+
+## Ferumoxides re-filed as a class (phase 34d, 2026-11-03)
+
+`db/phase34d_ferumoxides_to_class.sql`: new block-5 class 5004982 (`class_type` curated, `source_system` PharmacyCommons, slug
+`ferumoxides`); moiety 1001440 deleted and retired with `replaced_by_pcid` 5004982. Moved to the class: its 2 class memberships
+(Magnetic Resonance Contrast Activity 5000314, Paramagnetic Contrast Agent 5000376), 3 dictionary terms, the label link, the
+GSRS structure row (still counted in the 10,731, now attached to the class pcid), and the rxclass/rxnorm/classyfire staging rows.
+**Judgment call, easy to change:** a class cannot be a `has_component` object or an FDA ingredient moiety, so the Feridex
+(NDA020416-001, formulation 4002142) ingredient link and its `has_component` triple now point to Iron 1009810, which is
+FDA's own active moiety and what `active_moiety_pcid` already said. The class has no direct members yet, so `list_classes()`
+hides it from the class index (the page works by slug). Ferumoxytol 1001442 is untouched.
 
 ## Open items
 
