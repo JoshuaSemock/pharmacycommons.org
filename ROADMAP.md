@@ -13,7 +13,7 @@
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1–3 | Core schema, workbook ETL, frontend cutover | ✅ Done |
-| 4 | Enrichment: openFDA, CAS structures, classes, ECOTOX | 🟡 FDA products linked to PCIDs (phase 10) and classes loaded; **CAS structures and ECOTOX not started** |
+| 4 | Enrichment: openFDA, CAS structures, classes, ECOTOX | 🟡 FDA products linked to PCIDs (phase 10) and classes loaded; **structures via PubChem and FDA GSRS 10,731 of 15,930 (phase 34); CAS structures and ECOTOX not started** |
 | 5 | Governance & community: NPI verification, saved pages, moderation | ✅ Built — moderator UI (`/review`, `/admin`), roles incl. `owner`, community editing (phase 15), contributions admin; end-to-end test not written |
 | 6–7 | Label text; brand names via RxNorm | ✅ Done |
 | 8 | Drug classes, machine-readable API v1, version history, permalinks | ✅ Done; `/api` on the site domain still to switch over |
@@ -89,10 +89,15 @@ page; legal documents (effective 2026-10-27).
 
 ## Next — enrichment
 
-**6. Structure identifiers (CAS Common Chemistry)** — `physiochemical` has 0 rows. Backfill SMILES,
-InChI/InChIKey, formula, mass for every PCID with a CAS RN. CAS rows stay CC BY-NC 4.0 and must not
-be presented as CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow /
-pKa / solubility — those need a separate physprop source.
+**6. Structure identifiers** — *2026-11-03 (phase 34, `docs/structure-fetch.md`):* SMILES, InChI/InChIKey,
+formula and mass now come from PubChem (by InChIKey) and FDA GSRS (by UNII), not CAS: 10,731 of 15,930
+moieties done (81.2% of those that can have a structure), 2,718 marked not applicable (biologics etc.),
+349 not found at PubChem, 2,132 never tried (2,063 core moieties with no UNII or InChIKey). Next: DrugBank-ID
+rung (about 515), a reviewed name-lookup rung, then InChIKey backfill into `moieties` after Joshua rules on
+seven InChIKey-sharing pairs, (licence wording for the PubChem/GSRS rows is shelved by Joshua, 2026-11-03). Probe PubChem before any further run.
+*Still open:* the CAS Common Chemistry backfill. CAS rows stay CC BY-NC 4.0 and must not be presented as
+CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow / pKa / solubility —
+those need a separate physprop source.
 
 **7. Eco-risk data (ECOTOX / PPCP)** — inspect the real archive schema first, then write the loader
 (match on CAS). Define the RQ/PEC/MEC calculation and where it lives before showing any number.
@@ -123,7 +128,7 @@ schema definition for the API.
 - **`/api` hosting:** Cloudflare proxy (2026-09-28).
 - **Codebase license:** GPL-3.0-or-later.
 - **Repo sync:** missing Edge Function sources, reconstructed `db/` files, dead files deleted
-  (2026-10-13). All 9 deployed functions are in `supabase/functions/`.
+  (2026-10-13). All 11 deployed functions are in `supabase/functions/` (the two phase 34 structure functions added 2026-11-03).
 - **`moiety_hierarchy` mislabeling** fixed (v4). **FDA → PCID linking** data side done (phase 10).
 - **Primary class pointer:** replaced by hand-written `description_text` on moieties (phase 13); only
   the column drop (13c) remains.
