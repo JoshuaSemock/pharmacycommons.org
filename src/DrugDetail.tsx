@@ -37,6 +37,7 @@ import { isAbort, useEntityClasses, useEntityLists, useLabelText, useLegalStatus
 import type { LabelState, Loadable } from './drugPageData'
 import LasaFact from './components/LasaFact'
 import RemsFact from './components/RemsFact'
+import StructureIdentifier from './components/StructureIdentifier'
 import NetworkLink from './components/NetworkLink'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
@@ -1139,6 +1140,14 @@ function IdentifiersSection({ drug }: { drug: DrugDetailType }) {
             </IdentifierRow>
           ),
         )}
+        <StructureIdentifier
+          pcidCode={drug.pcid_code}
+          row={(label, source, children) => (
+            <IdentifierRow label={label} source={source}>
+              {children}
+            </IdentifierRow>
+          )}
+        />
         {extras.map(r => (
           <IdentifierRow key={r.label} label={r.label} source={r.source}>
             <IdentifierValue attrKey={r.attr} value={value(r.attr)} name={drug.name} />
