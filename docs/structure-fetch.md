@@ -76,27 +76,28 @@ directly; probe through the function.
   `select net.worker_restart();` cleared it.
 - The SQL tool's statement timeout is about 2 minutes; poll instead of sleeping.
 
-## For Joshua to decide
+## InChIKey-sharing pairs: Joshua's rulings (2026-11-03)
 
-Merge calls on InChIKeys shared by two moieties (no merge was made; both rows keep their own
-structure row, except the first pair, which rung 1 skips):
+No merge was made. Seven pairs share an InChIKey; each was ruled on (all have distinct UNIIs):
 
-| Key | PCIDs |
-| --- | --- |
-| `WDEFBBTXULIOBB-WBVHZDCISA-N` | 1007750 DEXTILIDINE, 1014084 TILIDINE |
-| `DYLGFOYVTXJFJP-MYYYXRDXSA-N` | 1015523 LUMEFANTRINE, (-)-, 1001855 LUMEFANTRINE |
-| `QBKSWRVVCFFDOT-UHFFFAOYSA-N` | 1015139 GOSSYPOL, (R)-, 1008990 GOSSYPOL |
-| `XCGYUJZMCCFSRP-UHFFFAOYSA-N` | 1015524 OXAMNIQUINE, (-)-, 1002149 OXAMNIQUINE |
-| `XZEUAXYWNKYKPL-WDYNHAJCSA-N` | 1015209 LEVORMELOXIFENE, 1011773 ORMELOXIFENE |
-| `WTFXARWRTYJXII-UHFFFAOYSA-N` | 1001440 FERUMOXIDES, 1001442 FERUMOXYTOL |
-| `PEYUIKBAABKQKQ-AFHBHXEDSA-N` | 1015527 SESAMIN, 1015528 SESAMIN, (±)- |
+| Key | PCIDs | Ruling |
+| --- | --- | --- |
+| `WDEFBBTXULIOBB-WBVHZDCISA-N` | 1007750 DEXTILIDINE, 1014084 TILIDINE | Keep separate; no link. |
+| `DYLGFOYVTXJFJP-MYYYXRDXSA-N` | 1015523 LUMEFANTRINE, (-)-, 1001855 LUMEFANTRINE | Keep; the (-) row already has `synonym_of_pcid` = 1001855. |
+| `QBKSWRVVCFFDOT-UHFFFAOYSA-N` | 1015139 GOSSYPOL, (R)-, 1008990 GOSSYPOL | Keep; `synonym_of_pcid` of 1015139 set to 1008990 (live 2026-11-03, tag `phase34d_inchikey_pair_rulings`). |
+| `XCGYUJZMCCFSRP-UHFFFAOYSA-N` | 1015524 OXAMNIQUINE, (-)-, 1002149 OXAMNIQUINE | Keep; the (-) row already has `synonym_of_pcid` = 1002149. |
+| `XZEUAXYWNKYKPL-WDYNHAJCSA-N` | 1015209 LEVORMELOXIFENE, 1011773 ORMELOXIFENE | Keep separate; no link. |
+| `WTFXARWRTYJXII-UHFFFAOYSA-N` | 1001440 FERUMOXIDES, 1001442 FERUMOXYTOL | Ferumoxytol is the moiety; ferumoxides is a class (Joshua). Both rows kept for now; 1001440 is still filed as a moiety. |
+| `PEYUIKBAABKQKQ-AFHBHXEDSA-N` | 1015527 SESAMIN, 1015528 SESAMIN, (±)- | Keep; the (±) row already has `synonym_of_pcid` = 1015527. |
+
+The 849 GSRS InChIKeys can now be backfilled into `moieties` with COALESCE guards; the shared keys above are known and intended.
+
+## Open items
 
 - **Licensing (shelved by Joshua, 2026-11-03: wording not settled; do not draft it until he reopens it).** `physiochemical` now holds PubChem and GSRS rows next to the (still empty)
   CAS scope. GSRS is U.S. government data. PubChem record data is generally open, but
   depositors can attach their own terms. Confirm how `docs/data-provenance-and-licensing.md`
   and `api_meta.data_license_scope` should describe these rows before the table is served
   through `/api` (it is not served today).
-- **InChIKey backfill into `moieties`.** The 849 GSRS rows carry InChIKeys, but writing them
-  to `moieties.inchi_key` would create more shared keys; decide the pairs above first, then
-  backfill with COALESCE guards.
+- **InChIKey backfill into `moieties`.** The pairs above are ruled on; the backfill (COALESCE-guarded) is not yet run.
 - **Name-lookup rung (4)** writes nothing until Joshua has reviewed the matches.
