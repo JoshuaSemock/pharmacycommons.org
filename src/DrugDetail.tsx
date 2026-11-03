@@ -37,6 +37,7 @@ import { isAbort, useEntityClasses, useEntityLists, useLabelText, useLegalStatus
 import type { LabelState, Loadable } from './drugPageData'
 import LasaFact from './components/LasaFact'
 import RemsFact from './components/RemsFact'
+import StructureDrawing from './components/StructureDrawing'
 import StructureIdentifier from './components/StructureIdentifier'
 import NetworkLink from './components/NetworkLink'
 
@@ -802,6 +803,7 @@ function QuickFacts({
         </h2>
         {onEditAll && <EditLink onClick={onEditAll} label="Edit Quick Facts" />}
       </div>
+      <StructureDrawing pcidCode={drug.pcid_code} />
       <dl className="lp-divide-y">
         <InfoboxFact term="Indications" propertyKey="indications" ctx={ctx}>
           {labelFact('indications_and_usage', s => <span>{firstSentence(sectionText(s), 200)}</span>, 'Not in this label')}

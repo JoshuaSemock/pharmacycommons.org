@@ -95,6 +95,7 @@ moieties done (81.2% of those that can have a structure), 2,718 marked not appli
 349 not found at PubChem, 2,132 never tried (2,063 core moieties with no UNII or InChIKey). Next: DrugBank-ID
 rung (about 515), a reviewed name-lookup rung, then InChIKey backfill into `moieties` after Joshua rules on
 seven InChIKey-sharing pairs, (licence wording for the PubChem/GSRS rows is shelved by Joshua, 2026-11-03). Probe PubChem before any further run.
+*2026-11-03 (phase 35):* structures are now drawn on the drug page (Quick facts), on demand in the browser with RDKit.js; combinations show one drawing per component moiety. 1,408 combination rows have no component link and show none (Joshua's call).
 *Still open:* the CAS Common Chemistry backfill. CAS rows stay CC BY-NC 4.0 and must not be presented as
 CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow / pKa / solubility —
 those need a separate physprop source.

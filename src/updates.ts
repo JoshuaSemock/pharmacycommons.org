@@ -30,6 +30,16 @@ export type Update = {
 
 export const UPDATES: Update[] = [
   {
+    id: 'structure-drawings',
+    date: '2026-11-03',
+    kind: 'Feature',
+    title: 'Chemical structures on drug pages',
+    summary:
+      'Drug pages now draw the molecule at the top of Quick facts. Salts, brands and combinations show one drawing for each active moiety.',
+    to: '/drugs/metformin',
+    cta: 'See metformin',
+  },
+  {
     id: 'structure-smiles',
     date: '2026-11-03',
     kind: 'Feature',
