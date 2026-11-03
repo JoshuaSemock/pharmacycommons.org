@@ -36,6 +36,7 @@ import StudyLinks from './components/StudyLinks'
 import { isAbort, useEntityClasses, useEntityLists, useLabelText, useLegalStatusLine } from './drugPageData'
 import type { LabelState, Loadable } from './drugPageData'
 import LasaFact from './components/LasaFact'
+import RemsFact from './components/RemsFact'
 import NetworkLink from './components/NetworkLink'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
@@ -835,6 +836,9 @@ function QuickFacts({
             <KeyListFact slug={q.slug} lists={lists} />
           </InfoboxFact>
         ))}
+        <InfoboxFact term="REMS" propertyKey="rems" ctx={ctx}>
+          <RemsFact pcidCode={drug.pcid_code} />
+        </InfoboxFact>
         <InfoboxFact term="Look-alike/sound-alike" propertyKey="lasa" ctx={ctx}>
           <LasaFact pcidCode={drug.pcid_code} />
         </InfoboxFact>

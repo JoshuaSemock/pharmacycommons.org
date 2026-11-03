@@ -131,6 +131,9 @@ schema definition for the API.
   (High, Medium and Low importance); Georgia MPJE lists removed; Learn collection published.
 - **Brand-name learner (phase 23):** `learn_brand_list`, three importance collections, `brand-names` list.
 - **Legal documents** (terms, disclaimer, privacy incl. study data, licensing) effective 2026-10-27.
+- **REMS products (phase 30, 2026-11-03):** list 10000049 (220 moieties) with Active/Inactive sublists and a
+  Quick facts "REMS" row. Held for Joshua: bowel-prep kits (HalfLytely, Suprep), Myobloc (needs an
+  rimabotulinumtoxinB moiety), and programs the export marks Active that look historical.
 - **Learn:** published with an in-app admin review page; study sets public, LLM-drafted items allowed,
   ported FSRS scheduler kept.
 
