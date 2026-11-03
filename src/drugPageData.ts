@@ -149,6 +149,30 @@ export function useRems(pcidCode: string): Loadable<RemsProgram[]> {
   return usePcidQuery(pcidCode, getRems, 'REMS programs')
 }
 
+/** A stored structure from physiochemical (phase 34): PubChem or FDA GSRS, never CAS. */
+export type Structure = {
+  smiles: string
+  source: string
+  pubchem_cid: number | null
+}
+
+async function getStructure(pcid: number, signal: AbortSignal): Promise<Structure[]> {
+  const { data, error } = await supabase
+    .from('physiochemical')
+    .select('smiles, source, pubchem_cid')
+    .eq('pcid', pcid)
+    .eq('structure_status', 'ok')
+    .not('smiles', 'is', null)
+    .abortSignal(signal)
+  if (error) throw new Error(error.message)
+  return ((data ?? []) as Structure[]).filter(r => r.smiles && r.smiles.trim())
+}
+
+/** The drug's SMILES, as zero or one row ([] when none is stored). */
+export function useStructure(pcidCode: string): Loadable<Structure[]> {
+  return usePcidQuery(pcidCode, getStructure, 'structure')
+}
+
 /** Every list the drug is on (for a moiety, also lists that name one of its forms or combinations). */
 export function useEntityLists(pcidCode: string): Loadable<EntityList[]> {
   return usePcidQuery(pcidCode, (pcid, signal) => getEntityLists(pcid, { signal }), 'lists')
