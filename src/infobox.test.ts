@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { citationHref, dedupeContained, toInfoboxState } from './infobox'
+import { citationHref, citationLabel, dedupeContained, toInfoboxState } from './infobox'
 import type { InfoboxEdit } from './infobox'
 
 const edit = (p: Partial<InfoboxEdit> & { id: number }): InfoboxEdit => ({
@@ -38,6 +38,25 @@ describe('citationHref', () => {
     expect(citationHref('PMID: 18540946')).toBe('https://pubmed.ncbi.nlm.nih.gov/18540946/')
     expect(citationHref('Boustani 2008')).toBeNull()
     expect(citationHref('javascript:alert(1)')).toBeNull()
+  })
+})
+
+describe('keyed citations', () => {
+  const setid = '56d13a1c-b289-4528-b23c-60f5427b4552'
+
+  it('reads [@dailymed:setid] as a DailyMed label and links it', () => {
+    expect(citationLabel(`[@dailymed:${setid}]`)).toBe('DailyMed label')
+    expect(citationHref(`[@dailymed:${setid}]`)).toBe(`https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=${setid}`)
+  })
+
+  it('does not link a dailymed key whose id is not a set id', () => {
+    expect(citationHref('[@dailymed:../../evil]')).toBeNull()
+    expect(citationHref('[@other:abc]')).toBeNull()
+  })
+
+  it('names an unknown key and leaves plain citations as typed', () => {
+    expect(citationLabel('[@ada2025:s181]')).toBe('Reference (ada2025)')
+    expect(citationLabel('Boustani 2008')).toBe('Boustani 2008')
   })
 })
 

@@ -150,9 +150,25 @@ export async function reviewInfoboxEdit(id: number, accept: boolean, note: strin
   await call('review_infobox_edit', { p_edit_id: id, p_accept: accept, p_note: note || null })
 }
 
+/** Source names for `[@key:id]` citations, shown instead of the raw key. */
+const CITATION_SOURCES: Record<string, string> = { dailymed: 'DailyMed label' }
+
+const KEYED_CITATION = /^\[@([a-z][a-z0-9_-]*):([^\]\s]+)\]$/i
+
+/** A citation as reading text: "[@dailymed:56d1…]" becomes "DailyMed label"; anything else is shown as typed. */
+export function citationLabel(citation: string): string {
+  const m = KEYED_CITATION.exec(citation.trim())
+  if (!m) return citation
+  return CITATION_SOURCES[m[1].toLowerCase()] ?? `Reference (${m[1]})`
+}
+
 /** True when a citation looks like a link we can open. */
 export function citationHref(citation: string): string | null {
   const t = citation.trim()
+  const keyed = KEYED_CITATION.exec(t)
+  if (keyed && keyed[1].toLowerCase() === 'dailymed' && /^[0-9a-f-]{36}$/i.test(keyed[2])) {
+    return `https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=${keyed[2]}`
+  }
   if (/^https?:\/\/\S+$/i.test(t)) return t
   const doi = /^(?:doi:\s*)?(10\.\d{4,9}\/\S+)$/i.exec(t)
   if (doi) return `https://doi.org/${doi[1]}`

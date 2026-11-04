@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Button from './components/Button'
 import type { ContributorStatus } from './contribute'
 import { reviewErrorMessage } from './history'
-import { citationHref, editInfobox, patrolInfoboxEdit, reviewInfoboxEdit } from './infobox'
+import { citationHref, citationLabel, editInfobox, patrolInfoboxEdit, reviewInfoboxEdit } from './infobox'
 import type { InfoboxEdit, InfoboxState } from './infobox'
 import { HandleSetup } from './OverviewEditor'
 
@@ -164,10 +164,10 @@ function CommunityMark({ edit }: { edit: InfoboxEdit }) {
       Source:{' '}
       {href ? (
         <a href={href} target="_blank" rel="nofollow ugc noopener noreferrer" className={LINK}>
-          {edit.citation}
+          {citationLabel(edit.citation)}
         </a>
       ) : (
-        edit.citation
+        citationLabel(edit.citation)
       )}
       {edit.patrol_status === 'unpatrolled' ? ' · not yet reviewed' : ''}
     </span>
