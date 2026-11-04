@@ -98,6 +98,7 @@ seven InChIKey-sharing pairs, (licence wording for the PubChem/GSRS rows is shel
 *Still open:* the CAS Common Chemistry backfill. CAS rows stay CC BY-NC 4.0 and must not be presented as
 CC0; Joshua wants to workshop the non-commercial question first. CAS has no log Kow / pKa / solubility —
 those need a separate physprop source.
+  *2026-11-03 (phase 36):* DrugBank rung built (0 of 556 matched); name-lookup candidates loaded for 2,061 moieties (759 with a structure, 217 shared-InChIKey duplicates to rule on). **Waiting on Joshua:** review `structure_review_sheet`, then `load_approved_name_structures()`.
 
 **7. Eco-risk data (ECOTOX / PPCP)** — inspect the real archive schema first, then write the loader
 (match on CAS). Define the RQ/PEC/MEC calculation and where it lives before showing any number.

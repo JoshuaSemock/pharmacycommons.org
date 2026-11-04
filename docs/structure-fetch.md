@@ -103,6 +103,28 @@ GSRS structure row (still counted in the 10,731, now attached to the class pcid)
 FDA's own active moiety and what `active_moiety_pcid` already said. The class has no direct members yet, so `list_classes()`
 hides it from the class index (the page works by slug). Ferumoxytol 1001442 is untouched.
 
+## Rungs 3 and 4: DrugBank cross-reference and reviewed name lookup (phase 36, 2026-11-03)
+
+Edge Function `pubchem-xref` (same guard and PubChem pacing as `pubchem-structures`: `x-ingest-token`, 2 workers, probe first).
+Migrations `db/phase36a_structure_rungs_3_4.sql` (queues, `structure_name_candidates`, `load_approved_name_structures()`) and
+`db/phase36b_structure_review_view.sql` (`structure_review_sheet`). Everything is service_role only.
+
+- **Rung 3, DrugBank ID** (`mode: "drugbank"`, PubChem substance cross-reference, must resolve to exactly one CID). Ran over the
+  556 core moieties with a `drugbank_id` and no InChIKey/UNII: **0 matched** (the residual is investigational code names, cell
+  therapies, vaccines and biologics, and PubChem's DrugBank deposit does not link them, not even Desoxycortone DB15972).
+  Nothing was written. The function stays for future use but this rung is a dead end for today's residual set.
+- **Rung 4, name lookup** (`mode: "name"`). Looks the name up in PubChem (stray spaces after commas removed, so MDMA's
+  `3, 4-methylenedioxymethamphetamine` resolves), and grades the match: `title_exact` / `synonym_exact` / `name_only` ->
+  confidence high (one CID) / medium (several CIDs) / low (name only). Writes only `structure_name_candidates`.
+  `inchi_key_owner_pcid` is set when another record already holds that InChIKey (possible duplicate record).
+  Result for the 2,061 moieties never matched by any earlier rung: **728 high, 24 medium, 7 low, 1,302 none; 217 candidates
+  share an InChIKey with an existing record.**
+- **Review.** `select * from structure_review_sheet` (759 rows; shared-InChIKey rows first, then low, medium, high). Export as CSV,
+  fill `decision` (`approve` / `reject`) and `reviewer_note`, write the decisions back, then run
+  `select public.load_approved_name_structures();` (insert-only; `match_method = 'pubchem_name'`, `source = 'PubChem'`).
+  Rows flagged as sharing an InChIKey are merge questions, not just structure questions: for example MDMA 1000001 and
+  midomafetamine 1003073, and heroin 1000015 / diacetylmorphine 1003071 / Diamorphine 1007783 are one substance each.
+
 ## Open items
 
 - **Licensing (shelved by Joshua, 2026-11-03: wording not settled; do not draft it until he reopens it).** `physiochemical` now holds PubChem and GSRS rows next to the (still empty)
@@ -111,4 +133,4 @@ hides it from the class index (the page works by slug). Ferumoxytol 1001442 is u
   and `api_meta.data_license_scope` should describe these rows before the table is served
   through `/api` (it is not served today).
 - **InChIKey backfill into `moieties`.** The pairs above are ruled on; the backfill (COALESCE-guarded) is not yet run.
-- **Name-lookup rung (4)** writes nothing until Joshua has reviewed the matches.
+- **Name-lookup rung (4)** has run (below); it writes nothing to `physiochemical` until Joshua has reviewed the matches and `load_approved_name_structures()` is run.
