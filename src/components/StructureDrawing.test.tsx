@@ -20,10 +20,10 @@ const part = (n: number, name: string, smiles: string | null): ComponentStructur
   source: smiles ? 'PubChem' : null,
   pubchem_cid: null,
 })
-const show = () =>
+const show = (code = 'PCID-1') =>
   render(
     <MemoryRouter>
-      <StructureDrawing pcidCode="PCID-1" />
+      <StructureDrawing pcidCode={code} />
     </MemoryRouter>,
   )
 
@@ -33,11 +33,19 @@ afterEach(() => {
 })
 
 describe('StructureDrawing', () => {
-  it('draws one moiety without a caption', async () => {
+  it("names a moiety's own drawing in plain text, not as a link", async () => {
     state = { data: [part(1, 'metformin', 'CN(C)C(=N)N=C(N)N')], failed: false }
-    show()
+    show('PCID-1000001')
     await waitFor(() => expect(screen.getByAltText('Structure of metformin')).toBeTruthy())
+    expect(screen.getByText('metformin').tagName).toBe('SPAN')
     expect(screen.queryByRole('link')).toBeNull()
+  })
+
+  it('names a single component on a salt or brand page and links it to the moiety', async () => {
+    state = { data: [part(1, 'metformin', 'CN(C)C(=N)N=C(N)N')], failed: false }
+    show('PCID-4000001')
+    await waitFor(() => expect(screen.getByAltText('Structure of metformin')).toBeTruthy())
+    expect(screen.getByRole('link', { name: 'metformin' }).getAttribute('href')).toBe('/drugs/pc:moiety:metformin')
   })
 
   it('draws a combination as one named, linked drawing per component and lists the missing one', async () => {
