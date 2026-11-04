@@ -1,7 +1,7 @@
 /**
  * Structure drawing at the top of Quick facts (phase 35, 2026-11-03).
  * Drawn in the browser from the stored SMILES (src/structureDraw.ts); nothing is stored.
- * A moiety page shows its own drawing; a salt, brand or combination page shows one per component moiety,
+ * A moiety page shows its own drawing, named; a salt, brand or combination page shows one per component moiety,
  * each named and linked. Components with no structure on file are listed by name. Renders nothing when
  * no component has a structure (biologics, never-fetched moieties) or while the data loads.
  *
@@ -63,6 +63,7 @@ export default function StructureDrawing({ pcidCode }: { pcidCode: string }) {
 
   const missing = rows.filter(r => r.smiles === null)
   const single = rows.length === 1
+  const self = Number(/^PCID-(\d+)$/.exec(pcidCode)?.[1] ?? 0)
 
   return (
     <figure className="lp-rule-b m-0 px-4 py-3" aria-label="Chemical structure" data-testid="structure-drawing">
@@ -70,13 +71,15 @@ export default function StructureDrawing({ pcidCode }: { pcidCode: string }) {
         {drawable.map(r => (
           <div key={r.moiety_pcid} className="lp-sunken min-w-0 rounded-md p-2">
             <Drawn name={r.name} smiles={r.smiles} />
-            {!single && (
-              <figcaption className="mt-1 text-center text-sm">
+            <figcaption className="mt-1 text-center text-sm">
+              {r.moiety_pcid === self ? (
+                <span className="text-ink">{r.name}</span>
+              ) : (
                 <Link to={`/drugs/${r.slug}`} className={`rounded-md text-ink underline-offset-2 hover:underline ${FOCUS}`}>
                   {r.name}
                 </Link>
-              </figcaption>
-            )}
+              )}
+            </figcaption>
           </div>
         ))}
       </div>
