@@ -173,6 +173,30 @@ export function useStructure(pcidCode: string): Loadable<Structure[]> {
   return usePcidQuery(pcidCode, getStructure, 'structure')
 }
 
+/**
+ * One component moiety of the page's record, from get_structures() (phase 35). A moiety page returns itself;
+ * a precise form, brand or combination page returns its component moieties. `smiles` is null when none is on file.
+ */
+export type ComponentStructure = {
+  moiety_pcid: number
+  slug: string
+  name: string
+  smiles: string | null
+  source: string | null
+  pubchem_cid: number | null
+}
+
+async function getStructures(pcid: number, signal: AbortSignal): Promise<ComponentStructure[]> {
+  const { data, error } = await supabase.rpc('get_structures', { p_pcid: pcid }).abortSignal(signal)
+  if (error) throw new Error(error.message)
+  return ((data ?? []) as ComponentStructure[]).map(r => ({ ...r, smiles: r.smiles && r.smiles.trim() ? r.smiles.trim() : null }))
+}
+
+/** The structures to draw on the page: one per component moiety ([] when the record has none). */
+export function useStructures(pcidCode: string): Loadable<ComponentStructure[]> {
+  return usePcidQuery(pcidCode, getStructures, 'structures')
+}
+
 /** Every list the drug is on (for a moiety, also lists that name one of its forms or combinations). */
 export function useEntityLists(pcidCode: string): Loadable<EntityList[]> {
   return usePcidQuery(pcidCode, (pcid, signal) => getEntityLists(pcid, { signal }), 'lists')
