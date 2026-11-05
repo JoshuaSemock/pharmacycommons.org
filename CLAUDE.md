@@ -50,12 +50,33 @@ for every file produced.**
 - **Legal documents** (effective 2026-10-27; operator Pharmacy of the Commons, LLC):
   canonical text is `docs/terms-of-use.md`, `docs/medical-disclaimer.md`,
   `docs/privacy-policy.md`, `docs/data-provenance-and-licensing.md`. The `/terms`,
-  `/disclaimer`, `/privacy`, `/licensing` pages import those files `?raw` and render them
-  (`src/pages/LegalPage.tsx`, `src/legal.ts`) — edit the markdown, never the pages.
+  `/disclaimer`, `/privacy`, `/licensing` pages import those files with `?fm` (front matter
+  parsed at build time) and render them (`src/pages/LegalPage.tsx`, `src/legalDoc.ts`,
+  `src/legal.ts`) — edit the markdown, never the pages. **Each document opens with YAML
+  front matter** (`title`, `label`, `route`, `lede`, `effective_date` as yyyy-mm-dd, `details`
+  = header lines such as Operator, `website`, `contact`, `body_sha256`); the page header reads
+  it. `LEGAL_PAGES` in `src/legal.ts` still repeats title/label/lede/route because the footer
+  and signup must not load the documents; `src/legal.test.ts` fails if they disagree.
   Registration is clickwrap-gated; signups store `legal_agreements_accepted`,
   `legal_agreements_version`, `legal_agreements_accepted_at` in
-  `auth.users.raw_user_meta_data`. **When a document's Effective Date changes, bump
-  `LEGAL_VERSION` in `src/legal.ts`** (`src/legal.test.ts` fails until you do).
+  `auth.users.raw_user_meta_data`. **When a document's `effective_date` changes, bump
+  `LEGAL_VERSION` in `src/legal.ts`** (`src/legal.test.ts` fails until you do). **When a
+  document's text changes, `body_sha256` must change too** (the test fails and prints the new
+  value; or run `node --experimental-strip-types scripts/legal-hash.mjs --write`). A material
+  change also needs a new `effective_date` and `LEGAL_VERSION`; a typo fix needs only the hash.
+- **Markdown front matter (2026-11-05):** one parser for blog posts and legal documents,
+  `src/frontmatterParse.ts` (the `yaml` package, core schema, no anchors/aliases, duplicate keys
+  an error, 16,000-character cap; never throws, returns `{ meta, body, error }`). It runs only
+  in Node: the Vite plugin `scripts/viteFrontmatter.ts` handles `file.md?fm` imports (and
+  `import.meta.glob(..., { query: '?fm' })`) so the browser gets parsed JSON and **no YAML
+  library ships in the main bundle** (importing `yaml` from app code added ~30 kB gzip to
+  `index.js` in a trial; don't). `src/frontmatter.ts` holds the browser-safe readers (`readText`,
+  `readIsoDate`, `readList`, `readFlag`, `readPairs`). `scripts/postbuild.mjs` and
+  `scripts/legal-hash.mjs` call the parser directly. Blog keys: `title`, `slug`, `date`
+  (yyyy-mm-dd), `author`, `summary`, `tags` (a list, or "a, b"), `draft`. **Quote a title that
+  contains a colon** (`title: "Build log: part 1"`); strict YAML rejects it, `src/blog.test.ts`
+  fails, and the post falls back to its file name. Community drug and concept pages do **not**
+  use front matter (page source is `src/pageSource/`; metadata is database columns).
 - Domain via Porkbun; USPTO Intent-to-Use filing planned (Class 42, "Pharmacy
   Commons"). Joshua decides when the licensing question is settled enough to file.
 

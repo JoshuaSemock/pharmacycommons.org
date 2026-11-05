@@ -29,6 +29,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { formatBrandName, formatDrugName } from '../src/names.ts'
+import { parseFrontmatter } from '../src/frontmatterParse.ts'
+import { readFlag, readIsoDate, readText } from '../src/frontmatter.ts'
 import { llmsTxt, openApiSpec } from '../src/developers/endpoints.ts'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -199,7 +201,7 @@ const STATIC_ROUTES = [
 // Route sources
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Mirrors src/blog.ts: frontmatter between --- fences, slug from the file name. */
+/** Same front matter reader as src/blog.ts (src/frontmatter.ts); slug from the file name. */
 function blogRoutes() {
   const dir = path.join(ROOT, 'src/content/posts')
   if (!fs.existsSync(dir)) return []
@@ -207,25 +209,17 @@ function blogRoutes() {
     .readdirSync(dir)
     .filter(f => f.endsWith('.md'))
     .map(file => {
-      const raw = fs.readFileSync(path.join(dir, file), 'utf8')
-      const meta = {}
-      const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw)
-      if (m) {
-        for (const line of m[1].split(/\r?\n/)) {
-          const i = line.indexOf(':')
-          if (i < 1) continue
-          meta[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^(["'])(.*)\1$/, '$2')
-        }
-      }
-      if (meta.draft === 'true') return null
-      const slug = meta.slug || file.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')
-      const title = meta.title || slug
+      const { meta, error } = parseFrontmatter(fs.readFileSync(path.join(dir, file), 'utf8'))
+      if (error) console.warn(`postbuild: front matter in ${file} could not be read: ${error}`)
+      if (readFlag(meta, 'draft')) return null
+      const slug = readText(meta, 'slug') ?? file.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')
+      const title = readText(meta, 'title') ?? slug
       return {
         path: `/blog/${slug}`,
         title,
         heading: title,
-        description: meta.summary || `${title}, from the Pharmacy Commons blog.`,
-        lastmod: /^\d{4}-\d{2}-\d{2}$/.test(meta.date ?? '') ? meta.date : undefined,
+        description: readText(meta, 'summary') ?? `${title}, from the Pharmacy Commons blog.`,
+        lastmod: readIsoDate(meta, 'date'),
       }
     })
     .filter(Boolean)

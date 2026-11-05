@@ -1,10 +1,16 @@
+---
+title: "Medical Information Disclaimer"
+label: "Medical Disclaimer"
+route: /disclaimer
+lede: "Pharmacy Commons is an educational reference, not medical advice. What that means for patients, clinicians and automated answers."
+effective_date: 2026-10-27
+details:
+  Operator: "Pharmacy of the Commons, LLC"
+website: https://pharmacycommons.org
+body_sha256: 9bab20503fba33fff9247ddf346cc4dbe9e127b775b06f02f825eef19c92525c
+---
+
 # Pharmacy Commons — Medical Information Disclaimer
-
-**Effective Date:** October 27, 2026
-
-**Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
-
-**Operator:** Pharmacy of the Commons, LLC
 
 Pharmacy Commons is an open educational compendium for clinical and public inquiry. It is designed to make pharmaceutical knowledge computable, auditable, and interoperable, but it is not to be used as a substitute for direct medical evaluation or the clinical judgment of a licensed practitioner.
 
