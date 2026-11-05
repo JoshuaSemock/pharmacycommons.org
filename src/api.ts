@@ -443,6 +443,37 @@ export async function searchClasses(query: string, limit = 3): Promise<ClassSear
   return ((data ?? []) as ClassSearchHit[]).map(c => ({ ...c, members: c.members ?? [] }))
 }
 
+/** One row from the `search_all` RPC (phase 28). */
+export type SearchAllHit = {
+  pcid: string
+  name: string
+  slug: string
+  entity_type: string
+  match: { on: string; text?: string; score: number }
+}
+
+export type SearchAllResult = {
+  query: string
+  /** True when nothing matched by name and these are typo-tolerant guesses. */
+  fuzzy: boolean
+  did_you_mean: string | null
+  results: SearchAllHit[]
+}
+
+/**
+ * Server-side search with typo tolerance (`search_all`, db/phase28_site_search.sql).
+ * The header uses it only when the instant in-browser search finds nothing, so
+ * "metfromin" offers metformin. Short queries return an empty result.
+ */
+export async function searchAll(query: string, limit = 6): Promise<SearchAllResult> {
+  const q = query.trim()
+  const empty: SearchAllResult = { query: q, fuzzy: false, did_you_mean: null, results: [] }
+  if (q.replace(/[^a-z0-9]/gi, '').length < 4) return empty
+  const { data, error } = await supabase.rpc('search_all', { p_q: q, p_limit: limit })
+  if (error) throw new Error(`Failed to search for '${q}': ${error.message}`)
+  return (data as SearchAllResult | null) ?? empty
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Lists (RPCs: list_lists, get_list, get_entity_lists)
 // ─────────────────────────────────────────────────────────────────────────────

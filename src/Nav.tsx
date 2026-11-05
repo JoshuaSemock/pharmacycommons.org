@@ -5,6 +5,7 @@ import { entryKindLine, loadCatalog, pcidOf, searchCatalog, toDrug } from './cat
 import SiteMenu, { AccountButton, AccountIconLink, BAR_ITEM, BAR_LINKS } from './SiteMenu'
 import { drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
 import type { SiteEntry } from './siteSearch'
+import type { SearchAllHit, SearchAllResult } from './api'
 
 /**
  * The site header: one bar, always in this order — logo, "Pharmacy Commons",
@@ -125,6 +126,24 @@ const barLinkClass = [
 /** One selectable row in the dropdown. */
 type Option = { key: string; to: string }
 
+const GUESS_KIND: Record<string, string> = {
+  moiety: 'Drug',
+  combination: 'Combination',
+  class: 'Classification',
+  list: 'List',
+  clinical: 'Condition or topic',
+  measurement: 'Lab test',
+  target: 'Biological target',
+  functional: 'Herbal or botanical source',
+}
+
+/** Where a typo-fallback hit opens: classes and lists have their own pages, the rest are drug-style pages. */
+function guessPath(h: SearchAllHit): string {
+  if (h.entity_type === 'class') return `/classifications/${h.slug}`
+  if (h.entity_type === 'list') return `/lists/${h.slug}`
+  return `/drugs/${h.slug}`
+}
+
 function HeaderSearch({ placement = 'bar', onDone }: { placement?: 'bar' | 'sheet'; onDone?: () => void }) {
   const sheet = placement === 'sheet'
   const inputRef = useRef<HTMLInputElement>(null)
@@ -151,6 +170,46 @@ function HeaderSearch({ placement = 'bar', onDone }: { placement?: 'bar' | 'shee
   const siteHits = useMemo(() => searchSite(entries, q), [entries, q])
   const drugBest = drugs.length ? drugScore(drugs[0].name, drugs[0].matchedBrand, q) : 0
   const { site, drugsFirst } = groupHits(siteHits, drugBest)
+
+  // Typo fallback: only when the instant local search finds nothing, ask the
+  // server (`search_all`, phase 28) after a short pause. api.ts is imported
+  // lazily so Supabase stays out of the first-load bundle.
+  const [guesses, setGuesses] = useState<SearchAllResult | null>(null)
+  const nothingLocal = catalogReady && q.length > 3 && drugs.length === 0 && siteHits.length === 0
+  useEffect(() => {
+    setGuesses(null)
+    if (!focused || !nothingLocal) return
+    let stale = false
+    const timer = setTimeout(() => {
+      import('./api')
+        .then(({ searchAll }) => searchAll(q))
+        .then(r => {
+          if (!stale) setGuesses(r)
+        })
+        .catch(err => console.warn('[search] typo lookup failed:', err))
+    }, 250)
+    return () => {
+      stale = true
+      clearTimeout(timer)
+    }
+  }, [focused, nothingLocal, q])
+
+  const guessGroup = {
+    key: 'guess',
+    label: guesses?.did_you_mean ? `Did you mean “${guesses.did_you_mean}”?` : 'Did you mean',
+    rows: (guesses?.fuzzy ? guesses.results : []).map(h => ({
+      option: { key: `guess-${h.pcid}`, to: guessPath(h) },
+      node: (
+        <>
+          <span className="min-w-0 flex-1">
+            <span className="lp-link-text block truncate font-sans text-[13.5px] text-ink">{h.name}</span>
+            <span className="block truncate font-sans text-[12px] text-ink">{GUESS_KIND[h.entity_type] ?? 'Page'}</span>
+          </span>
+          <span className="shrink-0 font-mono text-[10.5px] text-ink">{h.pcid}</span>
+        </>
+      ),
+    })),
+  }
 
   // Groups in the order shown, and the flat list the arrow keys walk.
   const groups: { key: string; label: string; rows: { option: Option; node: ReactNode }[] }[] = []
@@ -190,6 +249,7 @@ function HeaderSearch({ placement = 'bar', onDone }: { placement?: 'bar' | 'shee
     })),
   }))
   groups.push(...(drugsFirst ? [drugGroup, ...siteGroups] : [...siteGroups, drugGroup]).filter(g => g.rows.length > 0))
+  if (nothingLocal && guessGroup.rows.length > 0) groups.push(guessGroup)
 
   const seeAll: Option = { key: 'all', to: `/browse?q=${encodeURIComponent(q)}` }
   const options: Option[] = [...groups.flatMap(g => g.rows.map(r => r.option)), ...(groups.length ? [seeAll] : [])]

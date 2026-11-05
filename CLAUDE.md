@@ -233,6 +233,16 @@ only when nothing matches or the query is one character. Dictionary terms are
 not indexed (the `/tools/dictionary` page has its own search). Keep the placeholder in `index.html`'s static
 header in step with `Nav.tsx`.
 
+**Typo-tolerant search (2026-11-05, `db/phase28_site_search.sql`, `searchAll` in `src/api.ts`):** the `search_all(q, limit, types)`
+RPC ranks names, brands, class aliases/codes, concept names and published list titles from the `search_index` materialized
+view (trigram GIN + prefix btree). Exact tiers match `api_search`; only when nothing scores 40 or better does a fuzzy tier run,
+reranked by `osa_distance` (a transposition is one edit, because trigrams alone tie "metfromin" between metformin and Merbromin).
+The response carries `fuzzy` and `did_you_mean`. The header calls it **only when the local search finds nothing** (250 ms
+debounce, lazy `import('./api')`) and shows a "Did you mean" group. **After bulk loads run
+`refresh materialized view concurrently public.search_index;`** next to the `moiety_hierarchy` refresh. Not indexed:
+dictionary terms (source misspellings would become fuzzy targets), precise forms, formulations, blog posts, tools, pages.
+`GET /v1/search` still uses `api_search` (no typo tolerance).
+
 **Haptics (2026-10-13, `src/haptics.ts`, installed in `main.tsx`):** an 8 ms `navigator.vibrate` tick on touch taps of buttons, links and non-text controls. Android Chrome/Firefox use `navigator.vibrate`; iOS Safari 17.4+ has no such API, so a hidden `<input type="checkbox" switch>` is toggled from a real tap (unofficial; may stop working); skipped for reduced motion, disabled controls, mouse and pen.
 
 **index.html** is the single entry point (`index-updated.html` removed
