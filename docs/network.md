@@ -103,7 +103,7 @@ Modelled on Obsidian's local graph; no database changes.
 ## Deploying (done 2026-10-18; kept for the next migration)
 
 1. Apply `db/phase19_network.sql` as 19a, 19b, 19c (`apply_migration`, or the SQL editor and record by hand). Confirm each in `supabase_migrations.schema_migrations`, then run `get_advisors(security)`; the new functions are intentionally executable by anon.
-2. Add the `src/updates.ts` entry when it ships.
+2. Add the `src/content/updates/` entry when it ships.
 3. No new env vars; it uses the existing publishable key.
 
 ## Troubleshooting

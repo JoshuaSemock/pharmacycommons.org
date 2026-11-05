@@ -466,7 +466,7 @@ already made; the reason is given so it can be revisited.
 7. (2026-10-11) Apply `db/phase16c_page_templates.sql` as `phase16c_page_templates` and
    redeploy `publish-page` (herbal and class templates, §9 Q5). Done; registry md5 checked.
 8. Publish the guide (`src/content/posts/2026-10-11-how-to-edit-a-page.md`: set
-   `draft: false`) and add a `src/updates.ts` entry.
+   `draft: false`) and add a `src/content/updates/` entry.
 9. (2026-10-12) Phase 16d, interactions (§5a): apply `db/phase16d_interactions.sql` as five
    migrations, `phase16d_1_drop_grammar_check` … `phase16d_5_registry`, tables (part 3) before
    deploying `publish-page` v3 (it reads `community_statements` on open) and the registry (part 5)

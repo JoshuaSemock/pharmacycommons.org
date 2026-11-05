@@ -1,12 +1,35 @@
 /**
  * Tool registry, shared by the Tools page and the Tools menu in the nav.
  *
- * The Tools page lists every entry, section by section, in the order below,
+ * Each tool is one markdown file in src/content/tools/, named <id>.md. Adding a
+ * tool means adding a file, no code change. The front matter holds the fields
+ * and the body is the full description for the Tools page:
+ *
+ *   ---
+ *   name: "Days supply and quantity"
+ *   status: live                 # live, building or planned
+ *   section: calculators         # one of TOOL_SECTIONS below
+ *   order: 30                    # page and menu order; lower first
+ *   to: "/tools/days-supply"     # a page on this site, or
+ *   api_path: "/v1"              # a path on the public API (opens in a new tab)
+ *   summary: "One line for the nav menu"
+ *   keywords:                    # other names people use; give every tool some
+ *     - "dosing calculator"
+ *   ---
+ *   The full description, plain text.
+ *
+ * Files are parsed at build time (the `?fm` import, src/frontmatterParse.ts), so
+ * no YAML library ships to the browser. A file that cannot be used is left out and
+ * src/tools.test.ts fails.
+ *
+ * The Tools page lists every entry, section by section, in `order`,
  * followed by the third-party calculators. The nav menu shows the same
  * sections but only the tools that are active (live, with somewhere to go);
  * a section with no active tools is left out of the menu.
  */
 import { CURRENT_API_BASE } from './developers/endpoints'
+import { readList, readText } from './frontmatter'
+import type { FrontmatterResult } from './frontmatter'
 
 export type ToolStatus = 'live' | 'building' | 'planned'
 
@@ -40,136 +63,63 @@ export type Tool = {
   to?: string
   /** An address off this site (opens in a new tab). */
   href?: string
+  /** Page and menu order within the file set; lower first. */
+  order?: number
 }
 
-export const TOOLS: Tool[] = [
-  // Clinical workup
-  {
-    id: 'medication-reconciliation',
-    name: 'Medication reconciliation',
-    blurb:
-      'One complete list of prescriptions, over-the-counter products, supplements, herbals and alternative medicines, plus allergies and caffeine, nicotine, alcohol and recreational substance use. Directions are written out in full with no abbreviations, with the dose and 24-hour maximum calculated so they always agree. The list stays in your browser: save it as CSV, reopen it later, or print it.',
-    summary: 'Medication list, allergies, and directions builder',
-    status: 'live',
-    keywords: ['med rec', 'medrec', 'medication list', 'reconcile medications', 'home medications', 'allergy list', 'sig builder', 'directions builder', 'patient medication list'],
-    section: 'workup',
-    to: '/tools/medication-reconciliation',
-  },
+const FILES = import.meta.glob<FrontmatterResult>('./content/tools/*.md', {
+  query: '?fm',
+  import: 'default',
+  eager: true,
+})
 
-  // Clinical calculators
-  {
-    id: 'creatinine-clearance',
-    name: 'Creatinine clearance',
-    blurb:
-      'Cockcroft-Gault with actual, ideal, adjusted, and lean body weight side by side, so the weight choice is explicit rather than buried. Adds CKD-EPI 2021 eGFR, CKD and AKI staging, amputation correction, and a renal dose check.',
-    summary: 'Cockcroft-Gault by body weight, plus eGFR',
-    status: 'live',
-    keywords: ['crcl', 'clcr', 'cockcroft gault', 'egfr', 'gfr', 'ckd-epi', 'renal dosing', 'renal function', 'kidney function', 'creatinine', 'aki', 'ckd staging'],
-    section: 'calculators',
-    to: '/tools/creatinine-clearance',
-  },
-  {
-    id: 'days-supply',
-    name: 'Days supply and quantity',
-    blurb:
-      'Quantity from directions and days, or days from quantity, with package size, priming, drops per mL, and in-use limits counted in. Covers tablets, liquids, eye and ear drops, inhalers, insulin, and injectables including GLP-1 pens. Where the manufacturer and the payer disagree, both results are shown.',
-    summary: 'Quantity to dispense, or days a quantity lasts',
-    status: 'live',
-    keywords: ['dosing calculator', 'dose calculator', 'quantity calculator', 'quantity dispense', 'quantity to dispense', 'day supply', 'days supply', 'how many tablets', 'qty', 'dispense quantity', 'refill too soon', 'insulin pen', 'eye drops', 'inhaler', 'glp-1 pen', 'taper', 'fingertip unit'],
-    section: 'calculators',
-    to: '/tools/days-supply',
-  },
- 
-  
+const STATUSES: readonly ToolStatus[] = ['live', 'building', 'planned']
+const SECTION_IDS: readonly string[] = TOOL_SECTIONS.map(s => s.id)
 
-  // Clinical lists
-  {
-    id: 'do-not-crush',
-    name: 'Do not crush list',
-    blurb:
-      'Oral dosage forms that should not be crushed or chewed, grouped by reason: modified release, transmucosal, irritant, unpleasant taste, and hazardous or teratogenic.',
-    summary: 'Oral forms not to crush or chew, by reason',
-    status: 'live',
-    keywords: ['crush', 'chew', 'extended release', 'sustained release', 'enteric coated', 'feeding tube', 'swallow whole', 'modified release', 'oral dosage form'],
-    section: 'lists',
-    to: '/lists/do-not-crush',
-  },
-  {
-    id: 'qtc-prolonging',
-    name: 'QTc prolonging medications list',
-    blurb:
-      'Medications that prolong the QT interval, with the level of risk for each. Part of the wider list of drugs that affect the risk of arrhythmias, which also covers Brugada syndrome.',
-    summary: 'Drugs that prolong the QT interval, with risk',
-    status: 'live',
-    keywords: ['qt', 'qtc', 'long qt', 'torsades', 'arrhythmia', 'brugada', 'ecg', 'ekg', 'qt prolongation'],
-    section: 'lists',
-    to: '/lists/arrhythmia-risk-long-qt',
-  },
+/** Why a tool file cannot be used, or null. Exported for tests. */
+export function toolProblem({ meta, body, error }: FrontmatterResult): string | null {
+  if (error) return `front matter could not be read: ${error}`
+  if (!readText(meta, 'name')) return 'name is missing'
+  if (!STATUSES.includes(readText(meta, 'status') as ToolStatus)) return 'status must be live, building or planned'
+  if (!SECTION_IDS.includes(readText(meta, 'section') ?? '')) return `section must be one of ${SECTION_IDS.join(', ')}`
+  if (!body) return 'the body (the description) is empty'
+  const to = readText(meta, 'to')
+  if (to && !to.startsWith('/')) return 'to must be a path starting with /'
+  const apiPath = readText(meta, 'api_path')
+  if (apiPath && !apiPath.startsWith('/')) return 'api_path must start with /'
+  if (to && apiPath) return 'give to or api_path, not both'
+  if (readText(meta, 'status') === 'live' && !to && !apiPath) return 'a live tool needs to or api_path'
+  return null
+}
 
-  // Writing and reference
-  {
-    id: 'dictionary',
-    name: 'Spell-check dictionary for Word',
-    blurb:
-      'A custom dictionary file for Microsoft Word with 43,000 drug names, brand names, biologics, medical terms and abbreviations, so correct spellings stop being underlined and Word can suggest them. Step-by-step instructions for Windows and Mac, the full dictionary with definitions, and The Joint Commission "Do Not Use" abbreviations.',
-    summary: 'Spell-check drug names and medical terms in Word',
-    status: 'live',
-    keywords: ['spell check', 'spellcheck', 'word dictionary', 'custom dictionary', '.dic', 'abbreviations', 'medical terms', 'do not use', 'microsoft word', 'glossary'],
-    section: 'reference',
-    to: '/tools/dictionary',
-  },
+/** Exported for tests. Returns null for a file that cannot be used. */
+export function buildTool(path: string, fm: FrontmatterResult): Tool | null {
+  if (toolProblem(fm)) return null
+  const { meta, body } = fm
+  const apiPath = readText(meta, 'api_path')
+  const order = Number(readText(meta, 'order') ?? 0)
+  return {
+    id: (path.split('/').pop() ?? '').replace(/\.md$/, ''),
+    name: readText(meta, 'name') as string,
+    blurb: body,
+    summary: readText(meta, 'summary'),
+    keywords: readList(meta, 'keywords').length ? readList(meta, 'keywords') : undefined,
+    status: readText(meta, 'status') as ToolStatus,
+    section: readText(meta, 'section') as ToolSectionId,
+    to: readText(meta, 'to'),
+    href: apiPath ? `${CURRENT_API_BASE}${apiPath}` : undefined,
+    order: Number.isFinite(order) ? order : 0,
+  }
+}
 
-  // Environmental
-  {
-    id: 'risk-quotient',
-    name: 'Risk quotient',
-    blurb:
-      'PEC ÷ PNEC from consumption data, excretion fraction, and wastewater removal rate — the same computation that drives the eco-risk field on each monograph.',
-    status: 'planned',
-    section: 'environmental',
-  },
-  {
-    id: 'pec-estimator',
-    name: 'PEC estimator',
-    blurb: 'Predicted environmental concentration from defined daily dose, population served, and per-capita wastewater volume.',
-    status: 'planned',
-    section: 'environmental',
-  },
-
-  // Research
-  {
-    id: 'api',
-    name: 'API',
-    blurb:
-      'The live, read-only API index: record types, counts, data sources and every endpoint, as JSON. No key needed.',
-    summary: 'Live API index, as JSON',
-    status: 'live',
-    keywords: ['json', 'rest api', 'open data', 'endpoints'],
-    section: 'research',
-    href: `${CURRENT_API_BASE}/v1`,
-  },
-  {
-    id: 'developers',
-    name: 'Developers',
-    blurb:
-      'How to use the API: a quickstart, a console that runs requests against the live data, every endpoint with examples, and the OpenAPI, JSON Schema and JSON-LD files.',
-    summary: 'API guide, console, and endpoint reference',
-    status: 'live',
-    keywords: ['api docs', 'api documentation', 'openapi', 'json schema', 'json-ld', 'console', 'quickstart', 'machine readable'],
-    section: 'research',
-    to: '/developers',
-  },
-
-  // Planned
-  {
-    id: 'pharmacopoe-ai',
-    name: 'Pharmacopoe Ai',
-    blurb:
-      'A retrieval-grounded assistant answering from the Commons itself — monograph fields, label text, and environmental data — with every claim linked back to the record it came from. Scoped deliberately: it will decline questions the underlying data cannot support rather than generate a plausible answer. Not a diagnostic tool, and not a prescribing aid.',
-    status: 'planned',
-    section: 'planned',
-  },
-]
+export const TOOLS: Tool[] = Object.entries(FILES)
+  .map(([path, fm]) => {
+    const built = buildTool(path, fm)
+    if (!built) console.warn(`[tools] ${path}: ${toolProblem(fm)}`)
+    return built
+  })
+  .filter((t): t is Tool => t !== null)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || (a.id < b.id ? -1 : 1))
 
 /** A tool is active when it is live and has somewhere to go. */
 export const isActive = (tool: Tool): boolean => tool.status === 'live' && Boolean(tool.to || tool.href)

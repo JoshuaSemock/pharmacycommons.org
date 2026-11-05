@@ -44,5 +44,5 @@ Not changed: the mobile overflow on Browse (separate, fix centrally per the 2026
 
 ## Follow-ups
 
-- Add a What's new entry in `src/updates.ts` when this ships.
+- Add a What's new entry in `src/content/updates/` when this ships.
 - `docs/design-system.md` has no section on the drug page layout; none was added.
