@@ -77,6 +77,13 @@ for every file produced.**
   contains a colon** (`title: "Build log: part 1"`); strict YAML rejects it, `src/blog.test.ts`
   fails, and the post falls back to its file name. Community drug and concept pages do **not**
   use front matter (page source is `src/pageSource/`; metadata is database columns).
+  **Also markdown with front matter (2026-11-05):** the About page (`docs/about.md`, read by
+  `src/aboutDoc.ts`; each `##` is a section; the title must stay "About Pharmacy Commons" to match
+  `scripts/postbuild.mjs`), the What's new feed (`src/content/updates/`) and the tool registry
+  (`src/content/tools/`: `name`, `status`, `section`, `order`, `to` or `api_path`, `summary`,
+  `keywords`; body = description; sections and the third-party list stay in `src/tools.ts`). Their
+  readers return nothing for an unusable file and their tests fail, so a typo cannot silently
+  drop a tool or an update.
 - Domain via Porkbun; USPTO Intent-to-Use filing planned (Class 42, "Pharmacy
   Commons"). Joshua decides when the licensing question is settled enough to file.
 
@@ -208,14 +215,16 @@ canonical and a static heading, so they return HTTP 200, and writes
 moiety page only with `PRERENDER_ALL=1`. Keep the `<!-- pc:meta -->` and
 `<!-- pc:shell -->` markers in `index.html`.
 
-**What's new (home page):** `src/updates.ts` holds one entry per shipped feature
-or tool (date, kind, title, summary, link); blog posts join the feed
-automatically. **When you ship something user-facing, add an entry there** — the
-home page shows the newest five.
+**What's new (home page):** one markdown file per shipped feature or tool in
+`src/content/updates/`, named `yyyy-mm-dd-id.md` (front matter: `id`, `date`, `kind` Tool or
+Feature, `title`, `to`, optional `cta`, `detail`, `order` for same-day entries; the body is the
+summary), loaded by `src/updates.ts`; blog posts join the feed automatically. **When you ship
+something user-facing, add a file there** — the home page shows the newest three. A file that
+cannot be read is left out and `src/updates.test.ts` fails.
 
 **Header search is site-wide (2026-10-13, `src/siteSearch.ts`, `HeaderSearch` in `src/Nav.tsx`):** drugs, brands
 and concept pages still come from `searchCatalog`; everything else comes from one entry list: live tools
-(from `TOOLS` in `src/tools.ts` — **give a new tool `keywords`**, the other names people use, e.g. "dosing
+(from `TOOLS` in `src/tools.ts`, which loads one markdown file per tool from `src/content/tools/<id>.md` — **give a new tool `keywords`**, the other names people use, e.g. "dosing
 calculator" → Days supply), `SITE_PAGES` (add a line for any page worth finding), every published list
 (`listLists`), every class with members (`loadAllClasses`) and every non-draft post (`listPosts`), the last
 three loaded lazily on focus. Results are grouped (Tools, Pages, Lists, Classifications, Blog, Drugs and

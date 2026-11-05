@@ -2,14 +2,31 @@
  * "What's new" — one entry per thing we ship, shown on the home page beside
  * blog posts in a single dated feed.
  *
- * Adding a feature: add one object to UPDATES (newest first is tidy, but the
- * feed sorts by date anyway). Blog posts join the feed automatically from
- * src/content/posts/, so don't add them here.
+ * Adding a feature: add one markdown file to src/content/updates/, named
+ * yyyy-mm-dd-id.md. The front matter holds the entry's fields and the body is
+ * its summary (one or two sentences, written for someone who has never used the
+ * feature). Blog posts join the feed automatically from src/content/posts/, so
+ * don't add them here.
  *
- * `to` is the page the entry opens. Keep `summary` to one or two sentences,
- * written for someone who has never used the feature.
+ *   ---
+ *   id: network-compare            # defaults to the file name after the date
+ *   date: 2026-11-03               # yyyy-mm-dd, the day it went live
+ *   kind: Feature                  # Tool or Feature
+ *   title: "Network: compare two to four drugs or classes"
+ *   to: "/network/compare"         # the page the entry opens (starts with /)
+ *   cta: "Try a comparison"        # optional link text
+ *   detail: "..."                  # optional, shown when there is no summary
+ *   order: 0                       # optional, orders entries that share a date (lower first)
+ *   ---
+ *   Pick two to four drugs and see what they share.
+ *
+ * Files are parsed at build time (the `?fm` import, src/frontmatterParse.ts), so
+ * no YAML library ships to the browser. An entry that cannot be read is left out
+ * of the feed, and src/updates.test.ts fails so it gets fixed.
  */
 
+import { readText, readIsoDate } from './frontmatter'
+import type { FrontmatterResult } from './frontmatter'
 import { listPosts } from './blog'
 
 export type UpdateKind = 'Tool' | 'Feature' | 'Blog post'
@@ -26,394 +43,65 @@ export type Update = {
   cta?: string
   /** Shown when there is no summary (blog posts without a `summary:` line). */
   detail?: string
+  /** Orders entries that share a date, lower first. */
+  order?: number
 }
 
-export const UPDATES: Update[] = [
-  {
-    id: 'structure-drawings',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'Chemical structures on drug pages',
-    summary:
-      'Drug pages now draw the molecule at the top of Quick facts. Salts, brands and combinations show one drawing for each active moiety.',
-    to: '/drugs/metformin',
-    cta: 'See metformin',
-  },
-  {
-    id: 'structure-smiles',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'SMILES on drug pages',
-    summary:
-      'Drug pages now list the SMILES structure string under Identifiers, with its source (PubChem or FDA GSRS). Click the string to select it for copying.',
-    to: '/drugs/metformin',
-    cta: 'See metformin',
-  },
-  {
-    id: 'network-hierarchy',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'Network: classification hierarchy',
-    summary:
-      'See where a drug or class sits in WHO ATC, VA and other classification trees. Pick two drugs and the lowest class they share comes first, with the path above it and each drug on its own branch.',
-    to: '/network/hierarchy?c=1001923,1001318',
-    cta: 'See metformin and empagliflozin',
-  },
-  {
-    id: 'network-compare',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'Network: compare two to four drugs or classes',
-    summary:
-      'Pick metformin and Jardiance, or any two to four drugs, classes or topics, and see the classes, lists, products and conditions they share and the ones only one of them has. Each row keeps its own source, and the result can be drawn as a graph.',
-    to: '/network/compare?c=1001923,1001318',
-    cta: 'Try a comparison',
-  },
-  {
-    id: 'network-hubs',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'Network: browse every relationship of a large class',
-    summary:
-      'Select a concept and choose Browse all to page through everything recorded about it, alphabetically, searching by name and filtering by kind of relationship, then add the ones you want to the graph. Sources now name the dataset and link to the FDA application where there is one.',
-    to: '/network',
-    cta: 'Open the Network',
-  },
-  {
-    id: 'network-lists',
-    date: '2026-11-03',
-    kind: 'Feature',
-    title: 'Network: see which lists a drug is on',
-    summary:
-      'The Network now links every drug to the published lists it appears on, such as Anticholinergic Burden, the look-alike names and Federal Controlled Substances. Open any list as a graph of its entries, or use the new View in Network link in the header of a drug, class or list page.',
-    to: '/network',
-    cta: 'Open the Network',
-  },
-  {
-    id: 'federal-controlled-substances',
-    date: '2026-10-30',
-    kind: 'Feature',
-    title: 'Federal controlled substances, by schedule and importance',
-    summary:
-      'Every substance on the DEA schedules with its brand names, schedule and an importance rating. Open the whole list or just Schedule II, Schedules III to V, or the High, Medium and Low importance parts.',
-    to: '/lists/federal-controlled-substances',
-    cta: 'Open the list',
-  },
-  {
-    id: 'learn',
-    date: '2026-10-27',
-    kind: 'Feature',
-    title: 'Learn: flashcards and questions that schedule themselves',
-    summary:
-      'Study brand and generic names, drug classes, do-not-crush, anticholinergic burden, arrhythmia risk, controlled substances and Joint Commission do-not-use terms. Spaced repetition brings each card back just before you would forget it. It works without an account, and signing in saves your progress.',
-    to: '/learn',
-    cta: 'Start studying',
-  },
-  {
-    id: 'network-graph',
-    date: '2026-10-18',
-    kind: 'Feature',
-    title: 'Network: see how a drug, class or condition connects',
-    summary:
-      'Start from any concept and follow its recorded relationships as a graph. Every line is one stored statement with a direction and a source. Hover to focus, step out one to three levels, or turn on live physics and drag concepts around.',
-    to: '/network',
-    cta: 'Open the Network',
-  },
-  {
-    id: 'site-wide-search',
-    date: '2026-10-13',
-    kind: 'Feature',
-    title: 'The search box now finds every page, not just drugs',
-    summary:
-      'Type "dosing calculator", "day supply", "crcl" or "do not crush" and the tool or list opens; lists, classifications and blog posts turn up too. Use the arrow keys and Enter, or press Enter on an exact name to go straight there.',
-    to: '/tools',
-    cta: 'See the tools',
-  },
-  {
-    id: 'days-supply-calendar-view',
-    date: '2026-10-13',
-    kind: 'Feature',
-    title: 'A scrollable calendar in the days supply tool',
-    summary:
-      'The refill calendar now comes first and opens on today with five weeks behind and six ahead. Click a date to count the days from today, or enter a number of days before or after to see the date, such as the last fill date that is still on time for a 90-day supply.',
-    to: '/tools/days-supply',
-    cta: 'Open the tool',
-  },
-  {
-    id: 'days-supply-schedules',
-    date: '2026-10-13',
-    kind: 'Feature',
-    title: 'Tapers, weekday doses and creams in the days supply tool',
-    summary:
-      'Work out a taper, a dose that differs by weekday, or a pen that steps up in strength, one step at a time, including how long a pen may be used once opened. A new estimate also turns the skin you are treating into grams of cream or ointment, using fingertip units.',
-    to: '/tools/days-supply',
-    cta: 'Open the tool',
-  },
-  {
-    id: 'days-supply-calendar',
-    date: '2026-10-13',
-    kind: 'Feature',
-    title: 'Refill calendar and pasted directions in the days supply tool',
-    summary:
-      'Paste directions as written and the days supply tool fills in its builder for you to check. A new refill calendar shows when the next fill is due, or how many days have passed since the last one.',
-    to: '/tools/days-supply',
-    cta: 'Open the tool',
-  },
-  {
-    id: 'blog-comments',
-    date: '2026-10-12',
-    kind: 'Feature',
-    title: 'Comment on blog posts',
-    summary:
-      'Blog posts now have comments. Any signed-in account can join in under a public handle, and reply to other comments; verified providers show their credential beside their name.',
-    to: '/blog',
-    cta: 'Go to the blog',
-  },
-  {
-    id: 'community-interactions',
-    date: '2026-10-12',
-    kind: 'Feature',
-    title: 'Add a cited interaction to a drug or herbal page',
-    summary:
-      'Drug and herbal pages now have an Interactions section that NPI-verified providers can edit: one line per interacting drug, class or herbal, each with a citation. Community lines are stored apart from the FDA label’s interactions and shown beside them, never merged into them.',
-    to: '/drugs/metformin',
-    cta: 'See a drug page',
-  },
-  {
-    id: 'page-editor',
-    date: '2026-10-11',
-    kind: 'Feature',
-    title: 'Edit a whole drug page, with citations',
-    summary:
-      'Verified contributors can now edit any drug or topic page in one place, or just one section from its edit link: the lead, sections such as renal dosing and patient education, Quick Facts and brand names. Cite a PMID, DOI or DailyMed label and the page builds a numbered reference list; two people editing different sections no longer get in each other’s way.',
-    to: '/blog/how-to-edit-a-page',
-    cta: 'Read the guide',
-  },
-  {
-    id: 'page-types-abbreviations',
-    date: '2026-10-08',
-    kind: 'Feature',
-    title: 'Create pages for drug classes, anatomy and medical terms',
-    summary:
-      'Contributors can now start a page for a drug class (such as psychedelics), a body part, an organism, a procedure or any other medical term, from the Topics page. Pages whose name has a recognized abbreviation show it after the title, like High Altitude Pulmonary Edema (HAPE).',
-    to: '/topics',
-    cta: 'Go to Topics',
-  },
-  {
-    id: 'list-notes-sources',
-    date: '2026-10-07',
-    kind: 'Feature',
-    title: 'Do Not Crush: brands, dosage forms and corroborating sources',
-    summary:
-      'Each Do Not Crush entry now shows the brands and dosage forms it is about and which references also list it (MPR, Pharmacist’s Letter). Drugs with more than one reason show each reason separately, list search finds a drug by its brand, and the CSV download includes both.',
-    to: '/lists/do-not-crush',
-    cta: 'Open the list',
-  },
-  {
-    id: 'topics-index',
-    date: '2026-10-07',
-    kind: 'Feature',
-    title: 'Browse topics: conditions, labs, targets and herbals',
-    summary:
-      'A new A to Z of everything that isn’t a drug. Narrow by kind and type (indications, symptoms, CYP450 enzymes, lab panels…), sort by how many drugs connect to each topic, or browse the medical dictionary’s abbreviations and terms and start a page for any of them.',
-    to: '/topics',
-    cta: 'Browse topics',
-  },
-  {
-    id: 'concept-search',
-    date: '2026-10-07',
-    kind: 'Feature',
-    title: 'Search finds conditions, labs, targets and herbals',
-    summary:
-      'Search now returns pages for indications, symptoms, adverse effects, lab tests, biological targets and herbal sources, labelled by kind, alongside drugs. If nothing matches, you can start the page yourself.',
-    to: '/browse?q=lactic',
-    cta: 'Try a search',
-  },
-  {
-    id: 'brand-name-edits',
-    date: '2026-10-07',
-    kind: 'Feature',
-    title: 'Fix a drug’s brand names, with a source',
-    summary:
-      'NPI-verified providers can add a brand the FDA and RxNorm lists miss, such as an international brand, or flag one that doesn’t belong. A removed brand stays visible, struck through with the reason, so nothing disappears silently.',
-    to: '/drugs/metformin',
-    cta: 'See a drug page',
-  },
-  {
-    id: 'my-contributions',
-    date: '2026-10-05',
-    kind: 'Feature',
-    title: 'Track your edits under My contributions',
-    summary:
-      'Your account now lists every Overview edit, Quick Facts value and page you’ve created, with whether it’s live, waiting for review or not accepted, and any note the reviewer left.',
-    to: '/account',
-    cta: 'Open your account',
-  },
-  {
-    id: 'create-pages',
-    date: '2026-10-05',
-    kind: 'Feature',
-    title: 'Create a page for a condition, symptom, lab or drug',
-    summary:
-      'NPI-verified providers can now start a page for anything the reference is missing: an indication, symptom, adverse effect, lab test, target, herbal or drug. Each gets a permanent PCID, and a link to a page that doesn’t exist yet offers to create it.',
-    to: '/topics',
-    cta: 'Create a page from Topics',
-  },
-  {
-    id: 'quick-facts-community',
-    date: '2026-10-05',
-    kind: 'Feature',
-    title: 'Correct a Quick Fact, with a source',
-    summary:
-      'Every Quick Facts row on a drug page can now carry a community value from an NPI-verified provider, with its source. The label or list value is kept and shown one tap away, so any disagreement stays visible, and every change has its own history and review.',
-    to: '/drugs/sertraline',
-    cta: 'See a drug page',
-  },
-  {
-    id: 'overview-history',
-    date: '2026-10-05',
-    kind: 'Feature',
-    title: 'Overview history and review',
-    summary:
-      'Every Overview now has a history: who changed what, when, and why, with a line-by-line comparison of each version. Verified providers can restore an earlier version in one step, and reviewers work through a queue of new edits, accepting or rejecting changes to high-alert drugs before they appear.',
-    to: '/drugs/sertraline/history',
-    cta: 'See an example',
-  },
-  {
-    id: 'overview-editor',
-    date: '2026-10-04',
-    kind: 'Feature',
-    title: 'Write a drug page Overview',
-    summary:
-      'NPI-verified providers can now edit the Overview on any drug page: markdown with headings and tables, [[links]] to other pages picked from a list as you type, and live values such as {{acb_score}}. Every edit needs a short summary and is credited to your public handle; high-alert drugs are reviewed before changes appear.',
-    to: '/account',
-    cta: 'Verify to start editing',
-  },
-  {
-    id: 'community-overview',
-    date: '2026-10-04',
-    kind: 'Feature',
-    title: 'An Overview section on every drug page',
-    summary:
-      'Drug pages now have a community-written Overview after Quick Facts: practical notes, calculations and context the label leaves out, written by NPI-verified providers, with links to other pages and live values such as ACB scores. High-alert drugs are reviewed before changes appear. Editing opens next.',
-    to: '/drugs/vancomycin',
-    cta: 'See where it goes',
-  },
-  {
-    id: 'dictionary',
-    date: '2026-10-03',
-    kind: 'Tool',
-    title: 'Medical dictionary for Word',
-    summary:
-      'Download one file and Word stops underlining drug names, brand names, biologics and medical terms: about 43,000 words, with instructions for Windows and Mac. The full dictionary is browsable A–Z with definitions, and The Joint Commission "Do Not Use" abbreviations are now a list of their own.',
-    to: '/tools/dictionary',
-  },
-  {
-    id: 'medrec-clinical-lists',
-    date: '2026-10-03',
-    kind: 'Tool',
-    title: 'Medication reconciliation: anticholinergic burden, QT risk and do-not-crush',
-    summary:
-      'The medication reconciliation tool now marks drugs on the Anticholinergic Burden, QT and arrhythmia risk, and Do Not Crush lists, adds up the anticholinergic burden score, and puts a clinical risk summary on the printable list. Everything is still matched in your browser.',
-    to: '/tools/medication-reconciliation',
-  },
-  {
-    id: 'drug-page-quick-facts',
-    date: '2026-10-02',
-    kind: 'Feature',
-    title: 'Drug pages: Quick Facts and the full drug hierarchy',
-    summary:
-      'Every drug page now opens with a Quick Facts box (indication, dosing topics, contraindications, boxed warning, FDA class, legal status, and Most used / Do not crush / ACB / QTc lists) that links into the FDA label, which now starts collapsed. Brand formulations join precise forms and combinations in the hierarchy.',
-    to: '/drugs/metformin',
-    cta: 'See an example',
-  },
-  {
-    id: 'classifications',
-    date: '2026-10-02',
-    kind: 'Feature',
-    title: 'Classifications: one search, every system',
-    summary:
-      'Drug classes are now Classifications, in the top bar after Lists. One search covers WHO ATC, VA, FDA EPC/MOA/PE, ChemOnt and Pharmacy Commons groups at once, a filter narrows to one system, and up to three classes can be compared side by side.',
-    to: '/classifications',
-    cta: 'Take a look',
-  },
-  {
-    id: 'paper-and-dark-mode',
-    date: '2026-10-01',
-    kind: 'Feature',
-    title: 'A new page, and a dark mode',
-    summary:
-      'Pages now sit on a single sheet of floral-white paper with torn edges over the lichen, with fewer boxes in the way of the reading. Dark mode follows your device, or pick Light or Dark under Appearance in the site menu.',
-    to: '/',
-    cta: 'Take a look',
-  },
-  {
-    id: 'days-supply',
-    date: '2026-09-30',
-    kind: 'Tool',
-    title: 'Days supply and quantity',
-    summary:
-      'How much to dispense for a number of days, or how many days a quantity lasts, for tablets, liquids, eye and ear drops, inhalers, insulin and GLP-1 pens. Priming, drops per mL and in-use limits are counted in, and every step is shown.',
-    to: '/tools/days-supply',
-  },
-  {
-    id: 'references-resources',
-    date: '2026-09-30',
-    kind: 'Feature',
-    title: 'One catalog for references and resources',
-    summary:
-      'References now lists every source we cite or point to (80 in all), grouped by topic, with the datasets the Commons is built from marked. Every entry can be copied as a citation in AMA, APA, Vancouver, NLM or BibTeX. Resources draws on the same catalog.',
-    to: '/references',
-    cta: 'See the references',
-  },
-  {
-    id: 'legal-policies',
-    date: '2026-09-30',
-    kind: 'Feature',
-    title: 'Terms, disclaimer, privacy and licensing',
-    summary:
-      'The Terms of Use, Medical Information Disclaimer, Privacy Policy and Data Provenance and Licensing Policy now have their own pages, linked from every footer. New accounts agree to them when registering.',
-    to: '/terms',
-    cta: 'Read the terms',
-  },
-  {
-    id: 'developers',
-    date: '2026-09-28',
-    kind: 'Feature',
-    title: 'The API, for developers',
-    summary:
-      'Every record is also open data: search by name or brand, fetch full records as JSON or JSON-LD, and compare any two versions. Try it in a live console, then copy the request as curl, JavaScript, Python, R or an Excel query. No key needed.',
-    to: '/developers',
-    cta: 'Open the console',
-  },
-  {
-    id: 'medication-reconciliation',
-    date: '2026-09-27',
-    kind: 'Tool',
-    title: 'Medication reconciliation',
-    summary:
-      'Build one complete list of prescriptions, over-the-counter products, supplements and herbals, with allergies and substance use. Directions are written out in full, doses are calculated, and the list never leaves your browser.',
-    to: '/tools/medication-reconciliation',
-  },
-  {
-    id: 'lists',
-    date: '2026-09-25',
-    kind: 'Feature',
-    title: 'Drug lists',
-    summary:
-      'Sortable lists such as the most-used drugs in the US and the Georgia MPJE lists, each linked to its drug pages, with a side-by-side compare view and a CSV download.',
-    to: '/lists',
-  },
-  {
-    id: 'creatinine-clearance',
-    date: '2026-09-16',
-    kind: 'Tool',
-    title: 'Creatinine clearance',
-    summary:
-      'Cockcroft-Gault with actual, ideal and adjusted body weight side by side, plus CKD-EPI 2021 eGFR and a renal dose check. Every constant is cited.',
-    to: '/tools/creatinine-clearance',
-  },
-]
+const FILES = import.meta.glob<FrontmatterResult>('./content/updates/*.md', {
+  query: '?fm',
+  import: 'default',
+  eager: true,
+})
+
+const FILE_KINDS: readonly UpdateKind[] = ['Tool', 'Feature']
+
+function idFromPath(path: string): string {
+  const base = path.split('/').pop() ?? ''
+  return base.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')
+}
+
+/** Why an entry file cannot be used, or null. Exported for tests. */
+export function updateProblem({ meta, error }: FrontmatterResult): string | null {
+  if (error) return `front matter could not be read: ${error}`
+  if (!readIsoDate(meta, 'date')) return 'date must be yyyy-mm-dd'
+  if (!FILE_KINDS.includes(readText(meta, 'kind') as UpdateKind)) return 'kind must be Tool or Feature'
+  if (!readText(meta, 'title')) return 'title is missing'
+  if (!readText(meta, 'to')?.startsWith('/')) return 'to must be a path starting with /'
+  return null
+}
+
+/** Exported for tests. Returns null for an entry that cannot be used. */
+export function buildUpdate(path: string, fm: FrontmatterResult): Update | null {
+  if (updateProblem(fm)) return null
+  const { meta, body } = fm
+  const order = Number(readText(meta, 'order') ?? 0)
+  return {
+    id: readText(meta, 'id') ?? idFromPath(path),
+    date: readIsoDate(meta, 'date') as string,
+    kind: readText(meta, 'kind') as UpdateKind,
+    title: readText(meta, 'title') as string,
+    summary: body,
+    to: readText(meta, 'to') as string,
+    cta: readText(meta, 'cta'),
+    detail: readText(meta, 'detail'),
+    order: Number.isFinite(order) ? order : 0,
+  }
+}
+
+/** Newest first; entries that share a date by `order`, then id. */
+export function byNewest(a: Update, b: Update): number {
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1
+  return (a.order ?? 0) - (b.order ?? 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+}
+
+export const UPDATES: Update[] = Object.entries(FILES)
+  .map(([path, fm]) => {
+    const built = buildUpdate(path, fm)
+    if (!built) console.warn(`[updates] ${path}: ${updateProblem(fm)}`)
+    return built
+  })
+  .filter((u): u is Update => u !== null)
+  .sort(byNewest)
 
 const DEFAULT_CTA: Record<UpdateKind, string> = {
   Tool: 'Open the tool',
