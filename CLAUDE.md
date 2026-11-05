@@ -36,8 +36,7 @@ for every file produced.**
 5. Report status and drift in a few lines before starting work.
 
 ## Legal & governance context (don't contradict these)
-- Single-member LLC (no non-profit board), with future intent to convert to a
-  non-profit.
+- No non-profit board yet, with future intent to become a non-profit.
 - Codebase license: **GPL-3.0-or-later** — `LICENSE` and `package.json` both agree as
   of 2026-09-24. The only remaining MIT mention is the open-item line in
   `docs/data-model-decisions.md`; flag any new MIT reference you see.
@@ -47,7 +46,7 @@ for every file produced.**
   **Settled — do not re-ask Joshua about the data license.** Still open: confirm the DrugBank IDs came from the CC0 "DrugBank Vocabulary" file;
   CAS Common Chemistry rows (physiochemical) stay CC BY-NC 4.0 whatever we choose.
   ATC and ChemOnt restrict commercial redistribution — never present them as CC0.
-- **Legal documents** (effective 2026-10-27; operator Pharmacy Commons organization):
+- **Legal documents** (effective 2026-11-05; operator Pharmacy Commons organization):
   canonical text is `docs/terms-of-use.md`, `docs/medical-disclaimer.md`,
   `docs/privacy-policy.md`, `docs/data-provenance-and-licensing.md`. The `/terms`,
   `/disclaimer`, `/privacy`, `/licensing` pages import those files with `?fm` (front matter

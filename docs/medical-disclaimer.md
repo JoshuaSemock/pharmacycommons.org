@@ -3,7 +3,7 @@ title: "Medical Information Disclaimer"
 label: "Medical Disclaimer"
 route: /disclaimer
 lede: "Pharmacy Commons is an educational reference, not medical advice. What that means for patients, clinicians and automated answers."
-effective_date: 2026-10-27
+effective_date: 2026-11-05
 details:
   Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
