@@ -103,12 +103,13 @@ function InlineEditor({ page, name, target }: { page: CommunityPage; name: strin
 }
 
 /** Edit page · History · Review queue, under the page title. */
-export function PageTools({ page, slug }: { page: CommunityPage; slug: string }) {
+/** `inline` drops the top margin so the links can sit in a row of other page actions (drug page header). */
+export function PageTools({ page, slug, inline = false }: { page: CommunityPage; slug: string; inline?: boolean }) {
   const status = page.access.status
   const hasHistory = (page.content.data?.currentRevisionId ?? null) !== null || (page.content.data?.pendingCount ?? 0) > 0
   if (page.state.status !== 'ready' && !hasHistory) return null
   return (
-    <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-sans text-sm text-ink">
+    <p className={`${inline ? '' : 'mt-3 '}flex flex-wrap gap-x-4 gap-y-1 font-sans text-sm text-ink`}>
       {page.canEdit && (
         <Link to={`/drugs/${slug}/edit`} className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
           Edit page

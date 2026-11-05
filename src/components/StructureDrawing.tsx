@@ -36,11 +36,11 @@ function useDrawing(smiles: string): Drawing | null {
   return state && state.smiles === smiles ? state.drawing : null
 }
 
-/** One drawing in a fixed-size well, so the box does not jump while RDKit loads. */
-function Drawn({ name, smiles }: { name: string; smiles: string }) {
+/** One drawing in a fixed-size well, so the box does not jump while RDKit loads. A lone structure gets a shorter well (2026-11-03). */
+function Drawn({ name, smiles, compact }: { name: string; smiles: string; compact: boolean }) {
   const drawing = useDrawing(smiles)
   return (
-    <div className="flex aspect-[4/3] w-full items-center justify-center" data-testid="structure-well">
+    <div className={`flex w-full items-center justify-center ${compact ? 'h-40' : 'aspect-[4/3]'}`} data-testid="structure-well">
       {!drawing ? (
         <span className="block h-3/4 w-3/4 animate-pulse rounded bg-ink/10 motion-reduce:animate-none" aria-hidden="true" />
       ) : drawing.ok ? (
@@ -70,7 +70,7 @@ export default function StructureDrawing({ pcidCode }: { pcidCode: string }) {
       <div className={single ? '' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'}>
         {drawable.map(r => (
           <div key={r.moiety_pcid} className="lp-sunken min-w-0 rounded-md p-2">
-            <Drawn name={r.name} smiles={r.smiles} />
+            <Drawn name={r.name} smiles={r.smiles} compact={single} />
             <figcaption className="mt-1 text-center text-sm">
               {r.moiety_pcid === self ? (
                 <span className="text-ink">{r.name}</span>

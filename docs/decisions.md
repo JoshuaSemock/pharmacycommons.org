@@ -87,6 +87,7 @@
 **Page layout**
 - Order: header → jump-to-FDA-label link → Quick facts → open markdown section → uneditable sections (classification, lists, etc.). Keep the current section order and the rail/main-column split.
 - Header: drug name permanent; brand names editable.
+- **Drug page layout (2026-11-03):** the header (name, INN, brand names, page actions) moves into the right column above the Overview; the left rail (jump link, Quick facts, Identifiers) runs the full page height and scrolls with the page, with a sticky "On this page" index under it. On phones the order stays header, jump link, Quick facts, Overview. Replaces "header → jump-to-FDA-label link → Quick facts" for desktop. Details and status: `docs/drug-page-redesign-plan.md`.
 - Quick facts is the infobox and is fully editable. Text can pull a property live, e.g. `{ACB_score:metformin}`.
 - Open section is Wikipedia-style: users add paragraphs and their own headings. The description/Overview is its lead section; the old Overview editor folds into the full-page editor.
 - FDA label text stays locked. Classification and identifiers accept cited overrides shown beside the source. Renaming a page is reviewer-only. Contributors can reorder sections but not delete them.

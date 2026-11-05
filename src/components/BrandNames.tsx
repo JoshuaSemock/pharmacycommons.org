@@ -31,7 +31,7 @@ const LABEL = 'mb-1 block font-sans text-sm font-semibold text-ink'
 const SMALL_TEXT = { fontSize: 'var(--text-sm)' } as const
 const CHIP =
   'block rounded-md px-2.5 py-1 font-sans text-sm text-ink lp-chip peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30'
-const PREVIEW = 8
+const PREVIEW = 6
 
 function fdaHref(b: BrandName): string | null {
   const appl = b.appl_nos[0]?.replace(/^(NDA|BLA)/i, '')
@@ -96,7 +96,7 @@ export default function BrandNames({
             {showAll
               ? 'Show fewer'
               : view.shown.length > PREVIEW
-                ? `Show all ${view.shown.length}`
+                ? `+${view.shown.length - PREVIEW} more`
                 : view.removed.length > 0
                   ? `Show removed (${view.removed.length})`
                   : 'Show details'}

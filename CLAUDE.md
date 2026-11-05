@@ -233,8 +233,8 @@ entity with the same slug exists (848 do: drugs, classes, topics).
 order is Jump to label → Quick Facts → **Overview** (community-written, `src/OpenSection.tsx`)
 → hierarchy → FDA label (all sections collapsed, Expand all) → Identifiers →
 Guidelines (collapsed) → Classifications (FDA MOA/PE/CS first) → Lists → Additional
-metadata. On desktop Jump, Quick Facts and Identifiers sit in a sticky left rail; below
-`lg` both columns are `display: contents` and `order-*` interleaves them. The label,
+metadata. **Redesign 2026-11-03 (`docs/drug-page-redesign-plan.md`):** the header (name, "drug · INN", brand names, Network/History/Edit/Save) is the first item of the right column; on desktop Jump, Quick Facts and Identifiers sit in a left rail that runs the full page height and scrolls with it (no sticky box or inner scrollbar), with a sticky "On this page" index under Identifiers; Quick Facts is grouped (From the label with Boxed warning first, Class and status, Safety flags), long values clamp with Show more, and phones show the label group first with the rest behind a button. Below
+`lg` both columns are `display: contents` and `order-*` interleaves them (header is `order: 0`). The label,
 classes and lists are fetched once in `src/drugPageData.ts` (AbortController per
 request) and shared by Quick Facts and the full sections. Identifiers also lists **SMILES** (2026-11-03, `src/components/StructureIdentifier.tsx`, `useStructure` in `drugPageData.ts`) when `physiochemical` holds an `ok` structure for the record, with its source (PubChem or FDA GSRS) beside the label and a PubChem CID link; only moieties have rows, so other record types and biologics show no SMILES row. **A structure drawing sits at the top of Quick facts since 2026-11-03** (phase 35: `src/components/StructureDrawing.tsx`, `src/structureDraw.ts`, `useStructures` → `get_structures()`; one drawing for a moiety, one per component moiety for a salt, brand or combination). Quick Facts' key lists are
 matched by slug: `most-used-drugs-us`, `do-not-crush`, `anticholinergic-burden`,

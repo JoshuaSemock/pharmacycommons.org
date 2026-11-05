@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getDrugBySlug } from './api'
@@ -19,7 +19,8 @@ import type { Segment } from './identifiers'
 import type { LabelSection } from './labels'
 import { formatBrandName, formatDrugName, formatEntityName, formatNameByPcid } from './names'
 import MachinePanels from './MachinePanels'
-import OpenSection from './OpenSection'
+import OpenSection, { OPEN_SECTION_ID } from './OpenSection'
+import OnThisPage, { useHeadings } from './pages/OnThisPage'
 import { pageTypeFor } from './pageSource'
 import { EditLink } from './pageEditor/PageParts'
 import { LeadArea, PageTools, ReferencesFrame, SectionArea, SectionSkeleton, mainItems, useCommunityPage } from './pageEditor/CommunityPage'
@@ -43,10 +44,12 @@ import NetworkLink from './components/NetworkLink'
 
 // ─── Page layout (2026-10-02) ─────────────────────────────────────────────────
 //
-// Header: name + INN on the left, Save on the right; entity type; brand names.
+// Header (2026-11-03: moved into the right column, above the Overview): name, then
+// "drug · INN", brand names, and the page actions (Network, Edit/History, Save) on the right.
 // (The one-line description moved into the Overview on 2026-10-04.)
 //
 // Reading order (phones stack exactly this way):
+//   0. Header
 //   1. Jump to FDA prescribing information
 //   2. Quick Facts (infobox: indications, dosing, contraindications, boxed
 //      warning, FDA pharmacologic class, legal status, four key lists)
@@ -61,11 +64,13 @@ import NetworkLink from './components/NetworkLink'
 //   9. Lists
 //  10. Additional metadata / machine-readable
 //
-// Desktop: 1, 2 and 6 sit in a sticky left rail so Quick Facts and the
-// identifiers stay on screen while the label scrolls; everything else runs
-// down the main column in order. Both columns are `display: contents` below
-// lg, which lets the `order-*` classes interleave them into the single
-// stacked order above.
+// Desktop: 1, 2 and 6 sit in a left rail that runs the full height of the page and
+// scrolls with it (2026-11-03: it used to be a sticky box capped at the viewport height,
+// with its own scrollbar). Below Identifiers the rail holds a sticky "On this page" index
+// (desktop only), which uses the empty space under the rail for the rest of the scroll.
+// The header and everything else run down the main column in order. Both columns are
+// `display: contents` below lg, which lets the `order-*` classes interleave them into
+// the single stacked order above.
 //
 // Data: the drug record loads first; the label, classes and lists each load
 // in their own request (src/drugPageData.ts) and are shared by Quick Facts
@@ -209,6 +214,18 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
   const page = useCommunityPage(drug.pcid_code, drug.block_kind ?? 'moiety', 'drug', name)
   const modelMode = page.state.status === 'ready' || page.state.status === 'loading'
 
+  // "On this page": the main column's section headings, read from the DOM (as the text pages do),
+  // with the Overview first (the lead has no heading of its own). Top-level sections only.
+  const mainRef = useRef<HTMLDivElement>(null)
+  const sectionHeadings = useHeadings(mainRef, `${drug.slug}:${page.state.status}:${page.version}`)
+  const indexHeadings = sectionHeadings.length === 0
+    ? []
+    : [
+        { id: OPEN_SECTION_ID, text: 'Overview', level: 2 as const },
+        // A heading's count badge ("Clinical guidelines 3") is part of its text; the index drops it.
+        ...sectionHeadings.filter(h => h.level === 2).map(h => ({ ...h, text: h.text.replace(/(?<=\p{L})\d+$/u, '') })),
+      ]
+
   // Locked sections, by their ::name in the page source.
   const embed = (embedName: string, style: CSSProperties): ReactNode => {
     switch (embedName) {
@@ -250,38 +267,16 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
         <span className="min-w-0 truncate font-medium text-ink">{name}</span>
       </nav>
 
-      <DrugHeader
-        drug={drug}
-        version={page.version}
-        onEditBrands={page.canEdit ? () => page.edit({ kind: 'rail', name: 'brands' }) : undefined}
-        tools={<PageTools page={page} slug={drug.slug} />}
-      />
-
       <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-10">
-        <aside
-          aria-label="Quick reference"
-          className="contents lg:sticky lg:top-[calc(var(--nav-h,3.5rem)_+_1.5rem)] lg:block lg:max-h-[calc(100vh_-_var(--nav-h,3.5rem)_-_3rem)] lg:space-y-8 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pb-2"
-        >
-          <div className="min-w-0" style={{ order: 1 }}>
-            <JumpToLabel />
-          </div>
-          <div className="min-w-0" style={{ order: 2 }}>
-            <QuickFacts
-              key={page.version}
+        <div ref={mainRef} className="contents lg:col-start-2 lg:row-start-1 lg:block lg:min-w-0 lg:space-y-12">
+          <div className="min-w-0" style={{ order: 0 }}>
+            <DrugHeader
               drug={drug}
-              label={label}
-              classes={classes}
-              lists={lists}
-              onOpenSection={openLabelSection}
-              onEditAll={page.canEdit ? () => page.edit({ kind: 'rail', name: 'infobox' }) : undefined}
+              version={page.version}
+              onEditBrands={page.canEdit ? () => page.edit({ kind: 'rail', name: 'brands' }) : undefined}
+              tools={<PageTools page={page} slug={drug.slug} inline />}
             />
           </div>
-          <div className="min-w-0" style={{ order: modelMode ? identifiersOrder : 6 }}>
-            <IdentifiersSection drug={drug} />
-          </div>
-        </aside>
-
-        <div className="contents lg:block lg:min-w-0 lg:space-y-12">
           {main ? (
             main.map((item, i) => {
               const style: CSSProperties = { order: (i + 1) * 10 }
@@ -320,6 +315,31 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
             </>
           )}
         </div>
+
+        <aside aria-label="Quick reference" className="contents lg:col-start-1 lg:row-start-1 lg:block lg:space-y-8 lg:self-stretch">
+          <div className="min-w-0" style={{ order: 1 }}>
+            <JumpToLabel />
+          </div>
+          <div className="min-w-0" style={{ order: 2 }}>
+            <QuickFacts
+              key={page.version}
+              drug={drug}
+              label={label}
+              classes={classes}
+              lists={lists}
+              onOpenSection={openLabelSection}
+              onEditAll={page.canEdit ? () => page.edit({ kind: 'rail', name: 'infobox' }) : undefined}
+            />
+          </div>
+          <div className="min-w-0" style={{ order: modelMode ? identifiersOrder : 6 }}>
+            <IdentifiersSection drug={drug} />
+          </div>
+          {indexHeadings.length > 1 && (
+            <div className="hidden lg:sticky lg:top-[calc(var(--nav-h,3.5rem)_+_1.5rem)] lg:block">
+              <OnThisPage headings={indexHeadings} />
+            </div>
+          )}
+        </aside>
       </div>
     </div>
   )
@@ -579,29 +599,30 @@ function DrugHeader({
   version?: number
   /** Opens the brands block in the page editor; without it, the phase-15 brand editor is used. */
   onEditBrands?: () => void
+  /** Page actions (Edit, History, Sign in to edit); shown beside Network and Save. */
   tools?: ReactNode
 }) {
+  // One subtitle line ("drug · INN") replaces the entity-type line and the INN stamp.
+  const subtitle = [drug.entity_type, 'INN'].filter(Boolean).join(' · ')
   return (
-    <header className="mb-8 border-b border-ink/15 pb-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+    <header className="border-b border-ink/15 pb-6">
+      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0 flex-1 basis-72">
           <h1 className="min-w-0 font-sans font-semibold leading-tight text-ink [overflow-wrap:anywhere]">
             {formatEntityName(drug.name, drug.block_kind)}
           </h1>
-          <span className="lp-label shrink-0 rounded px-2 py-0.5 font-mono text-sm text-ink">INN</span>
+          <p className="mt-1 font-sans text-lg text-ink" title="International nonproprietary name">
+            {subtitle}
+          </p>
         </div>
-        <div className="shrink-0">
+        <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2">
+          <NetworkLink pcid={drug.pcid_code} />
+          {tools}
           <SaveButton pcidCode={drug.pcid_code} slug={drug.slug} name={drug.name} entityType={drug.entity_type ?? null} />
         </div>
       </div>
 
-      <p className="mt-1 font-sans text-lg text-ink">{drug.entity_type}</p>
-      <div className="mt-3">
-        <NetworkLink pcid={drug.pcid_code} />
-      </div>
-
       <BrandNames key={version} pcidCode={drug.pcid_code} brands={drug.brands ?? []} onEdit={onEditBrands} />
-      {tools}
     </header>
   )
 }
@@ -780,7 +801,7 @@ function QuickFacts({
     if (!s) return <span>{absent}</span>
     return (
       <>
-        {render(s)}
+        <Clamp>{render(s)}</Clamp>
         <MoreButton onClick={() => onOpenSection(key)} />
       </>
     )
@@ -795,6 +816,10 @@ function QuickFacts({
   ).join('; ')
   const legal = legalLine.failed ? legalFallback || null : legalLine.data
 
+  // Phones show the label summary first and the rest behind one button; desktop shows everything.
+  const [showRest, setShowRest] = useState(false)
+  const rest = showRest ? '' : 'hidden lg:block'
+
   return (
     <section aria-labelledby="quick-facts-heading" className="lp-raised rounded-md">
       <div className="lp-rule-b flex items-baseline justify-between gap-2 px-4 py-3">
@@ -804,16 +829,8 @@ function QuickFacts({
         {onEditAll && <EditLink onClick={onEditAll} label="Edit Quick Facts" />}
       </div>
       <StructureDrawing pcidCode={drug.pcid_code} />
-      <dl className="lp-divide-y">
-        <InfoboxFact term="Indications" propertyKey="indications" ctx={ctx}>
-          {labelFact('indications_and_usage', s => <span>{firstSentence(sectionText(s), 200)}</span>, 'Not in this label')}
-        </InfoboxFact>
-        <InfoboxFact term="Dosing" propertyKey="dosing" ctx={ctx}>
-          {labelFact('dosage_and_administration', s => <span>{topicLine(s)}</span>, 'Not in this label')}
-        </InfoboxFact>
-        <InfoboxFact term="Contraindications" propertyKey="contraindications" ctx={ctx}>
-          {labelFact('contraindications', s => <Contraindications section={s} />, 'Not in this label')}
-        </InfoboxFact>
+
+      <FactGroup label="From the label" first>
         <InfoboxFact term="Boxed warning" propertyKey="boxed_warning" ctx={ctx}>
           {labelLoading ? (
             <FactSkeleton />
@@ -828,25 +845,113 @@ function QuickFacts({
             <span>None in this label</span>
           )}
         </InfoboxFact>
-        <InfoboxFact term="Pharmacologic class (FDA)" propertyKey="epc_class" ctx={ctx}>
-          <EpcClasses classes={classes} />
+        <InfoboxFact term="Indications" propertyKey="indications" ctx={ctx}>
+          {labelFact('indications_and_usage', s => <span>{firstSentence(sectionText(s), 200)}</span>, 'Not in this label')}
         </InfoboxFact>
-        <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
-          {legal === undefined ? <FactSkeleton /> : legal === null ? <span>Not recorded</span> : <span>{legal}</span>}
+        <InfoboxFact term="Dosing" propertyKey="dosing" ctx={ctx}>
+          {labelFact('dosage_and_administration', s => <span>{topicLine(s)}</span>, 'Not in this label')}
         </InfoboxFact>
-        {QUICK_LISTS.map(q => (
-          <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>
-            <KeyListFact slug={q.slug} lists={lists} />
+        <InfoboxFact term="Contraindications" propertyKey="contraindications" ctx={ctx}>
+          {labelFact('contraindications', s => <Contraindications section={s} />, 'Not in this label')}
+        </InfoboxFact>
+      </FactGroup>
+
+      <div className={`lp-rule-t px-4 py-2 lg:hidden ${showRest ? 'hidden' : ''}`}>
+        <button
+          type="button"
+          onClick={() => setShowRest(true)}
+          aria-expanded={showRest}
+          className={`lp-press inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 font-sans text-sm text-ink ${FOCUS}`}
+        >
+          Show class, status and safety flags
+        </button>
+      </div>
+
+      <div className={rest}>
+        <FactGroup label="Class and status">
+          <InfoboxFact term="Pharmacologic class (FDA)" propertyKey="epc_class" ctx={ctx}>
+            <EpcClasses classes={classes} />
           </InfoboxFact>
-        ))}
-        <InfoboxFact term="REMS" propertyKey="rems" ctx={ctx}>
-          <RemsFact pcidCode={drug.pcid_code} />
-        </InfoboxFact>
-        <InfoboxFact term="Look-alike/sound-alike" propertyKey="lasa" ctx={ctx}>
-          <LasaFact pcidCode={drug.pcid_code} />
-        </InfoboxFact>
-      </dl>
+          <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
+            {legal === undefined ? <FactSkeleton /> : legal === null ? <span>Not recorded</span> : <span>{legal}</span>}
+          </InfoboxFact>
+          <InfoboxFact term={QUICK_LISTS[0].term} propertyKey={QUICK_LISTS[0].key} ctx={ctx}>
+            <KeyListFact slug={QUICK_LISTS[0].slug} lists={lists} />
+          </InfoboxFact>
+        </FactGroup>
+
+        <FactGroup label="Safety flags">
+          {QUICK_LISTS.slice(1).map(q => (
+            <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>
+              <KeyListFact slug={q.slug} lists={lists} />
+            </InfoboxFact>
+          ))}
+          <InfoboxFact term="REMS" propertyKey="rems" ctx={ctx}>
+            <RemsFact pcidCode={drug.pcid_code} />
+          </InfoboxFact>
+          <InfoboxFact term="Look-alike/sound-alike" propertyKey="lasa" ctx={ctx}>
+            <LasaFact pcidCode={drug.pcid_code} />
+          </InfoboxFact>
+        </FactGroup>
+      </div>
     </section>
+  )
+}
+
+/** A titled run of Quick facts rows. Flat label (nothing to click), a scored rule between groups. */
+function FactGroup({ label, first = false, children }: { label: string; first?: boolean; children: ReactNode }) {
+  return (
+    <div className={first ? '' : 'lp-rule-t'}>
+      <h3 className="px-4 pt-3 pb-0.5 font-sans font-medium text-ink" style={GROUP_HEADING}>
+        {label}
+      </h3>
+      <dl className="lp-divide-y">{children}</dl>
+    </div>
+  )
+}
+
+/**
+ * Keeps a long Quick facts value to about five lines, with a Show more / Show less toggle that only
+ * appears when the value is actually cut off. The full text stays in the DOM, so find-in-page and
+ * screen readers still see it.
+ */
+const CLAMP_PX = 96
+
+function Clamp({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [open, setOpen] = useState(false)
+  const [cut, setCut] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const measure = () => setCut(el.scrollHeight > CLAMP_PX + 1)
+    measure()
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    observer?.observe(el)
+    return () => observer?.disconnect()
+  }, [children])
+
+  return (
+    <>
+      <div
+        ref={ref}
+        className="overflow-hidden"
+        style={open ? undefined : { maxHeight: CLAMP_PX, WebkitMaskImage: cut ? 'linear-gradient(to bottom, #000 70%, transparent)' : undefined, maskImage: cut ? 'linear-gradient(to bottom, #000 70%, transparent)' : undefined }}
+      >
+        {children}
+      </div>
+      {(cut || open) && (
+        <button
+          type="button"
+          onClick={() => setOpen(v => !v)}
+          aria-expanded={open}
+          className={`lp-press mt-1 mr-1 inline-flex items-center rounded-md px-2 py-0.5 font-sans text-sm text-ink ${FOCUS}`}
+        >
+          {open ? 'Show less' : 'Show more'}
+        </button>
+      )}
+    </>
   )
 }
 
@@ -1017,7 +1122,7 @@ function HierarchySection({ drug, name, className, style }: { drug: DrugDetailTy
         </HierarchyGroup>
         <MemberGroup label="Precise salt and base forms" members={h.precise_forms} />
         <MemberGroup label="Brand formulations" members={h.formulations ?? []} brand />
-        <MemberGroup label="Combination products" members={h.combinations} />
+        <MemberGroup label="Combination products" members={h.combinations} collapsible />
       </div>
     </PageSection>
   )
@@ -1034,15 +1139,30 @@ function HierarchyGroup({ label, children }: { label: string; children: ReactNod
   )
 }
 
-function MemberGroup({ label, members, brand = false }: { label: string; members: HierarchyMember[]; brand?: boolean }) {
+/** A long group (combination products can run to dozens) starts as one line with its count; short ones show a preview. */
+const COLLAPSE_AT = 12
+
+function MemberGroup({ label, members, brand = false, collapsible = false }: { label: string; members: HierarchyMember[]; brand?: boolean; collapsible?: boolean }) {
   const sorted = [...members].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+  const [expanded, setExpanded] = useState(false)
+  const folded = collapsible && sorted.length > COLLAPSE_AT && !expanded
   return (
     <HierarchyGroup label={`${label}${sorted.length > 0 ? ` (${sorted.length})` : ''}`}>
       {sorted.length === 0 ? (
         <p className="font-sans text-sm text-ink">None recorded.</p>
+      ) : folded ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          aria-expanded={false}
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink ${FOCUS}`}
+        >
+          Show {sorted.length} {label.toLowerCase()} ↓
+        </button>
       ) : (
         <TileGrid
           items={sorted}
+          startOpen={collapsible && expanded}
           render={(m: HierarchyMember) => {
             const display = brand ? formatBrandName(m.name) : formatDrugName(m.name)
             const brands = (m.brands ?? []).map(formatBrandName).filter(b => b !== display)
@@ -1062,12 +1182,12 @@ function MemberGroup({ label, members, brand = false }: { label: string; members
   )
 }
 
-function TileGrid<T>({ items, render }: { items: T[]; render: (item: T) => ReactNode }) {
-  const [showAll, setShowAll] = useState(false)
+function TileGrid<T>({ items, render, startOpen = false }: { items: T[]; render: (item: T) => ReactNode; startOpen?: boolean }) {
+  const [showAll, setShowAll] = useState(startOpen)
   const visible = showAll ? items : items.slice(0, HIERARCHY_PREVIEW)
   return (
     <div>
-      <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {visible.map((item, i) => (
           <li key={i} className="min-w-0">
             {render(item)}
@@ -1089,10 +1209,10 @@ function TileGrid<T>({ items, render }: { items: T[]; render: (item: T) => React
 
 function MemberTile({ slug, name, pcid, note }: { slug: string; name: string; pcid: string; note: string | null }) {
   return (
-    <Link to={`/drugs/${slug}`} className={`${STAMP_LINK} block h-full min-w-0 px-3 py-2`}>
-      <span className="block font-sans text-base font-medium leading-snug text-ink [overflow-wrap:anywhere]">{name}</span>
-      {note && <span className="mt-0.5 block font-sans text-sm leading-snug text-ink">{note}</span>}
-      <span className="mt-0.5 block font-mono text-sm text-ink">{pcid}</span>
+    <Link to={`/drugs/${slug}`} className={`${STAMP_LINK} block h-full min-w-0 px-2.5 py-1.5`}>
+      <span className="block font-sans text-sm font-medium leading-snug text-ink [overflow-wrap:anywhere]">{name}</span>
+      {note && <span className="block font-sans text-sm leading-snug text-ink">{note}</span>}
+      <span className="block font-mono text-sm text-ink">{pcid}</span>
     </Link>
   )
 }
@@ -1122,13 +1242,26 @@ function IdentifiersSection({ drug }: { drug: DrugDetailType }) {
   const ndc = drug.fda_ndc_codes?.length ? drug.fda_ndc_codes.join(', ') : null
   const value = (key: string) => (key === 'NDC codes' ? ndc : attr(drug, key))
   const extras = EXTRA_IDENTIFIERS.filter(r => value(r.attr) !== null)
+  // Open by default; a reader who only wants the clinical facts can fold it away (2026-11-03).
+  const [open, setOpen] = useState(true)
 
   return (
     <section aria-labelledby="identifiers-heading" id="identifiers" className={ANCHOR_OFFSET}>
-      <h2 id="identifiers-heading" className="mb-3 font-semibold text-ink" style={RAIL_HEADING}>
-        Identifiers
-      </h2>
-      <dl className="space-y-3">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h2 id="identifiers-heading" className="font-semibold text-ink" style={RAIL_HEADING}>
+          Identifiers
+        </h2>
+        <button
+          type="button"
+          onClick={() => setOpen(v => !v)}
+          aria-expanded={open}
+          aria-controls="identifiers-list"
+          className={`lp-press inline-flex items-center rounded-md px-2.5 py-0.5 font-sans text-sm text-ink ${FOCUS}`}
+        >
+          {open ? 'Hide' : 'Show'}
+        </button>
+      </div>
+      <dl id="identifiers-list" className={`space-y-3 ${open ? '' : 'hidden'}`}>
         {IDENTIFIER_ROWS.map(r =>
           r.attr === null ? (
             <IdentifierRow key={r.label} label={r.label} source={r.source}>
