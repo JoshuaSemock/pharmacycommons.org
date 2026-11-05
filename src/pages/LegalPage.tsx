@@ -2,14 +2,17 @@ import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PageFrame, PageTitle } from './PageShell'
 import Markdown from './Markdown'
-import { LEGAL_CONTACT_EMAIL, LEGAL_PAGES, parseLegalDoc } from '../legal'
+import { LEGAL_CONTACT_EMAIL, LEGAL_PAGES } from '../legal'
+import { parseLegalDoc } from '../legalDoc'
 import type { LegalPageLink } from '../legal'
+import type { FrontmatterResult } from '../frontmatter'
 
 /**
  * Shared layout for /terms, /disclaimer, /licensing and /privacy.
  *
- * Renders a canonical docs/*.md file (loaded raw via import.meta.glob) inside
- * the standard text-page frame: title and Effective Date in the header, the
+ * Renders a canonical docs/*.md file (front matter parsed at build time, via import.meta.glob) inside
+ * the standard text-page frame: title and effective date (from the file's front
+ * matter) in the header, the
  * numbered sections in the reading column with "On this page" in the rail, then
  * a contact callout and links to the other three policies.
  *
@@ -17,9 +20,9 @@ import type { LegalPageLink } from '../legal'
  */
 
 // The four policies are small; load them eagerly into this one lazy chunk.
-const DOCS = import.meta.glob<string>(
+const DOCS = import.meta.glob<FrontmatterResult>(
   '../../docs/{terms-of-use,medical-disclaimer,privacy-policy,data-provenance-and-licensing}.md',
-  { query: '?raw', import: 'default', eager: true },
+  { query: '?fm', import: 'default', eager: true },
 )
 
 type LegalPageProps = {
@@ -29,10 +32,11 @@ type LegalPageProps = {
 
 export default function LegalPage({ current }: LegalPageProps) {
   const page = LEGAL_PAGES.find(p => p.to === current)
-  const source = page ? (DOCS[`../../${page.file}`] ?? '') : ''
-  const doc = useMemo(() => parseLegalDoc(source), [source])
-  const lede = page?.lede ?? ''
-  const title = page?.title ?? doc.title
+  const source = page ? DOCS[`../../${page.file}`] : undefined
+  const doc = useMemo(() => parseLegalDoc(source ?? { meta: {}, body: '', error: null }), [source])
+  // The document's own front matter wins; the LEGAL_PAGES entry is the fallback.
+  const lede = doc.lede ?? page?.lede ?? ''
+  const title = doc.title || page?.title || ''
   const related = LEGAL_PAGES.filter(p => p.to !== current)
 
   useEffect(() => {

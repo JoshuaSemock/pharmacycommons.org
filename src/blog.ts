@@ -6,9 +6,15 @@
  * at build time and inlines the raw text, so there is no runtime fetch and no
  * dependency on Supabase.
  *
- * Frontmatter is a small YAML subset: `key: value` pairs between --- fences.
- * Supported keys are listed in PostMeta below; anything else is ignored.
+ * Front matter is YAML between --- fences. It is parsed at build time (the
+ * `?fm` import, src/frontmatterParse.ts: the same parser the legal pages and the
+ * sitemap script use), so no YAML library ships to the browser. Keys read: title, slug,
+ * date (yyyy-mm-dd), author, summary, tags (a list, or "a, b"), draft.
+ * Anything else is ignored.
  */
+
+import { readFlag, readIsoDate, readList, readText } from './frontmatter'
+import type { FrontmatterResult } from './frontmatter'
 
 export type Post = {
   slug: string
@@ -23,45 +29,11 @@ export type Post = {
   file: string
 }
 
-const FILES = import.meta.glob('./content/posts/*.md', {
-  query: '?raw',
+const FILES = import.meta.glob<FrontmatterResult>('./content/posts/*.md', {
+  query: '?fm',
   import: 'default',
   eager: true,
-}) as Record<string, string>
-
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/
-
-function parseFrontmatter(raw: string): { meta: Record<string, string>; body: string } {
-  const match = FRONTMATTER.exec(raw)
-  if (!match) return { meta: {}, body: raw.trim() }
-
-  const meta: Record<string, string> = {}
-  for (const line of match[1].split(/\r?\n/)) {
-    const idx = line.indexOf(':')
-    if (idx < 1) continue
-    const key = line.slice(0, idx).trim()
-    let value = line.slice(idx + 1).trim()
-    // Strip a single layer of matching quotes.
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1)
-    }
-    meta[key] = value
-  }
-
-  return { meta, body: raw.slice(match[0].length).trim() }
-}
-
-function parseList(value: string | undefined): string[] {
-  if (!value) return []
-  const inner = value.startsWith('[') && value.endsWith(']') ? value.slice(1, -1) : value
-  return inner
-    .split(',')
-    .map(t => t.trim().replace(/^["']|["']$/g, ''))
-    .filter(Boolean)
-}
+})
 
 function slugFromPath(path: string): string {
   const base = path.split('/').pop() ?? ''
@@ -70,18 +42,18 @@ function slugFromPath(path: string): string {
     .replace(/^\d{4}-\d{2}-\d{2}-/, '') // drop the date prefix used for file ordering
 }
 
-function buildPost(path: string, raw: string): Post {
-  const { meta, body } = parseFrontmatter(raw)
+/** Exported for tests. */
+export function buildPost(path: string, { meta, body }: FrontmatterResult): Post {
   const words = body.split(/\s+/).filter(Boolean).length
 
   return {
-    slug: meta.slug || slugFromPath(path),
-    title: meta.title || slugFromPath(path),
-    date: meta.date || '',
-    author: meta.author || 'Joshua Semock, PharmD',
-    summary: meta.summary || '',
-    tags: parseList(meta.tags),
-    draft: meta.draft === 'true',
+    slug: readText(meta, 'slug') ?? slugFromPath(path),
+    title: readText(meta, 'title') ?? slugFromPath(path),
+    date: readIsoDate(meta, 'date') ?? '',
+    author: readText(meta, 'author') ?? 'Joshua Semock, PharmD',
+    summary: readText(meta, 'summary') ?? '',
+    tags: readList(meta, 'tags'),
+    draft: readFlag(meta, 'draft'),
     body,
     readingMinutes: Math.max(1, Math.round(words / 220)),
     file: path,
@@ -89,7 +61,7 @@ function buildPost(path: string, raw: string): Post {
 }
 
 const ALL: Post[] = Object.entries(FILES)
-  .map(([path, raw]) => buildPost(path, raw))
+  .map(([path, fm]) => buildPost(path, fm))
   .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
 
 /** Published posts, newest first. Drafts are visible in dev only. */

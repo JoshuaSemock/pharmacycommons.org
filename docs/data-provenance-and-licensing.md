@@ -1,14 +1,18 @@
+---
+title: "Data Provenance and Licensing Policy"
+label: "Data Provenance Policy"
+route: /licensing
+lede: "How the code and data are licensed, which upstream sources keep their own terms, and how to request removal of content."
+effective_date: 2026-10-27
+details:
+  Operator: "Pharmacy of the Commons, LLC"
+  Maintainer: "Dr. Joshua Semock, PharmD"
+website: https://pharmacycommons.org
+contact: contact@pharmacycommons.org
+body_sha256: 803b9c852f3ced3142468775f04ffb6a36400b67bcef4f513ee62ebfd7889346
+---
+
 # Pharmacy Commons — Data Provenance and Licensing Policy
-
-**Effective Date:** October 27, 2026
-
-**Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
-
-**Operator:** Pharmacy of the Commons, LLC
-
-**Maintainer:** Dr. Joshua Semock, PharmD
-
-**Contact:** contact@pharmacycommons.org
 
 Pharmacy Commons operates as an open-access public trust and computational knowledge layer designed to liberate clinical pharmacotherapy and regulatory data from proprietary enclosures. Grounded in the institutional design principles of Nobel laureate Elinor Ostrom, the project manages pharmaceutical information as a durable, shared resource for humans and machines alike.
 

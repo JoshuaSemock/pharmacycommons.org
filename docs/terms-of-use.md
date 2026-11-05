@@ -1,11 +1,17 @@
+---
+title: "Terms of Use"
+label: "Terms of Use"
+route: /terms
+lede: "The agreement that governs your use of Pharmacy Commons, its database, APIs and contributor accounts."
+effective_date: 2026-10-27
+details:
+  Last revised: "October 4, 2026 (Section 3, community contributions)"
+  Operator: "Pharmacy of the Commons, LLC"
+website: https://pharmacycommons.org
+body_sha256: 64291b7880bc5010d16bd37bf023efcef3cfe58cce3aa72ac325f91a35260187
+---
+
 # Pharmacy Commons — Terms of Use
-
-**Effective Date:** October 27, 2026
-**Last revised:** October 4, 2026 (Section 3, community contributions)
-**Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
-
-
-**Operator:** Pharmacy of the Commons, LLC
 
 This document serves as the primary legal agreement governing your access to the platform. For a complete understanding of the project's clinical boundaries and open-source data structures, please also review our Medical Information Disclaimer and our Data Provenance and Licensing Policy.
 
