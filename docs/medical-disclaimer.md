@@ -5,7 +5,7 @@ route: /disclaimer
 lede: "Pharmacy Commons is an educational reference, not medical advice. What that means for patients, clinicians and automated answers."
 effective_date: 2026-10-27
 details:
-  Operator: "Pharmacy of the Commons, LLC"
+  Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
 body_sha256: 9bab20503fba33fff9247ddf346cc4dbe9e127b775b06f02f825eef19c92525c
 ---

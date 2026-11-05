@@ -6,9 +6,9 @@ lede: "The agreement that governs your use of Pharmacy Commons, its database, AP
 effective_date: 2026-10-27
 details:
   Last revised: "October 4, 2026 (Section 3, community contributions)"
-  Operator: "Pharmacy of the Commons, LLC"
+  Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
-body_sha256: 64291b7880bc5010d16bd37bf023efcef3cfe58cce3aa72ac325f91a35260187
+body_sha256: a1c50b750903a5bb3d60d12e7d8a9a93ad9e633dbafeb39e3ad3b2b68d17d707
 ---
 
 # Pharmacy Commons — Terms of Use
@@ -17,7 +17,7 @@ This document serves as the primary legal agreement governing your access to the
 
 ### 1. Acceptance of These Terms
 
-Welcome to Pharmacy Commons. These Terms of Use (“Terms”) govern your access to and use of the website, its databases, educational materials, software, and related services (collectively, the “Services”). By accessing or using the Services, you acknowledge that you have read, understood, and agreed to these Terms. If you do not agree, you must discontinue use of the Services immediately. Pharmacy of the Commons, LLC may revise these Terms periodically. Continued use of the Services following the publication of revised Terms constitutes acceptance of the revisions.
+Welcome to Pharmacy Commons. These Terms of Use (“Terms”) govern your access to and use of the website, its databases, educational materials, software, and related services (collectively, the “Services”). By accessing or using the Services, you acknowledge that you have read, understood, and agreed to these Terms. If you do not agree, you must discontinue use of the Services immediately. Pharmacy Commons organization may revise these Terms periodically. Continued use of the Services following the publication of revised Terms constitutes acceptance of the revisions.
 
 ### 2. User Accounts and Verification
 
@@ -42,7 +42,7 @@ Pharmacy Commons permits verified users to write and edit page text, correct or 
 * **Page text** (descriptions and other written prose): under the Creative Commons Attribution-ShareAlike 4.0 International license (CC BY-SA 4.0).
 * **Structured contributions** (infobox values, page records, identifiers, links between pages, and similar data): dedicated to the public domain under Creative Commons CC0 1.0 Universal (CC0 1.0), to the extent you hold rights in them.
 
-You also grant Pharmacy of the Commons, LLC a non-exclusive, worldwide, royalty-free, perpetual license to use, reproduce, store, modify, adapt, organize, publish, distribute, display, and make your Contributions available as part of the Services, including in structured databases and machine-readable formats.
+You also grant Pharmacy Commons organization a non-exclusive, worldwide, royalty-free, perpetual license to use, reproduce, store, modify, adapt, organize, publish, distribute, display, and make your Contributions available as part of the Services, including in structured databases and machine-readable formats.
 
 **Attribution.** You agree to be credited by the public handle you choose and, unless you turn it off, the credential listed for your NPI in the NPI Registry. Your legal name, NPI number, and account identifiers are not published.
 
@@ -84,7 +84,7 @@ PHARMACY COMMONS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WARRANT
 
 ### 8. Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, PHARMACY OF THE COMMONS, LLC, AND ITS OPERATORS, CONTRIBUTORS, VOLUNTEERS, AND SERVICE PROVIDERS WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES ARISING FROM OR RELATED TO YOUR USE OF, OR INABILITY TO USE, THE SERVICES.
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, PHARMACY COMMONS ORGANIZATION, AND ITS OPERATORS, CONTRIBUTORS, VOLUNTEERS, AND SERVICE PROVIDERS WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES ARISING FROM OR RELATED TO YOUR USE OF, OR INABILITY TO USE, THE SERVICES.
 
 THIS INCLUDES, WITHOUT LIMITATION, CLAIMS ARISING FROM RELIANCE ON PHARMACEUTICAL INFORMATION, DATA ERRORS, OUTDATED INFORMATION, THIRD-PARTY SOURCES, OR AI-GENERATED OUTPUT.
 
@@ -111,7 +111,7 @@ These Terms are governed by and construed in accordance with the laws of the Sta
 ### 12. Dispute Resolution (Binding Arbitration and Class Action Waiver)
 
 **Please read this section carefully, as it affects your legal rights.**
-Before initiating formal legal proceedings, the parties agree to attempt to resolve any dispute through good-faith communication for a period of no less than 30 days. If the dispute cannot be resolved informally, you and Pharmacy of the Commons, LLC agree that any claim, dispute, or controversy arising out of or relating to these Terms or the Services shall be resolved exclusively through final and binding individual arbitration, rather than in court.
+Before initiating formal legal proceedings, the parties agree to attempt to resolve any dispute through good-faith communication for a period of no less than 30 days. If the dispute cannot be resolved informally, you and Pharmacy Commons organization agree that any claim, dispute, or controversy arising out of or relating to these Terms or the Services shall be resolved exclusively through final and binding individual arbitration, rather than in court.
 
 **Class Action Waiver:** You agree that any proceedings to resolve disputes will be conducted on an individual basis and not in a class, consolidated, or representative action. You expressly waive any right to participate in a class action lawsuit or class-wide arbitration.
 
@@ -126,4 +126,4 @@ For questions, legal inquiries, or concerns regarding these Terms, please contac
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
-**Operator:** Pharmacy of the Commons, LLC
+**Operator:** Pharmacy Commons organization
