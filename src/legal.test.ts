@@ -69,7 +69,7 @@ describe('legal documents', () => {
   it('moves header lines out of the body and keeps the operator', () => {
     const doc = parseLegalDoc(licensing)
     expect(doc.meta).toEqual([
-      { label: 'Operator', value: 'Pharmacy of the Commons, LLC' },
+      { label: 'Operator', value: 'Pharmacy Commons organization' },
       { label: 'Maintainer', value: 'Dr. Joshua Semock, PharmD' },
     ])
     expect(doc.contact).toBe('contact@pharmacycommons.org')
