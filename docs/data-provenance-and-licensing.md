@@ -3,9 +3,9 @@ title: "Data Provenance and Licensing Policy"
 label: "Data Provenance Policy"
 route: /licensing
 lede: "How the code and data are licensed, which upstream sources keep their own terms, and how to request removal of content."
-effective_date: 2026-10-27
+effective_date: 2026-11-05
 details:
-  Operator: "Pharmacy of the Commons, LLC"
+  Operator: "Pharmacy Commons organization"
   Maintainer: "Dr. Joshua Semock, PharmD"
 website: https://pharmacycommons.org
 contact: contact@pharmacycommons.org

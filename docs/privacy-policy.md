@@ -3,16 +3,16 @@ title: "Privacy Policy"
 label: "Privacy Policy"
 route: /privacy
 lede: "What we collect, why, who processes it, and how to delete your account. Never submit patient information."
-effective_date: 2026-10-27
+effective_date: 2026-11-05
 details:
-  Operator: "Pharmacy of the Commons, LLC"
+  Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
-body_sha256: 3368878f213b6c5889b620a0ff498bb5144adb7ebb57a5fd09715aed3ce08ba4
+body_sha256: 71ba18d9a96e7f2b4f767f2a0f228648de7b37b84b9bf73864fe4ddda8d61706
 ---
 
 # Pharmacy Commons — Privacy Policy
 
-This Privacy Policy explains how Pharmacy of the Commons, LLC collects, uses, stores, and protects your information when you use the Pharmacy Commons website, database, and related APIs (the “Services”). As an open-source project, our core philosophy is transparency. We collect only the data necessary to secure the platform, authenticate clinical contributors, and ensure the reliability of the public knowledge base.
+This Privacy Policy explains how Pharmacy Commons organization collects, uses, stores, and protects your information when you use the Pharmacy Commons website, database, and related APIs (the “Services”). As an open-source project, our core philosophy is transparency. We collect only the data necessary to secure the platform, authenticate clinical contributors, and ensure the reliability of the public knowledge base.
 
 ### 1. The Strict Prohibition of Protected Health Information (PHI)
 
@@ -95,4 +95,4 @@ If you have questions about this Privacy Policy, your data rights, or account de
 
 **Website:** [https://pharmacycommons.org](https://pharmacycommons.org)
 
-**Operator:** Pharmacy of the Commons, LLC
+**Operator:** Pharmacy Commons organization

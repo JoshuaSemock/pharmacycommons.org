@@ -69,7 +69,7 @@ describe('legal documents', () => {
   it('moves header lines out of the body and keeps the operator', () => {
     const doc = parseLegalDoc(licensing)
     expect(doc.meta).toEqual([
-      { label: 'Operator', value: 'Pharmacy of the Commons, LLC' },
+      { label: 'Operator', value: 'Pharmacy Commons organization' },
       { label: 'Maintainer', value: 'Dr. Joshua Semock, PharmD' },
     ])
     expect(doc.contact).toBe('contact@pharmacycommons.org')
@@ -107,7 +107,7 @@ describe('signup consent metadata', () => {
     const { legalAgreementMetadata } = await import('./auth')
     expect(legalAgreementMetadata(LEGAL_VERSION, new Date('2026-09-30T12:00:00Z'))).toEqual({
       legal_agreements_accepted: true,
-      legal_agreements_version: '2026-10-27',
+      legal_agreements_version: '2026-11-05',
       legal_agreements_accepted_at: '2026-09-30T12:00:00.000Z',
     })
   })
