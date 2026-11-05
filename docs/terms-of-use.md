@@ -3,9 +3,9 @@ title: "Terms of Use"
 label: "Terms of Use"
 route: /terms
 lede: "The agreement that governs your use of Pharmacy Commons, its database, APIs and contributor accounts."
-effective_date: 2026-10-27
+effective_date: 2026-11-05
 details:
-  Last revised: "October 4, 2026 (Section 3, community contributions)"
+  Last revised: "November 5, 2026 (operator name corrected)"
   Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
 body_sha256: a1c50b750903a5bb3d60d12e7d8a9a93ad9e633dbafeb39e3ad3b2b68d17d707

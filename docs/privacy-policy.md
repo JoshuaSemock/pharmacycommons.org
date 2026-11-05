@@ -3,7 +3,7 @@ title: "Privacy Policy"
 label: "Privacy Policy"
 route: /privacy
 lede: "What we collect, why, who processes it, and how to delete your account. Never submit patient information."
-effective_date: 2026-10-27
+effective_date: 2026-11-05
 details:
   Operator: "Pharmacy Commons organization"
 website: https://pharmacycommons.org
