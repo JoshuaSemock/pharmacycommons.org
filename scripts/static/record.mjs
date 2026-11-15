@@ -47,7 +47,12 @@ async function recordOne(context, route) {
   const r = {}
   const pending = []
   let errors = 0
+  // A permalink (/id/PCID-n) only needs the lookup it makes before redirecting; the
+  // page it lands on has its own recording.
+  const isPermalink = route.startsWith('/id/')
+  const startPath = pathOf(route)
   page.on('response', res => {
+    if (isPermalink && routeOf(new URL(page.url()).pathname) !== startPath) return
     const url = res.url()
     const at = url.indexOf('/supabase/')
     if (!url.startsWith(base) || at < 0) return
@@ -65,6 +70,11 @@ async function recordOne(context, route) {
     })())
   })
   try {
+    if (isPermalink) {
+      await page.goto(base + encodeURI(route), { waitUntil: 'commit', timeout: 60000 })
+      await page.waitForURL(u => routeOf(u.pathname) !== startPath, { timeout: 30000 }).catch(() => undefined)
+      await Promise.all(pending)
+    } else {
     await page.goto(base + encodeURI(route), { waitUntil: 'networkidle', timeout: 60000 })
     if (route === '/') {
       // Header search loads the catalog, lists, classes and posts on focus: record them too.
@@ -76,6 +86,7 @@ async function recordOne(context, route) {
     await page.waitForTimeout(500)
     await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => undefined)
     await Promise.all(pending)
+    }
   } finally {
     await page.close()
   }

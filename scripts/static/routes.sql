@@ -26,5 +26,5 @@ select route from (
          2, entity_type || slug
   from picked
   union all
-  select '/id/PCID-' || pcid, 3, entity_type || slug from picked where rn <= 5
+  select '/id/PCID-' || pcid, 3, entity_type || slug from picked
 ) x order by ord, k;
