@@ -23,6 +23,7 @@
  */
 
 import { TOOLS, isActive } from './tools'
+import { ACCOUNTS_ENABLED } from './features'
 
 export type SiteKind = 'tool' | 'page' | 'list' | 'class' | 'blog'
 
@@ -57,7 +58,10 @@ const KIND_ORDER: Record<SiteKind, number> = { tool: 0, page: 1, list: 2, blog: 
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Pages that are not tools. Add a line here when a page is worth finding by search. */
-export const SITE_PAGES: SiteEntry[] = [
+/** Pages that only make sense with accounts on (src/features.ts). */
+const ACCOUNT_PAGE_IDS = new Set(['page-new', 'page-account'])
+
+const ALL_SITE_PAGES: SiteEntry[] = [
   { id: 'page-browse', kind: 'page', title: 'Drugs A to Z', hint: 'Browse every drug by name', to: '/browse', keywords: ['browse', 'drug index', 'all drugs', 'alphabetical', 'monographs'] },
   { id: 'page-topics', kind: 'page', title: 'Topics', hint: 'Conditions, labs, targets and herbals', to: '/topics', keywords: ['conditions', 'diseases', 'adverse reactions', 'lab tests', 'labs', 'targets', 'herbals', 'botanicals', 'supplements', 'concepts'] },
   { id: 'page-network', kind: 'page', title: 'Network', hint: 'Explore how drugs, classes and topics connect', to: '/network', keywords: ['graph', 'knowledge graph', 'relationships', 'connections', 'map', 'cytoscape', 'class membership', 'visualization'] },
@@ -78,6 +82,8 @@ export const SITE_PAGES: SiteEntry[] = [
   { id: 'page-privacy', kind: 'page', title: 'Privacy', hint: 'What we collect and what we do not', to: '/privacy', keywords: ['privacy policy', 'data protection', 'cookies', 'legal'] },
   { id: 'page-licensing', kind: 'page', title: 'Data licensing', hint: 'How the data may be reused', to: '/licensing', keywords: ['license', 'licence', 'cc0', 'gpl', 'open data', 'provenance', 'legal'] },
 ]
+
+export const SITE_PAGES: SiteEntry[] = ACCOUNTS_ENABLED ? ALL_SITE_PAGES : ALL_SITE_PAGES.filter(p => !ACCOUNT_PAGE_IDS.has(p.id))
 
 /** Live tools with a page on this site. Tools that open off the site (the raw API) are left to the Developers page. */
 function toolEntries(): SiteEntry[] {

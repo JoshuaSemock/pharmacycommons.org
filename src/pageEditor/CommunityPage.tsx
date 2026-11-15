@@ -21,6 +21,7 @@ import { displayContext, usePageModel } from './usePageModel'
 import { publishedNotice, useEditAccess } from './access'
 import type { PublishResult } from './api'
 import { CommunitySection, EditLink, Frame, LeadText, ReferencesList, isEmptySection } from './PageParts'
+import { ACCOUNTS_ENABLED } from '../features'
 
 const PageEditor = lazy(() => import('./PageEditor'))
 
@@ -125,12 +126,12 @@ export function PageTools({ page, slug, inline = false }: { page: CommunityPage;
           Review queue
         </Link>
       )}
-      {status.kind === 'signed-out' && page.state.status === 'ready' && (
+      {ACCOUNTS_ENABLED && status.kind === 'signed-out' && page.state.status === 'ready' && (
         <Link to="/account" className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
           Sign in to edit
         </Link>
       )}
-      {status.kind === 'unverified' && page.state.status === 'ready' && (
+      {ACCOUNTS_ENABLED && status.kind === 'unverified' && page.state.status === 'ready' && (
         <Link to="/account" className={`lp-press inline-flex items-center rounded-md px-2.5 py-1 ${FOCUS}`}>
           Verify your NPI to edit
         </Link>

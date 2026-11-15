@@ -24,6 +24,7 @@ import { optionKey } from '../learn/keys'
 import { optionOrder } from '../learn/shuffle'
 import type { EventMode, LearnItem, Rating, ReviewEvent } from '../learn/types'
 import { useProgress } from '../learn/useProgress'
+import { ACCOUNTS_ENABLED } from '../features'
 
 type Loaded = { title: string; collectionId: string | null; items: LearnItem[] }
 type Tally = { answered: number; again: number; correct: number; mcq: number }
@@ -320,7 +321,7 @@ export default function LearnSession() {
         </p>
         {!cram && !progress.signedIn && !empty && (
           <p className="mt-3 font-sans text-[14px] text-ink">
-            Saved on this device only. <Link to="/account" className="underline">Sign in</Link> to keep your progress across devices.
+            Saved on this device only.{ACCOUNTS_ENABLED && <> <Link to="/account" className="underline">Sign in</Link> to keep your progress across devices.</>}
           </p>
         )}
         <FilterPanel items={loaded.items} selection={selection} matching={shown.length} onChange={changeFilters} />

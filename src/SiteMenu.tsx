@@ -6,6 +6,7 @@ import type { Tool } from './tools'
 import { useSession } from './auth'
 import { useThemeChoice } from './theme'
 import type { ThemeChoice } from './theme'
+import { ACCOUNTS_ENABLED } from './features'
 
 /**
  * The hamburger button and the menu it opens.
@@ -172,7 +173,7 @@ export default function SiteMenu({ placement = 'below', label, open, onOpenChang
         <div className="mx-auto max-w-page px-4 pt-2 pb-6 sm:px-6 md:grid md:grid-cols-[1fr_1.6fr_1fr] md:gap-x-10 md:pt-5">
           <div>
             {/* The bar shows the account button from md up; below that it lives here. */}
-            {!above && (
+            {!above && ACCOUNTS_ENABLED && (
               <div className="lp-rule-b py-3 md:hidden">
                 <AccountButton block />
               </div>
@@ -217,6 +218,11 @@ export default function SiteMenu({ placement = 'below', label, open, onOpenChang
  * session is on. Neither is bold.
  */
 export function AccountButton({ block = false }: { block?: boolean }) {
+  if (!ACCOUNTS_ENABLED) return null
+  return <AccountButtonInner block={block} />
+}
+
+function AccountButtonInner({ block }: { block: boolean }) {
   const { user, loading } = useSession()
   const base = [
     'items-center justify-center rounded-md px-3 font-sans text-[13px] whitespace-nowrap text-ink',
@@ -250,6 +256,11 @@ export function AccountButton({ block = false }: { block?: boolean }) {
 
 /** Account slot of the phone bar: a person icon, with a small foil dot once signed in. */
 export function AccountIconLink() {
+  if (!ACCOUNTS_ENABLED) return null
+  return <AccountIconLinkInner />
+}
+
+function AccountIconLinkInner() {
   const { user, loading } = useSession()
   const name = loading ? 'Account' : user ? 'Account, signed in' : 'Log in or register'
   return (

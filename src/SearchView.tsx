@@ -29,6 +29,7 @@ import {
 } from './catalog'
 import { drugWithBrand, formatBrandName, formatDrugName } from './names'
 import { newPageHref } from './wiki'
+import { ACCOUNTS_ENABLED } from './features'
 
 /** 0 means no cap — every remaining entry renders at once. */
 const PAGE_SIZES = [50, 100, 500, 0] as const
@@ -306,9 +307,11 @@ export default function SearchView() {
               <button onClick={() => setQuery('')} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
                 Browse every drug instead
               </button>
-              <Link to={newPageHref(query)} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
-                Create a page for “{query.trim()}”
-              </Link>
+              {ACCOUNTS_ENABLED && (
+                <Link to={newPageHref(query)} className="lp-press inline-flex items-center rounded-md px-2.5 py-1 font-sans text-sm text-ink">
+                  Create a page for “{query.trim()}”
+                </Link>
+              )}
             </p>
           </div>
         ) : (

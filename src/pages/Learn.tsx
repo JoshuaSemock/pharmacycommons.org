@@ -11,6 +11,7 @@ import LearnRail from '../components/LearnRail'
 import { listCollections } from '../learn/api'
 import { useProgress } from '../learn/useProgress'
 import type { LearnCollection } from '../learn/types'
+import { ACCOUNTS_ENABLED } from '../features'
 
 export default function Learn() {
   const [collections, setCollections] = useState<LearnCollection[] | null>(null)
@@ -57,8 +58,7 @@ export default function Learn() {
         </h1>
         <p className="mt-5 max-w-[42rem] font-sans text-[17px] leading-relaxed text-ink">
           Flashcards and single-best-answer questions built from the same records as the rest of the site, scheduled
-          with spaced repetition so you see a drug again just before you would forget it. Free, with no account needed;
-          sign in to keep your progress across devices.
+          with spaced repetition so you see a drug again just before you would forget it. Free, with no account needed{ACCOUNTS_ENABLED ? '; sign in to keep your progress across devices' : '; progress is saved in this browser'}.
         </p>
         <p className="mt-3 max-w-[42rem] font-sans text-[14px] leading-relaxed text-ink">
           Study aids, not clinical guidance. Every card shows its source; confirm against current labeling before acting.
@@ -74,7 +74,7 @@ export default function Learn() {
             </p>
             {!progress.signedIn && (
               <p className="mt-1 font-sans text-[13.5px] text-ink">
-                Saved on this device only. <Link to="/account" className="underline">Sign in</Link> to keep it.
+                Saved on this device only.{ACCOUNTS_ENABLED && <> <Link to="/account" className="underline">Sign in</Link> to keep it.</>}
               </p>
             )}
             {progress.pending && (

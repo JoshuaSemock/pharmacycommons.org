@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { STRONG_SCORE, drugScore, groupHits, scoreEntry, searchSite, staticEntries, tokens } from './siteSearch'
 import type { SiteEntry } from './siteSearch'
+import { ACCOUNTS_ENABLED } from './features'
 
 const extra: SiteEntry[] = [
   { id: 'list-do-not-crush', kind: 'list', title: 'Do not crush', hint: 'List · 226 drugs', to: '/lists/do-not-crush', keywords: [], body: 'Oral forms that should not be crushed' },
@@ -41,7 +42,9 @@ describe('searchSite', () => {
   it('finds site pages, lists, classes and posts', () => {
     expect(top('blog').to).toBe('/blog')
     expect(top('privacy policy').to).toBe('/privacy')
-    expect(top('sign in').to).toBe('/account')
+    // Read-only edition (src/features.ts): no Account or Create-a-page entries to find.
+    if (ACCOUNTS_ENABLED) expect(top('sign in').to).toBe('/account')
+    else expect(all.some(e => e.to === '/account' || e.to === '/new')).toBe(false)
     expect(top('georgia').to).toBe('/lists/georgia-mpje')
     expect(top('N06AB').to).toBe('/classifications/ssri')
     expect(top('editing').to).toBe('/blog/how-to-edit-a-page')

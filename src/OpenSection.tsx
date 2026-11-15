@@ -9,6 +9,7 @@ import OverviewEditor from './OverviewEditor'
 import { usePageContent } from './pageContent'
 import type { PageContent } from './pageContent'
 import { entityHref } from './wiki'
+import { ACCOUNTS_ENABLED } from './features'
 
 /**
  * The open, community-written section of a page (phase 15, docs/user-edits.md §2).
@@ -142,12 +143,14 @@ function EditAffordance({ status, onEdit }: { status: ContributorStatus; onEdit:
         </Button>
       )
     case 'signed-out':
+      if (!ACCOUNTS_ENABLED) return null
       return (
         <Link to="/account" className={`font-sans text-sm ${LINK}`}>
           Sign in to edit
         </Link>
       )
     case 'unverified':
+      if (!ACCOUNTS_ENABLED) return null
       return (
         <Link to="/account" className={`font-sans text-sm ${LINK}`}>
           Verify your NPI to edit
