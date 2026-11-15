@@ -11,3 +11,8 @@ routes = [
   { pattern = "pharmacycommons.org/api", zone_name = "pharmacycommons.org" },
 ]
 workers_dev = false
+
+# Static edition (docs/static-export.md): uncomment to answer /api/* from the
+# /api-static/ files on GitHub Pages instead of Supabase. Needs Joshua's go-ahead.
+# [vars]
+# API_MODE = "static"

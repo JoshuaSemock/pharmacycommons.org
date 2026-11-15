@@ -14,6 +14,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { handleStatic } from './static'
+
 const ORIGIN = 'https://nenwovhyrdcdkhxzjiiv.supabase.co/functions/v1/api'
 
 // Headers worth forwarding to the function. Nothing else leaves the edge:
@@ -50,8 +52,14 @@ function methodNotAllowed(): Response {
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: { API_MODE?: string } = {}): Promise<Response> {
     const url = new URL(request.url)
+
+    // Static edition (docs/static-export.md): answer from /api-static/ files on GitHub Pages.
+    if (env.API_MODE === 'static' && (url.pathname === '/api' || url.pathname.startsWith('/api/'))) {
+      if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') return methodNotAllowed()
+      return handleStatic(request, url)
+    }
 
     if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') {
       return methodNotAllowed()
