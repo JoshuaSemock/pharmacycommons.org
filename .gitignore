@@ -5,6 +5,7 @@ build/
 .env*
 # Local-stack defaults only (public CLI values); see docs/local-app.md
 !.env.localdb
+!.env.static
 .vite/
 vite.config.*.timestamp-*
 *.tsbuildinfo
