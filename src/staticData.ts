@@ -5,10 +5,12 @@
  * Supabase (`<origin>/supabase/...`: PostgREST, RPCs, Edge Functions) is answered
  * from files recorded in advance from the local stack by scripts/static/record.mjs:
  *
- *   /data/shared.json          answers many pages need (catalog, list index, ...)
- *   /data/p/<hash>.json        answers one route needs, keyed by its pathname
+ *   /data/p/<xx>/<hash>.json   the answers one route needs, keyed by its pathname
+ *   /data/s/<requestKey>.json  one answer that several routes (or the header
+ *                              search, on any page) need: catalog, list index, ...
  *
- * A bundle is `{ v: 1, r: { [requestKey]: [status, headers, body] } }`. The request
+ * A route bundle is `{ v: 1, r: { [requestKey]: [status, headers, body] } }`; a shared
+ * file is one `[status, headers, body]`. The request
  * key is `requestKey()` below; scripts/static/key.mjs must compute the same value.
  * A request nobody recorded gets a 404 with code `static_miss`, so the page shows
  * its normal error state instead of hanging.
@@ -56,6 +58,11 @@ function load(url: string, realFetch: typeof fetch): Promise<void> {
   return p
 }
 
+async function loadShared(key: string, realFetch: typeof fetch): Promise<void> {
+  const r = await realFetch(`${DATA_BASE}/s/${key}.json`).catch(() => null)
+  if (r?.ok) answers.set(key, (await r.json()) as Recorded)
+}
+
 function miss(method: string): Response {
   const headers = { 'content-type': 'application/json', 'content-range': '*/0' }
   const body = method === 'HEAD' ? null
@@ -75,12 +82,8 @@ export function installStaticFetch(): void {
     if (typeof init?.body === 'string') body = init.body
     else if (req && method !== 'GET' && method !== 'HEAD') body = await req.clone().text()
     const key = await requestKey(method, url.slice(prefix.length - 1), body)
-    if (!answers.has(key)) {
-      await Promise.all([
-        load(`${DATA_BASE}/shared.json`, realFetch),
-        routeFile(routeOf(window.location.pathname)).then(f => load(f, realFetch)),
-      ])
-    }
+    if (!answers.has(key)) await routeFile(routeOf(window.location.pathname)).then(f => load(f, realFetch))
+    if (!answers.has(key)) await loadShared(key, realFetch)
     const hit = answers.get(key)
     if (!hit) {
       console.warn('[static] miss', method, url.slice(prefix.length - 1).slice(0, 160))

@@ -66,10 +66,11 @@ async function recordOne(context, route) {
   })
   try {
     await page.goto(base + encodeURI(route), { waitUntil: 'networkidle', timeout: 60000 })
-    if (route === '/' || route === '/#search') {
+    if (route === '/') {
       // Header search loads the catalog, lists, classes and posts on focus: record them too.
-      const box = page.locator('header input[type="search"], header input').first()
+      const box = page.locator('input[aria-label="Search the commons"]:visible').first()
       await box.focus().catch(() => undefined)
+      await page.waitForTimeout(1500)
       await page.waitForLoadState('networkidle').catch(() => undefined)
     }
     await page.waitForTimeout(500)
