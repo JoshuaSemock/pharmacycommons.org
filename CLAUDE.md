@@ -5,7 +5,8 @@
 > 2026-11-15:** accounts, editing, page creation, review/admin and blog comments are off behind
 > `ACCOUNTS_ENABLED` in `src/features.ts` (`VITE_ACCOUNTS=on` brings them back; the code stays).
 > Treat the account/community sections below as dormant, not live. **Ingest jobs run locally**
-> with `pnpm ingest:local <job>` (`scripts/ingest-local.mjs`, local stack only; see `docs/local-app.md`). Edge Function and migration
+> with `pnpm ingest:local <job>` (`scripts/ingest-local.mjs`, local stack only; see `docs/local-app.md`). Start/stop/backup:
+> `scripts/local/` (desktop shortcuts and a 2:17 AM backup task on Joshua's PC). Edge Function and migration
 > counts below re-checked 2026-11-14.
 >
 > Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
