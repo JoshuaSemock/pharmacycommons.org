@@ -20,6 +20,9 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:local": "vite --mode localdb --host 127.0.0.1",
+    "build:local": "vite build --mode localdb",
+    "preview:local": "vite preview --mode localdb --host 127.0.0.1",
     "build": "vite build && node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs",
     "preview": "vite preview",
     "sitemap": "node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs",
