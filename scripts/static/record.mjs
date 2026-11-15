@@ -96,8 +96,23 @@ async function recordOne(context, route) {
   return { n: Object.keys(r).length, errors }
 }
 
-const browser = await chromium.launch({ executablePath: browserPath, headless: true })
-const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+// The headless browser can crash on a long run; when it does, start a new one and
+// put the route back in the queue (each route gets 3 tries).
+let browser = null
+let context = null
+let launching = null
+async function getContext() {
+  if (context && browser?.isConnected()) return context
+  launching ??= (async () => {
+    await browser?.close().catch(() => undefined)
+    browser = await chromium.launch({ executablePath: browserPath, headless: true })
+    context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+    console.log(`[record] browser started`)
+  })().finally(() => { launching = null })
+  await launching
+  return context
+}
+const tries = new Map()
 const todo = routes.filter(rt => !existsSync(rawFile(rt)))
 console.log(`${routes.length} routes, ${routes.length - todo.length} already recorded, ${todo.length} to go; ${workers} workers`)
 let done = 0
@@ -107,7 +122,7 @@ async function worker() {
     const route = todo.shift()
     if (!route) return
     try {
-      const { n, errors } = await recordOne(context, route)
+      const { n, errors } = await recordOne(await getContext(), route)
       if (errors) appendFileSync(join(out, 'errors.txt'), `${route}\t${errors} responses >= 500\n`)
       done++
       if (done % 25 === 0 || todo.length === 0) {
@@ -115,10 +130,17 @@ async function worker() {
         console.log(`${done} done (${rate.toFixed(2)}/s, ~${Math.round(todo.length / rate / 60)} min left); last ${route}: ${n} requests`)
       }
     } catch (e) {
-      appendFileSync(join(out, 'errors.txt'), `${route}\t${String(e).split('\n')[0]}\n`)
+      const n = (tries.get(route) ?? 0) + 1
+      tries.set(route, n)
+      const msg = String(e).split('\n')[0]
+      if (n < 3) {
+        todo.push(route)
+        if (/closed|createTarget|disconnected/i.test(msg)) await new Promise(r => setTimeout(r, 3000))
+      } else appendFileSync(join(out, 'errors.txt'), `${route}\t${msg}\n`)
     }
   }
 }
+await getContext()
 await Promise.all(Array.from({ length: workers }, worker))
-await browser.close()
+await browser?.close()
 console.log(`Finished in ${Math.round((Date.now() - started) / 1000)} s`)
