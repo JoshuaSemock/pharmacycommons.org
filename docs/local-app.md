@@ -17,7 +17,7 @@ hosted project is paused, never deleted, by Joshua himself after cutover.
 | 4 | Remove account features | Done 2026-11-15: build-time switch, see below |
 | 5 | Ingest functions as local scripts | Done 2026-11-15: `pnpm ingest:local`, see below |
 | 6 | Launch + nightly backup scripts | Done 2026-11-15: `scripts/local/`, see below |
-| 7 | Static public export to GitHub Pages | Not started (Joshua approves first publish) |
+| 7 | Static public export to GitHub Pages | In progress: prototype verified 2026-11-15, full recording running; `docs/static-export.md` (Joshua approves first publish and the Worker change) |
 | 8 | Verify, then Joshua pauses Supabase | Not started |
 
 ## Running it

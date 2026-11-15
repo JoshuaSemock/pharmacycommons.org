@@ -1,6 +1,6 @@
 # Static edition (phase 7 of the Supabase exit)
 
-Status 2026-11-15: **prototype (7a)**, nothing published. Plan and decisions: `docs/local-app.md`.
+Status 2026-11-15: prototype verified; full recording running on the PC; nothing published. Plan and decisions: `docs/local-app.md`.
 
 ## How it works
 The public site keeps the same React app, built with `vite build --mode static` (`.env.static`).
@@ -32,7 +32,26 @@ request to `<origin>/supabase/...` (PostgREST, RPCs, Edge Functions, the `api` f
   FDA label text, `/id/PCID-1001923` → `/drugs/metformin`, `/lists/do-not-crush` (226 rows),
   `/browse?q=lisin`; no misses, no requests leave the origin.
 
+## Public API (static)
+`scripts/static/export-api.mjs` saves, for every PCID, the local `api` function's current document,
+versions list, first page of changes and (classes) first page of members under `/api-static/v1/`, plus
+`slugs.json` and `retired.json`. `workers/api-proxy/src/static.ts` maps `/api/*` onto those files when
+`API_MODE = "static"` is set in `wrangler.toml` (commented out until Joshua approves the switch).
+Not served: `/v1/search` (501), older numbered versions, later pages of changes/members (404,
+`code: static_unavailable`).
+
+## Publishing (each step needs Joshua's go-ahead)
+1. `powershell -File scripts\static\package-data.ps1 -Out <dir>` makes `static-data.tar.gz`
+   (`data/` + `api-static/`); `-Upload` attaches it to the GitHub release `static-data`.
+2. Run the **Deploy the static edition** workflow (`.github/workflows/deploy-static.yml`, manual only):
+   builds `--mode static`, runs postbuild, unpacks the release file into `dist/`, deploys.
+3. Deploy the Worker with `API_MODE = "static"`.
+4. Turn off `deploy.yml`'s push trigger, so a merge to main no longer republishes the
+   Supabase-backed build.
+
 ## Known gaps (open)
+- `scripts/postbuild.mjs` reads published lists from the live project; once it is paused the
+  list route pages are skipped (soft failure). Point it at the exported data before pausing.
 - Typo-tolerant search (`search_all`), Network explorer, `/v1/search`: need live queries.
 - `/api` static documents not built yet; the Cloudflare Worker change waits for Joshua's approval.
 - `/id/PCID-n` bundles duplicate the target page's answers (trim before the full run).
