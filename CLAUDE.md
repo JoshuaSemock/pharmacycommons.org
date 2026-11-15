@@ -1,5 +1,9 @@
 # Pharmacy Commons — Project Instructions for Claude
 
+> **Supabase exit in progress (2026-11-14):** the app now also runs fully local (Supabase CLI stack +
+> `pnpm dev:local`); plan, status and backups in `docs/local-app.md`. Edge Function and migration
+> counts below re-checked 2026-11-14.
+>
 > Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
 > Detailed phase-by-phase history (Phases 1–4 narratives, validation runs, script
 > notes) moved to `docs/project-history.md` — read it when you need the "why",
@@ -176,7 +180,14 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
   `src/index.css` in the same commit as any styling change.
 - **Backend:** Supabase Postgres, project `nenwovhyrdcdkhxzjiiv` ("Pharmaceutical
   Commons Database"). RLS on every table. `src/supabaseClient.ts` is the single
-  `createClient()` (publishable `sb_publishable_…` key). Code that runs on every page (header,
+  `createClient()` (publishable `sb_publishable_…` key); it reads `VITE_SUPABASE_URL` /
+  `VITE_SUPABASE_PUBLISHABLE_KEY` when set (both or neither) and otherwise uses the live project.
+  **Local mode (2026-11-14, `docs/local-app.md`):** `supabase/config.toml` makes the repo the local
+  Supabase project (`supabase start`; database in Docker volume `supabase_db_pharmacy-commons`, never
+  `supabase db reset` it: there are no `supabase/migrations/`), and `pnpm dev:local` runs Vite in mode
+  `localdb` (`.env.localdb`, committed: public CLI defaults), proxying `/supabase/*` to the stack so
+  the browser sees one origin. Rebuild schema from `db/baseline/2026-11-14_schema.sql`, not by
+  replaying `db/phase*.sql` (drift: `docs/schema-drift-2026-11-14.md`). Code that runs on every page (header,
   account button, home) gets it via `getSupabase()` in `src/db.ts` so the SDK isn't in the
   first-load bundle; don't add static `supabaseClient` imports to Nav/SiteMenu/Home/catalog/auth.
 - **Package manager:** pnpm, pinned via `packageManager` (pnpm@10.34.3), Node ≥22.
@@ -531,8 +542,9 @@ Lists (Phase 9, `db/phase9-lists.md`): 38 published lists (checked 2026-10-07) �
 "Also listed by" `sources` for every entry. Read RPCs: `list_lists`,
 `get_list`, `get_entity_lists`. The `api` Edge Function does not serve lists yet.
 
-Deployed Edge Functions (11): `api` (public), `publish-page` (phase 16), `label-text`, `drugsfda-ingest`,
-`rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`, `pubchem-structures` and `gsrs-structures` (phase 34; guarded by `x-ingest-token`, `verify_jwt = false`).
+Deployed Edge Functions (12, checked 2026-11-14): `api` (public), `publish-page` (phase 16), `label-text`, `drugsfda-ingest`,
+`rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`, `pubchem-structures`, `gsrs-structures` (phase 34) and `pubchem-xref` (phase 36) (the last three guarded by `x-ingest-token`, `verify_jwt = false`).
+**188 rows in `supabase_migrations.schema_migrations` (2026-11-14 dump), latest 20261105212051 (`phase28c_search_index_alias_key`).**
 149 migrations applied (checked 2026-10-30; phase 34a/34b added 2026-11-03 as versions 20261103194410 and 20261103210156), latest version 20261030190349 (phase 24k, Learn federal filter tags) at the last full count. All 11 deployed functions have source under `supabase/functions/`. Live migration names don't always match repo file names (e.g. repo `phase24*` = live `phase19*_federal_*`) — match by version, not name.
 
 Shipped: 9-block schema + RLS; full workbook load; Supabase-backed frontend;
@@ -581,7 +593,7 @@ formulations in the moiety hierarchy (phase 10).
 - Tests: `api.test.ts` / `integration.test.ts` not yet updated for moiety-only
   filtering and hierarchy.
 - **Phase 25a applied 2026-10-30** (`db/phase25a_noncore_moiety_cleanup.sql`, run in the SQL editor, recorded as `20261030232600`): 55 non-core moieties merged or deleted (40 salts, 14 products, 1 junk), 13 relabelled Core; old PCIDs in `pcid_retired` with `replaced_by_pcid`; 69 non-core rows remain by design and still need the hide-from-search flag.
-- **Retired PCIDs: 410 without a pointer until phase 26a is applied (checked 2026-10-30):** `api_not_found()` reported `retired` and never read `replaced_by_pcid`; the Edge Function had no redirect. `db/phase26a_api_retired_replacement.sql` adds `replaced_by`/`replaced_by_pcid` to the 410 body (first live record on the chain); `supabase/functions/api` then 301s the record document (`/v1/entities|drugs/{retired}[.json|.jsonld]`) to the replacement. Versions/changes/members keep the 410. Slugs of retired records cannot redirect (the slug leaves `entities`). **Not live until Joshua runs 26a in the SQL editor and `api` is redeployed; delete this line then.**
+- **Phase 26a is recorded live (2026-11-14 check: `phase26a_api_retired_replacement`, version 20261031002500; `api` is at v9, redeployed 2026-10-31). Confirm a retired PCID 301s on `/api`, then delete this item.** Original note — **Retired PCIDs: 410 without a pointer until phase 26a is applied (checked 2026-10-30):** `api_not_found()` reported `retired` and never read `replaced_by_pcid`; the Edge Function had no redirect. `db/phase26a_api_retired_replacement.sql` adds `replaced_by`/`replaced_by_pcid` to the 410 body (first live record on the chain); `supabase/functions/api` then 301s the record document (`/v1/entities|drugs/{retired}[.json|.jsonld]`) to the replacement. Versions/changes/members keep the 410. Slugs of retired records cannot redirect (the slug leaves `entities`). **Not live until Joshua runs 26a in the SQL editor and `api` is redeployed; delete this line then.**
 - **No hide-from-search mechanism exists yet (2026-10-30):** the 137 non-core `moieties` rows are unchanged. On 2026-10-21 Joshua chose *hide from search only* (keep rows, PCIDs and list entries) over retiring/deleting, but neither the schema (no flag column) nor the search code (no `term_type` filter in `src/api.ts`) implements it. Next code task.
 - **Dispatch_Log / PCID_Blocks not updated** for the phase 23 and 24 mint batches (database is the authority; regenerate the batch tables from `docs/federal-controlled-substances.md` and the phase 23 section).
 - `tests/integration.test.ts` no longer exists (removed in the hygiene audit); `tests/api.test.ts` remains the stale one.
