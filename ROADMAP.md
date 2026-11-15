@@ -35,7 +35,8 @@ page; legal documents (effective 2026-11-05).
 - Done 2026-11-15: read-only edition (accounts, editing, comments off behind `ACCOUNTS_ENABLED` in `src/features.ts`).
 - Done 2026-11-15: ingest jobs run locally (`pnpm ingest:local`).
 - Done 2026-11-15: launch/stop scripts, desktop shortcuts, nightly local backup to OneDrive (`scripts/local/`).
-- Next: static read-only export to GitHub Pages (Joshua approves the first publish), final checks; then Joshua pauses the hosted project (never delete).
+- In progress 2026-11-15: static edition (`docs/static-export.md`): fetch shim, recorder, API export, Worker static mode and manual deploy workflow built; prototype verified; full recording running on the PC.
+- Next: finish the static export (Joshua approves the first publish and the Worker change), final checks; then Joshua pauses the hosted project (never delete).
 
 **1. Non-core moiety cleanup** *(2026-10-30: Joshua chose delete junk / relabel / merge instead of hide-only; `db/phase25a_noncore_moiety_cleanup.sql` written, **applied 2026-10-30** in the SQL editor as `20261030232600`; `moiety_hierarchy`, `ingredient_moiety_map`, `entity_brand_names` refreshed)*
 - Deletes 1 junk row, relabels 13 single compounds to Core moiety, merges 40 salts and 14 product rows into their parent drug moieties (55 PCIDs retired with `replaced_by_pcid`). 69 rows remain non-core by design (13 salts, 28 products, 28 combinations): ion-parent salts/products, true combinations (vaccines etc.), no-parent rows, and statute-text rows.

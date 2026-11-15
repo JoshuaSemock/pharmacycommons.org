@@ -30,6 +30,13 @@
 - It should also optimize pharmacotherapy for personalized medicine, using everything the site holds (lists, adverse effects, drug interactions, disease-state interactions, labs such as renal clearance, classifications, guideline recommendations) to suggest changes for environmental favorability, cost, effectiveness, reducing adverse effects and prescribing cascades, and avoiding Beers criteria, QT-list and ACB risks.
 - Target use cases: a prescriber wants a non-formulary drug the patient can't afford → best alternatives; first-line therapy isn't working (e.g. metformin in a patient with obesity → GLP-1); a psychiatric patient failing several medications → could another drug in the same class help.
 
+**Supabase exit (2026-11-14, 2026-11-15)**
+- Run Pharmacy Commons as a local app on Joshua's PC (Supabase CLI on Docker Desktop; fallback native Postgres + PostgREST), personal use in a localhost browser tab (no Tauri/Electron).
+- Keep pharmacycommons.org as a static, read-only export on GitHub Pages; PCID permalinks and stable URLs must keep working.
+- Pause the hosted Supabase project after cutover; never delete it. Joshua pauses it himself when told it is safe.
+- The website is read-only from 2026-11-15: accounts, editing, page creation, review/admin and blog comments switched off (`ACCOUNTS_ENABLED`); guest Learn progress kept, signed-in Learn progress dropped.
+- Static edition (2026-11-15, accepted defaults): data hosted on GitHub Pages, delivered to the deploy workflow as a GitHub release file (not committed); typo-tolerant search, the Network explorer and `/v1/search` are dropped from the public copy. The first publish and the Cloudflare Worker switch each need Joshua's go-ahead.
+
 **PharmacopeAi (2026-10-27)**
 - Planned AI product for Pharmacy Commons: a RAG system on Postgres in Supabase, using data such as FDA labels.
 

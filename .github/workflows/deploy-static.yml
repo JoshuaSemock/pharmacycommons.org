@@ -1,0 +1,80 @@
+name: Deploy the static edition to GitHub Pages
+
+# The static edition (docs/static-export.md): the same app built with --mode static,
+# plus the recorded data (/data/) and API files (/api-static/) made on Joshua's PC and
+# attached to the GitHub release `static-data` as static-data.tar.gz.
+#
+# Manual only. Running it replaces whatever deploy.yml last published.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # No `version:` key on purpose: pnpm/action-setup reads packageManager.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm exec vitest run
+
+      - name: Download the recorded data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download static-data --pattern static-data.tar.gz --dir "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/static" && tar -xzf "$RUNNER_TEMP/static-data.tar.gz" -C "$RUNNER_TEMP/static"
+          test -d "$RUNNER_TEMP/static/data/p" && test -f "$RUNNER_TEMP/static/api-static/v1.json" && test -f "$RUNNER_TEMP/static/route-meta.json"
+
+      # PC_ROUTE_META: postbuild reads list routes from the recorded rows, not the live project.
+      - name: Build the site (static mode)
+        env:
+          PC_ROUTE_META: ${{ runner.temp }}/static/route-meta.json
+        run: pnpm build:static && node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs
+
+      - name: Add the recorded data
+        run: |
+          mv "$RUNNER_TEMP/static/data" "$RUNNER_TEMP/static/api-static" dist/
+          du -sh dist dist/data dist/api-static
+
+      - name: Upload build output
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
