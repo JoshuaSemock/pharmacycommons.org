@@ -16,7 +16,7 @@ hosted project is paused, never deleted, by Joshua himself after cutover.
 | 3 | Front end points at the local stack via env | Done 2026-11-14 (PR #150) |
 | 4 | Remove account features | Done 2026-11-15: build-time switch, see below |
 | 5 | Ingest functions as local scripts | Done 2026-11-15: `pnpm ingest:local`, see below |
-| 6 | Launch + nightly backup scripts | Not started |
+| 6 | Launch + nightly backup scripts | Done 2026-11-15: `scripts/local/`, see below |
 | 7 | Static public export to GitHub Pages | Not started (Joshua approves first publish) |
 | 8 | Verify, then Joshua pauses Supabase | Not started |
 
@@ -133,6 +133,30 @@ from the hosted copy; that is expected, since the local copy is the working one.
 database: `moiety_hierarchy`, then `ingredient_moiety_map`, `entity_brand_names`, and
 `search_index` (`refresh materialized view concurrently …`). `rxclass` and `classyfire` feed
 `class_members` through `rebuild_classes()`.
+
+## Launch and nightly backup (phase 6, 2026-11-15)
+
+Scripts in `scripts/local/` (Windows PowerShell 5.1, ASCII only, no admin rights needed):
+
+| Script | What it does |
+| --- | --- |
+| `start-local.ps1` | starts Docker Desktop if needed (waits up to 3 min for the engine), `supabase start`, then `pnpm dev:local` in a minimized "Pharmacy Commons app" window, and opens http://127.0.0.1:5173. Leaves anything already running alone. |
+| `stop-local.ps1` | stops that dev server and `supabase stop` (the database stays in its Docker volume). Docker Desktop keeps running. |
+| `backup-local.ps1` | `pg_dump -Fc` of `public`, `archive`, `auth`, `storage`, `supabase_migrations` from the local database; checks it with `pg_restore --list`; keeps 14 in `Claude\Backups\local-nightly\` and copies each to the second location, keeping 7 there; one line per run in `backup-log.txt`. A stopped stack is logged as "skipped", not an error. |
+| `install-local.ps1` | desktop shortcuts "Pharmacy Commons" and "Stop Pharmacy Commons", and the scheduled task "Pharmacy Commons nightly backup" (daily 2:17 AM, current user, runs late if the PC was asleep or off). Re-running replaces them. |
+
+Second location: `%USERPROFILE%\OneDrive\Pharmacy Commons Backups` (Joshua's Desktop already lives in
+OneDrive, so this syncs off the PC). About 100 MB per dump, about 700 MB for the 7 kept there.
+Change it by re-running `install-local.ps1 -SecondDir "<folder>"`.
+
+Checked 2026-11-15 on Joshua's PC: a manual backup (98.7 MB, about 1 min, 32,154 entities, copied to
+OneDrive); the scheduled task run on demand (result 0, second log line; next run 2026-11-16 02:17);
+both shortcuts created; stop (0 containers left) then start (62 s, then a query through the app's
+`/supabase` proxy returned metformin).
+
+Restoring one of these dumps into a fresh stack: `supabase start`, create the extensions and the
+`archive` schema, then `pg_restore --no-owner -n public -n archive -n supabase_migrations` as in
+`Claude\Tools\restore-local.ps1` (that script refuses to run over a database that already has data).
 
 ## Schema baseline
 
