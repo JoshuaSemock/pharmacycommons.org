@@ -65,7 +65,12 @@ function localKeys() {
   let env = {}
   if (!process.env.LOCAL_SERVICE_ROLE_KEY) {
     const cli = process.env.SUPABASE_CLI || 'supabase'
-    const out = execFileSync(cli, ['status', '-o', 'env'], { encoding: 'utf8', env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' } })
+    // stderr ignored: `status` lists the services config.toml turns off ("Stopped services: …").
+    const out = execFileSync(cli, ['status', '-o', 'env'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
+    })
     for (const line of out.split(/\r?\n/)) {
       const m = line.match(/^([A-Z_]+)="?(.*?)"?$/)
       if (m) env[m[1]] = m[2]
