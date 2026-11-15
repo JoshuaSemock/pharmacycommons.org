@@ -34,8 +34,11 @@ pnpm dev:local            # app on http://127.0.0.1:5173, talking to the local s
 ```
 
 `pnpm dev:local` runs Vite in mode `localdb`, which loads `.env.localdb`:
-`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (the CLI's public local default) and
-`VITE_PC_API_BASE`. `src/supabaseClient.ts` uses them when set and falls back to the live
+`VITE_SUPABASE_URL=/supabase`, `VITE_SUPABASE_PUBLISHABLE_KEY` (the CLI's public local
+default) and `VITE_PC_API_BASE=/supabase/functions/v1/api`. In that mode the Vite dev and
+preview servers proxy `/supabase/*` to the stack on `127.0.0.1:54321`, so the browser
+only ever talks to one origin (no CORS; the Claude desktop app's built-in browser refuses
+cross-port localhost requests outright, which is how this was found). `src/supabaseClient.ts` uses them when set and falls back to the live
 project otherwise, so `pnpm build` (GitHub Pages) is unchanged. `build:local` /
 `preview:local` do the same for a production build.
 
