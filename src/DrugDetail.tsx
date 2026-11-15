@@ -51,22 +51,29 @@ import NetworkLink from './components/NetworkLink'
 // Reading order (phones stack exactly this way):
 //   0. Header
 //   1. Jump to FDA prescribing information
-//   2. Quick Facts (infobox: indications, dosing, contraindications, boxed
-//      warning, FDA pharmacologic class, legal status, four key lists)
-//   3. Overview — the open, community-written section (OpenSection.tsx,
+//   2. Quick Facts: one box of collapsible groups, every line "term, then value".
+//        From the label (boxed warning, indications, dosing, contraindications)
+//        Class and status (FDA class, legal status, most used)
+//        Safety flags (do not crush, ACB, QTc, REMS, look-alike/sound-alike)
+//        Identifiers (PCID, UNII, CAS, InChIKey, LactMed, statute, DrugBank, NDC...)
+//        Other metadata (base name, origin, MPJE relevance, environmental risk)
+//        Machine-readable (JSON, API, provenance: MachinePanels)
+//      Phones open only "From the label"; wide screens also open Class and status and
+//      Safety flags. Identifiers, Other metadata and Machine-readable start closed.
+//   3. Overview, the open, community-written section (OpenSection.tsx,
 //      phase 15): description, markdown body with [[links]] and {{values}},
 //      review status, What links here. Everything after it is ingest-owned.
 //   4. Drug hierarchy (moiety → precise forms → brand formulations → combinations)
 //   5. FDA prescribing information (every section collapsed, Expand all)
-//   6. Identifiers (PCID, CAS, UNII, InChIKey, LactMed, Georgia statute, then others)
-//   7. Clinical guidelines (collapsed)
-//   8. Classifications (FDA MOA, PE and chemical structure first, then the rest)
-//   9. Lists
-//  10. Additional metadata / machine-readable
+//   6. Clinical guidelines (collapsed)
+//   7. Classifications (FDA MOA, PE and chemical structure first, then the rest)
+//   8. Lists
 //
-// Desktop: 1, 2 and 6 sit in a left rail that runs the full height of the page and
-// scrolls with it (2026-11-03: it used to be a sticky box capped at the viewport height,
-// with its own scrollbar). Below Identifiers the rail holds a sticky "On this page" index
+// (2026-11-05: Identifiers, Additional metadata and the machine-readable panels moved into
+// Quick Facts. They used to sit in the left rail under Quick facts and as the last section.)
+//
+// Desktop: 1 and 2 sit in a left rail that runs the full height of the page and
+// scrolls with it. Below Quick facts the rail holds a sticky "On this page" index
 // (desktop only), which uses the empty space under the rail for the rest of the scroll.
 // The header and everything else run down the main column in order. Both columns are
 // `display: contents` below lg, which lets the `order-*` classes interleave them into
@@ -246,17 +253,15 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
       case 'references':
         return <ReferencesFrame key={embedName} page={page} style={style} />
       case 'metadata':
-        return <MetadataSection key={embedName} drug={drug} className="" style={style} />
+        // Moved into Quick facts (Other metadata, Machine-readable). A saved page source that
+        // still lists the section renders nothing here.
+        return null
       default:
         return null
     }
   }
 
   const main = modelMode ? mainItems(page) : null
-  // Phones stack one column: Identifiers follows the FDA label, wherever it has been moved.
-  const labelOrder = main ? (main.findIndex(m => m.kind === 'embed' && m.name === 'fda-label') + 1) * 10 : 50
-  const identifiersOrder = labelOrder + 5
-
   return (
     <div className="mx-auto max-w-page px-4 pb-24 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 py-4 font-sans text-sm text-ink">
@@ -308,10 +313,9 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
               <PageSection id={LABEL_ANCHOR} title="FDA prescribing information" className="order-5">
                 <LabelSections slug={drug.slug} label={label} open={openSections} onOpenChange={setOpenSections} />
               </PageSection>
-              <GuidelinesSection pcidCode={drug.pcid_code} className="order-7" />
-              <ClassificationsSection classes={classes} className="order-8" />
-              <ListsSection lists={lists} pcid={drug.pcid_code} className="order-9" />
-              <MetadataSection drug={drug} className="order-10" />
+              <GuidelinesSection pcidCode={drug.pcid_code} className="order-6" />
+              <ClassificationsSection classes={classes} className="order-7" />
+              <ListsSection lists={lists} pcid={drug.pcid_code} className="order-8" />
             </>
           )}
         </div>
@@ -330,9 +334,6 @@ function DrugPage({ drug }: { drug: DrugDetailType }) {
               onOpenSection={openLabelSection}
               onEditAll={page.canEdit ? () => page.edit({ kind: 'rail', name: 'infobox' }) : undefined}
             />
-          </div>
-          <div className="min-w-0" style={{ order: modelMode ? identifiersOrder : 6 }}>
-            <IdentifiersSection drug={drug} />
           </div>
           {indexHeadings.length > 1 && (
             <div className="hidden lg:sticky lg:top-[calc(var(--nav-h,3.5rem)_+_1.5rem)] lg:block">
@@ -759,6 +760,23 @@ const QUICK_LISTS: { slug: string; term: string; key: string }[] = [
   { slug: 'arrhythmia-risk', term: 'QTc risk', key: 'qtc_risk' },
 ]
 
+// The collapsible groups, top to bottom. `details` is left out when the drug has nothing to show.
+type FactGroupKey = 'label' | 'class' | 'safety' | 'identifiers' | 'details' | 'machine'
+const GROUP_KEYS: FactGroupKey[] = ['label', 'class', 'safety', 'identifiers', 'details', 'machine']
+const WIDE = '(min-width: 1024px)'
+
+/** Old links (#identifiers, #metadata) open the group that now holds that content. */
+const HASH_GROUPS: Record<string, FactGroupKey> = { '#identifiers': 'identifiers', '#metadata': 'machine' }
+
+/** Phones open the label group only; wide screens also open class/status and safety. Reference data starts closed. */
+function initialGroups(): Record<FactGroupKey, boolean> {
+  const wide = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(WIDE).matches
+  const open: Record<FactGroupKey, boolean> = { label: true, class: wide, safety: wide, identifiers: false, details: false, machine: false }
+  const fromHash = typeof window !== 'undefined' ? HASH_GROUPS[window.location.hash] : undefined
+  if (fromHash) open[fromHash] = true
+  return open
+}
+
 function QuickFacts({
   drug,
   label,
@@ -816,9 +834,14 @@ function QuickFacts({
   ).join('; ')
   const legal = legalLine.failed ? legalFallback || null : legalLine.data
 
-  // Phones show the label summary first and the rest behind one button; desktop shows everything.
-  const [showRest, setShowRest] = useState(false)
-  const rest = showRest ? '' : 'hidden lg:block'
+  const [groups, setGroups] = useState(initialGroups)
+  const toggle = (key: FactGroupKey) => setGroups(g => ({ ...g, [key]: !g[key] }))
+
+  const detailRows = metadataRows(drug)
+  const hasDetails = detailRows.length > 0 || Boolean(drug.eco)
+  const shown = GROUP_KEYS.filter(k => k !== 'details' || hasDetails)
+  const allOpen = shown.every(k => groups[k])
+  const setAll = (open: boolean) => setGroups(g => shown.reduce((acc, k) => ({ ...acc, [k]: open }), g))
 
   return (
     <section aria-labelledby="quick-facts-heading" className="lp-raised rounded-md">
@@ -826,11 +849,20 @@ function QuickFacts({
         <h2 id="quick-facts-heading" className="font-semibold text-ink" style={RAIL_HEADING}>
           Quick facts
         </h2>
-        {onEditAll && <EditLink onClick={onEditAll} label="Edit Quick Facts" />}
+        <span className="flex items-baseline gap-2">
+          <button
+            type="button"
+            onClick={() => setAll(!allOpen)}
+            className={`lp-press inline-flex items-center rounded-md px-2.5 py-0.5 font-sans text-sm text-ink ${FOCUS}`}
+          >
+            {allOpen ? 'Collapse all' : 'Expand all'}
+          </button>
+          {onEditAll && <EditLink onClick={onEditAll} label="Edit Quick Facts" />}
+        </span>
       </div>
       <StructureDrawing pcidCode={drug.pcid_code} />
 
-      <FactGroup label="From the label" first>
+      <FactGroup id="quick-label" label="From the label" first open={groups.label} onToggle={() => toggle('label')}>
         <InfoboxFact term="Boxed warning" propertyKey="boxed_warning" ctx={ctx}>
           {labelLoading ? (
             <FactSkeleton />
@@ -856,57 +888,161 @@ function QuickFacts({
         </InfoboxFact>
       </FactGroup>
 
-      <div className={`lp-rule-t px-4 py-2 lg:hidden ${showRest ? 'hidden' : ''}`}>
-        <button
-          type="button"
-          onClick={() => setShowRest(true)}
-          aria-expanded={showRest}
-          className={`lp-press inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 font-sans text-sm text-ink ${FOCUS}`}
-        >
-          Show class, status and safety flags
-        </button>
-      </div>
+      <FactGroup id="quick-class" label="Class and status" open={groups.class} onToggle={() => toggle('class')}>
+        <InfoboxFact term="Pharmacologic class (FDA)" propertyKey="epc_class" ctx={ctx}>
+          <EpcClasses classes={classes} />
+        </InfoboxFact>
+        <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
+          {legal === undefined ? <FactSkeleton /> : legal === null ? <span>Not recorded</span> : <span>{legal}</span>}
+        </InfoboxFact>
+        <InfoboxFact term={QUICK_LISTS[0].term} propertyKey={QUICK_LISTS[0].key} ctx={ctx}>
+          <KeyListFact slug={QUICK_LISTS[0].slug} lists={lists} />
+        </InfoboxFact>
+      </FactGroup>
 
-      <div className={rest}>
-        <FactGroup label="Class and status">
-          <InfoboxFact term="Pharmacologic class (FDA)" propertyKey="epc_class" ctx={ctx}>
-            <EpcClasses classes={classes} />
+      <FactGroup id="quick-safety" label="Safety flags" open={groups.safety} onToggle={() => toggle('safety')}>
+        {QUICK_LISTS.slice(1).map(q => (
+          <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>
+            <KeyListFact slug={q.slug} lists={lists} />
           </InfoboxFact>
-          <InfoboxFact term="Legal status" propertyKey="legal_status" ctx={ctx}>
-            {legal === undefined ? <FactSkeleton /> : legal === null ? <span>Not recorded</span> : <span>{legal}</span>}
-          </InfoboxFact>
-          <InfoboxFact term={QUICK_LISTS[0].term} propertyKey={QUICK_LISTS[0].key} ctx={ctx}>
-            <KeyListFact slug={QUICK_LISTS[0].slug} lists={lists} />
-          </InfoboxFact>
-        </FactGroup>
+        ))}
+        <InfoboxFact term="REMS" propertyKey="rems" ctx={ctx}>
+          <RemsFact pcidCode={drug.pcid_code} />
+        </InfoboxFact>
+        <InfoboxFact term="Look-alike/sound-alike" propertyKey="lasa" ctx={ctx}>
+          <LasaFact pcidCode={drug.pcid_code} />
+        </InfoboxFact>
+      </FactGroup>
 
-        <FactGroup label="Safety flags">
-          {QUICK_LISTS.slice(1).map(q => (
-            <InfoboxFact key={q.slug} term={q.term} propertyKey={q.key} ctx={ctx}>
-              <KeyListFact slug={q.slug} lists={lists} />
-            </InfoboxFact>
+      {/* Reference data: closed until asked for. The PCID stays visible on the closed Identifiers line. */}
+      <FactGroup id="identifiers" label="Identifiers" summary={drug.pcid_code} open={groups.identifiers} onToggle={() => toggle('identifiers')}>
+        <IdentifierRows drug={drug} />
+      </FactGroup>
+
+      {hasDetails && (
+        <FactGroup id="other-metadata" label="Other metadata" open={groups.details} onToggle={() => toggle('details')}>
+          {detailRows.map(r => (
+            <FactRow key={r.label} term={r.label}>
+              {r.value}
+            </FactRow>
           ))}
-          <InfoboxFact term="REMS" propertyKey="rems" ctx={ctx}>
-            <RemsFact pcidCode={drug.pcid_code} />
-          </InfoboxFact>
-          <InfoboxFact term="Look-alike/sound-alike" propertyKey="lasa" ctx={ctx}>
-            <LasaFact pcidCode={drug.pcid_code} />
-          </InfoboxFact>
+          {drug.eco ? <EcoFact eco={drug.eco} /> : null}
         </FactGroup>
-      </div>
+      )}
+
+      {/* id="metadata" keeps old #metadata links landing here. Always mounted: MachinePanels also puts the
+          record's JSON-LD and JSON alternates in <head> (useMachineHead), which must not wait for a click. */}
+      <FactGroup id="metadata" label="Machine-readable" plain open={groups.machine} onToggle={() => toggle('machine')}>
+        <div className="space-y-6 px-4 py-3">
+          <MachinePanels pcidCode={drug.pcid_code} slug={drug.slug} />
+        </div>
+      </FactGroup>
     </section>
   )
 }
 
-/** A titled run of Quick facts rows. Flat label (nothing to click), a scored rule between groups. */
-function FactGroup({ label, first = false, children }: { label: string; first?: boolean; children: ReactNode }) {
+/**
+ * A collapsible Quick facts group: one full-width button (label left, optional summary and chevron right),
+ * then its lines. The lines stay mounted while closed, so their loaded data and any open editors survive.
+ * `plain` swaps the term/value list for a bare block (the machine-readable panels are not term/value lines).
+ */
+function FactGroup({
+  id,
+  label,
+  summary,
+  first = false,
+  plain = false,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string
+  label: string
+  /** Shown beside the chevron while the group is closed. */
+  summary?: string
+  first?: boolean
+  plain?: boolean
+  open: boolean
+  onToggle: () => void
+  children: ReactNode
+}) {
+  const panelId = `${id}-panel`
+  const Panel = plain ? 'div' : 'dl'
   return (
-    <div className={first ? '' : 'lp-rule-t'}>
-      <h3 className="px-4 pt-3 pb-0.5 font-sans font-medium text-ink" style={GROUP_HEADING}>
-        {label}
+    <div id={id} className={`${first ? '' : 'lp-rule-t'} ${ANCHOR_OFFSET}`}>
+      <h3 className="m-0" style={{ fontSize: 'inherit', lineHeight: 'inherit', fontFamily: 'inherit' }}>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink/40"
+        >
+          <span className="font-semibold text-ink" style={GROUP_HEADING}>
+            {label}
+          </span>
+          <span className="flex shrink-0 items-center gap-2 font-mono text-sm text-ink">
+            {!open && summary ? <span>{summary}</span> : null}
+            <Chevron open={open} />
+          </span>
+        </button>
       </h3>
-      <dl className="lp-divide-y">{children}</dl>
+      <Panel id={panelId} className={`${plain ? '' : 'lp-divide-y'} ${open ? '' : 'hidden'}`}>
+        {children}
+      </Panel>
     </div>
+  )
+}
+
+/**
+ * One plain Quick facts line, in the same grid as InfoboxFact: term on the left, value on the right,
+ * and the source (when it has one) as a small line under the value.
+ */
+function FactRow({ term, source, children }: { term: string; source?: string; children: ReactNode }) {
+  return (
+    <div className="px-4 py-2.5">
+      <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-3">
+        <dt className="font-sans text-sm font-semibold leading-snug text-ink">{term}</dt>
+        <dd className="min-w-0 font-sans text-sm leading-snug text-ink [overflow-wrap:anywhere]">
+          {children}
+          {source ? <span className="mt-0.5 block font-sans text-xs">{source}</span> : null}
+        </dd>
+      </div>
+    </div>
+  )
+}
+
+/** Base name, origin and MPJE relevance, when the drug has them. */
+function metadataRows(drug: DrugDetailType): { label: string; value: string }[] {
+  return METADATA_ATTRS.map(label => ({ label, value: attr(drug, label) })).filter(
+    (r): r is { label: string; value: string } => r.value !== null,
+  )
+}
+
+/** Environmental risk as one headline line plus short follow-on lines, instead of the old card. */
+function EcoFact({ eco }: { eco: unknown }) {
+  const m = (typeof eco === 'object' && eco !== null ? eco : {}) as EcoLike
+  const rq = typeof m.rq_value === 'number' && Number.isFinite(m.rq_value) ? m.rq_value : null
+  const key = toRiskKey(m.rq_category)
+  const rqText = rq === null ? null : rq >= 10 ? rq.toFixed(1) : rq.toFixed(2)
+  const lines: { term: string; value: string }[] = []
+  if (typeof m.dpd_category === 'string' && m.dpd_category) {
+    lines.push({ term: 'Persistence', value: `${titleCase(m.dpd_category)}${typeof m.dpd_days === 'number' ? ` · ${m.dpd_days} days` : ''}` })
+  }
+  if (typeof m.excretion_route === 'string' && m.excretion_route) lines.push({ term: 'Excretion', value: titleCase(m.excretion_route) })
+  if (typeof m.primary_concern === 'string' && m.primary_concern) lines.push({ term: 'Concern', value: m.primary_concern })
+
+  return (
+    <FactRow term="Environmental risk">
+      <span className="font-medium">
+        {key ? ECO_RISK_COLORS[key].label : 'Unknown'} risk{rqText ? ` · RQ ${rqText}` : ''}
+      </span>
+      {lines.map(l => (
+        <span key={l.term} className="mt-0.5 block">
+          {l.term}: {l.value}
+        </span>
+      ))}
+    </FactRow>
   )
 }
 
@@ -1238,58 +1374,41 @@ const EXTRA_IDENTIFIERS: { label: string; source: string; attr: string }[] = [
   { label: 'NDC', source: 'DailyMed', attr: 'NDC codes' },
 ]
 
-function IdentifiersSection({ drug }: { drug: DrugDetailType }) {
+/** Identifier lines for the Quick facts group: term, then the stamped value, then its source. */
+function IdentifierRows({ drug }: { drug: DrugDetailType }) {
   const ndc = drug.fda_ndc_codes?.length ? drug.fda_ndc_codes.join(', ') : null
   const value = (key: string) => (key === 'NDC codes' ? ndc : attr(drug, key))
   const extras = EXTRA_IDENTIFIERS.filter(r => value(r.attr) !== null)
-  // Open by default; a reader who only wants the clinical facts can fold it away (2026-11-03).
-  const [open, setOpen] = useState(true)
 
   return (
-    <section aria-labelledby="identifiers-heading" id="identifiers" className={ANCHOR_OFFSET}>
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 id="identifiers-heading" className="font-semibold text-ink" style={RAIL_HEADING}>
-          Identifiers
-        </h2>
-        <button
-          type="button"
-          onClick={() => setOpen(v => !v)}
-          aria-expanded={open}
-          aria-controls="identifiers-list"
-          className={`lp-press inline-flex items-center rounded-md px-2.5 py-0.5 font-sans text-sm text-ink ${FOCUS}`}
-        >
-          {open ? 'Hide' : 'Show'}
-        </button>
-      </div>
-      <dl id="identifiers-list" className={`space-y-3 ${open ? '' : 'hidden'}`}>
-        {IDENTIFIER_ROWS.map(r =>
-          r.attr === null ? (
-            <IdentifierRow key={r.label} label={r.label} source={r.source}>
-              <Link to={`/id/${drug.pcid_code}`} title="Permanent link" className={`${STAMP_LINK} inline-block px-2 py-0.5 font-mono text-sm`}>
-                {drug.pcid_code}
-              </Link>
-            </IdentifierRow>
-          ) : (
-            <IdentifierRow key={r.label} label={r.label} source={r.source}>
-              <IdentifierValue attrKey={r.attr} value={value(r.attr)} name={drug.name} />
-            </IdentifierRow>
-          ),
-        )}
-        <StructureIdentifier
-          pcidCode={drug.pcid_code}
-          row={(label, source, children) => (
-            <IdentifierRow label={label} source={source}>
-              {children}
-            </IdentifierRow>
-          )}
-        />
-        {extras.map(r => (
-          <IdentifierRow key={r.label} label={r.label} source={r.source}>
+    <>
+      {IDENTIFIER_ROWS.map(r =>
+        r.attr === null ? (
+          <FactRow key={r.label} term={r.label} source={r.source}>
+            <Link to={`/id/${drug.pcid_code}`} title="Permanent link" className={`${STAMP_LINK} inline-block px-2 py-0.5 font-mono text-sm`}>
+              {drug.pcid_code}
+            </Link>
+          </FactRow>
+        ) : (
+          <FactRow key={r.label} term={r.label} source={r.source}>
             <IdentifierValue attrKey={r.attr} value={value(r.attr)} name={drug.name} />
-          </IdentifierRow>
-        ))}
-      </dl>
-    </section>
+          </FactRow>
+        ),
+      )}
+      <StructureIdentifier
+        pcidCode={drug.pcid_code}
+        row={(label, source, children) => (
+          <FactRow term={label} source={source}>
+            {children}
+          </FactRow>
+        )}
+      />
+      {extras.map(r => (
+        <FactRow key={r.label} term={r.label} source={r.source}>
+          <IdentifierValue attrKey={r.attr} value={value(r.attr)} name={drug.name} />
+        </FactRow>
+      ))}
+    </>
   )
 }
 
@@ -1582,9 +1701,7 @@ function ListsSection({ lists, pcid, className, style }: { lists: Loadable<Entit
 const METADATA_ATTRS = ['Base name', 'Origin', 'MPJE relevance']
 
 function MetadataSection({ drug, className, style }: { drug: DrugDetailType; className: string; style?: CSSProperties }) {
-  const rows = METADATA_ATTRS.map(label => ({ label, value: attr(drug, label) })).filter(
-    (r): r is { label: string; value: string } => r.value !== null,
-  )
+  const rows = metadataRows(drug)
   const eco = drug.eco
 
   return (
