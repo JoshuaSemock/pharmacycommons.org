@@ -4,6 +4,7 @@ import Nav from './Nav'
 import Footer from './Footer'
 import Home from './pages/Home'
 import { LEGAL_PAGES } from './legal'
+import { ACCOUNTS_ENABLED } from './features'
 
 // Home ships in the entry bundle because it is the landing page. Every other
 // route is split into its own chunk and fetched when first visited, so the
@@ -18,6 +19,7 @@ const References = lazy(() => import('./pages/References'))
 const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
 const Account = lazy(() => import('./pages/Account'))
+const ReadOnlyEdition = lazy(() => import('./pages/ReadOnlyEdition'))
 const Permalink = lazy(() => import('./pages/Permalink'))
 const ClassIndex = lazy(() => import('./pages/ClassIndex'))
 const ClassDetail = lazy(() => import('./pages/ClassDetail'))
@@ -78,11 +80,11 @@ export default function App() {
           <Route path="/browse" element={<SearchView />} />
           <Route path="/drugs/:slug" element={<DrugDetail />} />
           <Route path="/drugs/:slug/history" element={<PageHistory />} />
-          <Route path="/drugs/:slug/edit" element={<EditPage />} />
-          <Route path="/review" element={<ReviewQueue />} />
-          <Route path="/new" element={<CreatePage />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/learn" element={<LearnReview />} />
+          <Route path="/drugs/:slug/edit" element={ACCOUNTS_ENABLED ? <EditPage /> : <ReadOnlyEdition />} />
+          <Route path="/review" element={ACCOUNTS_ENABLED ? <ReviewQueue /> : <ReadOnlyEdition />} />
+          <Route path="/new" element={ACCOUNTS_ENABLED ? <CreatePage /> : <ReadOnlyEdition />} />
+          <Route path="/admin" element={ACCOUNTS_ENABLED ? <Admin /> : <ReadOnlyEdition />} />
+          <Route path="/admin/learn" element={ACCOUNTS_ENABLED ? <LearnReview /> : <ReadOnlyEdition />} />
           <Route path="/classifications" element={<ClassIndex />} />
           <Route path="/classifications/compare" element={<ClassCompare />} />
           <Route path="/classifications/:slug" element={<ClassDetail />} />
@@ -119,7 +121,7 @@ export default function App() {
           <Route path="/citations" element={<Moved to="/references" />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/account" element={<Account />} />
+          <Route path="/account" element={ACCOUNTS_ENABLED ? <Account /> : <ReadOnlyEdition />} />
           {LEGAL_PAGES.map(p => (
             <Route key={p.to} path={p.to} element={<LegalPage key={p.to} current={p.to} />} />
           ))}

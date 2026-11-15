@@ -6,6 +6,7 @@ import SiteMenu, { AccountButton, AccountIconLink, BAR_ITEM, BAR_LINKS } from '.
 import { drugScore, groupHits, loadSiteEntries, searchSite, staticEntries } from './siteSearch'
 import type { SiteEntry } from './siteSearch'
 import type { SearchAllHit, SearchAllResult } from './api'
+import { ACCOUNTS_ENABLED } from './features'
 
 /**
  * The site header: one bar, always in this order — logo, "Pharmacy Commons",
@@ -99,9 +100,11 @@ function DesktopNav() {
           ))}
         </ul>
 
-        <div className="hidden shrink-0 md:block">
-          <AccountButton />
-        </div>
+        {ACCOUNTS_ENABLED && (
+          <div className="hidden shrink-0 md:block">
+            <AccountButton />
+          </div>
+        )}
 
         <div className="shrink-0">
           <SiteMenu />
@@ -452,7 +455,7 @@ function MobileNav() {
         </>
       )}
 
-      <ul className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-1">
+      <ul className={`mx-auto grid h-16 max-w-md ${ACCOUNTS_ENABLED ? 'grid-cols-5' : 'grid-cols-4'} items-center px-1`}>
         <li className="flex justify-center">
           <NavLink to="/tools" className={BAR_ITEM}>
             <ToolsIcon />
@@ -479,9 +482,11 @@ function MobileNav() {
         <li className="flex justify-center">
           <SiteMenu placement="above" label="Menu" open={panel === 'menu'} onOpenChange={o => setPanel(o ? 'menu' : null)} />
         </li>
-        <li className="flex justify-center">
-          <AccountIconLink />
-        </li>
+        {ACCOUNTS_ENABLED && (
+          <li className="flex justify-center">
+            <AccountIconLink />
+          </li>
+        )}
       </ul>
     </nav>
   )

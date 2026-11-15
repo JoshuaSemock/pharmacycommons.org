@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { LIMIT_BOUNDS } from '../learn/settings'
 import type { Progress } from '../learn/useProgress'
+import { ACCOUNTS_ENABLED } from '../features'
 
 const FIELD = 'lp-field inline-flex rounded-md px-3 py-1.5'
 const INPUT = 'w-20 border-0 bg-transparent font-mono text-[14px] text-ink outline-none'
@@ -109,7 +110,9 @@ export default function LearnSettings({
             ? 'Couldn’t save to your account just now. The change holds on this device.'
             : signedIn
               ? 'Saved to your account.'
-              : 'Saved on this device. Sign in to keep it across devices.'}
+              : ACCOUNTS_ENABLED
+                ? 'Saved on this device. Sign in to keep it across devices.'
+                : 'Saved on this device.'}
         </p>
       </div>
     </section>

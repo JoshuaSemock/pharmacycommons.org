@@ -13,8 +13,8 @@ hosted project is paused, never deleted, by Joshua himself after cutover.
 | 0 | Inventory | Done 2026-11-14 |
 | 1 | Backup (pg_dump + Storage bucket) | Done 2026-11-14 |
 | 2 | Local database (supabase start + restore) | Done 2026-11-14 |
-| 3 | Front end points at the local stack via env | This change |
-| 4 | Remove account features | Not started (Joshua approves the list first) |
+| 3 | Front end points at the local stack via env | Done 2026-11-14 (PR #150) |
+| 4 | Remove account features | Done 2026-11-15: build-time switch, see below |
 | 5 | Ingest functions as local scripts | Not started |
 | 6 | Launch + nightly backup scripts | Not started |
 | 7 | Static public export to GitHub Pages | Not started (Joshua approves first publish) |
@@ -70,6 +70,33 @@ reset leaves an empty database (restore from a backup instead, below).
 2026-11-14 results: both restores 0 errors; all 106 public + archive tables match live
 exact row counts except `entity_label_rank` (live 12,417 vs 12,347 restored, because the
 live matview is stale: its own query returns 12,347 on live too).
+
+## Read-only edition (phase 4, decided 2026-11-15)
+
+Joshua's calls: a switch rather than deleting code; no accounts on the live site from now
+on; Learn starts fresh in each browser (server-side progress is not copied, and nothing
+is deleted from the database); read-only page history stays.
+
+`src/features.ts` exports `ACCOUNTS_ENABLED`, off unless the build sets `VITE_ACCOUNTS=on`.
+With it off:
+
+- `useSession()` (`src/auth.ts`) reports nobody signed in and never calls Supabase Auth,
+  so every control that checks for a user stays hidden (Save, Edit, Quick Facts and brand
+  editors, revision actions) and Learn uses its `localStorage` guest mode.
+- `/account`, `/new`, `/review`, `/admin`, `/admin/learn` and `/drugs/:slug/edit` render
+  `src/pages/ReadOnlyEdition.tsx`.
+- Hidden explicitly: the header and phone-bar account buttons (the phone bar drops to four
+  slots), "Sign in to edit" / "Verify your NPI to edit", every "Create a page" link and the
+  Topics create panel, blog comments, the "Sign in to keep your progress" Learn lines, and
+  the Account / Create-a-page entries in site search.
+
+Untouched: the database (account tables, functions, the 3 accounts and their data, all in
+the 2026-11-14 backup) and the `verify-npi` / `publish-page` functions, which nothing in the
+read-only build calls.
+
+**Open for Joshua:** the Terms of Use and Privacy Policy still describe accounts,
+registration and NPI verification. Changing them is a legal-document change (new
+`effective_date`, `LEGAL_VERSION`, `body_sha256`), so it was not done here.
 
 ## Schema baseline
 

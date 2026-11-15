@@ -19,12 +19,15 @@
 import { useEffect, useState } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { getSupabase } from './db'
+import { ACCOUNTS_ENABLED } from './features'
 
 export function useSession(): { session: Session | null; user: User | null; loading: boolean } {
   const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Accounts off (src/features.ts): nobody is ever signed in, and the Auth client is never asked.
+  const [loading, setLoading] = useState(ACCOUNTS_ENABLED)
 
   useEffect(() => {
+    if (!ACCOUNTS_ENABLED) return
     let cancelled = false
     let unsubscribe: (() => void) | null = null
 

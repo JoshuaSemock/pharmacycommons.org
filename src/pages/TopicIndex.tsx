@@ -20,6 +20,7 @@ import type { Topic, TopicKind, TopicSort } from '../topics'
 import { entityHref, newPageHref } from '../wiki'
 import { PAGE_KINDS, slugify } from '../contribute'
 import { supabase } from '../supabaseClient'
+import { ACCOUNTS_ENABLED } from '../features'
 
 /**
  * /topics — browse everything that isn't a drug (blocks 6–9).
@@ -158,7 +159,7 @@ export default function TopicIndex() {
           <HeaderLink to="/classifications">Classifications</HeaderLink>
           <HeaderLink to="/lists">Lists</HeaderLink>
         </p>
-        <CreatePanel />
+        {ACCOUNTS_ENABLED && <CreatePanel />}
       </header>
 
       {topics === 'failed' ? (
@@ -263,7 +264,7 @@ export default function TopicIndex() {
             {shown.length === 0 ? (
               <p className="py-8 font-sans text-[15px] text-ink">
                 Nothing matches.{' '}
-                {q.trim() && (
+                {ACCOUNTS_ENABLED && q.trim() && (
                   <Link to={newPageHref(q)} className={`underline underline-offset-2 ${FOCUS}`}>
                     Create a page for “{q.trim()}”
                   </Link>
@@ -530,7 +531,7 @@ function DictionaryTopics({
           {rows.length === 0 ? (
             <p className="py-6 font-sans text-[15px] text-ink">
               Nothing here.{' '}
-              {searching && (
+              {ACCOUNTS_ENABLED && searching && (
                 <Link to={newPageHref(q)} className={`underline underline-offset-2 ${FOCUS}`}>
                   Create a page for “{q.trim()}”
                 </Link>
@@ -554,7 +555,7 @@ function DictionaryTopics({
                         Open the page
                       </Link>
                     ) : (
-                      sl && (
+                      ACCOUNTS_ENABLED && sl && (
                         <Link
                           to={newPageHref(pageName)}
                           aria-label={`Create a page for ${pageName}`}

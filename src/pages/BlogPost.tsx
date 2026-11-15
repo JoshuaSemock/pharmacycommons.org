@@ -4,6 +4,7 @@ import Markdown from './Markdown'
 import BlogComments from '../components/BlogComments'
 import PageShell, { PageFrame, PageTitle, RailHeading } from './PageShell'
 import { getPost, listPosts, formatDate } from '../blog'
+import { ACCOUNTS_ENABLED } from '../features'
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
@@ -129,7 +130,7 @@ export default function BlogPost() {
         </nav>
       )}
 
-      {!post.draft && <BlogComments slug={post.slug} />}
+      {!post.draft && ACCOUNTS_ENABLED && <BlogComments slug={post.slug} />}
     </PageFrame>
   )
 }
