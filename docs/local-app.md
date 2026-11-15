@@ -15,7 +15,7 @@ hosted project is paused, never deleted, by Joshua himself after cutover.
 | 2 | Local database (supabase start + restore) | Done 2026-11-14 |
 | 3 | Front end points at the local stack via env | Done 2026-11-14 (PR #150) |
 | 4 | Remove account features | Done 2026-11-15: build-time switch, see below |
-| 5 | Ingest functions as local scripts | Not started |
+| 5 | Ingest functions as local scripts | Done 2026-11-15: `pnpm ingest:local`, see below |
 | 6 | Launch + nightly backup scripts | Not started |
 | 7 | Static public export to GitHub Pages | Not started (Joshua approves first publish) |
 | 8 | Verify, then Joshua pauses Supabase | Not started |
@@ -97,6 +97,42 @@ read-only build calls.
 **Open for Joshua:** the Terms of Use and Privacy Policy still describe accounts,
 registration and NPI verification. Changing them is a legal-document change (new
 `effective_date`, `LEGAL_VERSION`, `body_sha256`), so it was not done here.
+
+## Ingest jobs locally (phase 5, 2026-11-15)
+
+The local stack serves all twelve Edge Functions, so the ingest jobs run there unchanged and
+write to the local database. `scripts/ingest-local.mjs` (`pnpm ingest:local <job>`) calls one
+batch at a time instead of the functions' self-chaining, prints each batch's result and stops
+when the function reports nothing left. It refuses any API URL other than 127.0.0.1/localhost.
+
+| Job | Function | Token row | Notes |
+| --- | --- | --- | --- |
+| `drugsfda` | `drugsfda-ingest` | `drugsfda` | `--skip`, `--search`; pages of up to 1,000 |
+| `rxnorm` | `rxnorm-brands` | `rxnorm` | moieties with no `rxnorm_lookup` row |
+| `rxclass` | `rxclass-ingest` | `rxclass` | `--mode drugs` (default), `taxonomy`, `va_verify` |
+| `chemont` | `chemont-terms` | `rxclass` | one call |
+| `classyfire` | `classyfire-ingest` | `rxclass` | moieties with no `chemont_links` |
+| `pubchem` | `pubchem-structures` | `rxclass` | probes PubChem first, 5 s between batches |
+| `gsrs` | `gsrs-structures` | `rxclass` | |
+| `xref` | `pubchem-xref` | `rxclass` | `--mode drugbank` (writes) or `name` (review table only) |
+
+Options: `--limit`, `--once`, `--max-batches`, `--pause`. Keys come from `supabase status -o env`
+(set `SUPABASE_CLI` to the executable if it isn't on PATH; on Joshua's PC
+`C:\Harddrive\4. Drug Matrix\Claude\Tools\supabase\supabase.exe`).
+
+Only the `rxclass` token exists: `drugsfda` and `rxnorm` were switched off on the hosted
+project by deleting their rows, and the restore kept it that way. `--create-token` adds the
+missing row to the **local** database only.
+
+Checked 2026-11-15 on Joshua's PC: `drugsfda` without a token refuses; `rxclass --once --limit 5`
+processed 5 moieties (1 with classes, 4 with no RxCUI); `pubchem` probe 200, batch empty
+(ladder rung 1 complete). These runs write to the local database, which from now on drifts
+from the hosted copy; that is expected, since the local copy is the working one.
+
+**Bulk-load follow-up (unchanged):** after a large run, refresh the derived views in the local
+database: `moiety_hierarchy`, then `ingredient_moiety_map`, `entity_brand_names`, and
+`search_index` (`refresh materialized view concurrently …`). `rxclass` and `classyfire` feed
+`class_members` through `rebuild_classes()`.
 
 ## Schema baseline
 
