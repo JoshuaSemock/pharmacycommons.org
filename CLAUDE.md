@@ -545,7 +545,7 @@ Lists (Phase 9, `db/phase9-lists.md`): 38 published lists (checked 2026-10-07) �
 Deployed Edge Functions (12, checked 2026-11-14): `api` (public), `publish-page` (phase 16), `label-text`, `drugsfda-ingest`,
 `rxnorm-brands`, `rxclass-ingest`, `chemont-terms`, `classyfire-ingest`, `verify-npi`, `pubchem-structures`, `gsrs-structures` (phase 34) and `pubchem-xref` (phase 36) (the last three guarded by `x-ingest-token`, `verify_jwt = false`).
 **188 rows in `supabase_migrations.schema_migrations` (2026-11-14 dump), latest 20261105212051 (`phase28c_search_index_alias_key`).**
-149 migrations applied (checked 2026-10-30; phase 34a/34b added 2026-11-03 as versions 20261103194410 and 20261103210156), latest version 20261030190349 (phase 24k, Learn federal filter tags) at the last full count. All 11 deployed functions have source under `supabase/functions/`. Live migration names don't always match repo file names (e.g. repo `phase24*` = live `phase19*_federal_*`) — match by version, not name.
+All 12 deployed functions have source under `supabase/functions/`. (The 2026-10-30 count was 149 migrations.) Live migration names don't always match repo file names (e.g. repo `phase24*` = live `phase19*_federal_*`) — match by version, not name.
 
 Shipped: 9-block schema + RLS; full workbook load; Supabase-backed frontend;
 moiety-only search with hierarchy nesting; DailyMed labels + openFDA label-text
