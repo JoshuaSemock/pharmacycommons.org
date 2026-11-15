@@ -30,6 +30,10 @@ page; legal documents (effective 2026-11-05).
 
 ## Now — finish what's half-done
 
+**0. Supabase exit: run locally, keep a static public site** *(decided 2026-11-14; plan and status in `docs/local-app.md`)*
+- Done 2026-11-14: inventory, verified backups (database dump restored with 0 errors and every table matching live counts; all 52,571 Storage files), local Supabase stack with the data, front end on the local stack via `pnpm dev:local`.
+- Next: remove account features (Joshua approves the list), ingest functions as local scripts, launch and nightly-backup scripts, static read-only export to GitHub Pages (Joshua approves the first publish), final checks; then Joshua pauses the hosted project (never delete).
+
 **1. Non-core moiety cleanup** *(2026-10-30: Joshua chose delete junk / relabel / merge instead of hide-only; `db/phase25a_noncore_moiety_cleanup.sql` written, **applied 2026-10-30** in the SQL editor as `20261030232600`; `moiety_hierarchy`, `ingredient_moiety_map`, `entity_brand_names` refreshed)*
 - Deletes 1 junk row, relabels 13 single compounds to Core moiety, merges 40 salts and 14 product rows into their parent drug moieties (55 PCIDs retired with `replaced_by_pcid`). 69 rows remain non-core by design (13 salts, 28 products, 28 combinations): ion-parent salts/products, true combinations (vaccines etc.), no-parent rows, and statute-text rows.
 - The hide-from-search flag below is still needed for what remains.

@@ -4,9 +4,24 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import markdownFrontmatter from './scripts/viteFrontmatter.ts'
 
+// Local mode (`--mode localdb`, docs/local-app.md): the browser talks to the local
+// Supabase stack through this server at /supabase, so the app and its API share one
+// origin. Without it the app (:5173) calls the stack (:54321) cross-port, which some
+// embedded browsers refuse outright, and every request needs CORS.
+const LOCAL_STACK = 'http://127.0.0.1:54321'
+const localProxy = {
+  '/supabase': {
+    target: LOCAL_STACK,
+    changeOrigin: true,
+    rewrite: (p: string) => p.replace(/^\/supabase/, ''),
+  },
+}
+
 // Vite config — https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [markdownFrontmatter(), react(), tailwindcss()],
+  server: mode === 'localdb' ? { proxy: localProxy } : {},
+  preview: mode === 'localdb' ? { proxy: localProxy } : {},
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -35,4 +50,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))
