@@ -19,10 +19,12 @@ request to `<origin>/supabase/...` (PostgREST, RPCs, Edge Functions, the `api` f
 ## Producing the data (on the PC, local stack running)
 1. `pnpm build:local` then `pnpm preview:local` (port 4173, proxies /supabase to the stack).
 2. `psql ... -At -v sample=0 -f scripts/static/routes.sql -o routes.txt` (`sample=100` = 100 per type).
-3. `node scripts/static/record.mjs --routes routes.txt --out <dir> --workers 4` — headless Edge opens
+3. `node scripts/static/permalinks.mjs --out <dir>` writes the `/id/PCID-n` recordings straight from
+   the database (one lookup each).
+4. `node scripts/static/record.mjs --routes routes.txt --out <dir> --workers 4` — headless Edge opens
    each route and saves every /supabase response (`<dir>/raw/`; resumable; failures in `errors.txt`).
-4. `node scripts/static/pack.mjs --out <dir>` — writes `<dir>/site/data/` and prints sizes.
-5. `vite build --mode static --outDir dist-static`, copy `<dir>/site/data` into it.
+5. `node scripts/static/pack.mjs --out <dir>` — writes `<dir>/site/data/` and prints sizes.
+6. `vite build --mode static --outDir dist-static`, copy `<dir>/site/data` into it.
 
 ## Prototype measurements (847 routes: 100 per entity type + fixed pages)
 - 0.73 routes/s with 4 workers → the full ~32,100 routes ≈ 12 hours.

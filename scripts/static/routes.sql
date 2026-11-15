@@ -1,5 +1,6 @@
 -- Routes for the static edition recorder (docs/static-export.md).
 -- psql -At -v sample=100 -f scripts/static/routes.sql -o routes.txt   (sample=0 → every record)
+-- Permalinks (/id/PCID-n) are not recorded; scripts/static/permalinks.mjs writes them.
 -- Destination: scripts/static/routes.sql
 \if :{?sample}
 \else
@@ -25,6 +26,4 @@ select route from (
   select case entity_type when 'class' then '/classifications/' when 'list' then '/lists/' else '/drugs/' end || slug,
          2, entity_type || slug
   from picked
-  union all
-  select '/id/PCID-' || pcid, 3, entity_type || slug from picked
 ) x order by ord, k;
