@@ -41,7 +41,8 @@ Not served: `/v1/search` (501), older numbered versions, later pages of changes/
 `code: static_unavailable`).
 
 ## Publishing (each step needs Joshua's go-ahead)
-1. `powershell -File scripts\static\package-data.ps1 -Out <dir>` makes `static-data.tar.gz`
+1. `node scripts/static/export-route-meta.mjs <dir>/route-meta.json`, then
+   `powershell -File scripts\static\package-data.ps1 -Out <dir>` makes `static-data.tar.gz`
    (`data/` + `api-static/`); `-Upload` attaches it to the GitHub release `static-data`.
 2. Run the **Deploy the static edition** workflow (`.github/workflows/deploy-static.yml`, manual only):
    builds `--mode static`, runs postbuild, unpacks the release file into `dist/`, deploys.
@@ -50,8 +51,9 @@ Not served: `/v1/search` (501), older numbered versions, later pages of changes/
    Supabase-backed build.
 
 ## Known gaps (open)
-- `scripts/postbuild.mjs` reads published lists from the live project; once it is paused the
-  list route pages are skipped (soft failure). Point it at the exported data before pausing.
+- Fixed: `scripts/postbuild.mjs` reads list routes from `route-meta.json`
+  (`scripts/static/export-route-meta.mjs`, packed into the release file) when `PC_ROUTE_META` is set,
+  so the static deploy never calls the live project. Checked: 47 list pages + sitemap written.
 - Typo-tolerant search (`search_all`), Network explorer, `/v1/search`: need live queries.
 - `/api` static documents not built yet; the Cloudflare Worker change waits for Joshua's approval.
 - `/id/PCID-n` bundles duplicate the target page's answers (trim before the full run).
