@@ -34,7 +34,7 @@ import { readFlag, readIsoDate, readText } from '../src/frontmatter.ts'
 import { llmsTxt, openApiSpec } from '../src/developers/endpoints.ts'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const DIST = path.join(ROOT, 'dist')
+const DIST = path.join(ROOT, process.env.PC_DIST || 'dist') // PC_DIST: e.g. dist-static
 const SITE = 'https://pharmacycommons.org'
 const SUPABASE_URL = 'https://nenwovhyrdcdkhxzjiiv.supabase.co'
 // Public, RLS-scoped key; the same one shipped in src/supabaseClient.ts.
@@ -225,8 +225,19 @@ function blogRoutes() {
     .filter(Boolean)
 }
 
-/** PostgREST GET, paged 1,000 rows at a time. */
+// Static edition (docs/static-export.md): PC_ROUTE_META names a JSON file of
+// { "<pathAndQuery>": rows } written from the local stack by
+// scripts/static/export-route-meta.mjs, so the build needs no live database.
+const ROUTE_META = process.env.PC_ROUTE_META
+  ? JSON.parse(fs.readFileSync(process.env.PC_ROUTE_META, 'utf8'))
+  : null
+
+/** PostgREST GET, paged 1,000 rows at a time (or the recorded rows, see ROUTE_META). */
 async function rest(pathAndQuery) {
+  if (ROUTE_META) {
+    if (!ROUTE_META[pathAndQuery]) throw new Error(`no recorded rows for ${pathAndQuery}`)
+    return ROUTE_META[pathAndQuery]
+  }
   const rows = []
   for (let from = 0; ; from += 1000) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${pathAndQuery}`, {

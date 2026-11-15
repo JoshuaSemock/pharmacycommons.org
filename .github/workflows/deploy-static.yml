@@ -44,16 +44,23 @@ jobs:
       - name: Run tests
         run: pnpm exec vitest run
 
-      - name: Build the site (static mode)
-        run: pnpm build:static && node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs
-
-      - name: Add the recorded data
+      - name: Download the recorded data
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download static-data --pattern static-data.tar.gz --dir "$RUNNER_TEMP"
-          tar -xzf "$RUNNER_TEMP/static-data.tar.gz" -C dist
-          test -d dist/data/p && test -f dist/api-static/v1.json
+          mkdir -p "$RUNNER_TEMP/static" && tar -xzf "$RUNNER_TEMP/static-data.tar.gz" -C "$RUNNER_TEMP/static"
+          test -d "$RUNNER_TEMP/static/data/p" && test -f "$RUNNER_TEMP/static/api-static/v1.json" && test -f "$RUNNER_TEMP/static/route-meta.json"
+
+      # PC_ROUTE_META: postbuild reads list routes from the recorded rows, not the live project.
+      - name: Build the site (static mode)
+        env:
+          PC_ROUTE_META: ${{ runner.temp }}/static/route-meta.json
+        run: pnpm build:static && node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/postbuild.mjs
+
+      - name: Add the recorded data
+        run: |
+          mv "$RUNNER_TEMP/static/data" "$RUNNER_TEMP/static/api-static" dist/
           du -sh dist dist/data dist/api-static
 
       - name: Upload build output
