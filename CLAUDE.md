@@ -172,8 +172,10 @@ components (`has_component` → block-1 PCIDs), class membership (`member_of`), 
 
 ## Tech stack
 - **Frontend:** Vite 8 + React 19 + TypeScript 5.7, React Router v7 (slug routes),
-  deployed to GitHub Pages by `.github/workflows/deploy.yml` (the only workflow that
-  runs). Custom domain via `CNAME`.
+  deployed to GitHub Pages. **Since 2026-11-16 both deploy workflows are manual:**
+  `.github/workflows/deploy-static.yml` publishes the static edition (the public site);
+  `.github/workflows/deploy.yml` builds the old Supabase-backed site (use only to go back). A merge to
+  main deploys nothing. Custom domain via `CNAME`.
 - **Styling:** Tailwind CSS v4, CSS-first — all tokens in `src/index.css` inside
   `@theme {}`, no `tailwind.config.js`. Watch for token-name collisions with Tailwind
   built-ins.
@@ -325,7 +327,7 @@ silently does nothing.
 
 | What | Path |
 | --- | --- |
-| Deploy workflow | `.github/workflows/deploy.yml` (the only copy; the stale root `deploy.yml` was deleted 2026-09-24) |
+| Deploy workflows | `.github/workflows/deploy-static.yml` (static edition, manual) and `deploy.yml` (Supabase-backed, manual since 2026-11-16) |
 | React source | `src/` (`pages/`, `tools/`, `content/posts/`) |
 | Static assets at site root | `public/` |
 | SQL migrations mirrored as files | `db/` |
