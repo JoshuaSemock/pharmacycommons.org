@@ -1,6 +1,17 @@
 # Static edition (phase 7 of the Supabase exit)
 
-Status 2026-11-15: prototype verified; full recording running on the PC; nothing published. Plan and decisions: `docs/local-app.md`.
+Status 2026-11-16: **live.** pharmacycommons.org is the static edition (first deploy run
+43899007219); the Worker answers `/api/*` from `/api-static/` (version 7c07a3be, `API_MODE = "static"`).
+Data: release `static-data`, `static-data.tar.gz` 121,545,635 bytes, SHA-256 `3b878bc9…adc043`,
+recorded 2026-11-15/16 from the local stack (64,338 routes, 1 failed: `/drugs/nitrogen`, a 5xx).
+Whole site 712 MB of GitHub Pages' 1 GB (data 446 MB, api-static 239 MB, app 20 MB).
+
+### Refreshing the public site
+On the PC with the local stack up: `routes.sql` → `permalinks.mjs` → `record.mjs` (resumable;
+~3.5 h for everything) → `pack.mjs` → `learn-items.mjs` → `export-api.mjs` → `export-route-meta.mjs`
+→ `package-data.ps1`; then replace the release file (GitHub web UI: this session type cannot write
+releases) and run **Deploy the static edition**. Keep processes hidden (`Start-Process -WindowStyle
+Hidden`): closing a console window killed the first full run. Plan and decisions: `docs/local-app.md`.
 
 ## How it works
 The public site keeps the same React app, built with `vite build --mode static` (`.env.static`).
