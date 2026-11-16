@@ -18,7 +18,7 @@ hosted project is paused, never deleted, by Joshua himself after cutover.
 | 5 | Ingest functions as local scripts | Done 2026-11-15: `pnpm ingest:local`, see below |
 | 6 | Launch + nightly backup scripts | Done 2026-11-15: `scripts/local/`, see below |
 | 7 | Static public export to GitHub Pages | Done 2026-11-16: static site live, `/api` from static files (`docs/static-export.md`) |
-| 8 | Verify, then Joshua pauses Supabase | Not started |
+| 8 | Verify, then Joshua pauses Supabase | Checks passed 2026-11-16 (see below); safe to pause; Joshua pauses it |
 
 ## Running it
 
@@ -163,3 +163,21 @@ Restoring one of these dumps into a fresh stack: `supabase start`, create the ex
 `db/baseline/2026-11-14_schema.sql` is the live schema of `public` and `archive` as of
 the dump. It is authoritative for rebuilds; the `db/phase*.sql` files are history and
 are known to lag live (see `docs/schema-drift-2026-11-14.md`).
+
+
+## Phase 8 checks (2026-11-16)
+- Row counts, live vs local, 104 tables: 97 identical. The 7 differences are expected:
+  - `entity_versions`, `label_fetch_log`, `label_section_text`: local-only additions from the API
+    export and label fetches during recording.
+  - `rxclass_drug` +1, `rxclass_lookup` +5: the phase 5 local ingest test.
+  - `auth.identities` (3 live, 0 local): not restored; accounts are off, and the rows are in
+    `Backups\2026-11-14_supabase_db\full.dump`.
+  - `storage.objects` (52,571 live, 0 local): the bucket files are kept as plain files in
+    `Backups\2026-11-14_storage_label-sections`; nothing in the app reads Storage.
+- Changes on live since the 2026-11-14 backup: `entity_versions` +2 (snapshots taken by live API
+  calls) and `auth.refresh_tokens` +4 (sign-in sessions). No source data changed.
+- Supabase edge and function logs: no public traffic after the Worker switch (15:45 UTC); only
+  Supabase's own health checks.
+- Public site and local app checked side by side: metformin with label, `/id/PCID-1003192` →
+  lidocaine, search, Tools (8), creatinine clearance calculator (public site).
+- Nightly local backup ran 2026-11-16 02:17 (129 MB, 32,154 entities), copied to OneDrive.
