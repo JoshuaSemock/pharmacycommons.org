@@ -184,3 +184,11 @@ are known to lag live (see `docs/schema-drift-2026-11-14.md`).
 
 ## Tables page (2026-11-16)
 Browse, filter, export and edit every local table at `/tables` in the local app. See `docs/local-tables.md`.
+
+## Launcher change (2026-11-16)
+The "Pharmacy Commons" desktop icon now runs the **built** local app (`vite build --mode localdb` +
+`vite preview` on port 5173), rebuilding only when files in `src/`, `index.html` or the configs changed
+since the last build (stamp in `%LOCALAPPDATA%\PharmacyCommons`). The Vite dev server had become too
+slow on Joshua's PC to answer within the launcher's wait, so the browser never opened. For live editing
+run `scripts\local\start-local.ps1 -Dev` (dev server, pages reload as you save). A stuck server on 5173
+is stopped and replaced; stop-local.ps1 also closes the minimized app window.
