@@ -56,6 +56,13 @@ const shared = {}
 for (const rec of recs) for (const [k, v] of Object.entries(rec.r)) {
   if (rec.route === '/' || uses.get(k + JSON.stringify(v).length) >= threshold) shared[k] = v
 }
+// Compare views (/lists/compare, /classifications/compare) ask for the same answers the
+// list and class pages recorded. Copy those into data/s/ too (the pages keep theirs).
+const ALSO_SHARED = /^\/(lists|classifications)\/[^/]+$/
+const copies = {}
+for (const rec of recs) if (ALSO_SHARED.test(rec.route) && !rec.route.endsWith('/compare')) {
+  for (const [k, v] of Object.entries(rec.r)) if (!(k in shared)) copies[k] = v
+}
 
 const site = join(out, 'site')
 rmSync(join(site, 'data'), { recursive: true, force: true })
@@ -69,7 +76,7 @@ const write = (rel, obj) => {
 }
 
 const sharedSize = { raw: 0, gz: 0 }
-for (const [k, v] of Object.entries(shared)) {
+for (const [k, v] of Object.entries({ ...copies, ...shared })) {
   const s = write(`data/s/${k}.json`, v)
   sharedSize.raw += s.raw; sharedSize.gz += s.gz
 }
@@ -89,7 +96,7 @@ for (const rec of recs) {
 const mb = b => (b / 1048576).toFixed(1) + ' MB'
 const kb = b => (b / 1024).toFixed(1) + ' KB'
 console.log(`routes ${recs.length}; shared threshold ${threshold} routes; ${dropped} API-function answers left to /api-static`)
-console.log(`shared files: ${Object.keys(shared).length}, ${mb(sharedSize.raw)} (${mb(sharedSize.gz)} gzip)`)
+console.log(`shared files: ${Object.keys(shared).length} + ${Object.keys(copies).length} list/class copies, ${mb(sharedSize.raw)} (${mb(sharedSize.gz)} gzip)`)
 console.log(`route files: ${pages.n}, ${mb(pages.raw)} (${mb(pages.gz)} gzip), avg ${(pages.keys / pages.n).toFixed(1)} answers`)
 console.log('by first path segment: count, avg raw, avg gzip')
 for (const [t, s] of [...byType].sort()) console.log(`  /${t}: ${s.n}, ${kb(s.raw / s.n)}, ${kb(s.gz / s.n)}`)
