@@ -9,11 +9,16 @@
  *   /data/s/<requestKey>.json  one answer that several routes (or the header
  *                              search, on any page) need: catalog, list index, ...
  *
- * A route bundle is `{ v: 1, r: { [requestKey]: [status, headers, body] } }`; a shared
- * file is one `[status, headers, body]`. The request
+ * A route bundle is `{ v: 1, r: { [requestKey]: answer } }`; a shared file is one answer.
+ * An answer is `[status, headers, body]`, or `[status, headers, null, json]` for a JSON
+ * body stored unescaped (pack.mjs does that to save space). The request
  * key is `requestKey()` below; scripts/static/key.mjs must compute the same value.
  * A request nobody recorded gets a 404 with code `static_miss`, so the page shows
  * its normal error state instead of hanging.
+ *
+ * Record documents from the public API (`<API_BASE>/v1/entities/PCID-n[/versions|/changes]`,
+ * used by the Machine-readable panel) are not in the bundles: they are read from the same
+ * `/api-static/` files the Cloudflare Worker serves (scripts/static/export-api.mjs).
  *
  * Destination: src/staticData.ts
  */
@@ -21,7 +26,7 @@
 export const STATIC_PREFIX = '/supabase'
 const DATA_BASE = '/data'
 
-type Recorded = [number, Record<string, string>, string]
+type Recorded = [number, Record<string, string>, string] | [number, Record<string, string>, null, unknown]
 interface Bundle { v: number; r: Record<string, Recorded> }
 
 const answers = new Map<string, Recorded>()
@@ -50,17 +55,24 @@ function load(url: string, realFetch: typeof fetch): Promise<void> {
   let p = loading.get(url)
   if (!p) {
     p = realFetch(url)
-      .then(r => (r.ok ? (r.json() as Promise<Bundle>) : null))
-      .then(b => { if (b) for (const [k, v] of Object.entries(b.r)) answers.set(k, v) })
+      .then(r => (isJson(r) ? (r.json() as Promise<Bundle>) : null))
+      .then(b => { if (b?.r) for (const [k, v] of Object.entries(b.r)) answers.set(k, v) })
       .catch(() => undefined)
     loading.set(url, p)
   }
   return p
 }
 
+/** A real data file: 200 and JSON. Dev servers answer a missing file with index.html (200). */
+function isJson(r: Response | null): r is Response {
+  return !!r?.ok && (r.headers.get('content-type') ?? '').includes('json')
+}
+
 async function loadShared(key: string, realFetch: typeof fetch): Promise<void> {
   const r = await realFetch(`${DATA_BASE}/s/${key}.json`).catch(() => null)
-  if (r?.ok) answers.set(key, (await r.json()) as Recorded)
+  if (!isJson(r)) return
+  const v = (await r.json().catch(() => null)) as Recorded | null
+  if (Array.isArray(v)) answers.set(key, v)
 }
 
 function miss(method: string): Response {
@@ -70,14 +82,29 @@ function miss(method: string): Response {
   return new Response(body, { status: 404, headers })
 }
 
-export function installStaticFetch(): void {
+const API_DOC = /^\/v1\/entities\/(PCID-\d{7,8})(?:\.json)?(\/versions|\/changes)?(?:\?.*)?$/
+
+/** `${apiBase}/v1/entities/PCID-n[/versions|/changes]` → its /api-static file, else null. */
+export function apiStaticFile(url: string, apiBase: string): string | null {
+  if (!apiBase || !url.startsWith(apiBase + '/')) return null
+  const m = url.slice(apiBase.length).match(API_DOC)
+  return m ? `/api-static/v1/entities/${m[1]}${m[2] ?? ''}.json` : null
+}
+
+export function installStaticFetch(apiBase = ''): void {
   const realFetch = window.fetch.bind(window)
   const prefix = window.location.origin + STATIC_PREFIX + '/'
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const req = input instanceof Request ? input : null
     const url = req ? req.url : new URL(String(input), window.location.href).href
-    if (!url.startsWith(prefix)) return realFetch(input, init)
     const method = (init?.method ?? req?.method ?? 'GET').toUpperCase()
+    const apiFile = method === 'GET' ? apiStaticFile(url, apiBase) : null
+    if (apiFile) {
+      const r = await realFetch(apiFile).catch(() => null)
+      if (isJson(r)) return new Response(await r.text(), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } })
+      return miss('GET')
+    }
+    if (!url.startsWith(prefix)) return realFetch(input, init)
     let body = ''
     if (typeof init?.body === 'string') body = init.body
     else if (req && method !== 'GET' && method !== 'HEAD') body = await req.clone().text()
@@ -90,6 +117,7 @@ export function installStaticFetch(): void {
       return miss(method)
     }
     const [status, headers, text] = hit
-    return new Response(method === 'HEAD' || status === 204 ? null : text, { status, headers })
+    const answer = hit.length === 4 ? JSON.stringify(hit[3]) : text
+    return new Response(method === 'HEAD' || status === 204 ? null : answer, { status, headers })
   }
 }

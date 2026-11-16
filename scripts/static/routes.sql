@@ -1,5 +1,6 @@
 -- Routes for the static edition recorder (docs/static-export.md).
 -- psql -At -v sample=100 -f scripts/static/routes.sql -o routes.txt   (sample=0 → every record)
+-- Permalinks (/id/PCID-n) are not recorded; scripts/static/permalinks.mjs writes them.
 -- Destination: scripts/static/routes.sql
 \if :{?sample}
 \else
@@ -22,9 +23,11 @@ with fixed(route, ord) as (values
 select route from (
   select route, ord, '' k from fixed
   union all
+  -- Learn study sessions (src/learn/api.ts getCollection), by slug as the Learn page links them
+  select '/learn/study/' || slug, 1, 'learn' || slug
+  from learn_collections where is_official and status = 'published' and slug is not null
+  union all
   select case entity_type when 'class' then '/classifications/' when 'list' then '/lists/' else '/drugs/' end || slug,
          2, entity_type || slug
   from picked
-  union all
-  select '/id/PCID-' || pcid, 3, entity_type || slug from picked
 ) x order by ord, k;

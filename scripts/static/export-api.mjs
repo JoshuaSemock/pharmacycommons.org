@@ -14,6 +14,7 @@
 // documents point at https://pharmacycommons.org/api (the local function's own base is rewritten).
 //
 // Usage: node scripts/static/export-api.mjs --out ../static-out --retired retired.txt [--workers 4]
+//        node scripts/static/export-api.mjs --out ../static-out --minify-only   (re-minify saved files)
 //   retired.txt: psql -At -F'|' -c "select pcid, replaced_by_pcid from pcid_retired"
 // Local only. Re-running skips files that already exist.
 // Destination: scripts/static/export-api.mjs
@@ -33,7 +34,9 @@ const workers = Number(args.workers ?? 4)
 if (!args.out) { console.error('Need --out <dir>.'); process.exit(2) }
 const root = join(args.out, 'site', 'api-static')
 
-const fix = text => LOCAL_BASES.reduce((t, b) => t.split(b).join(PUBLIC_BASE), text)
+// Stored minified to fit GitHub Pages; the Worker pretty-prints JSON when it serves it.
+const minify = text => { try { return JSON.stringify(JSON.parse(text)) } catch { return text } }
+const fix = text => minify(LOCAL_BASES.reduce((t, b) => t.split(b).join(PUBLIC_BASE), text))
 function save(rel, text) {
   const path = join(root, rel)
   mkdirSync(dirname(path), { recursive: true })
@@ -51,6 +54,15 @@ async function get(path) {
       await new Promise(res => setTimeout(res, 1000 * attempt))
     }
   }
+}
+
+if ('minify-only' in args) {
+  const { readdirSync, statSync } = await import('node:fs')
+  let n = 0
+  const walk = d => { for (const e of readdirSync(d, { withFileTypes: true })) { const p = join(d, e.name); if (e.isDirectory()) walk(p); else { const t = readFileSync(p, 'utf8'); const m = minify(t); if (m !== t) { writeFileSync(p, m); n++ } } } }
+  walk(root)
+  console.log(`minified ${n} files`)
+  process.exit(0)
 }
 
 // Every entity (pcid, slug, type) via PostgREST, 1000 at a time.

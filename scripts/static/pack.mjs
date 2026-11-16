@@ -7,6 +7,11 @@
 //
 // Prints file counts and sizes (raw and gzip) so the full export can be projected.
 //
+// Space savers (the site must stay under GitHub Pages' 1 GB):
+//  - answers from the public API function (pretty-printed record documents, versions,
+//    changes) are dropped: src/staticData.ts reads those from /api-static/ instead;
+//  - JSON bodies are stored unescaped as [status, headers, null, json].
+//
 // Usage: node scripts/static/pack.mjs --out ../static-out [--share 3]
 // Destination: scripts/static/pack.mjs
 
@@ -24,7 +29,22 @@ if (!out) { console.error('Need --out <dir>.'); process.exit(2) }
 
 const rawDir = join(out, 'raw')
 const files = readdirSync(rawDir).filter(f => f.endsWith('.json'))
-const recs = files.map(f => JSON.parse(readFileSync(join(rawDir, f), 'utf8')))
+const isApiDoc = v => typeof v[2] === 'string' && v[2].startsWith('{\n') && v[2].includes('"pcid": "PCID-')
+function compact(v) {
+  if (typeof v[2] !== 'string' || !(v[1]['content-type'] ?? '').includes('json') || !v[2]) return v
+  try { return [v[0], v[1], null, JSON.parse(v[2])] } catch { return v }
+}
+let dropped = 0
+const recs = files.map(f => {
+  const rec = JSON.parse(readFileSync(join(rawDir, f), 'utf8'))
+  const r = {}
+  for (const [k, v] of Object.entries(rec.r)) {
+    if (isApiDoc(v)) { dropped++; continue }
+    r[k] = compact(v)
+  }
+  rec.r = r
+  return rec
+})
 
 // How many routes use each key (with the same answer).
 const uses = new Map()
@@ -35,6 +55,13 @@ for (const rec of recs) for (const [k, v] of Object.entries(rec.r)) {
 const shared = {}
 for (const rec of recs) for (const [k, v] of Object.entries(rec.r)) {
   if (rec.route === '/' || uses.get(k + JSON.stringify(v).length) >= threshold) shared[k] = v
+}
+// Compare views (/lists/compare, /classifications/compare) ask for the same answers the
+// list and class pages recorded. Copy those into data/s/ too (the pages keep theirs).
+const ALSO_SHARED = /^\/(lists|classifications)\/[^/]+$/
+const copies = {}
+for (const rec of recs) if (ALSO_SHARED.test(rec.route) && !rec.route.endsWith('/compare')) {
+  for (const [k, v] of Object.entries(rec.r)) if (!(k in shared)) copies[k] = v
 }
 
 const site = join(out, 'site')
@@ -49,7 +76,7 @@ const write = (rel, obj) => {
 }
 
 const sharedSize = { raw: 0, gz: 0 }
-for (const [k, v] of Object.entries(shared)) {
+for (const [k, v] of Object.entries({ ...copies, ...shared })) {
   const s = write(`data/s/${k}.json`, v)
   sharedSize.raw += s.raw; sharedSize.gz += s.gz
 }
@@ -68,8 +95,8 @@ for (const rec of recs) {
 
 const mb = b => (b / 1048576).toFixed(1) + ' MB'
 const kb = b => (b / 1024).toFixed(1) + ' KB'
-console.log(`routes ${recs.length}; shared threshold ${threshold} routes`)
-console.log(`shared files: ${Object.keys(shared).length}, ${mb(sharedSize.raw)} (${mb(sharedSize.gz)} gzip)`)
+console.log(`routes ${recs.length}; shared threshold ${threshold} routes; ${dropped} API-function answers left to /api-static`)
+console.log(`shared files: ${Object.keys(shared).length} + ${Object.keys(copies).length} list/class copies, ${mb(sharedSize.raw)} (${mb(sharedSize.gz)} gzip)`)
 console.log(`route files: ${pages.n}, ${mb(pages.raw)} (${mb(pages.gz)} gzip), avg ${(pages.keys / pages.n).toFixed(1)} answers`)
 console.log('by first path segment: count, avg raw, avg gzip')
 for (const [t, s] of [...byType].sort()) console.log(`  /${t}: ${s.n}, ${kb(s.raw / s.n)}, ${kb(s.gz / s.n)}`)

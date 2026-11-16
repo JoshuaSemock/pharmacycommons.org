@@ -6,4 +6,4 @@
  */
 import { installStaticFetch } from './staticData'
 
-if (import.meta.env.VITE_STATIC === '1') installStaticFetch()
+if (import.meta.env.VITE_STATIC === '1') installStaticFetch((import.meta.env.VITE_PC_API_BASE as string | undefined) ?? '')
