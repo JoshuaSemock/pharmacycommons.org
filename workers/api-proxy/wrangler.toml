@@ -12,7 +12,8 @@ routes = [
 ]
 workers_dev = false
 
-# Static edition (docs/static-export.md): uncomment to answer /api/* from the
-# /api-static/ files on GitHub Pages instead of Supabase. Needs Joshua's go-ahead.
-# [vars]
-# API_MODE = "static"
+# Static edition (docs/static-export.md): /api/* is answered from the /api-static/
+# files on GitHub Pages instead of Supabase (switched 2026-11-16 with Joshua's go-ahead).
+# Delete these two lines and redeploy to go back to the Supabase Edge Function.
+[vars]
+API_MODE = "static"
