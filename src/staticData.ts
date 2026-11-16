@@ -55,17 +55,24 @@ function load(url: string, realFetch: typeof fetch): Promise<void> {
   let p = loading.get(url)
   if (!p) {
     p = realFetch(url)
-      .then(r => (r.ok ? (r.json() as Promise<Bundle>) : null))
-      .then(b => { if (b) for (const [k, v] of Object.entries(b.r)) answers.set(k, v) })
+      .then(r => (isJson(r) ? (r.json() as Promise<Bundle>) : null))
+      .then(b => { if (b?.r) for (const [k, v] of Object.entries(b.r)) answers.set(k, v) })
       .catch(() => undefined)
     loading.set(url, p)
   }
   return p
 }
 
+/** A real data file: 200 and JSON. Dev servers answer a missing file with index.html (200). */
+function isJson(r: Response | null): r is Response {
+  return !!r?.ok && (r.headers.get('content-type') ?? '').includes('json')
+}
+
 async function loadShared(key: string, realFetch: typeof fetch): Promise<void> {
   const r = await realFetch(`${DATA_BASE}/s/${key}.json`).catch(() => null)
-  if (r?.ok) answers.set(key, (await r.json()) as Recorded)
+  if (!isJson(r)) return
+  const v = (await r.json().catch(() => null)) as Recorded | null
+  if (Array.isArray(v)) answers.set(key, v)
 }
 
 function miss(method: string): Response {
@@ -94,7 +101,7 @@ export function installStaticFetch(apiBase = ''): void {
     const apiFile = method === 'GET' ? apiStaticFile(url, apiBase) : null
     if (apiFile) {
       const r = await realFetch(apiFile).catch(() => null)
-      if (r?.ok) return new Response(await r.text(), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } })
+      if (isJson(r)) return new Response(await r.text(), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } })
       return miss('GET')
     }
     if (!url.startsWith(prefix)) return realFetch(input, init)

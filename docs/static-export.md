@@ -23,7 +23,9 @@ request to `<origin>/supabase/...` (PostgREST, RPCs, Edge Functions, the `api` f
    the database (one lookup each).
 4. `node scripts/static/record.mjs --routes routes.txt --out <dir> --workers 4` — headless Edge opens
    each route and saves every /supabase response (`<dir>/raw/`; resumable; failures in `errors.txt`).
-5. `node scripts/static/pack.mjs --out <dir>` — writes `<dir>/site/data/` and prints sizes.
+5. `node scripts/static/pack.mjs --out <dir>` — writes `<dir>/site/data/` (replacing it) and prints sizes;
+   then `node scripts/static/learn-items.mjs --out <dir>` adds `data/learn-items.json` for the Learn
+   review queue, which depends on each visitor's progress and so can't be recorded.
 6. `vite build --mode static --outDir dist-static`, copy `<dir>/site/data` into it.
 
 ## Prototype measurements (847 routes: 100 per entity type + fixed pages)

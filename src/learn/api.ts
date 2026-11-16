@@ -65,8 +65,17 @@ export async function getCollection(idOrSlug: string): Promise<{ collection: Lea
   }
 }
 
+let staticItems: Promise<ItemRow[]> | null = null
+
 /** Published items by id, for the due queue that spans collections. Missing or unpublished ids are skipped. */
 export async function getItemsByIds(ids: readonly string[]): Promise<LearnItem[]> {
+  // Static edition: the due queue depends on this browser's progress, so it cannot be
+  // recorded; every published item is in one file (scripts/static/learn-items.mjs).
+  if (import.meta.env.VITE_STATIC === '1') {
+    staticItems ??= fetch('/data/learn-items.json').then(r => (r.ok ? (r.json() as Promise<ItemRow[]>) : []))
+    const want = new Set(ids)
+    return (await staticItems).filter(row => want.has(row.id)) as unknown as LearnItem[]
+  }
   const sb = await getSupabase()
   const out: LearnItem[] = []
   for (let i = 0; i < ids.length; i += 100) {

@@ -23,6 +23,10 @@ with fixed(route, ord) as (values
 select route from (
   select route, ord, '' k from fixed
   union all
+  -- Learn study sessions (src/learn/api.ts getCollection), by slug as the Learn page links them
+  select '/learn/study/' || slug, 1, 'learn' || slug
+  from learn_collections where is_official and status = 'published' and slug is not null
+  union all
   select case entity_type when 'class' then '/classifications/' when 'list' then '/lists/' else '/drugs/' end || slug,
          2, entity_type || slug
   from picked
