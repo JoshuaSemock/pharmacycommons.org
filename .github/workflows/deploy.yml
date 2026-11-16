@@ -1,8 +1,9 @@
-name: Build and deploy to GitHub Pages
+name: Build and deploy to GitHub Pages (Supabase-backed, manual)
 
+# Manual only since the static edition (2026-11-16, docs/static-export.md): this builds the
+# Supabase-backed site, and an automatic run on every merge would replace the static
+# site that deploy-static.yml publishes. Run it by hand only to go back to the live backend.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

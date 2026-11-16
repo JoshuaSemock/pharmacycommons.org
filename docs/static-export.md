@@ -51,8 +51,8 @@ Not served: `/v1/search` (501), older numbered versions, later pages of changes/
 2. Run the **Deploy the static edition** workflow (`.github/workflows/deploy-static.yml`, manual only):
    builds `--mode static`, runs postbuild, unpacks the release file into `dist/`, deploys.
 3. Deploy the Worker with `API_MODE = "static"`.
-4. Turn off `deploy.yml`'s push trigger, so a merge to main no longer republishes the
-   Supabase-backed build.
+4. Done in PR #154: `deploy.yml` is manual-only, so a merge to main no longer republishes the
+   Supabase-backed build. Refreshing the public site = steps 1 and 2 again.
 
 ## Known gaps (open)
 - Fixed: `scripts/postbuild.mjs` reads list routes from `route-meta.json`
