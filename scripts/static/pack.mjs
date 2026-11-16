@@ -7,6 +7,11 @@
 //
 // Prints file counts and sizes (raw and gzip) so the full export can be projected.
 //
+// Space savers (the site must stay under GitHub Pages' 1 GB):
+//  - answers from the public API function (pretty-printed record documents, versions,
+//    changes) are dropped: src/staticData.ts reads those from /api-static/ instead;
+//  - JSON bodies are stored unescaped as [status, headers, null, json].
+//
 // Usage: node scripts/static/pack.mjs --out ../static-out [--share 3]
 // Destination: scripts/static/pack.mjs
 
@@ -24,7 +29,22 @@ if (!out) { console.error('Need --out <dir>.'); process.exit(2) }
 
 const rawDir = join(out, 'raw')
 const files = readdirSync(rawDir).filter(f => f.endsWith('.json'))
-const recs = files.map(f => JSON.parse(readFileSync(join(rawDir, f), 'utf8')))
+const isApiDoc = v => typeof v[2] === 'string' && v[2].startsWith('{\n') && v[2].includes('"pcid": "PCID-')
+function compact(v) {
+  if (typeof v[2] !== 'string' || !(v[1]['content-type'] ?? '').includes('json') || !v[2]) return v
+  try { return [v[0], v[1], null, JSON.parse(v[2])] } catch { return v }
+}
+let dropped = 0
+const recs = files.map(f => {
+  const rec = JSON.parse(readFileSync(join(rawDir, f), 'utf8'))
+  const r = {}
+  for (const [k, v] of Object.entries(rec.r)) {
+    if (isApiDoc(v)) { dropped++; continue }
+    r[k] = compact(v)
+  }
+  rec.r = r
+  return rec
+})
 
 // How many routes use each key (with the same answer).
 const uses = new Map()
@@ -68,7 +88,7 @@ for (const rec of recs) {
 
 const mb = b => (b / 1048576).toFixed(1) + ' MB'
 const kb = b => (b / 1024).toFixed(1) + ' KB'
-console.log(`routes ${recs.length}; shared threshold ${threshold} routes`)
+console.log(`routes ${recs.length}; shared threshold ${threshold} routes; ${dropped} API-function answers left to /api-static`)
 console.log(`shared files: ${Object.keys(shared).length}, ${mb(sharedSize.raw)} (${mb(sharedSize.gz)} gzip)`)
 console.log(`route files: ${pages.n}, ${mb(pages.raw)} (${mb(pages.gz)} gzip), avg ${(pages.keys / pages.n).toFixed(1)} answers`)
 console.log('by first path segment: count, avg raw, avg gzip')

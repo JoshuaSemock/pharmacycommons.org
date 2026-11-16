@@ -55,7 +55,11 @@ async function serve(path: string, ld: boolean): Promise<Response> {
   const r = await file(path)
   if (!r) return unavailable(404, 'This document')
   const type = path.endsWith('.jsonld') || ld ? 'application/ld+json' : path.includes('/schema/') ? 'application/schema+json' : 'application/json'
-  return new Response(r.body, {
+  // Files are stored minified (GitHub Pages size limit); answer pretty-printed like the function.
+  const text = await r.text()
+  let body = text
+  try { body = JSON.stringify(JSON.parse(text), null, 2) } catch { /* not JSON: pass through */ }
+  return new Response(body, {
     status: 200,
     headers: { 'content-type': `${type}; charset=utf-8`, 'cache-control': 'public, max-age=300', ...CORS },
   })
