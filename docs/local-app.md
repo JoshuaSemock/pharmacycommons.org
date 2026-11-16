@@ -181,3 +181,6 @@ are known to lag live (see `docs/schema-drift-2026-11-14.md`).
 - Public site and local app checked side by side: metformin with label, `/id/PCID-1003192` →
   lidocaine, search, Tools (8), creatinine clearance calculator (public site).
 - Nightly local backup ran 2026-11-16 02:17 (129 MB, 32,154 entities), copied to OneDrive.
+
+## Tables page (2026-11-16)
+Browse, filter, export and edit every local table at `/tables` in the local app. See `docs/local-tables.md`.

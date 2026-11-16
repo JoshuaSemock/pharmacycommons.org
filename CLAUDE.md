@@ -9,7 +9,9 @@
 > from recorded files (`src/staticData.ts`, `scripts/static/`, `docs/static-export.md`); the Worker serves
 > `/api/*` from `/api-static/` (`API_MODE = "static"`). The public site no longer reads Supabase. **Ingest jobs run locally**
 > with `pnpm ingest:local <job>` (`scripts/ingest-local.mjs`, local stack only; see `docs/local-app.md`). Start/stop/backup:
-> `scripts/local/` (desktop shortcuts and a 2:17 AM backup task on Joshua's PC). Edge Function and migration
+> `scripts/local/` (desktop shortcuts and a 2:17 AM backup task on Joshua's PC). **Tables page (local app
+> only):** `/tables` browses and edits every local table through a localdb-only Vite endpoint
+> (`scripts/viteLocalDb.ts`, `docs/local-tables.md`). Edge Function and migration
 > counts below re-checked 2026-11-14.
 >
 > Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
