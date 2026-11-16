@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import markdownFrontmatter from './scripts/viteFrontmatter.ts'
+import localDb from './scripts/viteLocalDb.ts'
 
 // Local mode (`--mode localdb`, docs/local-app.md): the browser talks to the local
 // Supabase stack through this server at /supabase, so the app and its API share one
@@ -19,7 +20,8 @@ const localProxy = {
 
 // Vite config — https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [markdownFrontmatter(), react(), tailwindcss()],
+  // localDb: the Tables page's endpoint to the local database (docs/local-tables.md), local mode only.
+  plugins: [markdownFrontmatter(), react(), tailwindcss(), ...(mode === 'localdb' ? [localDb()] : [])],
   server: mode === 'localdb' ? { proxy: localProxy } : {},
   preview: mode === 'localdb' ? { proxy: localProxy } : {},
   resolve: {
