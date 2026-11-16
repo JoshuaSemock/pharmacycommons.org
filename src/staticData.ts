@@ -102,7 +102,8 @@ export function installStaticFetch(apiBase = ''): void {
     if (apiFile) {
       const r = await realFetch(apiFile).catch(() => null)
       if (isJson(r)) return new Response(await r.text(), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } })
-      return miss('GET')
+      // No file (a retired PCID, say): let the public API answer (the Worker redirects those).
+      return realFetch(input, init)
     }
     if (!url.startsWith(prefix)) return realFetch(input, init)
     let body = ''
