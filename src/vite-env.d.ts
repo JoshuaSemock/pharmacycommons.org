@@ -5,3 +5,6 @@ declare module '*.md?fm' {
   const result: import('./frontmatter').FrontmatterResult
   export default result
 }
+
+// package.json "version", injected by vite.config.ts (src/release.ts).
+declare const __APP_VERSION__: string

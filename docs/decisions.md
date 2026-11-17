@@ -36,6 +36,8 @@
 - Pause the hosted Supabase project after cutover; never delete it. Joshua pauses it himself when told it is safe.
 - The website is read-only from 2026-11-15: accounts, editing, page creation, review/admin and blog comments switched off (`ACCOUNTS_ENABLED`); guest Learn progress kept, signed-in Learn progress dropped.
 - Static edition (2026-11-15, accepted defaults): data hosted on GitHub Pages, delivered to the deploy workflow as a GitHub release file (not committed); typo-tolerant search, the Network explorer and `/v1/search` are dropped from the public copy. The first publish and the Cloudflare Worker switch each need Joshua's go-ahead.
+- One editable version (2026-11-17): the local app is the Vite dev server only (`pnpm dev:local`, started by the desktop icon); the built-preview mode was removed.
+- Version numbers (2026-11-17, Joshua asked for this stage to get its own number): this stage is **0.2.0, the static edition**; everything before it is retroactively 0.1.0, the online edition. The number lives in `package.json`, is shown in the site footer with the edition and data date (`src/release.ts`), and is recorded in `CHANGELOG.md`. Numbering proposed by Claude: the middle number changes with the build/hosting model, the last for fixes and features; 1.0.0 is Joshua's call.
 
 **PharmacopeAi (2026-10-27)**
 - Planned AI product for Pharmacy Commons: a RAG system on Postgres in Supabase, using data such as FDA labels.
