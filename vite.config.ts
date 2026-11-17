@@ -22,7 +22,14 @@ const localProxy = {
 export default defineConfig(({ mode }) => ({
   // localDb: the Tables page's endpoint to the local database (docs/local-tables.md), local mode only.
   plugins: [markdownFrontmatter(), react(), tailwindcss(), ...(mode === 'localdb' ? [localDb()] : [])],
-  server: mode === 'localdb' ? { proxy: localProxy } : {},
+  // Only the app's own sources: never scan or watch build output, above all dist-static/
+  // (the static edition, ~200,000 files), which made the dev server hang at
+  // "scanning dependencies" on Joshua's PC (2026-11-17).
+  optimizeDeps: { entries: ['index.html'] },
+  server: {
+    watch: { ignored: ['**/dist/**', '**/dist-static/**', '**/.git/**'] },
+    ...(mode === 'localdb' ? { proxy: localProxy } : {}),
+  },
   preview: mode === 'localdb' ? { proxy: localProxy } : {},
   resolve: {
     alias: {
