@@ -8,6 +8,24 @@ footer with the edition and, for the public site, the day its data was recorded
 Numbering: the middle number changes when the way the site is built or hosted changes, the
 last number for fixes and smaller features. Version 1.0.0 is reserved for Joshua to call.
 
+## 0.2.1 (2026-11-17) Search guesses and Network return
+
+Two features the static edition had dropped work again, with no database behind the site
+(`docs/static-export.md`, "Live queries without a database").
+
+- **Typo-tolerant search:** "metfromin" offers metformin again. The header's `search_all` runs
+  in the browser (`src/staticSearch.ts`) over a 0.6 MB search index, fetched only when the
+  instant search finds nothing. It matched the database's own `search_all()` on 99% of 400 test
+  queries; the rest are ties.
+- **Network pages:** the graph, Browse all, Compare and Classification hierarchy run on SQLite in
+  the browser (`src/staticNetwork.ts`, sql.js), from a 3.4 MB database fetched only on those
+  pages. They matched the database's `network_*` functions on all 1,015 checks.
+- **Data:** `scripts/static/export-sqlite.mjs` writes both files from the local database in about a
+  minute, as `static-query.tar.gz`, a small second file on the `static-data` release. The deploy
+  workflow adds it when it is there.
+- **Measured, not adopted:** serving all page data from one SQLite file with range requests
+  (`docs/sqlite-range-prototype.md`). It was about 19 times slower per page than today's files.
+
 ## 0.2.0 (2026-11-17) Static edition
 
 The Supabase exit (`docs/local-app.md`, `docs/static-export.md`).

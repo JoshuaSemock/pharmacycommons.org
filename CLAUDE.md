@@ -16,7 +16,11 @@
 > edition; the number is `package.json` "version", shown in the footer by `src/release.ts`
 > (with the edition and `VITE_DATA_SNAPSHOT` from `.env.static`), history in `CHANGELOG.md`.
 > **When you bump the version, add a CHANGELOG entry and a What's new file in the same commit;
-> when you re-record the static data, change `VITE_DATA_SNAPSHOT`.**
+> when you re-record the static data, change `VITE_DATA_SNAPSHOT`.** **0.2.1 (2026-11-17):** the static
+> edition computes typo-tolerant search (`src/staticSearch.ts`) and the Network RPCs (`src/staticNetwork.ts`,
+> sql.js over `/data/db/network.sqlite.gz`) in the browser, routed by `src/staticComputed.ts`; data from
+> `scripts/static/export-sqlite.mjs` (`static-query.tar.gz` on the `static-data` release). **These are copies
+> of SQL functions: change them with `search_all` / `network_*` and re-run `check-search.mjs` / `check-network.mjs`.**
 >
 > Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
 > Detailed phase-by-phase history (Phases 1–4 narratives, validation runs, script
@@ -268,7 +272,9 @@ The response carries `fuzzy` and `did_you_mean`. The header calls it **only when
 debounce, lazy `import('./api')`) and shows a "Did you mean" group. **After bulk loads run
 `refresh materialized view concurrently public.search_index;`** next to the `moiety_hierarchy` refresh. Not indexed:
 dictionary terms (source misspellings would become fuzzy targets), precise forms, formulations, blog posts, tools, pages.
-`GET /v1/search` still uses `api_search` (no typo tolerance).
+`GET /v1/search` still uses `api_search` (no typo tolerance). **Static edition copy:** `src/staticSearch.ts`
+re-implements this function in TypeScript (pg_trgm similarity/word_similarity, `osa_distance`, same tiers); keep the two
+in step and re-run `scripts/static/check-search.mjs` (99.0% identical on 400 queries, 2026-11-17).
 
 **Haptics (2026-10-13, `src/haptics.ts`, installed in `main.tsx`):** an 8 ms `navigator.vibrate` tick on touch taps of buttons, links and non-text controls. Android Chrome/Firefox use `navigator.vibrate`; iOS Safari 17.4+ has no such API, so a hidden `<input type="checkbox" switch>` is toggled from a real tap (unofficial; may stop working); skipped for reduced motion, disabled controls, mouse and pen.
 

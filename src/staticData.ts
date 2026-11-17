@@ -16,12 +16,17 @@
  * A request nobody recorded gets a 404 with code `static_miss`, so the page shows
  * its normal error state instead of hanging.
  *
+ * A few requests depend on what the visitor types or picks (typo-tolerant search, the
+ * Network pages) and are computed in the browser instead: src/staticComputed.ts.
+ *
  * Record documents from the public API (`<API_BASE>/v1/entities/PCID-n[/versions|/changes]`,
  * used by the Machine-readable panel) are not in the bundles: they are read from the same
  * `/api-static/` files the Cloudflare Worker serves (scripts/static/export-api.mjs).
  *
  * Destination: src/staticData.ts
  */
+
+import { computedAnswer, isComputed } from './staticComputed'
 
 export const STATIC_PREFIX = '/supabase'
 const DATA_BASE = '/data'
@@ -109,12 +114,14 @@ export function installStaticFetch(apiBase = ''): void {
     let body = ''
     if (typeof init?.body === 'string') body = init.body
     else if (req && method !== 'GET' && method !== 'HEAD') body = await req.clone().text()
-    const key = await requestKey(method, url.slice(prefix.length - 1), body)
+    const path = url.slice(prefix.length - 1)
+    if (isComputed(method, path)) return computedAnswer(method, path, body, realFetch)
+    const key = await requestKey(method, path, body)
     if (!answers.has(key)) await routeFile(routeOf(window.location.pathname)).then(f => load(f, realFetch))
     if (!answers.has(key)) await loadShared(key, realFetch)
     const hit = answers.get(key)
     if (!hit) {
-      console.warn('[static] miss', method, url.slice(prefix.length - 1).slice(0, 160))
+      console.warn('[static] miss', method, path.slice(0, 160))
       return miss(method)
     }
     const [status, headers, text] = hit
