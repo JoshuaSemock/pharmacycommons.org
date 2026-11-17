@@ -52,6 +52,20 @@ jobs:
           mkdir -p "$RUNNER_TEMP/static" && tar -xzf "$RUNNER_TEMP/static-data.tar.gz" -C "$RUNNER_TEMP/static"
           test -d "$RUNNER_TEMP/static/data/p" && test -f "$RUNNER_TEMP/static/api-static/v1.json" && test -f "$RUNNER_TEMP/static/route-meta.json"
 
+      # Optional: search index and Network database (scripts/static/export-sqlite.mjs), a small
+      # separate file so it can be refreshed without re-uploading static-data.tar.gz. Without it
+      # typo-tolerant search and the Network pages show their "could not load" states.
+      - name: Download the query data (if attached)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download static-data --pattern static-query.tar.gz --dir "$RUNNER_TEMP"; then
+            tar -xzf "$RUNNER_TEMP/static-query.tar.gz" -C "$RUNNER_TEMP/static"
+            ls -l "$RUNNER_TEMP/static/data/search-index.json" "$RUNNER_TEMP/static/data/db"
+          else
+            echo "::warning::static-query.tar.gz is not attached to the static-data release; search typo guesses and Network pages will not load."
+          fi
+
       # PC_ROUTE_META: postbuild reads list routes from the recorded rows, not the live project.
       - name: Build the site (static mode)
         env:
