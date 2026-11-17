@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { PageTitle } from '@/pages/PageShell'
 import { API_BASE, SITE_BASE } from '@/machine'
+import { DATA_SNAPSHOT } from '@/release'
 import { ENDPOINTS, buildUrl, exampleValues, type Endpoint } from '@/developers/endpoints'
 import { runRequest } from '@/developers/client'
 import Console, { CODE_SURFACE } from '@/developers/Console'
@@ -184,7 +185,7 @@ export default function Developers() {
 
         {/* Console */}
         <section aria-labelledby="console" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
-          <H2 id="console" lede="Pick an endpoint, fill in a record by name or PCID, and run it against the live API. The address bar keeps the request, so you can share it.">
+          <H2 id="console" lede={`Pick an endpoint, fill in a record by name or PCID, and run it against the public API. The address bar keeps the request, so you can share it.${DATA_SNAPSHOT ? ` The API serves a copy of the data recorded on ${DATA_SNAPSHOT}.` : ''}`}>
             Console
           </H2>
           <Console apiBase={API_BASE} />
@@ -264,7 +265,7 @@ export default function Developers() {
         <section aria-labelledby="versions" className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
           <H2
             id="versions"
-            lede="Records change as sources update and editors review them. Every version is kept at its own permanent address, so any two can be compared. This is built from the same public endpoints you can call."
+            lede="Records change as sources update. Every version is kept at its own permanent address, so any two can be compared. This is built from the same public endpoints you can call."
           >
             Compare versions
           </H2>

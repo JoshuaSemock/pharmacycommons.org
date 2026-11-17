@@ -12,7 +12,11 @@
 > `scripts/local/` (desktop shortcuts and a 2:17 AM backup task on Joshua's PC). **Tables page (local app
 > only):** `/tables` browses and edits every local table through a localdb-only Vite endpoint
 > (`scripts/viteLocalDb.ts`, `docs/local-tables.md`). Edge Function and migration
-> counts below re-checked 2026-11-14.
+> counts below re-checked 2026-11-14. **Version 0.2.0 (2026-11-17):** this stage is the static
+> edition; the number is `package.json` "version", shown in the footer by `src/release.ts`
+> (with the edition and `VITE_DATA_SNAPSHOT` from `.env.static`), history in `CHANGELOG.md`.
+> **When you bump the version, add a CHANGELOG entry and a What's new file in the same commit;
+> when you re-record the static data, change `VITE_DATA_SNAPSHOT`.**
 >
 > Last reconciled against live Supabase and this repo: **2026-10-30** (counts, migrations, next PCIDs and known-drift section; rows marked † in Current status were not re-counted).
 > Detailed phase-by-phase history (Phases 1–4 narratives, validation runs, script

@@ -9,7 +9,8 @@ Whole site 712 MB of GitHub Pages' 1 GB (data 446 MB, api-static 239 MB, app 20 
 ### Refreshing the public site
 On the PC with the local stack up: `routes.sql` → `permalinks.mjs` → `record.mjs` (resumable;
 ~3.5 h for everything) → `pack.mjs` → `learn-items.mjs` → `export-api.mjs` → `export-route-meta.mjs`
-→ `package-data.ps1`; then replace the release file (GitHub web UI: this session type cannot write
+→ `package-data.ps1`; set `VITE_DATA_SNAPSHOT` in `.env.static` to the recording day (the footer and
+Developers page show it, `src/release.ts`) and commit; then replace the release file (GitHub web UI: this session type cannot write
 releases) and run **Deploy the static edition**. Keep processes hidden (`Start-Process -WindowStyle
 Hidden`): closing a console window killed the first full run. Plan and decisions: `docs/local-app.md`.
 
