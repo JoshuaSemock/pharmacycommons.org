@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import { readFileSync } from 'node:fs'
 import markdownFrontmatter from './scripts/viteFrontmatter.ts'
 import localDb from './scripts/viteLocalDb.ts'
 
@@ -18,9 +19,13 @@ const localProxy = {
   },
 }
 
+// The site's version (src/release.ts, CHANGELOG.md) comes from package.json alone.
+const APP_VERSION: string = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')).version
+
 // Vite config — https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   // localDb: the Tables page's endpoint to the local database (docs/local-tables.md), local mode only.
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   plugins: [markdownFrontmatter(), react(), tailwindcss(), ...(mode === 'localdb' ? [localDb()] : [])],
   // Only the app's own sources: never scan or watch build output, above all dist-static/
   // (the static edition, ~200,000 files), which made the dev server hang at

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { LEGAL_PAGES } from './legal'
+import { releaseLine } from './release'
 
 /**
  * Site-wide footer: disclaimer, US crisis lines, legal pages, links, licensing.
@@ -63,6 +64,11 @@ export default function Footer() {
               CC0 1.0
             </a>
             ; third-party data keeps its source license
+            <br />
+            {/* Version and edition, src/release.ts; history in CHANGELOG.md. */}
+            <a href={`${REPO_URL}/blob/main/CHANGELOG.md`} target="_blank" rel="noreferrer" className={link}>
+              {releaseLine()}
+            </a>
           </p>
 
           <nav aria-label="Footer">
