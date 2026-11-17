@@ -6,7 +6,7 @@ import type { Tool } from './tools'
 import { useSession } from './auth'
 import { useThemeChoice } from './theme'
 import type { ThemeChoice } from './theme'
-import { ACCOUNTS_ENABLED } from './features'
+import { ACCOUNTS_ENABLED, LOCAL_TOOLS_ENABLED } from './features'
 
 /**
  * The hamburger button and the menu it opens.
@@ -39,6 +39,8 @@ const EXPLORE_LINKS = [
   { to: '/learn', label: 'Learn' },
   { to: '/network', label: 'Network' },
   { to: '/tools', label: 'Tools' },
+  // Local app only: the database tables (docs/local-tables.md).
+  ...(LOCAL_TOOLS_ENABLED ? [{ to: '/tables', label: 'Tables' }] : []),
 ]
 
 const REFERENCE_LINKS = [

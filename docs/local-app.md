@@ -181,3 +181,16 @@ are known to lag live (see `docs/schema-drift-2026-11-14.md`).
 - Public site and local app checked side by side: metformin with label, `/id/PCID-1003192` →
   lidocaine, search, Tools (8), creatinine clearance calculator (public site).
 - Nightly local backup ran 2026-11-16 02:17 (129 MB, 32,154 entities), copied to OneDrive.
+
+## Tables page (2026-11-16)
+Browse, filter, export and edit every local table at `/tables` in the local app. See `docs/local-tables.md`.
+
+## Launcher (2026-11-17)
+The "Pharmacy Commons" desktop icon runs one editable version: the Vite dev server (`pnpm dev:local`)
+on http://127.0.0.1:5173. Data edits (Tables page, Studio) and code edits (pages reload on save) both
+show immediately. The 2026-11-16 built-preview mode was removed at Joshua's request (one version only).
+The dev server had hung at "scanning dependencies" because it scanned and watched `dist-static/` (the
+static edition, ~200,000 files); `vite.config.ts` now scans only `index.html` and ignores `dist/` and
+`dist-static/`. Measured on the PC: first start after the fix 70 s, normal restart 34 s, metformin page
+about 6 s. A server that does not answer on 5173 is stopped and replaced; stop-local.ps1 also closes
+the minimized app window.

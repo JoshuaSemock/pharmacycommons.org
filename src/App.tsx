@@ -4,7 +4,7 @@ import Nav from './Nav'
 import Footer from './Footer'
 import Home from './pages/Home'
 import { LEGAL_PAGES } from './legal'
-import { ACCOUNTS_ENABLED } from './features'
+import { ACCOUNTS_ENABLED, LOCAL_TOOLS_ENABLED } from './features'
 
 // Home ships in the entry bundle because it is the landing page. Every other
 // route is split into its own chunk and fetched when first visited, so the
@@ -21,6 +21,9 @@ const BlogPost = lazy(() => import('./pages/BlogPost'))
 const Account = lazy(() => import('./pages/Account'))
 const ReadOnlyEdition = lazy(() => import('./pages/ReadOnlyEdition'))
 const Permalink = lazy(() => import('./pages/Permalink'))
+// Local app only (docs/local-tables.md): never routed in the public or Supabase builds.
+const Tables = lazy(() => import('./pages/Tables'))
+const TableView = lazy(() => import('./pages/TableView'))
 const ClassIndex = lazy(() => import('./pages/ClassIndex'))
 const ClassDetail = lazy(() => import('./pages/ClassDetail'))
 const ClassCompare = lazy(() => import('./pages/ClassCompare'))
@@ -102,6 +105,8 @@ export default function App() {
           <Route path="/lists/:slug" element={<ListDetail />} />
           {/* Permanent PCID address → current record page (also the JSON-LD @id) */}
           <Route path="/id/:pcid" element={<Permalink />} />
+          {LOCAL_TOOLS_ENABLED && <Route path="/tables" element={<Tables />} />}
+          {LOCAL_TOOLS_ENABLED && <Route path="/tables/:name" element={<TableView />} />}
           <Route path="/about" element={<About />} />
           <Route path="/tools" element={<Tools />} />
           <Route
